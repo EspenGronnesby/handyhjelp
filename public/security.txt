@@ -1,0 +1,27 @@
+Contact: security@handyhjelp.no
+Expires: 2025-12-31T23:59:59.000Z
+Preferred-Languages: no, en
+Canonical: https://handyhjelp.no/.well-known/security.txt
+
+# Security Policy
+# If you discover a security vulnerability, please report it to:
+# Email: security@handyhjelp.no
+# Please do not publicly disclose security issues until they have been addressed.
+
+# Scope
+# This security policy applies to:
+# - All web applications hosted on handyhjelp.no
+# - All associated subdomains and services
+
+# Out of Scope
+# - Social engineering attacks
+# - Physical attacks
+# - Third-party services not directly controlled by us
+
+# Hall of Fame
+# We maintain a hall of fame for security researchers who responsibly
+# disclose vulnerabilities to us.
+
+# Acknowledgments
+# We appreciate the security research community's efforts in keeping
+# our platform secure.

@@ -5,7 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronRight, Home, Building2, User, Phone, Mail } from "lucide-react";
+import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle } from "lucide-react";
+import { contactFormSchema, type ContactFormData, sanitizeInput } from "@/lib/validation";
+import { formRateLimiter, detectSuspiciousActivity, logSecurityEvent } from "@/lib/security";
+import { z } from "zod";
 
 interface FormData {
   type: "private" | "business" | null;
@@ -18,6 +21,8 @@ interface FormData {
 export const QuoteForm = () => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     type: null,
     name: "",
@@ -27,40 +32,187 @@ export const QuoteForm = () => {
   });
 
   const handleNext = () => {
-    if (step < 3) setStep(step + 1);
+    if (validateCurrentStep() && step < 3) {
+      setStep(step + 1);
+      setErrors({});
+    }
   };
 
   const handleBack = () => {
-    if (step > 1) setStep(step - 1);
+    if (step > 1) {
+      setStep(step - 1);
+      setErrors({});
+    }
   };
 
-  const handleSubmit = () => {
-    toast({
-      title: "Takk for henvendelsen!",
-      description: "Vi kontakter deg innen 2 timer i åpningstiden med et uforpliktende tilbud.",
-      duration: 5000,
-    });
-    // Reset form
-    setStep(1);
-    setFormData({
-      type: null,
-      name: "",
-      email: "",
-      phone: "",
-      description: ""
-    });
+  const validateCurrentStep = (): boolean => {
+    const currentErrors: Record<string, string> = {};
+
+    try {
+      if (step === 1) {
+        if (!formData.type) {
+          currentErrors.type = "Velg kunde type";
+          setErrors(currentErrors);
+          return false;
+        }
+      } else if (step === 2) {
+        // Validate step 2 fields
+        const step2Data = {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone
+        };
+
+        if (!step2Data.name.trim()) {
+          currentErrors.name = "Navn er påkrevd";
+        } else if (step2Data.name.length < 2) {
+          currentErrors.name = "Navn må være minst 2 tegn";
+        } else if (step2Data.name.length > 100) {
+          currentErrors.name = "Navn kan ikke være mer enn 100 tegn";
+        } else if (!/^[a-zA-ZæøåÆØÅ\s\-'\.]+$/.test(step2Data.name)) {
+          currentErrors.name = "Navn kan kun inneholde bokstaver";
+        }
+
+        if (!step2Data.email.trim()) {
+          currentErrors.email = "E-post er påkrevd";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(step2Data.email)) {
+          currentErrors.email = "Ugyldig e-postadresse";
+        } else if (step2Data.email.length > 255) {
+          currentErrors.email = "E-post kan ikke være mer enn 255 tegn";
+        }
+
+        if (!step2Data.phone.trim()) {
+          currentErrors.phone = "Telefonnummer er påkrevd";
+        } else if (!/^[\+]?[0-9\s\-\(\)]{8,15}$/.test(step2Data.phone.trim())) {
+          currentErrors.phone = "Ugyldig telefonnummer";
+        }
+
+      } else if (step === 3) {
+        if (!formData.description.trim()) {
+          currentErrors.description = "Beskrivelse er påkrevd";
+        } else if (formData.description.length < 10) {
+          currentErrors.description = "Beskrivelse må være minst 10 tegn";
+        } else if (formData.description.length > 2000) {
+          currentErrors.description = "Beskrivelse kan ikke være mer enn 2000 tegn";
+        }
+      }
+
+      setErrors(currentErrors);
+      return Object.keys(currentErrors).length === 0;
+    } catch (error) {
+      console.error('Validation error:', error);
+      setErrors({ general: "Validering feilet. Prøv igjen." });
+      return false;
+    }
   };
 
-  const isStepValid = () => {
+  const handleSubmit = async () => {
+    if (!validateCurrentStep()) return;
+    
+    setIsSubmitting(true);
+
+    try {
+      // Rate limiting check
+      const userIdentifier = formData.email || 'anonymous';
+      if (!formRateLimiter.isAllowed(userIdentifier)) {
+        const remainingTime = Math.ceil(formRateLimiter.getRemainingTime(userIdentifier) / 60000);
+        toast({
+          title: "For mange forsøk",
+          description: `Vent ${remainingTime} minutter før du prøver igjen.`,
+          variant: "destructive",
+          duration: 5000,
+        });
+        return;
+      }
+
+      // Security validation
+      const validationData: ContactFormData = {
+        type: formData.type!,
+        name: sanitizeInput(formData.name),
+        email: sanitizeInput(formData.email),
+        phone: sanitizeInput(formData.phone),
+        description: sanitizeInput(formData.description)
+      };
+
+      // Check for suspicious activity
+      if (detectSuspiciousActivity(validationData)) {
+        logSecurityEvent('suspicious_form_submission', { 
+          userAgent: navigator.userAgent,
+          timestamp: new Date().toISOString()
+        });
+        toast({
+          title: "Sikkerhetsfeil",
+          description: "Forespørselen inneholder ugyldig innhold.",
+          variant: "destructive",
+          duration: 5000,
+        });
+        return;
+      }
+
+      // Final validation with zod schema
+      const validatedData = contactFormSchema.parse(validationData);
+
+      // Simulate form submission (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      toast({
+        title: "Takk for henvendelsen!",
+        description: "Vi kontakter deg innen 2 timer i åpningstiden med et uforpliktende tilbud.",
+        duration: 5000,
+      });
+
+      // Reset form
+      setStep(1);
+      setFormData({
+        type: null,
+        name: "",
+        email: "",
+        phone: "",
+        description: ""
+      });
+      setErrors({});
+
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const zodErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            zodErrors[err.path[0] as string] = err.message;
+          }
+        });
+        setErrors(zodErrors);
+      } else {
+        console.error('Form submission error:', error);
+        toast({
+          title: "Feil ved sending",
+          description: "Noe gikk galt. Prøv igjen senere.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isStepValid = (): boolean => {
     switch (step) {
       case 1:
         return formData.type !== null;
       case 2:
-        return formData.name && formData.email && formData.phone;
+        return !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
       case 3:
-        return formData.description.length > 10;
+        return formData.description.trim().length >= 10;
       default:
         return false;
+    }
+  };
+
+  const handleInputChange = (field: keyof FormData, value: any) => {
+    setFormData({ ...formData, [field]: value });
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: '' });
     }
   };
 
@@ -82,7 +234,7 @@ export const QuoteForm = () => {
             <Button
               variant={formData.type === "private" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center space-y-2"
-              onClick={() => setFormData({ ...formData, type: "private" })}
+              onClick={() => handleInputChange('type', 'private')}
             >
               <Home className="h-6 w-6" />
               <span>Privat</span>
@@ -90,12 +242,18 @@ export const QuoteForm = () => {
             <Button
               variant={formData.type === "business" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center space-y-2"
-              onClick={() => setFormData({ ...formData, type: "business" })}
+              onClick={() => handleInputChange('type', 'business')}
             >
               <Building2 className="h-6 w-6" />
               <span>Bedrift</span>
             </Button>
           </div>
+          {errors.type && (
+            <div className="flex items-center gap-1 mt-2 text-sm text-destructive">
+              <AlertCircle className="h-3 w-3" />
+              {errors.type}
+            </div>
+          )}
         </div>
       )}
 
@@ -107,30 +265,51 @@ export const QuoteForm = () => {
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Fullt navn"
-                className="pl-10"
+                className={`pl-10 ${errors.name ? 'border-destructive' : ''}`}
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                maxLength={100}
               />
+              {errors.name && (
+                <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.name}
+                </div>
+              )}
             </div>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="email"
                 placeholder="E-postadresse"
-                className="pl-10"
+                className={`pl-10 ${errors.email ? 'border-destructive' : ''}`}
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                maxLength={255}
               />
+              {errors.email && (
+                <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.email}
+                </div>
+              )}
             </div>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="tel"
                 placeholder="Telefonnummer"
-                className="pl-10"
+                className={`pl-10 ${errors.phone ? 'border-destructive' : ''}`}
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                maxLength={15}
               />
+              {errors.phone && (
+                <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.phone}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -141,12 +320,19 @@ export const QuoteForm = () => {
           <Label className="text-base font-medium">Beskriv oppdraget</Label>
           <Textarea
             placeholder="Fortell oss om jobben som skal gjøres, når det passer og eventuelle spesielle ønsker..."
-            className="min-h-32"
+            className={`min-h-32 ${errors.description ? 'border-destructive' : ''}`}
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            maxLength={2000}
           />
+          {errors.description && (
+            <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+              <AlertCircle className="h-3 w-3" />
+              {errors.description}
+            </div>
+          )}
           <p className="text-sm text-muted-foreground">
-            Jo mer detaljer, desto mer nøyaktig blir tilbudet.
+            Jo mer detaljer, desto mer nøyaktig blir tilbudet. ({formData.description.length}/2000 tegn)
           </p>
         </div>
       )}
@@ -169,19 +355,27 @@ export const QuoteForm = () => {
           ) : (
             <Button 
               onClick={handleSubmit}
-              disabled={!isStepValid()}
+              disabled={!isStepValid() || isSubmitting}
               className="bg-success hover:bg-success-hover text-success-foreground"
             >
-              Send forespørsel
+              {isSubmitting ? "Sender..." : "Send forespørsel"}
             </Button>
           )}
         </div>
       </div>
 
-            {/* Privacy Note - Clean and minimal */}
-            <p className="text-xs text-hero-text-muted/80 mt-6 text-center max-w-md mx-auto leading-relaxed">
-              Vi svarer som regel innen 2 timer i åpningstiden. Dine opplysninger deles aldri med tredjeparter.
-            </p>
+      {/* Error message for general errors */}
+      {errors.general && (
+        <div className="flex items-center gap-2 mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <span className="text-sm text-destructive">{errors.general}</span>
+        </div>
+      )}
+
+      {/* Privacy Note - Clean and minimal */}
+      <p className="text-xs text-hero-text-muted/80 mt-6 text-center max-w-md mx-auto leading-relaxed">
+        Vi svarer som regel innen 2 timer i åpningstiden. Dine opplysninger behandles trygt og deles aldri med tredjeparter.
+      </p>
     </Card>
   );
 };
