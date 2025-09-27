@@ -54,6 +54,6 @@ export const defaultFAQItems: FAQItem[] = [
   },
   {
     question: "Hva slags tjenester tilbyr dere?",
-    answer: "Vi tilbyr flyttehjelp, montering av møbler og utstyr, rydding og bortkjøring, teppelegging og småjobber som maling og reparasjoner."
+    answer: "Vi tilbyr flyttehjelp, montering av møbler og utstyr, rydding og bortkjøring, tømrerarbeider og småjobber som maling og reparasjoner."
   }
 ];

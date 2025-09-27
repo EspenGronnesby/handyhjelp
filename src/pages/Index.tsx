@@ -58,9 +58,9 @@ const Index = () => {
                   details: "Henting av gamle møbler, hageavfall, smådeponi-turer"
                 },
                 {
-                  title: "Teppelegging",
-                  description: "Profesjonell teppelegging",
-                  details: "Montering av tepper, gulvbelegg og reparasjoner"
+                  title: "Tømrer jobber",
+                  description: "Profesjonelle tømrer- og snekkerarbeider",
+                  details: "Bygge/reparere terrasser, sette opp hyller, enkle snekkerarbeider, vedlikehold av trekonstruksjoner"
                 },
                 {
                   title: "Småjobber",
