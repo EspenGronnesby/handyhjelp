@@ -46,7 +46,7 @@ export const HeroSection = () => {
 
             {/* Description */}
             <p className="text-hero-muted mb-8 animate-fade-in-left">
-              Flytting, montering, rydding, teppelegging og småjobber – enkelt og trygt. 
+              Flytting, montering, rydding, tømrer oppdrag/snekker og småjobber – enkelt og trygt. 
               Rask hjelp, ærlige priser og godt humør.
             </p>
 
