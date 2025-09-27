@@ -6,35 +6,35 @@
 
 @layer base {
   :root {
-    /* Core Brand Colors - Deep Blue Professional Palette */
-    --background: 210 20% 98%;
-    --foreground: 222 84% 4.9%;
+    /* HandyHjelp Brand Colors */
+    --background: 0 0% 97%;
+    --foreground: 0 0% 11%;
 
     /* Hero & Main Sections */
-    --hero-bg: 222 47% 11%;
-    --hero-bg-secondary: 215 50% 15%;
-    --hero-text: 210 40% 98%;
-    --hero-text-muted: 215 25% 75%;
+    --hero-bg: 178 48% 32%;
+    --hero-bg-secondary: 178 48% 28%;
+    --hero-text: 0 0% 98%;
+    --hero-text-muted: 178 20% 75%;
 
     /* Cards & Surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 222 84% 4.9%;
-    --card-elevated: 210 20% 98%;
+    --card-foreground: 0 0% 11%;
+    --card-elevated: 0 0% 97%;
 
-    /* Professional Primary - Deep Blue */
-    --primary: 222 47% 11%;
-    --primary-hover: 215 50% 15%;
-    --primary-foreground: 210 40% 98%;
+    /* HandyHjelp Primary - Teal */
+    --primary: 178 48% 32%;
+    --primary-hover: 178 48% 28%;
+    --primary-foreground: 0 0% 98%;
 
-    /* Success/CTA - Professional Green */
-    --success: 142 76% 36%;
-    --success-hover: 142 76% 32%;
-    --success-foreground: 210 40% 98%;
+    /* Success/CTA - HandyHjelp Green */
+    --success: 178 48% 32%;
+    --success-hover: 178 48% 28%;
+    --success-foreground: 0 0% 98%;
 
-    /* Secondary - Light Professional */
-    --secondary: 210 40% 96%;
-    --secondary-hover: 210 40% 92%;
-    --secondary-foreground: 222 47% 11%;
+    /* Secondary - HandyHjelp Blue-Gray */
+    --secondary: 213 30% 32%;
+    --secondary-hover: 213 30% 28%;
+    --secondary-foreground: 0 0% 98%;
 
     /* Muted Content */
     --muted: 210 40% 96%;
@@ -59,9 +59,9 @@
     --ring: 222 47% 11%;
 
     /* Gradients for Hero & Special Sections */
-    --gradient-hero: linear-gradient(135deg, hsl(222 47% 11%), hsl(215 50% 15%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 20% 98%));
-    --gradient-cta: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 32%));
+    --gradient-hero: linear-gradient(135deg, hsl(178 48% 32%), hsl(178 48% 28%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 97%));
+    --gradient-cta: linear-gradient(135deg, hsl(178 48% 32%), hsl(178 48% 28%));
 
     /* Shadows & Effects */
     --shadow-card: 0 4px 6px -1px hsl(222 47% 11% / 0.1), 0 2px 4px -1px hsl(222 47% 11% / 0.06);

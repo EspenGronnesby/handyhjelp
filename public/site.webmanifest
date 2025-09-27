@@ -1,7 +1,7 @@
 {
   "name": "HandyHjelp",
   "short_name": "HandyHjelp",
-  "description": "Professional property caretaker and maintenance services",
+  "description": "Lokal handyhjelp i Kristiansand. Flytting, montering, rydding og småjobber.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a202c",

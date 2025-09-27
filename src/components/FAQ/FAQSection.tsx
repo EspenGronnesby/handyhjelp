@@ -1,60 +1,61 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FAQSchema, defaultFAQItems } from "@/components/SEO/FAQSchema";
+import { Button } from "@/components/ui/button";
+import { Phone } from "lucide-react";
 
 export const FAQSection = () => {
   return (
     <section className="py-16 bg-background" id="faq">
+      <FAQSchema faqItems={defaultFAQItems} />
+      
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="heading-section">Frequently Asked Questions</h2>
-            <p className="text-muted-foreground text-lg">
-              Get answers to common questions about our professional property caretaker services.
-            </p>
-          </div>
-          
+        <div className="text-center mb-12">
+          <h2 className="heading-section">Ofte stilte spørsmål</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Her er svarene på de vanligste spørsmålene om våre tjenester og priser.
+          </p>
+        </div>
+
+        <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="space-y-4">
             {defaultFAQItems.map((item, index) => (
-              <AccordionItem 
-                key={index} 
-                value={`item-${index}`}
-                className="card-professional px-6 py-2 border-0 shadow-sm"
-              >
-                <AccordionTrigger className="text-left hover:no-underline py-6">
-                  <h3 className="font-semibold text-foreground text-lg">
-                    {item.question}
-                  </h3>
+              <AccordionItem key={index} value={`item-${index}`} className="card-professional px-6">
+                <AccordionTrigger className="text-left py-6 hover:no-underline">
+                  <span className="font-semibold text-foreground">{item.question}</span>
                 </AccordionTrigger>
-                <AccordionContent className="pb-6 pt-0">
-                  <p className="text-muted-foreground leading-relaxed">
-                    {item.answer}
-                  </p>
+                <AccordionContent className="pb-6 text-muted-foreground leading-relaxed">
+                  {item.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-          
-          <div className="text-center mt-12">
-            <p className="text-muted-foreground mb-4">
-              Still have questions about our caretaker services?
+
+          <div className="text-center mt-12 p-8 bg-muted/30 rounded-xl">
+            <h3 className="text-xl font-bold text-foreground mb-4">
+              Har du flere spørsmål?
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Ring oss på telefon eller send inn forespørsel, så hjelper vi deg.
             </p>
-            <a
-              href="tel:+1-555-PROCARE"
-              className="btn-hero inline-flex items-center gap-2"
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="mr-4"
+              onClick={() => window.location.href = 'tel:+4740000000'}
             >
-              Call Us Now: (555) PROCARE
-            </a>
+              <Phone className="mr-2 h-4 w-4" />
+              +47 400 00 000
+            </Button>
+            <Button 
+              size="lg"
+              className="bg-success hover:bg-success-hover text-success-foreground"
+              onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              Send forespørsel
+            </Button>
           </div>
         </div>
       </div>
-      
-      {/* FAQ Structured Data */}
-      <FAQSchema faqItems={defaultFAQItems} />
     </section>
   );
 };

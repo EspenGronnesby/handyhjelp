@@ -1,101 +1,87 @@
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Send, FileText, Calendar, CheckCircle } from "lucide-react";
-
-const steps = [
-  {
-    number: "1",
-    title: "Send Request",
-    description: "Submit your caretaker service request online with a brief description of your property maintenance needs.",
-    icon: Send,
-    details: "All property maintenance requests are responded to as quickly as possible."
-  },
-  {
-    number: "2", 
-    title: "Get Free Quote",
-    description: "Shortly after your request, you'll receive a free, no-obligation quote from a qualified caretaker service provider.",
-    icon: FileText,
-    details: "Professional assessment and competitive pricing for all services."
-  },
-  {
-    number: "3",
-    title: "Book Service",
-    description: "Accept the quote and schedule your caretaker services at a time that works best for you.",
-    icon: Calendar,
-    details: "Flexible scheduling and reliable, professional service delivery."
-  }
-];
+import { Phone, Calculator, CheckCircle } from "lucide-react";
 
 export const ProcessSection = () => {
+  const steps = [
+    {
+      number: 1,
+      title: "Ta kontakt",
+      description: "Ring oss eller send inn skjema",
+      icon: Phone,
+      details: "Vi svarer som regel innen 2 timer i åpningstiden og gir deg råd om hva som trengs."
+    },
+    {
+      number: 2,
+      title: "Få tilbud",
+      description: "Tydelig pris før oppstart",
+      icon: Calculator,
+      details: "Du får forutsigbare priser basert på timepris fra 600 kr inkl. mva. Ingen skjulte kostnader."
+    },
+    {
+      number: 3,
+      title: "Vi løser det",
+      description: "Profesjonell utførelse",
+      icon: CheckCircle,
+      details: "Vi behandler hjemmet ditt som vårt eget og rydder opp etter oss. Fornøydgaranti inkludert."
+    }
+  ];
+
   return (
-    <section className="py-16 bg-background">
+    <section className="py-16 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12 animate-fade-in-up">
-          <h2 className="heading-section">
-            How to get caretaker services in 3 easy steps:
+        <div className="text-center mb-12">
+          <h2 id="process-heading" className="heading-section">
+            Slik fungerer det
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            We make it simple to connect with professional property caretakers who deliver quality service you can trust.
+            Enkelt, trygt og forutsigbart. Fra første kontakt til ferdig jobb.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
           {steps.map((step, index) => {
-            const Icon = step.icon;
+            const IconComponent = step.icon;
+            
             return (
               <Card 
                 key={step.number} 
-                className="card-professional p-8 text-center relative overflow-hidden animate-fade-in-up"
-                style={{ animationDelay: `${index * 0.2}s` }}
+                className="card-professional p-6 text-center hover:scale-105 transition-transform duration-300"
               >
-                {/* Step Number Badge */}
-                <div className="absolute top-4 right-4 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
-                  {step.number}
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                    <IconComponent className="h-8 w-8 text-primary-foreground" />
+                  </div>
                 </div>
-
-                {/* Icon */}
-                <div className="mx-auto mb-6 w-16 h-16 bg-success/10 rounded-full flex items-center justify-center">
-                  <Icon className="h-8 w-8 text-success" />
+                
+                <div className="mb-4">
+                  <div className="text-sm font-medium text-primary mb-2">
+                    Steg {step.number}
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-muted-foreground font-medium">
+                    {step.description}
+                  </p>
                 </div>
-
-                {/* Content */}
-                <h3 className="text-xl font-bold mb-4 text-foreground">
-                  {step.title}
-                </h3>
                 
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  {step.description}
-                </p>
-                
-                <p className="text-sm text-primary font-medium">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {step.details}
                 </p>
-
-                {/* Connector Arrow (for larger screens) */}
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                    <div className="w-8 h-8 bg-background border-2 border-success rounded-full flex items-center justify-center shadow-md">
-                      <CheckCircle className="h-4 w-4 text-success" />
-                    </div>
-                  </div>
-                )}
               </Card>
             );
           })}
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center mt-12 animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
-          <p className="text-muted-foreground mb-4">
-            Ready to get started with professional property care?
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              onClick={() => document.getElementById('quote-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="btn-hero"
-            >
-              Get Your Free Quote
-            </button>
-          </div>
+        <div className="text-center">
+          <Button 
+            size="lg" 
+            className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4"
+            onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            Kom i gang nå
+          </Button>
         </div>
       </div>
     </section>

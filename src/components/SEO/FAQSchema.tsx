@@ -1,3 +1,5 @@
+import React from 'react';
+
 interface FAQItem {
   question: string;
   answer: string;
@@ -7,11 +9,11 @@ interface FAQSchemaProps {
   faqItems: FAQItem[];
 }
 
-export const FAQSchema = ({ faqItems }: FAQSchemaProps) => {
-  const schemaData = {
+export const FAQSchema = ({ faqItems }: FAQSchemaProps): JSX.Element => {
+  const structuredData = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": faqItems.map(item => ({
+    "mainEntity": faqItems.map((item) => ({
       "@type": "Question",
       "name": item.question,
       "acceptedAnswer": {
@@ -24,37 +26,34 @@ export const FAQSchema = ({ faqItems }: FAQSchemaProps) => {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(schemaData)
-      }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
     />
   );
 };
 
-// Default FAQ data for property caretaker services
 export const defaultFAQItems: FAQItem[] = [
   {
-    question: "What types of property caretaker services do you offer?",
-    answer: "We offer comprehensive property caretaker services including regular maintenance, landscaping, cleaning, repairs, property inspections, security monitoring, and emergency response services for both residential and commercial properties."
+    question: "Hva koster det?",
+    answer: "Timepris fra 600 kr inkl. mva. Minstetid 1 time, deretter per påbegynt 30. min. Vi avklarer pris før oppstart. Førstegangs-kunde får -10% på første oppdrag."
   },
   {
-    question: "Are your caretaker services licensed and insured?", 
-    answer: "Yes, HandyHjelp is fully licensed and insured. We carry comprehensive liability insurance and all our technicians are certified professionals with years of experience in property maintenance and care."
+    question: "Tar dere med avfall?",
+    answer: "Ja, vi kan hente og kjøre bort avfall som del av rydding og bortkjøring-tjenesten. Eventuelle deponi-gebyr legges på etter kvittering."
   },
   {
-    question: "How do you provide 24/7 caretaker services?",
-    answer: "Our 24/7 service includes emergency response for urgent issues, security monitoring, and a dedicated hotline for property emergencies. For routine maintenance, we work during regular business hours but are always available for true emergencies."
+    question: "Kan dere montere alt?",
+    answer: "Vi monterer det meste av møbler, hvitevarer og utstyr. Jobber som krever autorisasjon (el/vann/gass) må utføres av fagperson."
   },
   {
-    question: "What areas do you serve for property caretaking?",
-    answer: "We provide property caretaker services nationwide. Contact us with your location and we'll connect you with certified caretakers in your area who can provide immediate quotes and service."
+    question: "Hvor raskt kan dere komme?",
+    answer: "Ofte samme uke – noen ganger samme dag. Vi svarer som regel innen 2 timer i åpningstiden. Ta kontakt, så finner vi et tidspunkt som passer."
   },
   {
-    question: "How much do professional property caretaker services cost?",
-    answer: "Our property caretaker service costs vary based on property size, services needed, and frequency of care. We offer free quotes and competitive pricing with packages starting from basic maintenance to comprehensive property management solutions."
+    question: "Hvilke områder dekker dere?",
+    answer: "Vi dekker Kristiansand, Lund, Søm, Vågsbygd, Randesund og Søgne etter avtale. Kjøring i Kristiansand er inkludert."
   },
   {
-    question: "How quickly can you start providing caretaker services?",
-    answer: "We can typically begin property caretaker services within 24-48 hours of your request. For emergency situations, we offer same-day response. Contact us for a free quote and we'll discuss your timeline needs."
+    question: "Hva slags tjenester tilbyr dere?",
+    answer: "Vi tilbyr flyttehjelp, montering av møbler og utstyr, rydding og bortkjøring, teppelegging og småjobber som maling og reparasjoner."
   }
 ];

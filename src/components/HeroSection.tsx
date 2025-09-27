@@ -1,109 +1,97 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Clock, Star } from "lucide-react";
 import { QuoteForm } from "@/components/QuoteForm";
 import heroImage from "@/assets/hero-caretaker.jpg";
+import { Shield, Clock, Star } from "lucide-react";
 
 export const HeroSection = () => {
   return (
-    <section className="hero-gradient min-h-screen flex items-center relative overflow-hidden" aria-labelledby="hero-heading">
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
-          <img 
-            src={heroImage} 
-            alt="Professional property caretaker team providing maintenance and landscaping services"
-            className="w-full h-full object-cover opacity-30"
-            loading="eager"
-          />
-        <div className="absolute inset-0 bg-hero-bg/70" aria-hidden="true"></div>
+    <section className="min-h-screen hero-gradient relative flex items-center">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${heroImage})` }}
+      >
+        <div className="absolute inset-0 bg-hero-bg/80"></div>
       </div>
-
-      {/* Content Container */}
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          
-          {/* Main Content */}
-          <div className="animate-fade-in-left">
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-screen py-20">
+          {/* Left Content */}
+          <div className="text-left">
             {/* Trust Indicators */}
-            <div className="flex items-center space-x-6 mb-6">
+            <div className="flex flex-wrap gap-6 mb-8">
               <div className="flex items-center space-x-2 text-hero-text-muted">
-                <Shield className="h-4 w-4" />
-                <span className="text-sm">Fully Licensed & Insured</span>
+                <Shield className="h-5 w-5" />
+                <span className="text-sm font-medium">Lokal & pålitelig</span>
               </div>
               <div className="flex items-center space-x-2 text-hero-text-muted">
-                <Clock className="h-4 w-4" />
-                <span className="text-sm">24/7 Emergency Service</span>
+                <Clock className="h-5 w-5" />
+                <span className="text-sm font-medium">Rask respons</span>
               </div>
               <div className="flex items-center space-x-2 text-hero-text-muted">
-                <Star className="h-4 w-4" />
-                <span className="text-sm">5-Star Rated</span>
+                <Star className="h-5 w-5" />
+                <span className="text-sm font-medium">Fornøydgaranti</span>
               </div>
             </div>
 
-            <h1 id="hero-heading" className="heading-hero mb-6">
-              Professional Property Caretaker Services
-              <span className="block text-success">Get Your Free Quote Today</span>
+            {/* Main Heading */}
+            <h1 className="heading-hero mb-6 animate-fade-in-left">
+              Vi fikser det du ikke rekker selv
             </h1>
+            
+            {/* Tagline */}
+            <p className="text-hero-text-muted text-xl mb-4 animate-fade-in-left">
+              Din lokale handyhjelp i Kristiansand
+            </p>
 
             {/* Description */}
-            <p className="text-hero-muted mb-8 max-w-lg">
-              We make it easy for you to find the right property caretaker for your needs. 
-              Fill out our simple form with your project details, and we'll connect you with 
-              qualified caretakers who meet your requirements and budget.
+            <p className="text-hero-muted mb-8 animate-fade-in-left">
+              Flytting, montering, rydding, teppelegging og småjobber – enkelt og trygt. 
+              Rask hjelp, ærlige priser og godt humør.
             </p>
 
-            <p className="text-hero-muted mb-8">
-              Whether it's maintenance, repairs, landscaping, or ongoing property management, 
-              you'll receive a free, no-obligation quote from professional caretakers in your area.
-            </p>
+            <div className="space-y-4 mb-8">
+              <p className="text-hero-text-muted text-lg">
+                <span className="font-semibold">Fra 600 kr/time inkl. mva</span> · Førstegangs-kunde: -10%
+              </p>
+              <p className="text-hero-text-muted">
+                Vi dekker Kristiansand, Lund, Søm, Vågsbygd, Randesund og Søgne
+              </p>
+            </div>
 
-            <p className="text-hero-muted mb-10 font-medium">
-              Save time and stress by letting us find the best caretaker for your property.
-            </p>
-
-            {/* Call to Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button 
-                onClick={() => document.getElementById('quote-form')?.scrollIntoView({ behavior: 'smooth' })}
-                className="btn-hero group"
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-left">
+              <Button 
+                size="lg" 
+                className="btn-hero text-lg px-8 py-4"
+                onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Get Free Quote Now
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-              
+                Få gratis tilbud nå
+              </Button>
               <Button 
                 variant="outline" 
-                size="lg"
-                className="btn-outline-hero"
+                size="lg" 
+                className="btn-outline-hero text-lg px-6 py-4"
                 onClick={() => document.getElementById('process-section')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                How It Works
+                Slik fungerer det
               </Button>
             </div>
           </div>
 
-          {/* Quote Form - Right side */}
-          <div className="animate-fade-in-right lg:ml-8" id="quote-form">
-            <div className="card-elevated p-8">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-foreground mb-2">
-                  Get a Free Quote from Professional Caretakers
-                </h2>
-                <p className="text-muted-foreground">
-                  Submit a brief description of your project and we'll help you find the best caretaker for your specific needs.
-                </p>
-              </div>
-              
-              {/* Integrated Quote Form */}
-              <QuoteForm />
-            </div>
+          {/* Right Content - Quote Form */}
+          <div className="animate-fade-in-right">
+            <QuoteForm />
           </div>
         </div>
       </div>
 
-      {/* Bottom Wave Separator */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
-        <svg className="relative block w-full h-20" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M1200 120L0 16.48 0 0 1200 0 1200 120z" className="fill-background"></path>
+      {/* Wave Separator */}
+      <div className="absolute bottom-0 left-0 right-0">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="relative block w-full h-16">
+          <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" className="fill-background"></path>
+          <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" className="fill-background"></path>
+          <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" className="fill-background"></path>
         </svg>
       </div>
     </section>
