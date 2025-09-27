@@ -92,7 +92,6 @@ export const HeroSection = () => {
           viewBox="0 0 1200 120" 
           preserveAspectRatio="none" 
           className="relative block w-full h-20"
-          style={{ transform: 'rotateY(180deg)' }}
         >
           {/* Multiple wave layers for depth */}
           <path 
