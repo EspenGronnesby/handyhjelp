@@ -1,3 +1,15 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://procare-property-services.lovable.app/sitemap.xml
+
+# Allow all crawlers to access CSS and JS files
+User-agent: *
+Allow: /assets/
+Allow: /_app/
+Allow: /favicon
+
+# Allow specific social media crawlers
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +22,6 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Crawl-delay for heavy crawlers (optional)
+User-agent: Bingbot
+Crawl-delay: 1

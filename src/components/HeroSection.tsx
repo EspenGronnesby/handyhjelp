@@ -5,15 +5,16 @@ import heroImage from "@/assets/hero-caretaker.jpg";
 
 export const HeroSection = () => {
   return (
-    <section className="hero-gradient min-h-screen flex items-center relative overflow-hidden">
+    <section className="hero-gradient min-h-screen flex items-center relative overflow-hidden" aria-labelledby="hero-heading">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={heroImage} 
-          alt="Professional property caretaker services"
-          className="w-full h-full object-cover opacity-30"
-        />
-        <div className="absolute inset-0 bg-hero-bg/70"></div>
+          <img 
+            src={heroImage} 
+            alt="Professional property caretaker team providing maintenance and landscaping services"
+            className="w-full h-full object-cover opacity-30"
+            loading="eager"
+          />
+        <div className="absolute inset-0 bg-hero-bg/70" aria-hidden="true"></div>
       </div>
 
       {/* Content Container */}
@@ -38,8 +39,7 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            {/* Main Headline */}
-            <h1 className="heading-hero mb-6">
+            <h1 id="hero-heading" className="heading-hero mb-6">
               Professional Property Caretaker Services
               <span className="block text-success">Get Your Free Quote Today</span>
             </h1>
