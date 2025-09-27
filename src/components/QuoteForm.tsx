@@ -178,9 +178,10 @@ export const QuoteForm = () => {
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground mt-4 text-center">
-        Vi svarer som regel innen 2 timer i åpningstiden. Dine opplysninger deles aldri med tredjeparter.
-      </p>
+            {/* Privacy Note - Clean and minimal */}
+            <p className="text-xs text-hero-text-muted/80 mt-6 text-center max-w-md mx-auto leading-relaxed">
+              Vi svarer som regel innen 2 timer i åpningstiden. Dine opplysninger deles aldri med tredjeparter.
+            </p>
     </Card>
   );
 };
