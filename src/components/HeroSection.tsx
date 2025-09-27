@@ -71,7 +71,7 @@ export const HeroSection = () => {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="btn-outline-hero text-lg px-6 py-4"
+                className="bg-black text-white border-black text-lg px-6 py-4 hover:bg-black hover:text-white"
                 onClick={() => document.getElementById('process-section')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Slik fungerer det
