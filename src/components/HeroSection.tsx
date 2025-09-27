@@ -92,6 +92,7 @@ export const HeroSection = () => {
           viewBox="0 0 1200 120" 
           preserveAspectRatio="none" 
           className="relative block w-full h-20"
+          style={{ transform: 'scaleX(-1)' }}
         >
           {/* Multiple wave layers for depth */}
           <path 
