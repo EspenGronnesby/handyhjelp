@@ -1,6 +1,6 @@
 {
-  "name": "ProCare Property Services",
-  "short_name": "ProCare",
+  "name": "HandyHjelp",
+  "short_name": "HandyHjelp",
   "description": "Professional property caretaker and maintenance services",
   "start_url": "/",
   "display": "standalone",

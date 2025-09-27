@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Menu, Phone, Mail } from "lucide-react";
 import { useState } from "react";
+import handyhjelpLogo from '@/assets/handyhjelp-logo.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,11 +27,15 @@ export const Header = () => {
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-success rounded-lg flex items-center justify-center">
-              <span className="text-success-foreground font-bold text-lg">PC</span>
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img 
+                src={handyhjelpLogo} 
+                alt="HandyHjelp Logo" 
+                className="w-10 h-10 object-contain"
+              />
             </div>
             <div>
-              <h1 className="text-hero-text font-bold text-xl leading-none">ProCare</h1>
+              <h1 className="text-hero-text font-bold text-xl leading-none">HandyHjelp</h1>
               <p className="text-hero-text-muted text-xs leading-none">Property Services</p>
             </div>
           </div>

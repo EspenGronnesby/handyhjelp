@@ -39,7 +39,7 @@ export const defaultFAQItems: FAQItem[] = [
   },
   {
     question: "Are your caretaker services licensed and insured?", 
-    answer: "Yes, ProCare Property Services is fully licensed and insured. We carry comprehensive liability insurance and all our technicians are certified professionals with years of experience in property maintenance and care."
+    answer: "Yes, HandyHjelp is fully licensed and insured. We carry comprehensive liability insurance and all our technicians are certified professionals with years of experience in property maintenance and care."
   },
   {
     question: "How do you provide 24/7 caretaker services?",
