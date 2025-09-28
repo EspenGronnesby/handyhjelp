@@ -34,27 +34,36 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            {/* Main Heading */}
-            <h1 className="heading-hero mb-6 animate-fade-in-left">
-              Vi fikser det du ikke rekker selv
+            {/* Main Heading - Responsive */}
+            <h1 className="heading-hero mb-4 md:mb-6 animate-fade-in-left">
+              <span className="md:hidden">Lokal handyhjelp i Kristiansand</span>
+              <span className="hidden md:block">Vi fikser det du ikke rekker selv</span>
             </h1>
             
-            {/* Tagline */}
-            <p className="text-hero-text-muted text-xl mb-4 animate-fade-in-left">
+            {/* Tagline - Mobile only */}
+            <p className="text-hero-text-muted text-lg mb-4 animate-fade-in-left md:hidden">
+              Flytting • Montering • Tømrer • Småjobber
+            </p>
+
+            {/* Tagline - Desktop */}
+            <p className="text-hero-text-muted text-xl mb-4 animate-fade-in-left hidden md:block">
               Din lokale handyhjelp i Kristiansand
             </p>
 
-            {/* Description */}
-            <p className="text-hero-muted mb-8 animate-fade-in-left">
+            {/* Description - Desktop only */}
+            <p className="text-hero-muted mb-8 animate-fade-in-left hidden md:block">
               Flytting, montering, rydding, tømrer oppdrag/snekker og småjobber – enkelt og trygt. 
               Rask hjelp, ærlige priser og godt humør.
             </p>
 
-            <div className="space-y-4 mb-8">
-              <p className="text-hero-text-muted text-lg">
-                <span className="font-semibold">Fra 600 kr/time inkl. mva</span> · Førstegangs-kunde: -10%
+            <div className="space-y-2 md:space-y-4 mb-6 md:mb-8">
+              <p className="text-hero-text-muted text-base md:text-lg">
+                <span className="font-semibold">Fra 600 kr/time</span>
+                <span className="hidden md:inline"> inkl. mva</span> · 
+                <span className="hidden md:inline">Førstegangs-kunde: </span>
+                <span className="md:hidden">Ny kunde: </span>-10%
               </p>
-              <p className="text-hero-text-muted">
+              <p className="text-hero-text-muted text-sm md:text-base hidden md:block">
                 Vi dekker Kristiansand, Lund, Søm, Vågsbygd, Randesund og Søgne
               </p>
             </div>
