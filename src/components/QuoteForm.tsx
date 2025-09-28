@@ -176,8 +176,29 @@ export const QuoteForm = () => {
       // Final validation with zod schema
       const validatedData = contactFormSchema.parse(validationData);
 
-      // Simulate form submission (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Send email notification
+      const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-quote-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          type: formData.type,
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          orgNumber: formData.selectedCompany?.orgNumber,
+          companyName: formData.selectedCompany?.name,
+          description: formData.description
+        }),
+      });
+
+      const emailResult = await emailResponse.json();
+
+      if (!emailResult.success) {
+        throw new Error(emailResult.error || 'Email sending failed');
+      }
 
       toast({
         title: "Takk for henvendelsen!",
