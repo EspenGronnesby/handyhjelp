@@ -78,7 +78,7 @@ export const BreadcrumbNavigation = () => {
                 "@type": "ListItem",
                 "position": index + 1,
                 "name": item.label,
-                ...(item.href && { "item": `https://procare-property-services.lovable.app${item.href}` })
+                ...(item.href && { "item": `https://handyhjelp.lovable.app${item.href}` })
               }))
             })
           }}

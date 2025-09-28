@@ -19,12 +19,28 @@ export const contactFormSchema = z.object({
     .min(8, { message: 'Telefonnummer må være minst 8 siffer' })
     .max(15, { message: 'Telefonnummer kan ikke være mer enn 15 siffer' })
     .regex(/^[\+]?[0-9\s\-\(\)]+$/, { message: 'Ugyldig telefonnummer format' }),
+  address: z.string()
+    .trim()
+    .min(5, { message: 'Adresse må være minst 5 tegn' })
+    .max(200, { message: 'Adresse kan ikke være mer enn 200 tegn' })
+    .optional(),
   orgNumber: z.string().optional(),
   description: z.string()
     .trim()
     .min(10, { message: 'Beskrivelse må være minst 10 tegn' })
     .max(2000, { message: 'Beskrivelse kan ikke være mer enn 2000 tegn' })
 }).superRefine((data, ctx) => {
+  // Address validation for private customers
+  if (data.type === 'private') {
+    if (!data.address || data.address.trim() === '') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['address'],
+        message: 'Adresse er påkrevd for private kunder'
+      });
+    }
+  }
+  
   // Organization number validation for business customers
   if (data.type === 'business') {
     if (!data.orgNumber || data.orgNumber.trim() === '') {
