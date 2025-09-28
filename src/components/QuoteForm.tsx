@@ -25,6 +25,7 @@ interface FormData {
   name: string;
   email: string;
   phone: string;
+  address: string;
   orgNumber: string;
   companyName: string;
   selectedCompany: Company | null;
@@ -41,6 +42,7 @@ export const QuoteForm = () => {
     name: "",
     email: "",
     phone: "",
+    address: "",
     orgNumber: "",
     companyName: "",
     selectedCompany: null,
@@ -101,6 +103,17 @@ export const QuoteForm = () => {
           currentErrors.phone = "Telefonnummer er påkrevd";
         } else if (!/^[\+]?[0-9\s\-\(\)]{8,15}$/.test(step2Data.phone.trim())) {
           currentErrors.phone = "Ugyldig telefonnummer";
+        }
+
+        // Address validation for private customers
+        if (formData.type === 'private') {
+          if (!formData.address.trim()) {
+            currentErrors.address = "Adresse er påkrevd";
+          } else if (formData.address.length < 5) {
+            currentErrors.address = "Adresse må være minst 5 tegn";
+          } else if (formData.address.length > 200) {
+            currentErrors.address = "Adresse kan ikke være mer enn 200 tegn";
+          }
         }
 
         // Organization number and company validation for business customers
@@ -188,6 +201,7 @@ export const QuoteForm = () => {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
+          address: formData.address,
           orgNumber: formData.selectedCompany?.orgNumber,
           companyName: formData.selectedCompany?.name,
           description: formData.description
@@ -213,6 +227,7 @@ export const QuoteForm = () => {
         name: "",
         email: "",
         phone: "",
+        address: "",
         orgNumber: "",
         companyName: "",
         selectedCompany: null,
@@ -250,7 +265,8 @@ export const QuoteForm = () => {
       case 2:
         const basicFieldsValid = !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
         const companyValid = formData.type === 'business' ? !!formData.selectedCompany : true;
-        return basicFieldsValid && companyValid;
+        const addressValid = formData.type === 'private' ? !!(formData.address.trim() && formData.address.length >= 5) : true;
+        return basicFieldsValid && companyValid && addressValid;
       case 3:
         return formData.description.trim().length >= 10;
       default:
@@ -361,6 +377,24 @@ export const QuoteForm = () => {
                 </div>
               )}
             </div>
+            {formData.type === 'private' && (
+              <div className="relative">
+                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Adresse (gate/vei, postnummer, sted)"
+                  className={`pl-10 ${errors.address ? 'border-destructive' : ''}`}
+                  value={formData.address}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  maxLength={200}
+                />
+                {errors.address && (
+                  <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.address}
+                  </div>
+                )}
+              </div>
+            )}
             {formData.type === 'business' && (
               <div className="space-y-4">
                 <CompanySearch

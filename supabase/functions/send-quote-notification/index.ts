@@ -13,6 +13,7 @@ interface QuoteRequest {
   name: string;
   email: string;
   phone: string;
+  address?: string;
   orgNumber?: string;
   companyName?: string;
   description: string;
@@ -33,6 +34,9 @@ const handler = async (req: Request): Promise<Response> => {
     const companyInfo = quoteData.type === "business" && quoteData.companyName 
       ? `\n<strong>Bedrift:</strong> ${quoteData.companyName}\n<strong>Org.nummer:</strong> ${quoteData.orgNumber}\n`
       : "";
+    const addressInfo = quoteData.type === "private" && quoteData.address
+      ? `<p><strong>Adresse:</strong> ${quoteData.address}</p>`
+      : "";
 
     const emailHtml = `
       <h2>Ny tilbudsforespørsel fra HandyHjelp</h2>
@@ -42,6 +46,7 @@ const handler = async (req: Request): Promise<Response> => {
       <p><strong>Navn:</strong> ${quoteData.name}</p>
       <p><strong>E-post:</strong> ${quoteData.email}</p>
       <p><strong>Telefon:</strong> ${quoteData.phone}</p>
+      ${addressInfo}
       ${companyInfo}
       
       <h3>Oppdragsbeskrivelse</h3>
