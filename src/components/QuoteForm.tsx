@@ -6,9 +6,19 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building } from "lucide-react";
+import { CompanySearch } from "./CompanySearch";
 import { contactFormSchema, type ContactFormData, sanitizeInput } from "@/lib/validation";
 import { formRateLimiter, detectSuspiciousActivity, logSecurityEvent } from "@/lib/security";
 import { z } from "zod";
+
+interface Company {
+  orgNumber: string;
+  name: string;
+  organizationForm: string;
+  address: string;
+  postalCode: string;
+  city: string;
+}
 
 interface FormData {
   type: "private" | "business" | null;
@@ -16,6 +26,8 @@ interface FormData {
   email: string;
   phone: string;
   orgNumber: string;
+  companyName: string;
+  selectedCompany: Company | null;
   description: string;
 }
 
@@ -30,6 +42,8 @@ export const QuoteForm = () => {
     email: "",
     phone: "",
     orgNumber: "",
+    companyName: "",
+    selectedCompany: null,
     description: ""
   });
 
@@ -89,15 +103,10 @@ export const QuoteForm = () => {
           currentErrors.phone = "Ugyldig telefonnummer";
         }
 
-        // Organization number validation for business customers
+        // Organization number and company validation for business customers
         if (formData.type === 'business') {
-          if (!formData.orgNumber.trim()) {
-            currentErrors.orgNumber = "Organisasjonsnummer er påkrevd for bedriftskunder";
-          } else {
-            const cleanOrgNumber = formData.orgNumber.replace(/\s/g, '');
-            if (!/^\d{9}$/.test(cleanOrgNumber)) {
-              currentErrors.orgNumber = "Organisasjonsnummer må være 9 siffer";
-            }
+          if (!formData.selectedCompany) {
+            currentErrors.company = "Vennligst finn og velg din bedrift fra Brønnøysundregistrene";
           }
         }
 
@@ -145,7 +154,7 @@ export const QuoteForm = () => {
         name: sanitizeInput(formData.name),
         email: sanitizeInput(formData.email),
         phone: sanitizeInput(formData.phone),
-        orgNumber: formData.type === 'business' ? sanitizeInput(formData.orgNumber) : undefined,
+        orgNumber: formData.selectedCompany?.orgNumber,
         description: sanitizeInput(formData.description)
       };
 
@@ -184,6 +193,8 @@ export const QuoteForm = () => {
         email: "",
         phone: "",
         orgNumber: "",
+        companyName: "",
+        selectedCompany: null,
         description: ""
       });
       setErrors({});
@@ -217,8 +228,8 @@ export const QuoteForm = () => {
         return formData.type !== null;
       case 2:
         const basicFieldsValid = !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
-        const orgNumberValid = formData.type === 'business' ? formData.orgNumber.trim() !== '' : true;
-        return basicFieldsValid && orgNumberValid;
+        const companyValid = formData.type === 'business' ? formData.selectedCompany !== null : true;
+        return basicFieldsValid && companyValid;
       case 3:
         return formData.description.trim().length >= 10;
       default:
@@ -330,24 +341,22 @@ export const QuoteForm = () => {
               )}
             </div>
             {formData.type === 'business' && (
-              <div className="relative">
-                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Organisasjonsnummer (9 siffer)"
-                  className={`pl-10 ${errors.orgNumber ? 'border-destructive' : ''}`}
-                  value={formData.orgNumber}
-                  onChange={(e) => {
-                    // Format as XXX XXX XXX
-                    const value = e.target.value.replace(/\D/g, '').substring(0, 9);
-                    const formatted = value.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3').trim();
-                    handleInputChange('orgNumber', formatted);
+              <div className="space-y-4">
+                <CompanySearch
+                  onCompanySelect={(company) => {
+                    handleInputChange('selectedCompany', company);
+                    if (company) {
+                      handleInputChange('orgNumber', company.orgNumber);
+                      handleInputChange('companyName', company.name);
+                    }
                   }}
-                  maxLength={11}
+                  selectedCompany={formData.selectedCompany}
+                  disabled={isSubmitting}
                 />
-                {errors.orgNumber && (
-                  <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                {errors.company && (
+                  <div className="flex items-center gap-1 text-sm text-destructive">
                     <AlertCircle className="h-3 w-3" />
-                    {errors.orgNumber}
+                    {errors.company}
                   </div>
                 )}
               </div>

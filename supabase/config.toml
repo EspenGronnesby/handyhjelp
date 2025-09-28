@@ -1,1 +1,4 @@
 project_id = "bwwodqzhkehirerzlzpu"
+
+[functions.company-search]
+verify_jwt = false
