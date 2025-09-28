@@ -13,11 +13,11 @@ export const Header = () => {
         <div className="hidden md:block bg-primary text-primary-foreground py-2">
           <div className="container mx-auto px-4 flex justify-end space-x-6 text-sm">
             <a 
-              href="tel:+4740000000" 
+              href="tel:+4741250553" 
               className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
             >
               <Phone className="h-4 w-4" />
-              <span>+47 400 00 000</span>
+              <span>+47 41250553</span>
             </a>
             <a 
               href="mailto:Handyhjelp@gmail.com" 
@@ -109,11 +109,11 @@ export const Header = () => {
                 {/* Mobile Contact Info */}
                 <div className="pt-4 border-t border-border space-y-3">
                   <a 
-                    href="tel:+4740000000" 
+                    href="tel:+4741250553" 
                     className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
                   >
                     <Phone className="h-4 w-4" />
-                    <span>+47 400 00 000</span>
+                    <span>+47 41250553</span>
                   </a>
                   <a 
                     href="mailto:Handyhjelp@gmail.com" 
