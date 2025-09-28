@@ -16,7 +16,7 @@ interface Company {
 }
 
 interface CompanySearchProps {
-  onCompanySelect: (company: Company) => void;
+  onCompanySelect: (company: Company | null) => void;
   selectedCompany?: Company | null;
   disabled?: boolean;
 }
@@ -118,7 +118,7 @@ export const CompanySearch = ({ onCompanySelect, selectedCompany, disabled = fal
             variant="outline"
             size="sm"
             onClick={() => {
-              onCompanySelect(null as any);
+              onCompanySelect(null);
               setSearchMessage("");
               setShowResults(false);
             }}

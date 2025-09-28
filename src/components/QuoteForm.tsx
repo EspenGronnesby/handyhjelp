@@ -249,7 +249,8 @@ export const QuoteForm = () => {
         return formData.type !== null;
       case 2:
         const basicFieldsValid = !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
-        const companyValid = formData.type === 'business' ? formData.selectedCompany !== null : true;
+        const companyValid = formData.type === 'business' ? !!formData.selectedCompany : true;
+        console.log('Step 2 validation:', { basicFieldsValid, companyValid, selectedCompany: formData.selectedCompany, type: formData.type });
         return basicFieldsValid && companyValid;
       case 3:
         return formData.description.trim().length >= 10;
@@ -365,10 +366,14 @@ export const QuoteForm = () => {
               <div className="space-y-4">
                 <CompanySearch
                   onCompanySelect={(company) => {
+                    console.log('Company selected:', company);
                     handleInputChange('selectedCompany', company);
                     if (company) {
                       handleInputChange('orgNumber', company.orgNumber);
                       handleInputChange('companyName', company.name);
+                    } else {
+                      handleInputChange('orgNumber', '');
+                      handleInputChange('companyName', '');
                     }
                   }}
                   selectedCompany={formData.selectedCompany}
