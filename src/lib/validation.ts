@@ -19,10 +19,32 @@ export const contactFormSchema = z.object({
     .min(8, { message: 'Telefonnummer må være minst 8 siffer' })
     .max(15, { message: 'Telefonnummer kan ikke være mer enn 15 siffer' })
     .regex(/^[\+]?[0-9\s\-\(\)]+$/, { message: 'Ugyldig telefonnummer format' }),
+  orgNumber: z.string().optional(),
   description: z.string()
     .trim()
     .min(10, { message: 'Beskrivelse må være minst 10 tegn' })
     .max(2000, { message: 'Beskrivelse kan ikke være mer enn 2000 tegn' })
+}).superRefine((data, ctx) => {
+  // Organization number validation for business customers
+  if (data.type === 'business') {
+    if (!data.orgNumber || data.orgNumber.trim() === '') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['orgNumber'],
+        message: 'Organisasjonsnummer er påkrevd for bedriftskunder'
+      });
+    } else {
+      // Norwegian organization number validation: 9 digits
+      const cleanOrgNumber = data.orgNumber.replace(/\s/g, '');
+      if (!/^\d{9}$/.test(cleanOrgNumber)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['orgNumber'],
+          message: 'Organisasjonsnummer må være 9 siffer'
+        });
+      }
+    }
+  }
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;

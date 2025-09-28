@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle } from "lucide-react";
+import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building } from "lucide-react";
 import { contactFormSchema, type ContactFormData, sanitizeInput } from "@/lib/validation";
 import { formRateLimiter, detectSuspiciousActivity, logSecurityEvent } from "@/lib/security";
 import { z } from "zod";
@@ -15,6 +15,7 @@ interface FormData {
   name: string;
   email: string;
   phone: string;
+  orgNumber: string;
   description: string;
 }
 
@@ -28,6 +29,7 @@ export const QuoteForm = () => {
     name: "",
     email: "",
     phone: "",
+    orgNumber: "",
     description: ""
   });
 
@@ -87,6 +89,18 @@ export const QuoteForm = () => {
           currentErrors.phone = "Ugyldig telefonnummer";
         }
 
+        // Organization number validation for business customers
+        if (formData.type === 'business') {
+          if (!formData.orgNumber.trim()) {
+            currentErrors.orgNumber = "Organisasjonsnummer er påkrevd for bedriftskunder";
+          } else {
+            const cleanOrgNumber = formData.orgNumber.replace(/\s/g, '');
+            if (!/^\d{9}$/.test(cleanOrgNumber)) {
+              currentErrors.orgNumber = "Organisasjonsnummer må være 9 siffer";
+            }
+          }
+        }
+
       } else if (step === 3) {
         if (!formData.description.trim()) {
           currentErrors.description = "Beskrivelse er påkrevd";
@@ -131,6 +145,7 @@ export const QuoteForm = () => {
         name: sanitizeInput(formData.name),
         email: sanitizeInput(formData.email),
         phone: sanitizeInput(formData.phone),
+        orgNumber: formData.type === 'business' ? sanitizeInput(formData.orgNumber) : undefined,
         description: sanitizeInput(formData.description)
       };
 
@@ -168,6 +183,7 @@ export const QuoteForm = () => {
         name: "",
         email: "",
         phone: "",
+        orgNumber: "",
         description: ""
       });
       setErrors({});
@@ -200,7 +216,9 @@ export const QuoteForm = () => {
       case 1:
         return formData.type !== null;
       case 2:
-        return !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
+        const basicFieldsValid = !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
+        const orgNumberValid = formData.type === 'business' ? formData.orgNumber.trim() !== '' : true;
+        return basicFieldsValid && orgNumberValid;
       case 3:
         return formData.description.trim().length >= 10;
       default:
@@ -311,6 +329,29 @@ export const QuoteForm = () => {
                 </div>
               )}
             </div>
+            {formData.type === 'business' && (
+              <div className="relative">
+                <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Organisasjonsnummer (9 siffer)"
+                  className={`pl-10 ${errors.orgNumber ? 'border-destructive' : ''}`}
+                  value={formData.orgNumber}
+                  onChange={(e) => {
+                    // Format as XXX XXX XXX
+                    const value = e.target.value.replace(/\D/g, '').substring(0, 9);
+                    const formatted = value.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3').trim();
+                    handleInputChange('orgNumber', formatted);
+                  }}
+                  maxLength={11}
+                />
+                {errors.orgNumber && (
+                  <div className="flex items-center gap-1 mt-1 text-sm text-destructive">
+                    <AlertCircle className="h-3 w-3" />
+                    {errors.orgNumber}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
