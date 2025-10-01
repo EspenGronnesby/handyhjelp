@@ -1,10 +1,25 @@
 import { Button } from "@/components/ui/button";
-import { Menu, Phone, Mail } from "lucide-react";
+import { Menu, Phone, Mail, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import handyhjelpLogo from '@/assets/handyhjelp-logo.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: 'Logget ut',
+      description: 'Du er nå logget ut.'
+    });
+    navigate('/');
+  };
 
   return (
     <header className="fixed top-0 left-0 w-full bg-background/95 backdrop-blur-md border-b border-border z-50">
@@ -60,13 +75,40 @@ export const Header = () => {
               </a>
             </nav>
 
-            {/* Get Quote Button */}
-            <Button 
-              className="hidden md:inline-flex bg-success hover:bg-success-hover text-success-foreground"
-              onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
-            >
-              Få tilbud
-            </Button>
+            {/* Auth Buttons */}
+            <div className="hidden md:flex items-center gap-2">
+              {user ? (
+                <>
+                  <Link to="/dashboard">
+                    <Button variant="outline" className="gap-2">
+                      <User className="h-4 w-4" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost"
+                    className="gap-2"
+                    onClick={handleSignOut}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logg ut
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="outline" className="gap-2">
+                    <User className="h-4 w-4" />
+                    Logg inn
+                  </Button>
+                </Link>
+              )}
+              <Button 
+                className="bg-success hover:bg-success-hover text-success-foreground"
+                onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Få tilbud
+              </Button>
+            </div>
 
             {/* Mobile Menu Button */}
             <Button
@@ -123,6 +165,43 @@ export const Header = () => {
                     <span>Handyhjelp@gmail.com</span>
                   </a>
                 </div>
+                
+                {user ? (
+                  <>
+                    <Link to="/dashboard" className="block w-full">
+                      <Button 
+                        variant="outline"
+                        className="w-full gap-2 justify-start"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User className="h-4 w-4" />
+                        Dashboard
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="ghost"
+                      className="w-full gap-2 justify-start"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        handleSignOut();
+                      }}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logg ut
+                    </Button>
+                  </>
+                ) : (
+                  <Link to="/auth" className="block w-full">
+                    <Button 
+                      variant="outline"
+                      className="w-full gap-2 justify-start"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      Logg inn
+                    </Button>
+                  </Link>
+                )}
                 
                 <Button 
                   className="w-full bg-success hover:bg-success-hover text-success-foreground mt-4"

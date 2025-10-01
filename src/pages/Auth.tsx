@@ -1,0 +1,157 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+
+const Auth = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signUp, signIn, user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await signIn(email, password);
+        if (error) throw error;
+        toast({
+          title: 'Velkommen tilbake!',
+          description: 'Du er nå logget inn.'
+        });
+        navigate('/dashboard');
+      } else {
+        if (!fullName || !phone) {
+          toast({
+            title: 'Feil',
+            description: 'Vennligst fyll ut alle felter',
+            variant: 'destructive'
+          });
+          setLoading(false);
+          return;
+        }
+        const { error } = await signUp(email, password, fullName, phone);
+        if (error) throw error;
+        toast({
+          title: 'Konto opprettet!',
+          description: 'Du er nå logget inn og kan begynne å bruke dashboardet.'
+        });
+        navigate('/dashboard');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Feil',
+        description: error.message || 'Noe gikk galt. Prøv igjen.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 px-4 py-12">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">
+            {isLogin ? 'Logg inn' : 'Opprett konto'}
+          </CardTitle>
+          <CardDescription className="text-center">
+            {isLogin
+              ? 'Logg inn for å se dine tilbud og jobber'
+              : 'Opprett en konto for å holde oversikt over dine forespørsler'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {!isLogin && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Fullt navn</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Ola Nordmann"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required={!isLogin}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefonnummer</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+47 123 45 678"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required={!isLogin}
+                  />
+                </div>
+              </>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="email">E-post</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="din@epost.no"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Passord</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLogin ? 'Logg inn' : 'Opprett konto'}
+            </Button>
+          </form>
+          <div className="mt-4 text-center text-sm">
+            <button
+              type="button"
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-primary hover:underline"
+            >
+              {isLogin
+                ? 'Har du ikke en konto? Opprett en her'
+                : 'Har du allerede en konto? Logg inn'}
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default Auth;

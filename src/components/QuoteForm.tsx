@@ -10,6 +10,8 @@ import { CompanySearch } from "./CompanySearch";
 import { contactFormSchema, type ContactFormData, sanitizeInput } from "@/lib/validation";
 import { formRateLimiter, detectSuspiciousActivity, logSecurityEvent } from "@/lib/security";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Company {
   orgNumber: string;
@@ -34,6 +36,7 @@ interface FormData {
 
 export const QuoteForm = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -188,6 +191,31 @@ export const QuoteForm = () => {
 
       // Final validation with zod schema
       const validatedData = contactFormSchema.parse(validationData);
+
+      // Save quote to database
+      const quoteData = {
+        user_id: user?.id || null,
+        type: formData.type!,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address || null,
+        org_number: formData.selectedCompany?.orgNumber || null,
+        company_name: formData.selectedCompany?.name || null,
+        description: formData.description,
+        status: 'pending'
+      };
+
+      const { data: quoteRecord, error: dbError } = await supabase
+        .from('quotes')
+        .insert(quoteData)
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw new Error('Failed to save quote');
+      }
 
       // Send email notification
       const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-quote-notification`, {
