@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Loader2, FileText, Briefcase, User, Bell, Home } from 'lucide-react';
+import { Loader2, FileText, Briefcase, User, Bell, Home, Star } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -31,6 +31,7 @@ const Dashboard = () => {
     { path: '/dashboard', label: 'Oversikt', icon: Home },
     { path: '/dashboard/quotes', label: 'Mine tilbud', icon: FileText },
     { path: '/dashboard/jobs', label: 'Mine jobber', icon: Briefcase },
+    { path: '/dashboard/loyalty', label: 'Kundeklubb', icon: Star },
     { path: '/dashboard/profile', label: 'Profil', icon: User },
     { path: '/dashboard/notifications', label: 'Varsler', icon: Bell }
   ];

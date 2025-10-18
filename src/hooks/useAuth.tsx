@@ -28,7 +28,7 @@ export const useAuth = () => {
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string, phone: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -39,6 +39,14 @@ export const useAuth = () => {
         }
       }
     });
+
+    // Award welcome bonus after successful signup
+    if (!error && data.user) {
+      await supabase.functions.invoke('award-welcome-bonus', {
+        body: { userId: data.user.id }
+      });
+    }
+
     return { error };
   };
 
