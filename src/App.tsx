@@ -14,6 +14,8 @@ import DashboardJobs from "./pages/DashboardJobs";
 import DashboardLoyalty from "./pages/DashboardLoyalty";
 import DashboardProfile from "./pages/DashboardProfile";
 import DashboardNotifications from "./pages/DashboardNotifications";
+import CustomerLogin from "./pages/CustomerLogin";
+import CustomerPortal from "./pages/CustomerPortal";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/kunde-innlogging" element={<CustomerLogin />} />
+            <Route path="/kunde-portal" element={<CustomerPortal />} />
             <Route path="/dashboard" element={<Dashboard />}>
               <Route index element={<DashboardHome />} />
               <Route path="quotes" element={<DashboardQuotes />} />

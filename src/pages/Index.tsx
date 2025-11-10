@@ -6,6 +6,7 @@ import { FAQSection } from "@/components/FAQ/FAQSection";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -112,6 +113,18 @@ const Index = () => {
           </div>
         </section>
       </main>
+
+      {/* Customer Portal Link */}
+      <footer className="py-8 bg-card border-t">
+        <div className="container mx-auto px-4 text-center">
+          <Link 
+            to="/kunde-innlogging" 
+            className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+          >
+            Er du eksisterende kunde? Se dine prosjekter →
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 };
