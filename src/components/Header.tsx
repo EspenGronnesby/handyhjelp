@@ -82,7 +82,7 @@ export const Header = () => {
                   <Link to="/dashboard">
                     <Button variant="outline" className="gap-2">
                       <User className="h-4 w-4" />
-                      Dashboard
+                      Profil
                     </Button>
                   </Link>
                   <Button 
@@ -175,7 +175,7 @@ export const Header = () => {
                         onClick={() => setIsMenuOpen(false)}
                       >
                         <User className="h-4 w-4" />
-                        Dashboard
+                        Profil
                       </Button>
                     </Link>
                     <Button 
