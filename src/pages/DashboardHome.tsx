@@ -77,7 +77,7 @@ const DashboardHome = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Velkommen til ditt dashboard</h1>
+        <h1 className="text-3xl font-bold mb-2">Velkommen til din profil</h1>
         <p className="text-muted-foreground">
           Her kan du holde oversikt over alle dine tilbud, jobber og varslinger
         </p>
