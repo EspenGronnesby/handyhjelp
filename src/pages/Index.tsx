@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
 import { ProcessSection } from "@/components/ProcessSection";
 import { QuoteForm } from "@/components/QuoteForm";
@@ -162,7 +163,7 @@ const Index = () => {
       </main>
 
       {/* Customer Portal Link */}
-      <footer className="py-8 bg-card border-t">
+      <div className="py-8 bg-muted border-t">
         <div className="container mx-auto px-4 text-center">
           <Link 
             to="/kunde-innlogging" 
@@ -171,7 +172,9 @@ const Index = () => {
             Er du eksisterende kunde? Se dine prosjekter →
           </Link>
         </div>
-      </footer>
+      </div>
+
+      <Footer />
     </div>
   );
 };

@@ -18,6 +18,8 @@ import CustomerLogin from "./pages/CustomerLogin";
 import CustomerPortal from "./pages/CustomerPortal";
 import FAQ from "./pages/FAQ";
 import Projects from "./pages/Projects";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,8 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/prosjekter" element={<Projects />} />
+            <Route path="/om-oss" element={<About />} />
+            <Route path="/kontakt" element={<Contact />} />
             <Route path="/kunde-innlogging" element={<CustomerLogin />} />
             <Route path="/kunde-portal" element={<CustomerPortal />} />
             <Route path="/dashboard" element={<Dashboard />}>

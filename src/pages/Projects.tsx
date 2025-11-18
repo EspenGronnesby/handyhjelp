@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Card, CardContent } from "@/components/ui/card";
@@ -105,11 +106,7 @@ const Projects = () => {
         </div>
       </main>
 
-      <footer className="py-8 bg-card border-t">
-        <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
-          <p>&copy; {new Date().getFullYear()} HandyHjelp. Alle rettigheter reservert.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

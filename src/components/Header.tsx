@@ -63,14 +63,29 @@ export const Header = () => {
 
           <div className="flex items-center space-x-4">
             {/* Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link to="/" className="text-foreground hover:text-primary transition-colors">
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link to="/" className="text-foreground hover:text-primary transition-colors text-sm">
                 Hjem
               </Link>
-              <Link to="/prosjekter" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/tjenester" className="text-foreground hover:text-primary transition-colors text-sm">
+                Tjenester
+              </Link>
+              <Link to="/prosjekter" className="text-foreground hover:text-primary transition-colors text-sm">
                 Prosjekter
               </Link>
-              <Link to="/faq" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/priser" className="text-foreground hover:text-primary transition-colors text-sm">
+                Priser
+              </Link>
+              <Link to="/raad" className="text-foreground hover:text-primary transition-colors text-sm">
+                Råd
+              </Link>
+              <Link to="/om-oss" className="text-foreground hover:text-primary transition-colors text-sm">
+                Om oss
+              </Link>
+              <Link to="/kontakt" className="text-foreground hover:text-primary transition-colors text-sm">
+                Kontakt
+              </Link>
+              <Link to="/faq" className="text-foreground hover:text-primary transition-colors text-sm">
                 FAQ
               </Link>
             </nav>
@@ -134,11 +149,46 @@ export const Header = () => {
                   Hjem
                 </Link>
                 <Link 
+                  to="/tjenester" 
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Tjenester
+                </Link>
+                <Link 
                   to="/prosjekter" 
                   className="block text-foreground hover:text-primary transition-colors py-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Prosjekter
+                </Link>
+                <Link 
+                  to="/priser" 
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Priser
+                </Link>
+                <Link 
+                  to="/raad" 
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Råd
+                </Link>
+                <Link 
+                  to="/om-oss" 
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Om oss
+                </Link>
+                <Link 
+                  to="/kontakt" 
+                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Kontakt
                 </Link>
                 <Link 
                   to="/faq" 
