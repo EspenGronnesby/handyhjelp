@@ -14,8 +14,6 @@ import DashboardJobs from "./pages/DashboardJobs";
 import DashboardLoyalty from "./pages/DashboardLoyalty";
 import DashboardProfile from "./pages/DashboardProfile";
 import DashboardNotifications from "./pages/DashboardNotifications";
-import CustomerLogin from "./pages/CustomerLogin";
-import CustomerPortal from "./pages/CustomerPortal";
 import FAQ from "./pages/FAQ";
 import Projects from "./pages/Projects";
 import About from "./pages/About";
@@ -41,8 +39,6 @@ const App = () => (
             <Route path="/kontakt" element={<Contact />} />
             <Route path="/tjenester" element={<Services />} />
             <Route path="/raad" element={<Blog />} />
-            <Route path="/kunde-innlogging" element={<CustomerLogin />} />
-            <Route path="/kunde-portal" element={<CustomerPortal />} />
             <Route path="/dashboard" element={<Dashboard />}>
               <Route index element={<DashboardHome />} />
               <Route path="quotes" element={<DashboardQuotes />} />

@@ -5,9 +5,3 @@ verify_jwt = false
 
 [functions.send-quote-notification]
 verify_jwt = false
-
-[functions.customer-login]
-verify_jwt = false
-
-[functions.customer-get-projects]
-verify_jwt = false
