@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, Clock, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
+import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 
 export const Footer = () => {
   return (
@@ -8,7 +9,11 @@ export const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {/* Kolonne 1: HandyHjelp Info */}
           <div>
-            <h3 className="text-xl font-bold mb-4 text-primary">HandyHjelp</h3>
+            <img 
+              src={handyhjelpLogo} 
+              alt="HandyHjelp - Levert med kvalitet" 
+              className="h-16 w-auto object-contain mb-4"
+            />
             <p className="text-sm mb-4 opacity-90">
               Din pålitelige partner for vaktmester-, tømrer- og blikkenslagertjenester. 
               Med over 20 års erfaring leverer vi kvalitet og trygghet til kunder i Kristiansand og omegn.
