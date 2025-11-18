@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
+import handyhjelpLogo from '@/assets/handyhjelp-logo.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -51,7 +51,7 @@ export const Header = () => {
             <img 
               src={handyhjelpLogo} 
               alt="HandyHjelp - Levert med kvalitet" 
-              className="h-12 md:h-14 w-auto object-contain"
+              className="h-16 md:h-20 w-auto object-contain"
             />
           </Link>
 

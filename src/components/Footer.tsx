@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, Clock, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
-import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
+import handyhjelpLogo from '@/assets/handyhjelp-logo.png';
 
 export const Footer = () => {
   return (
@@ -12,7 +12,7 @@ export const Footer = () => {
             <img 
               src={handyhjelpLogo} 
               alt="HandyHjelp - Levert med kvalitet" 
-              className="h-16 w-auto object-contain mb-4"
+              className="h-20 w-auto object-contain mb-4"
             />
             <p className="text-sm mb-4 opacity-90">
               Din pålitelige partner for vaktmester-, tømrer- og blikkenslagertjenester. 
