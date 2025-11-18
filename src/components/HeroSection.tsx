@@ -1,93 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { QuoteForm } from "@/components/QuoteForm";
 import heroImage from "@/assets/hero-caretaker.jpg";
-import { Shield, Clock, Star, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Badge } from "@/components/ui/badge";
+import { Shield, Clock, Star } from "lucide-react";
 
 export const HeroSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const slides = [
-    {
-      image: heroImage,
-      badge: "Anbefalt av 200+ kunder"
-    },
-    {
-      image: heroImage,
-      badge: "20+ års erfaring"
-    },
-    {
-      image: heroImage,
-      badge: "100% tilfredsgaranti"
-    }
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [slides.length]);
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
   return (
     <section className="min-h-screen hero-gradient relative flex items-center">
-      {/* Background Carousel */}
-      {slides.map((slide, index) => (
-        <div 
-          key={index}
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
-            index === currentSlide ? 'opacity-100' : 'opacity-0'
-          }`}
-          style={{ backgroundImage: `url(${slide.image})` }}
-        >
-          <div className="absolute inset-0 bg-hero-bg/80"></div>
-        </div>
-      ))}
-
-      {/* Animated Badge */}
-      <Badge 
-        className="absolute top-24 right-8 z-20 bg-success text-success-foreground animate-pulse text-sm px-4 py-2"
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${heroImage})` }}
       >
-        {slides[currentSlide].badge}
-      </Badge>
-
-      {/* Carousel Controls */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors flex items-center justify-center"
-        aria-label="Forrige bilde"
-      >
-        <ChevronLeft className="h-6 w-6 text-white" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors flex items-center justify-center"
-        aria-label="Neste bilde"
-      >
-        <ChevronRight className="h-6 w-6 text-white" />
-      </button>
-
-      {/* Carousel Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`w-2 h-2 rounded-full transition-all ${
-              index === currentSlide ? 'bg-white w-8' : 'bg-white/50'
-            }`}
-            aria-label={`Gå til bilde ${index + 1}`}
-          />
-        ))}
+        <div className="absolute inset-0 bg-hero-bg/80"></div>
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
@@ -148,16 +72,15 @@ export const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-left">
               <Button 
                 size="lg" 
-                variant="cta"
-                className="text-lg px-8 py-4"
+                className="btn-hero text-lg px-8 py-4 bg-success hover:bg-success-hover"
                 onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Bestill fast avtale
               </Button>
               <Button 
-                variant="cta-outline"
+                variant="outline" 
                 size="lg" 
-                className="text-lg px-6 py-4"
+                className="border-2 border-hero-text text-hero-text text-lg px-6 py-4 hover:bg-hero-text/10"
                 onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
               >
                 Se våre tjenester

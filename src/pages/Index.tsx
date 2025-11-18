@@ -5,9 +5,6 @@ import { ProcessSection } from "@/components/ProcessSection";
 import { QuoteForm } from "@/components/QuoteForm";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { WhyUsStats } from "@/components/WhyUsStats";
-import { TestimonialsSection } from "@/components/TestimonialsSection";
-import { RecentProjects } from "@/components/RecentProjects";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -25,9 +22,6 @@ const Index = () => {
       {/* Hero Section with Integrated Quote Form */}
       <main>
         <HeroSection />
-        
-        {/* Why Us Statistics */}
-        <WhyUsStats />
         
         {/* How It Works Process Section */}
         <section id="process-section" aria-labelledby="process-heading">
@@ -151,12 +145,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* Testimonials Section */}
-        <TestimonialsSection />
-
-        {/* Recent Projects */}
-        <RecentProjects />
 
         {/* Standalone Quote Form Section */}
         <section className="py-16 bg-muted/30" id="quote-standalone" aria-labelledby="quote-heading">
