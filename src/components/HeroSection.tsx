@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { QuoteForm } from "@/components/QuoteForm";
-import heroImage from "@/assets/hero-caretaker.jpg";
+import heroImage from "@/assets/hero-building-maintenance.jpg";
 import { Phone } from "lucide-react";
 
 export const HeroSection = () => {
@@ -19,8 +19,8 @@ export const HeroSection = () => {
           {/* Left Content */}
           <div className="text-left">
             {/* Main Heading - Minimalist */}
-            <h1 className="text-4xl md:text-7xl font-bold mb-6 md:mb-8 animate-fade-in-left font-heading text-white">
-              Vi tar vare på dine bygg
+            <h1 className="text-4xl md:text-7xl font-bold mb-6 md:mb-8 animate-fade-in-left font-heading text-white leading-tight">
+              Vi tar vare på <br className="hidden md:block" />dine bygg
             </h1>
             
             {/* Short Tagline */}
