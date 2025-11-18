@@ -1,7 +1,7 @@
 import { LoginResponse, ProjectsResponse } from "@/types/customer";
 
-const API_BASE = "https://odbqdzmdlelotqfuxbwf.supabase.co/functions/v1";
-const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kYnFkem1kbGVsb3RxZnV4YndmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1OTY1NTQsImV4cCI6MjA3NTE3MjU1NH0.g4P9Zc_-IvlaXY9RgzjMykB0wNAV7bVim0jD4dabPyY";
+const API_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
+const API_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const headers = {
   "Content-Type": "application/json",
