@@ -115,7 +115,7 @@ const Index = () => {
             </div>
 
             <div className="text-center">
-              <div className="bg-accent/50 p-8 rounded-xl max-w-3xl mx-auto border-2 border-primary/20">
+              <div className="bg-primary/5 p-8 rounded-xl max-w-3xl mx-auto border-2 border-primary shadow-lg">
                 <h3 className="text-2xl font-bold text-foreground mb-4 font-heading">Faste avtaler for bedrifter</h3>
                 <div className="space-y-3 text-muted-foreground mb-6">
                   <p className="text-lg">
