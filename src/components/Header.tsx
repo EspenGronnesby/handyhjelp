@@ -64,15 +64,15 @@ export const Header = () => {
           <div className="flex items-center space-x-4">
             {/* Navigation Links */}
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#process-section" className="text-foreground hover:text-primary transition-colors">
-                Slik fungerer det
-              </a>
-              <a href="#services" className="text-foreground hover:text-primary transition-colors">
-                Tjenester
-              </a>
-              <a href="#faq" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/" className="text-foreground hover:text-primary transition-colors">
+                Hjem
+              </Link>
+              <Link to="/prosjekter" className="text-foreground hover:text-primary transition-colors">
+                Prosjekter
+              </Link>
+              <Link to="/faq" className="text-foreground hover:text-primary transition-colors">
                 FAQ
-              </a>
+              </Link>
             </nav>
 
             {/* Auth Buttons */}
@@ -126,27 +126,27 @@ export const Header = () => {
           {isMenuOpen && (
             <div className="md:hidden absolute top-full left-0 right-0 bg-background border-t border-border shadow-lg z-50">
               <div className="container mx-auto px-4 py-4 space-y-4">
-                <a 
-                  href="#process-section" 
+                <Link 
+                  to="/" 
                   className="block text-foreground hover:text-primary transition-colors py-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Slik fungerer det
-                </a>
-                <a 
-                  href="#services" 
+                  Hjem
+                </Link>
+                <Link 
+                  to="/prosjekter" 
                   className="block text-foreground hover:text-primary transition-colors py-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Tjenester
-                </a>
-                <a 
-                  href="#faq" 
+                  Prosjekter
+                </Link>
+                <Link 
+                  to="/faq" 
                   className="block text-foreground hover:text-primary transition-colors py-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   FAQ
-                </a>
+                </Link>
                 
                 {/* Mobile Contact Info */}
                 <div className="pt-4 border-t border-border space-y-3">
