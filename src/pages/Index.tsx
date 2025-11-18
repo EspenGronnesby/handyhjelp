@@ -2,7 +2,6 @@ import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { ProcessSection } from "@/components/ProcessSection";
 import { QuoteForm } from "@/components/QuoteForm";
-import { FAQSection } from "@/components/FAQ/FAQSection";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
@@ -27,9 +26,6 @@ const Index = () => {
         <section id="process-section" aria-labelledby="process-heading">
           <ProcessSection />
         </section>
-
-        {/* FAQ Section with Structured Data */}
-        <FAQSection />
 
         {/* Services Section */}
         <section className="py-16 bg-background" id="services">
