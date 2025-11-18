@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import handyhjelpLogo from '@/assets/handyhjelp-logo.png';
+import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -47,19 +47,13 @@ export const Header = () => {
         {/* Main Navigation */}
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <img 
-                src={handyhjelpLogo} 
-                alt="HandyHjelp Logo" 
-                className="w-10 h-10 object-contain"
-              />
-            </div>
-            <div>
-              <h1 className="text-foreground font-bold text-xl leading-none">HandyHjelp</h1>
-              <p className="text-muted-foreground text-xs leading-none">Din lokale handyhjelp</p>
-            </div>
-          </div>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={handyhjelpLogo} 
+              alt="HandyHjelp - Levert med kvalitet" 
+              className="h-12 md:h-14 w-auto object-contain"
+            />
+          </Link>
 
           <div className="flex items-center space-x-4">
             {/* Navigation Links */}
