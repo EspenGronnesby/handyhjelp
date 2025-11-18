@@ -6,62 +6,62 @@
 
 @layer base {
   :root {
-    /* HandyHjelp Brand Colors */
-    --background: 0 0% 97%;
+    /* HandyHjelp Brand Colors - Warm Professional */
+    --background: 40 33% 97%;
     --foreground: 0 0% 11%;
 
-    /* Hero & Main Sections */
-    --hero-bg: 178 48% 32%;
-    --hero-bg-secondary: 178 48% 28%;
+    /* Hero & Main Sections - Terracotta Warmth */
+    --hero-bg: 25 53% 56%;
+    --hero-bg-secondary: 25 53% 48%;
     --hero-text: 0 0% 98%;
-    --hero-text-muted: 178 20% 75%;
+    --hero-text-muted: 25 20% 85%;
 
     /* Cards & Surfaces */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 11%;
-    --card-elevated: 0 0% 97%;
+    --card-elevated: 40 25% 98%;
 
-    /* HandyHjelp Primary - Teal */
-    --primary: 178 48% 32%;
-    --primary-hover: 178 48% 28%;
+    /* Primary - Warm Terracotta */
+    --primary: 25 53% 56%;
+    --primary-hover: 25 53% 48%;
     --primary-foreground: 0 0% 98%;
 
-    /* Success/CTA - HandyHjelp Green */
-    --success: 178 48% 32%;
-    --success-hover: 178 48% 28%;
+    /* Success/CTA - Fresh Green */
+    --success: 145 63% 42%;
+    --success-hover: 145 63% 38%;
     --success-foreground: 0 0% 98%;
 
-    /* Secondary - HandyHjelp Blue-Gray */
-    --secondary: 213 30% 32%;
-    --secondary-hover: 213 30% 28%;
+    /* Secondary - Deep Blue-Gray */
+    --secondary: 210 29% 24%;
+    --secondary-hover: 210 29% 20%;
     --secondary-foreground: 0 0% 98%;
 
     /* Muted Content */
-    --muted: 210 40% 96%;
-    --muted-hover: 210 40% 92%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 40 20% 94%;
+    --muted-hover: 40 20% 88%;
+    --muted-foreground: 25 8% 45%;
 
-    /* Accent - Warm Professional */
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    /* Accent - Warm Beige */
+    --accent: 40 25% 93%;
+    --accent-foreground: 210 29% 24%;
 
     /* Status Colors */
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
     --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
+    --warning-foreground: 0 0% 11%;
 
     /* Form Elements */
-    --border: 220 13% 91%;
-    --border-input: 220 13% 85%;
+    --border: 40 15% 88%;
+    --border-input: 40 15% 82%;
     --input: 0 0% 100%;
-    --input-foreground: 222 84% 4.9%;
-    --ring: 222 47% 11%;
+    --input-foreground: 0 0% 11%;
+    --ring: 25 53% 56%;
 
     /* Gradients for Hero & Special Sections */
-    --gradient-hero: linear-gradient(135deg, hsl(178 48% 32%), hsl(178 48% 28%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(0 0% 97%));
-    --gradient-cta: linear-gradient(135deg, hsl(178 48% 32%), hsl(178 48% 28%));
+    --gradient-hero: linear-gradient(135deg, hsl(25 53% 56%), hsl(25 53% 48%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(40 25% 98%));
+    --gradient-cta: linear-gradient(135deg, hsl(145 63% 42%), hsl(145 63% 38%));
 
     /* Shadows & Effects */
     --shadow-card: 0 4px 6px -1px hsl(222 47% 11% / 0.1), 0 2px 4px -1px hsl(222 47% 11% / 0.06);
