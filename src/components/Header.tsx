@@ -73,9 +73,6 @@ export const Header = () => {
               <Link to="/prosjekter" className="text-foreground hover:text-primary transition-colors text-sm">
                 Prosjekter
               </Link>
-              <Link to="/priser" className="text-foreground hover:text-primary transition-colors text-sm">
-                Priser
-              </Link>
               <Link to="/raad" className="text-foreground hover:text-primary transition-colors text-sm">
                 Råd
               </Link>
