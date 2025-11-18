@@ -1,29 +1,43 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Phone, Calculator, CheckCircle } from "lucide-react";
+import { Phone, Calculator, CheckCircle, Calendar, Award } from "lucide-react";
 
 export const ProcessSection = () => {
   const steps = [
     {
       number: 1,
-      title: "Ta kontakt",
-      description: "Ring oss eller send inn skjema",
+      title: "Kontakt & Behovskartlegging",
+      description: "Ta kontakt via telefon eller skjema",
       icon: Phone,
-      details: "Vi svarer som regel innen 2 timer i åpningstiden og gir deg råd om hva som trengs."
+      details: "Vi svarer innen 2 timer og kartlegger dine behov grundig."
     },
     {
       number: 2,
-      title: "Få tilbud",
-      description: "Tydelig pris før oppstart",
+      title: "Befaring og tilbud",
+      description: "Forhåndsvurdering og prisestimat",
       icon: Calculator,
-      details: "Du får forutsigbare priser basert på timepris fra 600 kr inkl. mva. Ingen skjulte kostnader."
+      details: "Vi gjør en befaring og gir deg et transparent tilbud uten forpliktelser."
     },
     {
       number: 3,
-      title: "Vi løser det",
-      description: "Profesjonell utførelse",
+      title: "Avtale tidspunkt",
+      description: "Vi tilpasser oss din timeplan",
+      icon: Calendar,
+      details: "Vi finner et tidspunkt som passer deg best, enten det er i dag eller neste uke."
+    },
+    {
+      number: 4,
+      title: "Profesjonell utførelse",
+      description: "Erfarne fagfolk på jobb",
       icon: CheckCircle,
-      details: "Vi behandler hjemmet ditt som vårt eget og rydder opp etter oss. Fornøydgaranti inkludert."
+      details: "Vi utfører arbeidet med høy kvalitet og rydder perfekt opp etter oss."
+    },
+    {
+      number: 5,
+      title: "Kvalitetskontroll & oppfølging",
+      description: "Vi sikrer at du er fornøyd",
+      icon: Award,
+      details: "Gjennomgang av arbeidet sammen med deg og oppfølging ved behov. 100% tilfredsgaranti."
     }
   ];
 
@@ -31,15 +45,15 @@ export const ProcessSection = () => {
     <section className="py-16 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 id="process-heading" className="heading-section">
-            Slik fungerer det
+          <h2 id="process-heading" className="text-3xl md:text-4xl font-heading font-bold mb-4">
+            Hvordan vi jobber
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Enkelt, trygt og forutsigbart. Fra første kontakt til ferdig jobb.
+            En sømløs prosess fra start til slutt
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="grid md:grid-cols-5 gap-6 mb-12">
           {steps.map((step, index) => {
             const IconComponent = step.icon;
             
@@ -77,7 +91,7 @@ export const ProcessSection = () => {
         <div className="text-center">
           <Button 
             size="lg" 
-            className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4"
+            variant="cta"
             onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
           >
             Kom i gang nå
