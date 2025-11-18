@@ -8,22 +8,19 @@ export const ProcessSection = () => {
       number: 1,
       title: "Ta kontakt",
       description: "Ring oss eller send inn skjema",
-      icon: Phone,
-      details: "Vi svarer som regel innen 2 timer i åpningstiden og gir deg råd om hva som trengs."
+      icon: Phone
     },
     {
       number: 2,
       title: "Få tilbud",
       description: "Tydelig pris før oppstart",
-      icon: Calculator,
-      details: "Du får forutsigbare priser basert på timepris fra 600 kr inkl. mva. Ingen skjulte kostnader."
+      icon: Calculator
     },
     {
       number: 3,
       title: "Vi løser det",
       description: "Profesjonell utførelse",
-      icon: CheckCircle,
-      details: "Vi behandler hjemmet ditt som vårt eget og rydder opp etter oss. Fornøydgaranti inkludert."
+      icon: CheckCircle
     }
   ];
 
@@ -65,10 +62,6 @@ export const ProcessSection = () => {
                     {step.description}
                   </p>
                 </div>
-                
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {step.details}
-                </p>
               </Card>
             );
           })}
