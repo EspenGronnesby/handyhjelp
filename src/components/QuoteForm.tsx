@@ -512,10 +512,6 @@ export const QuoteForm = () => {
         </div>
       )}
 
-      {/* Privacy Note - Clean and minimal */}
-      <p className="text-xs text-hero-text-muted/80 mt-6 text-center max-w-md mx-auto leading-relaxed">
-        Vi svarer som regel innen 2 timer i åpningstiden. Dine opplysninger behandles trygt og deles aldri med tredjeparter.
-      </p>
     </Card>
   );
 };
