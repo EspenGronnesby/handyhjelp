@@ -5,7 +5,7 @@ import { Phone } from "lucide-react";
 
 export const HeroSection = () => {
   return (
-    <section className="min-h-screen relative flex items-center">
+    <section className="min-h-screen relative flex items-center pt-32 md:pt-20">
       {/* Background Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -15,7 +15,7 @@ export const HeroSection = () => {
       </div>
       
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-screen py-20">
+        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-8rem)] py-12 md:py-20">
           {/* Left Content */}
           <div className="text-left">
             {/* Main Heading - Minimalist */}
