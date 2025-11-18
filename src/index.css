@@ -6,44 +6,44 @@
 
 @layer base {
   :root {
-    /* HandyHjelp Brand Colors - Warm Professional */
-    --background: 40 33% 97%;
-    --foreground: 0 0% 11%;
+    /* HandyHjelp Brand Colors - Professional Blue-Gray */
+    --background: 210 40% 98%;
+    --foreground: 217 19% 27%;
 
-    /* Hero & Main Sections - Terracotta Warmth */
-    --hero-bg: 25 53% 56%;
-    --hero-bg-secondary: 25 53% 48%;
+    /* Hero & Main Sections - Deep Marine Blue */
+    --hero-bg: 213 51% 24%;
+    --hero-bg-secondary: 210 29% 24%;
     --hero-text: 0 0% 98%;
-    --hero-text-muted: 25 20% 85%;
+    --hero-text-muted: 210 20% 85%;
 
     /* Cards & Surfaces */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 11%;
-    --card-elevated: 40 25% 98%;
+    --card-foreground: 217 19% 27%;
+    --card-elevated: 210 40% 98%;
 
-    /* Primary - Warm Terracotta */
-    --primary: 25 53% 56%;
-    --primary-hover: 25 53% 48%;
+    /* Primary - Professional Turquoise (CTA) */
+    --primary: 188 94% 37%;
+    --primary-hover: 188 94% 32%;
     --primary-foreground: 0 0% 98%;
 
-    /* Success/CTA - Fresh Green */
-    --success: 145 63% 42%;
-    --success-hover: 145 63% 38%;
+    /* Success/CTA - Professional Turquoise */
+    --success: 188 94% 37%;
+    --success-hover: 188 94% 32%;
     --success-foreground: 0 0% 98%;
 
-    /* Secondary - Deep Blue-Gray */
+    /* Secondary - Dark Blue-Gray */
     --secondary: 210 29% 24%;
     --secondary-hover: 210 29% 20%;
     --secondary-foreground: 0 0% 98%;
 
     /* Muted Content */
-    --muted: 40 20% 94%;
-    --muted-hover: 40 20% 88%;
-    --muted-foreground: 25 8% 45%;
+    --muted: 210 40% 96%;
+    --muted-hover: 210 40% 92%;
+    --muted-foreground: 217 19% 45%;
 
-    /* Accent - Warm Beige */
-    --accent: 40 25% 93%;
-    --accent-foreground: 210 29% 24%;
+    /* Accent - Warm Orange (minimal use) */
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 98%;
 
     /* Status Colors */
     --destructive: 0 84% 60%;
@@ -52,16 +52,16 @@
     --warning-foreground: 0 0% 11%;
 
     /* Form Elements */
-    --border: 40 15% 88%;
-    --border-input: 40 15% 82%;
+    --border: 210 20% 88%;
+    --border-input: 210 20% 82%;
     --input: 0 0% 100%;
-    --input-foreground: 0 0% 11%;
-    --ring: 25 53% 56%;
+    --input-foreground: 217 19% 27%;
+    --ring: 188 94% 37%;
 
     /* Gradients for Hero & Special Sections */
-    --gradient-hero: linear-gradient(135deg, hsl(25 53% 56%), hsl(25 53% 48%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(40 25% 98%));
-    --gradient-cta: linear-gradient(135deg, hsl(145 63% 42%), hsl(145 63% 38%));
+    --gradient-hero: linear-gradient(135deg, hsl(213 51% 24%), hsl(210 29% 20%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 98%));
+    --gradient-cta: linear-gradient(135deg, hsl(188 94% 37%), hsl(188 94% 32%));
 
     /* Shadows & Effects */
     --shadow-card: 0 4px 6px -1px hsl(222 47% 11% / 0.1), 0 2px 4px -1px hsl(222 47% 11% / 0.06);
@@ -168,14 +168,14 @@
 
   /* Professional Button Styles */
   .btn-hero {
-    @apply bg-success hover:bg-success-hover text-success-foreground;
+    @apply bg-primary hover:bg-primary-hover text-primary-foreground;
     @apply px-8 py-4 rounded-lg font-semibold text-lg;
     @apply shadow-lg hover:shadow-xl transform hover:scale-105;
     @apply transition-all duration-300 ease-out;
   }
 
   .btn-outline-hero {
-    @apply border-2 border-hero-text text-hero-text hover:bg-hero-text hover:text-hero-bg;
+    @apply border-2 border-foreground text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary;
     @apply px-6 py-3 rounded-lg font-medium;
     @apply transition-all duration-300 ease-out;
   }
@@ -203,7 +203,7 @@
 
   /* Typography Enhancements */
   .heading-hero {
-    @apply text-4xl md:text-5xl lg:text-6xl font-bold text-hero-text;
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold text-foreground;
     @apply leading-tight tracking-tight;
   }
 

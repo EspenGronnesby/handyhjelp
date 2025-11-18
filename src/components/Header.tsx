@@ -25,18 +25,18 @@ export const Header = () => {
     <header className="fixed top-0 left-0 w-full bg-background/95 backdrop-blur-md border-b border-border z-50">
       <div className="container mx-auto px-4">
         {/* Top Contact Bar - Hidden on mobile */}
-        <div className="hidden md:block bg-primary text-primary-foreground py-2">
+        <div className="hidden md:block bg-secondary text-secondary-foreground py-2">
           <div className="container mx-auto px-4 flex justify-end space-x-6 text-sm">
             <a 
               href="tel:+4741250553" 
-              className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+              className="flex items-center space-x-2 hover:text-primary transition-colors"
             >
               <Phone className="h-4 w-4" />
               <span>+47 41250553</span>
             </a>
             <a 
               href="mailto:Handyhjelp@gmail.com" 
-              className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+              className="flex items-center space-x-2 hover:text-primary transition-colors"
             >
               <Mail className="h-4 w-4" />
               <span>Handyhjelp@gmail.com</span>
