@@ -22,49 +22,49 @@ export const HeroSection = () => {
             <div className="flex flex-wrap gap-6 mb-8">
               <div className="flex items-center space-x-2 text-hero-text-muted">
                 <Shield className="h-5 w-5" />
-                <span className="text-sm font-medium">Lokal & pålitelig</span>
+                <span className="text-sm font-medium">20+ års erfaring</span>
               </div>
               <div className="flex items-center space-x-2 text-hero-text-muted">
                 <Clock className="h-5 w-5" />
-                <span className="text-sm font-medium">Rask respons</span>
+                <span className="text-sm font-medium">Sertifiserte fagfolk</span>
               </div>
               <div className="flex items-center space-x-2 text-hero-text-muted">
                 <Star className="h-5 w-5" />
-                <span className="text-sm font-medium">Fornøydgaranti</span>
+                <span className="text-sm font-medium">Fast kontaktperson</span>
               </div>
             </div>
 
             {/* Main Heading - Responsive */}
-            <h1 className="heading-hero mb-4 md:mb-6 animate-fade-in-left">
-              <span className="md:hidden">Lokal handyhjelp i Kristiansand</span>
-              <span className="hidden md:block">Vi fikser det du ikke rekker selv</span>
+            <h1 className="heading-hero mb-4 md:mb-6 animate-fade-in-left font-heading">
+              <span className="md:hidden">Profesjonell eiendomspleie i Kristiansand</span>
+              <span className="hidden md:block">Profesjonell eiendomspleie i Kristiansand</span>
             </h1>
             
             {/* Tagline - Mobile only */}
             <p className="text-hero-text-muted text-lg mb-4 animate-fade-in-left md:hidden">
-              Flytting • Montering • Tømrer • Småjobber
+              Vaktmester • Tømrer • Blikk
             </p>
 
             {/* Tagline - Desktop */}
             <p className="text-hero-text-muted text-xl mb-4 animate-fade-in-left hidden md:block">
-              Din lokale handyhjelp i Kristiansand
+              Vaktmester • Tømrer • Blikk – Din lokale ekspert for trygg og effektiv vedlikehold
             </p>
 
             {/* Description - Desktop only */}
-            <p className="text-hero-muted mb-8 animate-fade-in-left hidden md:block">
-              Flytting, montering, rydding, tømrer oppdrag/snekker og småjobber – enkelt og trygt. 
-              Rask hjelp, ærlige priser og godt humør.
+            <p className="text-hero-text-muted text-base mb-8 animate-fade-in-left hidden md:block">
+              Vi tar oss av alt fra daglig eiendomspleie til profesjonelle tømrer- og blikkarbeider. 
+              Få faste avtaler som gir deg ro i hverdagen.
             </p>
 
             <div className="space-y-2 md:space-y-4 mb-6 md:mb-8">
               <p className="text-hero-text-muted text-base md:text-lg">
-                <span className="font-semibold">Fra 600 kr/time</span>
+                <span className="font-semibold">Fra 650 kr/time</span>
                 <span className="hidden md:inline"> inkl. mva</span> · 
-                <span className="hidden md:inline">Førstegangs-kunde: </span>
-                <span className="md:hidden">Ny kunde: </span>-10%
+                <span className="hidden md:inline">Avtaler fra 1 dag til 5 år</span>
+                <span className="md:hidden">Faste avtaler tilgjengelig</span>
               </p>
               <p className="text-hero-text-muted text-sm md:text-base hidden md:block">
-                Vi dekker Kristiansand, Lund, Søm, Vågsbygd, Randesund og Søgne
+                Vi dekker Kristiansand, Søgne og Vennesla
               </p>
             </div>
 
@@ -72,18 +72,18 @@ export const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-left">
               <Button 
                 size="lg" 
-                className="btn-hero text-lg px-8 py-4"
+                className="btn-hero text-lg px-8 py-4 bg-success hover:bg-success-hover"
                 onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Få gratis tilbud nå
+                Bestill fast avtale
               </Button>
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="bg-black text-white border-black text-lg px-6 py-4 hover:bg-black hover:text-white"
-                onClick={() => document.getElementById('process-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className="border-2 border-hero-text text-hero-text text-lg px-6 py-4 hover:bg-hero-text/10"
+                onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Slik fungerer det
+                Se våre tjenester
               </Button>
             </div>
           </div>

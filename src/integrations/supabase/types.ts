@@ -451,14 +451,8 @@ export type Database = {
         }
         Returns: string
       }
-      expire_old_points: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      get_active_campaign_multiplier: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      expire_old_points: { Args: never; Returns: number }
+      get_active_campaign_multiplier: { Args: never; Returns: number }
     }
     Enums: {
       loyalty_tier: "bronze" | "silver" | "gold"

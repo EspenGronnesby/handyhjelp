@@ -35,64 +35,115 @@ const Index = () => {
         <section className="py-16 bg-background" id="services">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="heading-section">Våre tjenester</h2>
+              <h2 className="heading-section font-heading">Våre hovedtjenester</h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Fra flyttehjelp til småjobber – vi løser praktiske oppgaver raskt og trygt.
+                Profesjonell eiendomspleie skreddersydd for dine behov
               </p>
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
               {[
                 {
-                  title: "Flyttehjelp",
-                  description: "Bæring, transport og trygg flytting",
-                  details: "Bæring mellom bolig/etasje, laste/lossing av varebil, sikring av møbler"
+                  title: "Vaktmestertjenester",
+                  icon: "🔧",
+                  description: "Profesjonell eiendomspleie og vedlikehold",
+                  details: [
+                    "Daglig/ukentlig/månedlig tilsyn av bygg",
+                    "Renhold av fellesarealer og uteområder",
+                    "Mindre reparasjoner og vedlikehold",
+                    "Vintervedlikehold (strøing, snørydding)",
+                    "Inspeksjonsrapporter og dokumentasjon"
+                  ],
+                  target: "Borettslag, sameier, næringseiendom",
+                  price: "Fra 650 kr/time"
                 },
                 {
-                  title: "Montering", 
-                  description: "Møbler, hvitevarer og utstyr",
-                  details: "IKEA-møbler, TV-veggfeste, hvitevare-innsetting (uten rør/strøm-omlegging)"
+                  title: "Tømrertjenester",
+                  icon: "🔨",
+                  description: "Kvalitetssnekring og konstruksjonsarbeid",
+                  details: [
+                    "Bygging og reparasjon av terrasser",
+                    "Montering av dører, vinduer og innredning",
+                    "Takarbeid og taktekking",
+                    "Renovering av bad og kjøkken (trearbeid)",
+                    "Laftekonstruksjoner og vedskjul"
+                  ],
+                  target: "Privatpersoner, bedrifter, boligselskaper",
+                  price: "Fra 750 kr/time"
                 },
                 {
-                  title: "Rydding & bortkjøring",
-                  description: "Vi sorterer og kjører bort avfall",
-                  details: "Henting av gamle møbler, hageavfall, smådeponi-turer"
-                },
-                {
-                  title: "Tømrer jobber",
-                  description: "Profesjonelle tømrer- og snekkerarbeider",
-                  details: "Bygge/reparere terrasser, sette opp hyller, enkle snekkerarbeider, vedlikehold av trekonstruksjoner"
-                },
-                {
-                  title: "Småjobber",
-                  description: "Enkle reparasjoner og vedlikehold",
-                  details: "Små sparkling/maling, skifte håndtak/grep, enkle utendørs småjobber"
+                  title: "Blikkenslagertjenester",
+                  icon: "💧",
+                  description: "Sikker taktekkningsløsninger og vannsystemer",
+                  details: [
+                    "Montering og vedlikehold av takrenner",
+                    "Beslag og blikk på tak og vegger",
+                    "Tetting og vannsikring",
+                    "Ventilasjonsarbeider",
+                    "Inspeksjon av tak og blikkarbeider"
+                  ],
+                  target: "Eiendomsselskaper, borettslag, privatpersoner",
+                  price: "Fra 800 kr/time"
                 }
               ].map((service, index) => (
-                <div key={index} className="card-professional p-6">
-                  <h3 className="text-xl font-bold text-foreground mb-2">{service.title}</h3>
-                  <p className="text-muted-foreground font-medium mb-3">{service.description}</p>
-                  <p className="text-sm text-muted-foreground">{service.details}</p>
+                <div key={index} className="card-professional p-8 hover:shadow-xl transition-all duration-300">
+                  <div className="text-5xl mb-4">{service.icon}</div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2 font-heading">{service.title}</h3>
+                  <p className="text-primary font-medium mb-4">{service.description}</p>
+                  
+                  <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
+                    {service.details.map((detail, idx) => (
+                      <li key={idx} className="flex items-start">
+                        <span className="text-success mr-2">✓</span>
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <div className="border-t border-border pt-4 space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-semibold text-foreground">Målgruppe:</span> {service.target}
+                    </p>
+                    <p className="text-lg font-bold text-primary">{service.price}</p>
+                  </div>
+                  
+                  <Button 
+                    className="w-full mt-4 bg-primary hover:bg-primary-hover"
+                    onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Bestill tjeneste
+                  </Button>
                 </div>
               ))}
             </div>
 
             <div className="text-center">
-              <div className="bg-muted/30 p-8 rounded-xl max-w-2xl mx-auto">
-                <h3 className="text-xl font-bold text-foreground mb-4">Priser og vilkår</h3>
-                <div className="space-y-2 text-muted-foreground mb-6">
-                  <p><span className="font-semibold">Fra 600 kr/time inkl. mva</span></p>
-                  <p>Minstetid: 1 time, deretter per påbegynt 30. min</p>
-                  <p>Førstegangs-kunde: -10% på første oppdrag</p>
-                  <p>Materialer/forbruk faktureres etter kvittering</p>
+              <div className="bg-accent/50 p-8 rounded-xl max-w-3xl mx-auto border-2 border-primary/20">
+                <h3 className="text-2xl font-bold text-foreground mb-4 font-heading">Faste avtaler for bedrifter</h3>
+                <div className="space-y-3 text-muted-foreground mb-6">
+                  <p className="text-lg">
+                    <span className="font-semibold text-foreground">Spar tid og penger</span> med en fast serviceavtale
+                  </p>
+                  <p>Få fast kontaktperson, prioritert service og forutsigbare kostnader</p>
+                  <p className="text-sm">Avtaler fra 1 dag til 5 år • Automatisk fakturering • Fleksible betingelser</p>
                 </div>
-                <Button 
-                  size="lg"
-                  className="bg-success hover:bg-success-hover text-success-foreground"
-                  onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  Få uforpliktende tilbud
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button 
+                    size="lg"
+                    className="bg-success hover:bg-success-hover"
+                    onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Forespør fast avtale
+                  </Button>
+                  <Button 
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Engangsjobb
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
