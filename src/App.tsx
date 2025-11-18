@@ -21,6 +21,7 @@ import Projects from "./pages/Projects";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Services from "./pages/Services";
+import Blog from "./pages/Blog";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/om-oss" element={<About />} />
             <Route path="/kontakt" element={<Contact />} />
             <Route path="/tjenester" element={<Services />} />
+            <Route path="/raad" element={<Blog />} />
             <Route path="/kunde-innlogging" element={<CustomerLogin />} />
             <Route path="/kunde-portal" element={<CustomerPortal />} />
             <Route path="/dashboard" element={<Dashboard />}>
