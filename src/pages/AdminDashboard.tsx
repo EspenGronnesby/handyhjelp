@@ -5,9 +5,11 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Users, FileText, Briefcase } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Users, FileText, Briefcase, Play, CheckCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 interface Quote {
   id: string;
@@ -107,11 +109,61 @@ const AdminDashboard = () => {
   const statusLabels: Record<string, string> = {
     pending: 'Venter',
     accepted: 'Akseptert',
-    completed: 'Fullført',
+    completed: 'Prosjektet er ferdig',
     rejected: 'Avvist',
     confirmed: 'Bekreftet',
     started: 'Startet',
-    in_progress: 'Pågår'
+    in_progress: 'Jobber med saken'
+  };
+
+  const handleStartJob = async (jobId: string) => {
+    try {
+      toast.loading('Starter jobb og sender e-post...');
+      
+      const { error } = await supabase.functions.invoke('send-job-started-email', {
+        body: { jobId }
+      });
+
+      if (error) throw error;
+
+      toast.success('Jobb startet og kunde er varslet via e-post!');
+      
+      // Refresh jobs data
+      const { data } = await supabase
+        .from('jobs')
+        .select('*, quotes(name, company_name, description)')
+        .order('created_at', { ascending: false });
+      
+      if (data) setJobs(data);
+    } catch (error: any) {
+      console.error('Error starting job:', error);
+      toast.error('Kunne ikke starte jobb: ' + error.message);
+    }
+  };
+
+  const handleCompleteJob = async (jobId: string) => {
+    try {
+      toast.loading('Avslutter jobb og sender e-post...');
+      
+      const { error } = await supabase.functions.invoke('send-job-completed-email', {
+        body: { jobId }
+      });
+
+      if (error) throw error;
+
+      toast.success('Jobb fullført og kunde er varslet via e-post!');
+      
+      // Refresh jobs data
+      const { data } = await supabase
+        .from('jobs')
+        .select('*, quotes(name, company_name, description)')
+        .order('created_at', { ascending: false });
+      
+      if (data) setJobs(data);
+    } catch (error: any) {
+      console.error('Error completing job:', error);
+      toast.error('Kunne ikke fullføre jobb: ' + error.message);
+    }
   };
 
   return (
@@ -218,6 +270,31 @@ const AdminDashboard = () => {
                   <p className="text-sm font-semibold">Beløp: {job.amount.toLocaleString('nb-NO')} kr</p>
                 )}
                 {job.notes && <p className="text-sm text-muted-foreground">Notater: {job.notes}</p>}
+                
+                <div className="flex gap-2 pt-2">
+                  {job.status !== 'in_progress' && job.status !== 'completed' && (
+                    <Button
+                      onClick={() => handleStartJob(job.id)}
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <Play className="h-4 w-4" />
+                      Start
+                    </Button>
+                  )}
+                  
+                  {job.status === 'in_progress' && (
+                    <Button
+                      onClick={() => handleCompleteJob(job.id)}
+                      size="sm"
+                      className="flex items-center gap-2"
+                      variant="secondary"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      Avslutt
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
