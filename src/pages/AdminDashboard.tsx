@@ -116,10 +116,36 @@ const AdminDashboard = () => {
     in_progress: 'Jobber med saken'
   };
 
-  const handleStartJob = async (jobId: string) => {
+  const handleStartQuote = async (quoteId: string, userId: string) => {
     try {
       toast.loading('Starter jobb og sender e-post...');
       
+      // First, check if job already exists for this quote
+      const { data: existingJob } = await supabase
+        .from('jobs')
+        .select('id')
+        .eq('quote_id', quoteId)
+        .single();
+
+      let jobId = existingJob?.id;
+
+      // If no job exists, create one
+      if (!jobId) {
+        const { data: newJob, error: jobError } = await supabase
+          .from('jobs')
+          .insert({
+            quote_id: quoteId,
+            user_id: userId,
+            status: 'confirmed'
+          })
+          .select('id')
+          .single();
+
+        if (jobError) throw jobError;
+        jobId = newJob.id;
+      }
+
+      // Now call the edge function to start the job
       const { error } = await supabase.functions.invoke('send-job-started-email', {
         body: { jobId }
       });
@@ -128,42 +154,61 @@ const AdminDashboard = () => {
 
       toast.success('Jobb startet og kunde er varslet via e-post!');
       
-      // Refresh jobs data
-      const { data } = await supabase
-        .from('jobs')
-        .select('*, quotes(name, company_name, description)')
-        .order('created_at', { ascending: false });
+      // Refresh data
+      const [quotesResult, jobsResult] = await Promise.all([
+        supabase.from('quotes').select('*').order('created_at', { ascending: false }),
+        supabase.from('jobs').select('*, quotes(name, company_name, description)').order('created_at', { ascending: false })
+      ]);
       
-      if (data) setJobs(data);
+      if (quotesResult.data) setQuotes(quotesResult.data);
+      if (jobsResult.data) setJobs(jobsResult.data);
     } catch (error: any) {
-      console.error('Error starting job:', error);
+      console.error('Error starting quote:', error);
       toast.error('Kunne ikke starte jobb: ' + error.message);
     }
   };
 
-  const handleCompleteJob = async (jobId: string) => {
+  const handleCompleteQuote = async (quoteId: string) => {
     try {
       toast.loading('Avslutter jobb og sender e-post...');
       
+      // Find the job for this quote
+      const { data: job, error: jobError } = await supabase
+        .from('jobs')
+        .select('id')
+        .eq('quote_id', quoteId)
+        .single();
+
+      if (jobError || !job) {
+        toast.error('Fant ikke jobb for denne forespørselen');
+        return;
+      }
+
       const { error } = await supabase.functions.invoke('send-job-completed-email', {
-        body: { jobId }
+        body: { jobId: job.id }
       });
 
       if (error) throw error;
 
       toast.success('Jobb fullført og kunde er varslet via e-post!');
       
-      // Refresh jobs data
-      const { data } = await supabase
-        .from('jobs')
-        .select('*, quotes(name, company_name, description)')
-        .order('created_at', { ascending: false });
+      // Refresh data
+      const [quotesResult, jobsResult] = await Promise.all([
+        supabase.from('quotes').select('*').order('created_at', { ascending: false }),
+        supabase.from('jobs').select('*, quotes(name, company_name, description)').order('created_at', { ascending: false })
+      ]);
       
-      if (data) setJobs(data);
+      if (quotesResult.data) setQuotes(quotesResult.data);
+      if (jobsResult.data) setJobs(jobsResult.data);
     } catch (error: any) {
-      console.error('Error completing job:', error);
+      console.error('Error completing quote:', error);
       toast.error('Kunne ikke fullføre jobb: ' + error.message);
     }
+  };
+
+  const getQuoteJobStatus = (quoteId: string) => {
+    const job = jobs.find(j => j.quote_id === quoteId);
+    return job?.status || null;
   };
 
   return (
@@ -187,7 +232,7 @@ const AdminDashboard = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tilbud</CardTitle>
+            <CardTitle className="text-sm font-medium">Forespørsler</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -207,7 +252,7 @@ const AdminDashboard = () => {
 
       <Tabs defaultValue="quotes" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="quotes">Tilbud</TabsTrigger>
+          <TabsTrigger value="quotes">Forespørsler</TabsTrigger>
           <TabsTrigger value="jobs">Jobber</TabsTrigger>
           <TabsTrigger value="customers">Kunder</TabsTrigger>
         </TabsList>
@@ -233,6 +278,31 @@ const AdminDashboard = () => {
                 {quote.address && <p className="text-sm text-muted-foreground">Adresse: {quote.address}</p>}
                 <p className="text-sm text-muted-foreground">E-post: {quote.email}</p>
                 <p className="text-sm text-muted-foreground">Telefon: {quote.phone}</p>
+                
+                <div className="flex gap-2 pt-2">
+                  {getQuoteJobStatus(quote.id) !== 'in_progress' && getQuoteJobStatus(quote.id) !== 'completed' && (
+                    <Button
+                      onClick={() => handleStartQuote(quote.id, quote.user_id!)}
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <Play className="h-4 w-4" />
+                      Start
+                    </Button>
+                  )}
+                  
+                  {getQuoteJobStatus(quote.id) === 'in_progress' && (
+                    <Button
+                      onClick={() => handleCompleteQuote(quote.id)}
+                      size="sm"
+                      className="flex items-center gap-2"
+                      variant="secondary"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      Avslutt
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -270,31 +340,6 @@ const AdminDashboard = () => {
                   <p className="text-sm font-semibold">Beløp: {job.amount.toLocaleString('nb-NO')} kr</p>
                 )}
                 {job.notes && <p className="text-sm text-muted-foreground">Notater: {job.notes}</p>}
-                
-                <div className="flex gap-2 pt-2">
-                  {job.status !== 'in_progress' && job.status !== 'completed' && (
-                    <Button
-                      onClick={() => handleStartJob(job.id)}
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      <Play className="h-4 w-4" />
-                      Start
-                    </Button>
-                  )}
-                  
-                  {job.status === 'in_progress' && (
-                    <Button
-                      onClick={() => handleCompleteJob(job.id)}
-                      size="sm"
-                      className="flex items-center gap-2"
-                      variant="secondary"
-                    >
-                      <CheckCircle className="h-4 w-4" />
-                      Avslutt
-                    </Button>
-                  )}
-                </div>
               </CardContent>
             </Card>
           ))}
