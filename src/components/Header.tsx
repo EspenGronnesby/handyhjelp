@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import handyhjelpLogo from '@/assets/handyhjelp-logo.png';
+import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,7 +25,7 @@ export const Header = () => {
     <header className="fixed top-0 left-0 w-full bg-background/95 backdrop-blur-md border-b border-border z-50">
       <div className="container mx-auto px-4">
         {/* Top Contact Bar - Hidden on mobile */}
-        <div className="hidden md:block bg-secondary text-secondary-foreground py-2">
+        <div className="hidden md:block bg-secondary text-secondary-foreground py-1.5">
           <div className="container mx-auto px-4 flex justify-end space-x-6 text-sm">
             <a 
               href="tel:+4741250553" 
@@ -45,13 +45,13 @@ export const Header = () => {
         </div>
 
         {/* Main Navigation */}
-        <div className="flex items-center justify-between md:justify-between py-4">
+        <div className="flex items-center justify-between md:justify-between py-2">
           {/* Logo - Centered on mobile, left-aligned on desktop */}
           <Link to="/" className="flex items-center absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none">
             <img 
               src={handyhjelpLogo} 
               alt="HandyHjelp - Levert med kvalitet" 
-              className="h-20 md:h-24 w-auto object-contain"
+              className="h-16 md:h-20 w-auto object-contain"
             />
           </Link>
 
