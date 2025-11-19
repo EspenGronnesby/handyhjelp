@@ -14,6 +14,7 @@ import DashboardJobs from "./pages/DashboardJobs";
 import DashboardLoyalty from "./pages/DashboardLoyalty";
 import DashboardProfile from "./pages/DashboardProfile";
 import DashboardNotifications from "./pages/DashboardNotifications";
+import AdminDashboard from "./pages/AdminDashboard";
 import FAQ from "./pages/FAQ";
 import Projects from "./pages/Projects";
 import About from "./pages/About";
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="loyalty" element={<DashboardLoyalty />} />
               <Route path="profile" element={<DashboardProfile />} />
               <Route path="notifications" element={<DashboardNotifications />} />
+              <Route path="admin" element={<AdminDashboard />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
