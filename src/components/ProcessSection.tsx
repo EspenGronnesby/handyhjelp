@@ -13,7 +13,7 @@ export const ProcessSection = () => {
     {
       number: 2,
       title: "Få tilbud",
-      description: "Tydelig pris før oppstart",
+      description: "Detaljert prisestimat før oppstart",
       icon: Calculator
     },
     {
