@@ -85,9 +85,6 @@ export const UsePointsModal = ({ open, onClose, currentBalance, getPointsValue }
             <div className="bg-primary/10 p-4 rounded-lg text-center">
               <p className="text-sm text-muted-foreground mb-2">Din rabattkode</p>
               <p className="text-2xl font-bold font-mono tracking-wider">{discountCode}</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                {discountValue} kr rabatt
-              </p>
             </div>
 
             <Button onClick={handleCopyCode} className="w-full" variant="outline">
@@ -137,14 +134,14 @@ export const UsePointsModal = ({ open, onClose, currentBalance, getPointsValue }
               placeholder="Minimum 200 poeng"
             />
             <p className="text-sm text-muted-foreground">
-              Tilgjengelig: {currentBalance.toLocaleString()} poeng
+              Minimum 200 poeng
             </p>
           </div>
 
           {discountValue > 0 && (
             <div className="bg-primary/10 p-4 rounded-lg">
-              <p className="text-sm text-muted-foreground">Du får</p>
-              <p className="text-2xl font-bold">{discountValue} kr rabatt</p>
+              <p className="text-sm text-muted-foreground">Du får rabatt</p>
+              <p className="text-2xl font-bold">{pointsToUse} poeng</p>
             </div>
           )}
         </div>

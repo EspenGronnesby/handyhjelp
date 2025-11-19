@@ -165,7 +165,7 @@ export const useLoyalty = () => {
   };
 
   const getPointsValue = (points: number) => {
-    return Math.floor(points / 10);
+    return Math.floor(points / 100);
   };
 
   return {

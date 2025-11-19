@@ -7,8 +7,11 @@ import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { user } = useAuth();
+  
   return (
     <div className="min-h-screen">
       {/* Google Analytics */}
@@ -165,12 +168,21 @@ const Index = () => {
       {/* Customer Portal Link */}
       <div className="py-8 bg-muted border-t">
         <div className="container mx-auto px-4 text-center">
-          <Link 
-            to="/kunde-innlogging" 
-            className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
-          >
-            Er du eksisterende kunde? Se dine prosjekter →
-          </Link>
+          {user ? (
+            <Link 
+              to="/dashboard" 
+              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+            >
+              Gå til din profil →
+            </Link>
+          ) : (
+            <Link 
+              to="/auth" 
+              className="inline-flex items-center gap-2 text-primary hover:underline text-sm font-medium"
+            >
+              Er du eksisterende kunde? Logg inn her →
+            </Link>
+          )}
         </div>
       </div>
 

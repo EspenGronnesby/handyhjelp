@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Send } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -17,13 +18,29 @@ const Contact = () => {
     message: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Melding sendt!",
-      description: "Vi tar kontakt med deg innen 2 timer."
-    });
-    setFormData({ name: "", email: "", phone: "", message: "" });
+    
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: formData
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Melding sendt!",
+        description: "Vi tar kontakt med deg innen 2 timer."
+      });
+      setFormData({ name: "", email: "", phone: "", message: "" });
+    } catch (error) {
+      console.error('Error sending contact email:', error);
+      toast({
+        title: "Noe gikk galt",
+        description: "Prøv igjen eller ring oss på +47 41250553",
+        variant: "destructive"
+      });
+    }
   };
 
   const faqItems = [
