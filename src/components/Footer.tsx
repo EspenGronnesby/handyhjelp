@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, Clock, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
-import handyhjelpLogo from '@/assets/handyhjelp-logo.png';
+import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
+import handyhjelpLogoFooter from '@/assets/handyhjelp-logo-footer.png';
 
 export const Footer = () => {
   return (
     <footer className="bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
           {/* Kolonne 1: HandyHjelp Info */}
           <div>
             <img 
@@ -120,6 +121,15 @@ export const Footer = () => {
                 <span>Man-Fre 07:00-17:00</span>
               </li>
             </ul>
+          </div>
+
+          {/* Kolonne 5: Logo */}
+          <div className="col-span-2 lg:col-span-1 flex items-center justify-center lg:justify-end">
+            <img 
+              src={handyhjelpLogoFooter} 
+              alt="HandyHjelp Logo" 
+              className="h-32 w-auto object-contain opacity-90"
+            />
           </div>
         </div>
       </div>
