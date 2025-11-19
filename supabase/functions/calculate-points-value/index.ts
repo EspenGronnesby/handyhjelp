@@ -15,16 +15,16 @@ Deno.serve(async (req) => {
       throw new Error('Valid points number is required');
     }
 
-    // Conversion rate: 100 poeng = 10 kr
-    const kronerValue = Math.floor(points / 10);
-    const remainingPoints = points % 10;
+    // Conversion rate: 100 poeng = 1 kr
+    const kronerValue = Math.floor(points / 100);
+    const remainingPoints = points % 100;
 
     return new Response(
       JSON.stringify({ 
         points,
         kronerValue,
         remainingPoints,
-        conversionRate: '10 poeng = 1 kr'
+        conversionRate: '100 poeng = 1 kr'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );

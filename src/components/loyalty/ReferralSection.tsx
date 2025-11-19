@@ -60,9 +60,32 @@ export const ReferralSection = () => {
 
     if (error) {
       console.error('Error creating referral code:', error);
+      toast.error('Kunne ikke generere kode');
     } else if (data) {
       setReferralCode(data.code);
       setUsesCount(0);
+      toast.success('Ny referansekode generert!');
+    }
+  };
+
+  const handleGenerateNewCode = async () => {
+    if (!user) return;
+    
+    setLoading(true);
+    try {
+      // Delete existing code
+      await supabase
+        .from('referral_codes')
+        .delete()
+        .eq('referrer_user_id', user.id);
+      
+      // Create new code
+      await createReferralCode();
+    } catch (error) {
+      console.error('Error generating new code:', error);
+      toast.error('Kunne ikke generere ny kode');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -140,6 +163,14 @@ export const ReferralSection = () => {
                 <Share2 className="h-4 w-4" />
               </Button>
             </div>
+            <Button 
+              onClick={handleGenerateNewCode} 
+              variant="ghost" 
+              className="w-full text-xs"
+              disabled={loading}
+            >
+              Generer ny kode
+            </Button>
           </div>
 
           <div className="p-3 bg-primary/10 rounded-lg">

@@ -45,13 +45,13 @@ export const Header = () => {
         </div>
 
         {/* Main Navigation */}
-        <div className="flex items-center justify-between md:justify-between py-2">
+        <div className="flex items-center justify-between md:justify-between py-3 md:py-4">
           {/* Logo - Centered on mobile, left-aligned on desktop */}
-          <Link to="/" className="flex items-center absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none">
+          <Link to="/" className="flex items-center absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none z-20">
             <img 
               src={handyhjelpLogo} 
               alt="HandyHjelp - Levert med kvalitet" 
-              className="h-16 md:h-20 w-auto object-contain"
+              className="h-14 md:h-16 w-auto object-contain"
             />
           </Link>
 
