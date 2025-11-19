@@ -146,13 +146,27 @@ const AdminDashboard = () => {
       }
 
       // Now call the edge function to start the job
-      const { error } = await supabase.functions.invoke('send-job-started-email', {
+      const { data: emailResult, error } = await supabase.functions.invoke('send-job-started-email', {
         body: { jobId }
       });
 
       if (error) throw error;
 
-      toast.success('Jobb startet og kunde er varslet via e-post!');
+      // Check if email actually sent successfully
+      if (emailResult?.emailResponse?.error) {
+        const emailError = emailResult.emailResponse.error;
+        console.error('Email sending failed:', emailError);
+        
+        if (emailError.statusCode === 403) {
+          toast.error('VIKTIG: E-post ikke sendt! Du må verifisere domenet ditt på resend.com for å sende e-post til kunder. Jobben er startet, men kunden fikk ingen varsling.', {
+            duration: 10000
+          });
+        } else {
+          toast.error('Jobb startet, men e-post feilet: ' + emailError.message);
+        }
+      } else {
+        toast.success('Jobb startet og kunde er varslet via e-post!');
+      }
       
       // Refresh data
       const [quotesResult, jobsResult] = await Promise.all([
@@ -241,7 +255,7 @@ const AdminDashboard = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Jobber</CardTitle>
+            <CardTitle className="text-sm font-medium">Pågående</CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -253,7 +267,7 @@ const AdminDashboard = () => {
       <Tabs defaultValue="quotes" className="space-y-4">
         <TabsList>
           <TabsTrigger value="quotes">Forespørsler</TabsTrigger>
-          <TabsTrigger value="jobs">Jobber</TabsTrigger>
+          <TabsTrigger value="jobs">Pågående</TabsTrigger>
           <TabsTrigger value="customers">Kunder</TabsTrigger>
         </TabsList>
 
