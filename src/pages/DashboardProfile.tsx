@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Shield } from 'lucide-react';
+import { Loader2, Shield, LogOut } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Profile {
   full_name: string;
@@ -26,6 +28,8 @@ const DashboardProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -90,6 +94,15 @@ const DashboardProfile = () => {
       });
     }
     setSaving(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: 'Logget ut',
+      description: 'Du er nå logget ut.'
+    });
+    navigate('/');
   };
 
   if (loading) {
@@ -173,6 +186,17 @@ const DashboardProfile = () => {
           </Button>
         </CardContent>
       </Card>
+
+      <div className="pt-6 border-t">
+        <Button 
+          onClick={handleSignOut} 
+          variant="outline" 
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          Logg ut
+        </Button>
+      </div>
     </div>
   );
 };
