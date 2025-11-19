@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Shield } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface Profile {
   full_name: string;
@@ -21,6 +22,7 @@ const DashboardProfile = () => {
     phone: '',
     address: ''
   });
+  const [roles, setRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
@@ -44,6 +46,17 @@ const DashboardProfile = () => {
           address: data.address || ''
         });
       }
+
+      // Fetch user roles
+      const { data: rolesData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+
+      if (rolesData) {
+        setRoles(rolesData.map(r => r.role));
+      }
+
       setLoading(false);
     };
 
@@ -90,7 +103,19 @@ const DashboardProfile = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Min profil</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-bold">Min profil</h1>
+          {roles.length > 0 && (
+            <div className="flex gap-2">
+              {roles.map((role) => (
+                <Badge key={role} variant="default" className="flex items-center gap-1">
+                  <Shield className="h-3 w-3" />
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
         <p className="text-muted-foreground">
           Oppdater dine personlige opplysninger
         </p>
