@@ -164,6 +164,30 @@ export const QuoteForm = () => {
         return;
       }
 
+      // Check daily quote limit for authenticated users (2 quotes per day)
+      if (user) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const { count, error: countError } = await supabase
+          .from('quotes')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .gte('created_at', today.toISOString());
+
+        if (countError) {
+          console.error('Error checking quote limit:', countError);
+        } else if (count !== null && count >= 2) {
+          toast({
+            title: "Daglig grense nådd",
+            description: "Du kan sende maks 2 tilbudsforespørsler per dag. Prøv igjen i morgen.",
+            variant: "destructive"
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Security validation
       const validationData: ContactFormData = {
         type: formData.type!,
