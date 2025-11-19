@@ -8,6 +8,38 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting: Track requests per IP
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS_PER_WINDOW = 3;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  
+  if (!record || now > record.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return false;
+  }
+  
+  record.count++;
+  return true;
+}
+
+// HTML sanitization
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 interface QuoteRequest {
   type: "private" | "business";
   name: string;
@@ -25,17 +57,73 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Rate limiting check
+    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+    
+    if (!checkRateLimit(clientIp)) {
+      console.warn(`Rate limit exceeded for IP: ${clientIp}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: "For mange forespørsler. Vennligst prøv igjen senere."
+        }),
+        {
+          status: 429,
+          headers: { 
+            "Content-Type": "application/json", 
+            ...corsHeaders 
+          },
+        }
+      );
+    }
+
     const quoteData: QuoteRequest = await req.json();
+    
+    // Input validation
+    if (!quoteData.name || !quoteData.email || !quoteData.phone || !quoteData.description) {
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: "Manglende obligatoriske felt"
+        }),
+        {
+          status: 400,
+          headers: { 
+            "Content-Type": "application/json", 
+            ...corsHeaders 
+          },
+        }
+      );
+    }
+
+    // Length validation
+    if (quoteData.name.length > 100 || quoteData.description.length > 2000) {
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: "Input er for lang"
+        }),
+        {
+          status: 400,
+          headers: { 
+            "Content-Type": "application/json", 
+            ...corsHeaders 
+          },
+        }
+      );
+    }
     
     console.log("Processing quote request:", { type: quoteData.type, email: quoteData.email });
 
-    // Create email content
+    // Create email content with HTML sanitization
     const customerType = quoteData.type === "business" ? "Bedrift" : "Privatperson";
     const companyInfo = quoteData.type === "business" && quoteData.companyName 
-      ? `\n<strong>Bedrift:</strong> ${quoteData.companyName}\n<strong>Org.nummer:</strong> ${quoteData.orgNumber}\n`
+      ? `\n<strong>Bedrift:</strong> ${escapeHtml(quoteData.companyName)}\n<strong>Org.nummer:</strong> ${escapeHtml(quoteData.orgNumber || '')}\n`
       : "";
     const addressInfo = quoteData.type === "private" && quoteData.address
-      ? `<p><strong>Adresse:</strong> ${quoteData.address}</p>`
+      ? `<p><strong>Adresse:</strong> ${escapeHtml(quoteData.address)}</p>`
       : "";
 
     const emailHtml = `
@@ -43,14 +131,14 @@ const handler = async (req: Request): Promise<Response> => {
       
       <h3>Kundeinformasjon</h3>
       <p><strong>Type:</strong> ${customerType}</p>
-      <p><strong>Navn:</strong> ${quoteData.name}</p>
-      <p><strong>E-post:</strong> ${quoteData.email}</p>
-      <p><strong>Telefon:</strong> ${quoteData.phone}</p>
+      <p><strong>Navn:</strong> ${escapeHtml(quoteData.name)}</p>
+      <p><strong>E-post:</strong> ${escapeHtml(quoteData.email)}</p>
+      <p><strong>Telefon:</strong> ${escapeHtml(quoteData.phone)}</p>
       ${addressInfo}
       ${companyInfo}
       
       <h3>Oppdragsbeskrivelse</h3>
-      <p>${quoteData.description.replace(/\n/g, '<br>')}</p>
+      <p>${escapeHtml(quoteData.description).replace(/\n/g, '<br>')}</p>
       
       <hr>
       <p><em>Denne forespørselen kom fra HandyHjelp.no</em></p>
@@ -60,7 +148,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "HandyHjelp <noreply@handyhjelp.no>",
       to: ["handyhjelp@gmail.com"],
-      subject: `Ny tilbudsforespørsel fra ${quoteData.name} (${customerType})`,
+      subject: `Ny tilbudsforespørsel fra ${escapeHtml(quoteData.name)} (${customerType})`,
       html: emailHtml,
       replyTo: quoteData.email,
     });
