@@ -84,22 +84,12 @@ export const Header = () => {
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center gap-2">
               {user ? (
-                <>
-                  <Link to="/dashboard">
-                    <Button variant="outline" className="gap-2">
-                      <User className="h-4 w-4" />
-                      Profil
-                    </Button>
-                  </Link>
-                  <Button 
-                    variant="ghost"
-                    className="gap-2"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Logg ut
+                <Link to="/dashboard">
+                  <Button variant="outline" className="gap-2">
+                    <User className="h-4 w-4" />
+                    Profil
                   </Button>
-                </>
+                </Link>
               ) : (
                 <Link to="/auth">
                   <Button variant="outline" className="gap-2">
@@ -208,29 +198,16 @@ export const Header = () => {
                 </div>
                 
                 {user ? (
-                  <>
-                    <Link to="/dashboard" className="block w-full">
-                      <Button 
-                        variant="outline"
-                        className="w-full gap-2 justify-start"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <User className="h-4 w-4" />
-                        Profil
-                      </Button>
-                    </Link>
+                  <Link to="/dashboard" className="block w-full">
                     <Button 
-                      variant="ghost"
+                      variant="outline"
                       className="w-full gap-2 justify-start"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        handleSignOut();
-                      }}
+                      onClick={() => setIsMenuOpen(false)}
                     >
-                      <LogOut className="h-4 w-4" />
-                      Logg ut
+                      <User className="h-4 w-4" />
+                      Profil
                     </Button>
-                  </>
+                  </Link>
                 ) : (
                   <Link to="/auth" className="block w-full">
                     <Button 
