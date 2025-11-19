@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Send } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -17,13 +18,27 @@ const Contact = () => {
     phone: "",
     message: ""
   });
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const captchaRef = useRef<HCaptcha>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!captchaToken) {
+      toast({
+        title: "Vennligst bekreft at du ikke er en robot",
+        description: "Fullfør captcha-verifiseringen først.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
     try {
       const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: formData
+        body: { ...formData, captchaToken }
       });
 
       if (error) throw error;
@@ -33,6 +48,8 @@ const Contact = () => {
         description: "Vi tar kontakt med deg innen 2 timer."
       });
       setFormData({ name: "", email: "", phone: "", message: "" });
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
     } catch (error) {
       console.error('Error sending contact email:', error);
       toast({
@@ -40,6 +57,8 @@ const Contact = () => {
         description: "Prøv igjen eller ring oss på +47 41250553",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -130,9 +149,19 @@ const Contact = () => {
                         rows={5}
                       />
                     </div>
-                    <Button type="submit" variant="cta" className="w-full gap-2">
+                    
+                    <div className="flex justify-center my-4">
+                      <HCaptcha
+                        ref={captchaRef}
+                        sitekey="10000000-ffff-ffff-ffff-000000000001"
+                        onVerify={(token) => setCaptchaToken(token)}
+                        onExpire={() => setCaptchaToken(null)}
+                      />
+                    </div>
+                    
+                    <Button type="submit" variant="cta" className="w-full gap-2" disabled={isSubmitting || !captchaToken}>
                       <Send className="h-4 w-4" />
-                      Send melding
+                      {isSubmitting ? "Sender..." : "Send melding"}
                     </Button>
                   </form>
                 </CardContent>

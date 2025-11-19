@@ -45,6 +45,7 @@ interface ContactRequest {
   email: string;
   phone: string;
   message: string;
+  captchaToken: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -74,7 +75,38 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { name, email, phone, message }: ContactRequest = await req.json();
+    const { name, email, phone, message, captchaToken }: ContactRequest = await req.json();
+    
+    // Verify hCaptcha token
+    if (!captchaToken) {
+      return new Response(
+        JSON.stringify({ error: "Captcha-verifisering mangler" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
+    const captchaResponse = await fetch('https://hcaptcha.com/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `response=${captchaToken}&secret=${Deno.env.get('HCAPTCHA_SECRET')}`,
+    });
+
+    const captchaResult = await captchaResponse.json();
+    if (!captchaResult.success) {
+      console.warn('Captcha verification failed:', captchaResult);
+      return new Response(
+        JSON.stringify({ error: "Captcha-verifisering feilet" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
     
     // Input validation
     if (!name || !email || !phone || !message) {

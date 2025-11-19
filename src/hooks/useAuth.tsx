@@ -40,12 +40,8 @@ export const useAuth = () => {
       }
     });
 
-    // Award welcome bonus after successful signup
-    if (!error && data.user) {
-      await supabase.functions.invoke('award-welcome-bonus', {
-        body: { userId: data.user.id }
-      });
-    }
+    // Welcome bonus is now awarded automatically via database trigger
+    // See: award_welcome_bonus_trigger() function
 
     return { error };
   };
