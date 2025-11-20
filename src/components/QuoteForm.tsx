@@ -390,11 +390,11 @@ export const QuoteForm = () => {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-foreground">Få gratis tilbud</h3>
         <div className="text-sm text-muted-foreground">
-          {user ? "Beskrivelse" : `${step}/3: ${step === 1 ? "Kunde" : step === 2 ? "Kontaktinfo" : "Beskrivelse"}`}
+          {user && userProfile?.customer_type ? "Beskrivelse" : `${step}/3: ${step === 1 ? "Kunde" : step === 2 ? "Kontaktinfo" : "Beskrivelse"}`}
         </div>
       </div>
 
-      {step === 1 && !user && (
+      {step === 1 && (
         <div className="space-y-4 animate-fade-in-up">
           <Label className="text-base font-medium">Privat eller bedrift?</Label>
           
@@ -465,7 +465,7 @@ export const QuoteForm = () => {
         </div>
       )}
 
-      {step === 2 && !user && (
+      {step === 2 && (
         <div className="space-y-4 animate-fade-in-up">
           <Label className="text-base font-medium">Dine kontaktopplysninger</Label>
           <div className="space-y-4">
@@ -592,7 +592,7 @@ export const QuoteForm = () => {
       )}
 
       <div className="flex justify-between pt-6 border-t">
-        {step > 1 && !user && (
+        {step > 1 && (
           <Button variant="outline" onClick={handleBack}>
             Tilbake
           </Button>
