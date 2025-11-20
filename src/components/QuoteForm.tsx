@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building } from "lucide-react";
+import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building, CheckCircle } from "lucide-react";
 import { CompanySearch } from "./CompanySearch";
 import { contactFormSchema, type ContactFormData, sanitizeInput } from "@/lib/validation";
 import { formRateLimiter, detectSuspiciousActivity, logSecurityEvent } from "@/lib/security";
@@ -42,6 +42,12 @@ export const QuoteForm = () => {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userProfile, setUserProfile] = useState<{
+    full_name: string;
+    email: string;
+    phone: string;
+    address: string;
+  } | null>(null);
   const [formData, setFormData] = useState<FormData>({
     type: null,
     name: "",
@@ -53,6 +59,34 @@ export const QuoteForm = () => {
     selectedCompany: null,
     description: ""
   });
+
+  // Fetch user profile data if logged in
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name, email, phone, address')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return;
+        }
+
+        if (data) {
+          setUserProfile(data);
+        }
+      } catch (error) {
+        console.error('Error in fetchProfile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
 
   const handleNext = () => {
     if (validateCurrentStep() && step < 3) {
@@ -342,11 +376,36 @@ export const QuoteForm = () => {
       {step === 1 && (
         <div className="space-y-4 animate-fade-in-up">
           <Label className="text-base font-medium">Privat eller bedrift?</Label>
+          
+          {user && userProfile && (
+            <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-md text-sm text-success-foreground">
+              <CheckCircle className="h-4 w-4 text-success" />
+              <span>Dine kontaktopplysninger vil bli fylt ut automatisk</span>
+            </div>
+          )}
+          
           <div className="grid grid-cols-2 gap-4">
             <Button
               variant={formData.type === "private" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center space-y-2"
-              onClick={() => handleInputChange('type', 'private')}
+              onClick={() => {
+                handleInputChange('type', 'private');
+                // Auto-fill for logged-in users
+                if (user && userProfile) {
+                  setFormData(prev => ({
+                    ...prev,
+                    type: 'private',
+                    name: userProfile.full_name || '',
+                    email: userProfile.email || '',
+                    phone: userProfile.phone || '',
+                    address: userProfile.address || ''
+                  }));
+                  toast({
+                    title: "Kontaktinfo fylt ut",
+                    description: "Dine opplysninger er hentet fra profilen din",
+                  });
+                }
+              }}
             >
               <Home className="h-6 w-6" />
               <span>Privat</span>
@@ -354,7 +413,23 @@ export const QuoteForm = () => {
             <Button
               variant={formData.type === "business" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center space-y-2"
-              onClick={() => handleInputChange('type', 'business')}
+              onClick={() => {
+                handleInputChange('type', 'business');
+                // Auto-fill for logged-in users (not address for business)
+                if (user && userProfile) {
+                  setFormData(prev => ({
+                    ...prev,
+                    type: 'business',
+                    name: userProfile.full_name || '',
+                    email: userProfile.email || '',
+                    phone: userProfile.phone || ''
+                  }));
+                  toast({
+                    title: "Kontaktinfo fylt ut",
+                    description: "Dine opplysninger er hentet fra profilen din",
+                  });
+                }
+              }}
             >
               <Building2 className="h-6 w-6" />
               <span>Bedrift</span>
