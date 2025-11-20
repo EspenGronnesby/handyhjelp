@@ -147,7 +147,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send email to HandyHjelp
     const emailResponse = await resend.emails.send({
       from: "HandyHjelp <noreply@handyhjelp.no>",
-      to: ["handyhjelp@gmail.com"],
+      to: ["Team@handyhjelp.no"],
       subject: `Ny tilbudsforespørsel fra ${escapeHtml(quoteData.name)} (${customerType})`,
       html: emailHtml,
       replyTo: quoteData.email,

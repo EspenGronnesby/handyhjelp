@@ -35,11 +35,11 @@ export const Header = () => {
               <span>+47 41250553</span>
             </a>
             <a 
-              href="mailto:Handyhjelp@gmail.com" 
+              href="mailto:Team@handyhjelp.no" 
               className="flex items-center space-x-2 hover:text-primary transition-colors"
             >
               <Mail className="h-4 w-4" />
-              <span>Handyhjelp@gmail.com</span>
+              <span>Team@handyhjelp.no</span>
             </a>
           </div>
         </div>
@@ -189,11 +189,11 @@ export const Header = () => {
                     <span>+47 41250553</span>
                   </a>
                   <a 
-                    href="mailto:Handyhjelp@gmail.com" 
+                    href="mailto:Team@handyhjelp.no" 
                     className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
                   >
                     <Mail className="h-4 w-4" />
-                    <span>Handyhjelp@gmail.com</span>
+                    <span>Team@handyhjelp.no</span>
                   </a>
                 </div>
                 
