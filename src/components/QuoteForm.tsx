@@ -243,9 +243,12 @@ export const QuoteForm = () => {
               address: formData.type === 'private' ? formData.address : null
             });
 
-          if (!profileError) {
-            userId = tempUserId;
+          if (profileError) {
+            console.error('Profile creation failed:', profileError);
           }
+          
+          // Always use tempUserId for consistency, even if profile creation failed
+          userId = tempUserId;
         }
       }
 
