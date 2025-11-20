@@ -254,9 +254,19 @@ const AdminDashboard = () => {
         jobId = newJob.id;
       }
 
+      // Get current session for auth header
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Du må være logget inn for å utføre denne handlingen');
+        return;
+      }
+
       // Now call the edge function to start the job
       const { data: emailResult, error } = await supabase.functions.invoke('send-job-started-email', {
-        body: { jobId }
+        body: { jobId },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       if (error) throw error;
@@ -295,6 +305,13 @@ const AdminDashboard = () => {
     try {
       toast.loading('Avslutter jobb og sender e-post...');
       
+      // Get current session for auth header
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Du må være logget inn for å utføre denne handlingen');
+        return;
+      }
+
       // Find the job for this quote
       const { data: job, error: jobError } = await supabase
         .from('jobs')
@@ -308,7 +325,10 @@ const AdminDashboard = () => {
       }
 
       const { error } = await supabase.functions.invoke('send-job-completed-email', {
-        body: { jobId: job.id }
+        body: { jobId: job.id },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
       });
 
       if (error) throw error;
