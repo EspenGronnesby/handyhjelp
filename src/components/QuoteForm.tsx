@@ -204,12 +204,24 @@ export const QuoteForm = () => {
   };
 
   const handleSubmit = async () => {
-    if (!validateCurrentStep()) return;
+    console.log('[QuoteForm] 🔵 handleSubmit called');
+    console.log('[QuoteForm] Current step:', step);
+    console.log('[QuoteForm] Form data:', formData);
     
+    const isValid = validateCurrentStep();
+    console.log('[QuoteForm] Validation result:', isValid);
+    
+    if (!isValid) {
+      console.log('[QuoteForm] ❌ Validation failed, stopping submission');
+      return;
+    }
+    
+    console.log('[QuoteForm] ✅ Validation passed, starting submission');
     setIsSubmitting(true);
 
     try {
       // Rate limiting check
+      console.log('[QuoteForm] Checking rate limit...');
       const userIdentifier = formData.email || 'anonymous';
       if (!formRateLimiter.isAllowed(userIdentifier)) {
         const remainingTime = Math.ceil(formRateLimiter.getRemainingTime(userIdentifier) / 60000);
@@ -222,8 +234,11 @@ export const QuoteForm = () => {
         return;
       }
 
+      console.log('[QuoteForm] ✅ Rate limit passed');
+
       // Check daily quote limit for authenticated users (2 quotes per day)
       if (user) {
+        console.log('[QuoteForm] Checking daily quote limit for user:', user.id);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
@@ -234,8 +249,9 @@ export const QuoteForm = () => {
           .gte('created_at', today.toISOString());
 
         if (countError) {
-          console.error('Error checking quote limit:', countError);
+          console.error('[QuoteForm] Error checking quote limit:', countError);
         } else if (count !== null && count >= 2) {
+          console.log('[QuoteForm] ❌ Daily limit reached:', count);
           toast({
             title: "Daglig grense nådd",
             description: "Du kan sende maks 2 tilbudsforespørsler per dag. Prøv igjen i morgen.",
@@ -244,8 +260,10 @@ export const QuoteForm = () => {
           setIsSubmitting(false);
           return;
         }
+        console.log('[QuoteForm] ✅ Daily limit check passed, count:', count);
       }
 
+      console.log('[QuoteForm] Starting security validation...');
       // Security validation
       const validationData: ContactFormData = {
         type: formData.type!,
@@ -257,8 +275,12 @@ export const QuoteForm = () => {
         isAuthenticated: !!user,
       };
 
+      console.log('[QuoteForm] Validation data prepared:', validationData);
+
       // Check for suspicious activity
+      console.log('[QuoteForm] Checking for suspicious activity...');
       if (detectSuspiciousActivity(validationData)) {
+        console.log('[QuoteForm] ❌ Suspicious activity detected');
         logSecurityEvent('suspicious_form_submission', { 
           userAgent: navigator.userAgent,
           timestamp: new Date().toISOString()
@@ -271,12 +293,16 @@ export const QuoteForm = () => {
         });
         return;
       }
+      console.log('[QuoteForm] ✅ No suspicious activity detected');
 
       // Final validation with zod schema
+      console.log('[QuoteForm] Performing Zod schema validation...');
       const validatedData = contactFormSchema.parse(validationData);
+      console.log('[QuoteForm] ✅ Zod validation passed');
 
       // Save quote to database - Allow NULL user_id for anonymous submissions
       // Users can later register with the same email to claim their quotes
+      console.log('[QuoteForm] Preparing to save quote to database...');
       const quoteData = {
         user_id: user?.id || null, // NULL for anonymous users, will be linked when they register
         type: formData.type!,
@@ -290,6 +316,8 @@ export const QuoteForm = () => {
         status: 'pending'
       };
 
+      console.log('[QuoteForm] Quote data to insert:', quoteData);
+      
       const { data: quoteRecord, error: dbError } = await supabase
         .from('quotes')
         .insert(quoteData)
@@ -297,9 +325,11 @@ export const QuoteForm = () => {
         .single();
 
       if (dbError) {
-        console.error('Database error:', dbError);
+        console.error('[QuoteForm] ❌ Database error:', dbError);
         throw new Error('Failed to save quote');
       }
+
+      console.log('[QuoteForm] ✅ Quote saved to database, ID:', quoteRecord.id);
 
       // Send email notification using Supabase client
       console.log('[QuoteForm] Sending email notification for quote:', quoteRecord.id);
