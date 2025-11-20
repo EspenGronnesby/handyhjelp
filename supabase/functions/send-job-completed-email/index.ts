@@ -21,7 +21,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     console.log('[send-job-completed-email] Function invoked');
     
-    // Verify authentication
+    // Verify authentication using JWT
     const authHeader = req.headers.get('Authorization');
     console.log('[send-job-completed-email] Auth header present:', !!authHeader);
     
@@ -33,17 +33,19 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Create client with user's auth
-    const supabaseClient = createClient(
+    // Use service role client to verify the JWT and check admin role
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log('[send-job-completed-email] Attempting to verify user...');
+    // Extract JWT token from Bearer header
+    const token = authHeader.replace('Bearer ', '');
     
-    // Verify user is authenticated
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    console.log('[send-job-completed-email] Verifying JWT token...');
+    
+    // Verify the JWT token to get user info
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
     
     console.log('[send-job-completed-email] User verification result:', {
       hasUser: !!user,
@@ -59,8 +61,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check if user is admin
-    const { data: roleData, error: roleError } = await supabaseClient
+    // Check if user is admin using service role client
+    const { data: roleData, error: roleError } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
@@ -77,12 +79,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Admin verified:", user.id);
 
-    // Use service role for actual operations
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
     const { jobId }: JobCompleteRequest = await req.json();
 
     if (!jobId) {
@@ -95,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Fetch job and related quote/profile information
+    // Fetch job and related quote/profile information using service role
     const { data: job, error: jobError } = await supabaseAdmin
       .from('jobs')
       .select(`
