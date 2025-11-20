@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { Loader2, Home, Building2 } from 'lucide-react';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +14,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [customerType, setCustomerType] = useState<'private' | 'business' | null>(null);
   const [loading, setLoading] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
@@ -40,7 +40,7 @@ const Auth = () => {
         });
         navigate('/dashboard');
       } else {
-        if (!fullName || !phone) {
+        if (!fullName || !phone || !customerType) {
           toast({
             title: 'Feil',
             description: 'Vennligst fyll ut alle felter',
@@ -49,7 +49,7 @@ const Auth = () => {
           setLoading(false);
           return;
         }
-        const { error } = await signUp(email, password, fullName, phone);
+        const { error } = await signUp(email, password, fullName, phone, customerType);
         if (error) throw error;
         toast({
           title: 'Konto opprettet!',
@@ -123,6 +123,29 @@ const Auth = () => {
                     onChange={(e) => setPhone(e.target.value)}
                     required={!isLogin}
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Privat eller bedrift?</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button
+                      type="button"
+                      variant={customerType === "private" ? "default" : "outline"}
+                      className="h-20 flex flex-col items-center justify-center space-y-2"
+                      onClick={() => setCustomerType('private')}
+                    >
+                      <Home className="h-6 w-6" />
+                      <span>Privat</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={customerType === "business" ? "default" : "outline"}
+                      className="h-20 flex flex-col items-center justify-center space-y-2"
+                      onClick={() => setCustomerType('business')}
+                    >
+                      <Building2 className="h-6 w-6" />
+                      <span>Bedrift</span>
+                    </Button>
+                  </div>
                 </div>
               </>
             )}

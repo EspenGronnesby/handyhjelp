@@ -47,6 +47,7 @@ export const QuoteForm = () => {
     email: string;
     phone: string;
     address: string;
+    customer_type: 'private' | 'business' | null;
   } | null>(null);
   const [formData, setFormData] = useState<FormData>({
     type: null,
@@ -68,7 +69,7 @@ export const QuoteForm = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('full_name, email, phone, address')
+          .select('full_name, email, phone, address, customer_type')
           .eq('id', user.id)
           .single();
 
@@ -78,7 +79,23 @@ export const QuoteForm = () => {
         }
 
         if (data) {
-          setUserProfile(data);
+          setUserProfile({
+            ...data,
+            customer_type: data.customer_type as 'private' | 'business' | null
+          });
+          
+          // Auto-skip step 1 if customer_type exists
+          if (data.customer_type && (data.customer_type === 'private' || data.customer_type === 'business')) {
+            setFormData(prev => ({
+              ...prev,
+              type: data.customer_type as 'private' | 'business',
+              name: data.full_name || '',
+              email: data.email || '',
+              phone: data.phone || '',
+              address: data.customer_type === 'private' ? (data.address || '') : ''
+            }));
+            setStep(2);
+          }
         }
       } catch (error) {
         console.error('Error in fetchProfile:', error);
