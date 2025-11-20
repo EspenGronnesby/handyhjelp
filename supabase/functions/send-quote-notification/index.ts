@@ -52,6 +52,8 @@ interface QuoteRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log('[send-quote-notification] Function invoked');
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -61,6 +63,8 @@ const handler = async (req: Request): Promise<Response> => {
     const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 
                      req.headers.get('x-real-ip') || 
                      'unknown';
+    
+    console.log('[send-quote-notification] Processing request from IP:', clientIp);
     
     if (!checkRateLimit(clientIp)) {
       console.warn(`Rate limit exceeded for IP: ${clientIp}`);
@@ -80,9 +84,16 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const quoteData: QuoteRequest = await req.json();
+    console.log('[send-quote-notification] Quote data received:', { 
+      type: quoteData.type, 
+      email: quoteData.email,
+      hasName: !!quoteData.name,
+      hasDescription: !!quoteData.description 
+    });
     
     // Input validation
     if (!quoteData.name || !quoteData.email || !quoteData.phone || !quoteData.description) {
+      console.error('[send-quote-notification] Missing required fields');
       return new Response(
         JSON.stringify({ 
           success: false,
@@ -100,6 +111,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Length validation
     if (quoteData.name.length > 100 || quoteData.description.length > 2000) {
+      console.error('[send-quote-notification] Input too long');
       return new Response(
         JSON.stringify({ 
           success: false,
@@ -145,6 +157,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     // Send email to HandyHjelp
+    console.log('[send-quote-notification] Sending email to Team@handyhjelp.no');
     const emailResponse = await resend.emails.send({
       from: "HandyHjelp <team@handyhjelp.no>",
       to: ["Team@handyhjelp.no"],
@@ -153,8 +166,14 @@ const handler = async (req: Request): Promise<Response> => {
       replyTo: quoteData.email,
     });
 
+    console.log('[send-quote-notification] Team email sent successfully:', {
+      id: emailResponse.data?.id,
+      error: emailResponse.error
+    });
+
     // Send confirmation email to customer
-    await resend.emails.send({
+    console.log('[send-quote-notification] Sending confirmation email to customer:', quoteData.email);
+    const customerEmailResponse = await resend.emails.send({
       from: "HandyHjelp <team@handyhjelp.no>",
       to: [quoteData.email],
       subject: "Takk for din tilbudsforespørsel! 📋",
@@ -186,7 +205,12 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Emails sent successfully:", emailResponse);
+    console.log('[send-quote-notification] Customer email sent successfully:', {
+      id: customerEmailResponse.data?.id,
+      error: customerEmailResponse.error
+    });
+
+    console.log('[send-quote-notification] ✅ Both emails sent successfully');
 
     return new Response(JSON.stringify({ 
       success: true,
@@ -200,7 +224,12 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
   } catch (error: any) {
-    console.error("Error in send-quote-notification function:", error);
+    console.error('[send-quote-notification] ❌ Error:', error);
+    console.error('[send-quote-notification] Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     return new Response(
       JSON.stringify({ 
         success: false,
