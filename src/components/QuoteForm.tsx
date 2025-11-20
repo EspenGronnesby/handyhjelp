@@ -286,11 +286,12 @@ export const QuoteForm = () => {
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
+          quoteId: quoteRecord.id,
           type: formData.type,
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          address: formData.address,
+          ...(formData.type === 'private' && formData.address ? { address: formData.address } : {}),
           orgNumber: formData.selectedCompany?.orgNumber,
           companyName: formData.selectedCompany?.name,
           description: formData.description
