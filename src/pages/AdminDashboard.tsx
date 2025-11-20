@@ -53,6 +53,8 @@ interface Profile {
   phone?: string;
   address?: string;
   customer_type?: 'private' | 'business' | null;
+  org_number?: string;
+  company_name?: string;
   created_at: string;
 }
 
@@ -97,7 +99,7 @@ const AdminDashboard = () => {
       const [quotesResult, jobsResult, profilesResult, emailLogsResult] = await Promise.all([
         supabase.from('quotes').select('*').order('created_at', { ascending: false }),
         supabase.from('jobs').select('*, quotes(name, company_name, description)').order('created_at', { ascending: false }),
-        supabase.from('profiles').select('id, full_name, email, phone, address, customer_type, created_at').order('created_at', { ascending: false }),
+        supabase.from('profiles').select('id, full_name, email, phone, address, customer_type, org_number, company_name, created_at').order('created_at', { ascending: false }),
         supabase.from('email_logs').select('*').order('created_at', { ascending: false })
       ]);
 
@@ -735,6 +737,12 @@ const AdminDashboard = () => {
                 <p className="text-sm text-muted-foreground">E-post: {profile.email}</p>
                 {profile.phone && <p className="text-sm text-muted-foreground">Telefon: {profile.phone}</p>}
                 {profile.address && <p className="text-sm text-muted-foreground">Adresse: {profile.address}</p>}
+                {profile.customer_type === 'business' && profile.org_number && (
+                  <>
+                    <p className="text-sm text-muted-foreground">Bedrift: {profile.company_name}</p>
+                    <p className="text-sm text-muted-foreground">Org.nr: {profile.org_number}</p>
+                  </>
+                )}
               </CardContent>
             </Card>
           ))}
