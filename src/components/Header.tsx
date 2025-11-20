@@ -84,26 +84,35 @@ export const Header = () => {
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center gap-2">
               {user ? (
-                <Link to="/dashboard">
-                  <Button variant="outline" className="gap-2">
-                    <User className="h-4 w-4" />
-                    Profil
-                  </Button>
-                </Link>
+                <>
+                  <Link to="/dashboard">
+                    <Button variant="outline" className="gap-2">
+                      <User className="h-4 w-4" />
+                      Profil
+                    </Button>
+                  </Link>
+                  <Link to="/tilbud">
+                    <Button className="bg-success hover:bg-success-hover text-success-foreground">
+                      Få tilbud
+                    </Button>
+                  </Link>
+                </>
               ) : (
-                <Link to="/auth">
-                  <Button variant="outline" className="gap-2">
-                    <User className="h-4 w-4" />
-                    Logg inn
+                <>
+                  <Link to="/auth">
+                    <Button variant="outline" className="gap-2">
+                      <User className="h-4 w-4" />
+                      Logg inn
+                    </Button>
+                  </Link>
+                  <Button 
+                    className="bg-success hover:bg-success-hover text-success-foreground"
+                    onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+                  >
+                    Få tilbud
                   </Button>
-                </Link>
+                </>
               )}
-              <Button 
-                className="bg-success hover:bg-success-hover text-success-foreground"
-                onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Få tilbud
-              </Button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -191,38 +200,49 @@ export const Header = () => {
                 </div>
                 
                 {user ? (
-                  <Link to="/dashboard" className="block w-full">
-                    <Button 
-                      variant="outline"
-                      className="w-full gap-2 justify-start"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <User className="h-4 w-4" />
-                      Profil
-                    </Button>
-                  </Link>
+                  <>
+                    <Link to="/dashboard" className="block w-full">
+                      <Button 
+                        variant="outline"
+                        className="w-full gap-2 justify-start"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User className="h-4 w-4" />
+                        Profil
+                      </Button>
+                    </Link>
+                    <Link to="/tilbud" className="block w-full mt-2">
+                      <Button 
+                        className="w-full bg-success hover:bg-success-hover text-success-foreground"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Få tilbud
+                      </Button>
+                    </Link>
+                  </>
                 ) : (
-                  <Link to="/auth" className="block w-full">
+                  <>
+                    <Link to="/auth" className="block w-full">
+                      <Button 
+                        variant="outline"
+                        className="w-full gap-2 justify-start"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <User className="h-4 w-4" />
+                        Logg inn
+                      </Button>
+                    </Link>
                     <Button 
-                      variant="outline"
-                      className="w-full gap-2 justify-start"
-                      onClick={() => setIsMenuOpen(false)}
+                      className="w-full bg-success hover:bg-success-hover text-success-foreground mt-4"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' });
+                      }}
                     >
-                      <User className="h-4 w-4" />
-                      Logg inn
+                      Få tilbud
                     </Button>
-                  </Link>
+                  </>
                 )}
-                
-                <Button 
-                  className="w-full bg-success hover:bg-success-hover text-success-foreground mt-4"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  Få tilbud
-                </Button>
               </div>
             </div>
           )}
