@@ -94,7 +94,12 @@ export const QuoteForm = () => {
               phone: data.phone || '',
               address: data.customer_type === 'private' ? (data.address || '') : ''
             }));
-            setStep(2);
+            setStep(3);
+            
+            toast({
+              title: "Informasjon hentet",
+              description: "Dine kontaktopplysninger er automatisk fylt ut. Skriv kun beskrivelsen av jobben.",
+            });
           }
         }
       } catch (error) {
@@ -172,8 +177,8 @@ export const QuoteForm = () => {
           }
         }
 
-        // Organization number and company validation for business customers
-        if (formData.type === 'business') {
+        // Organization number and company validation for business customers (only for non-logged-in users)
+        if (formData.type === 'business' && !user) {
           if (!formData.selectedCompany) {
             currentErrors.company = "Vennligst finn og velg din bedrift fra Brønnøysundregistrene";
           }
@@ -248,7 +253,8 @@ export const QuoteForm = () => {
         email: sanitizeInput(formData.email),
         phone: sanitizeInput(formData.phone),
         orgNumber: formData.selectedCompany?.orgNumber,
-        description: sanitizeInput(formData.description)
+        description: sanitizeInput(formData.description),
+        isAuthenticated: !!user,
       };
 
       // Check for suspicious activity
@@ -384,13 +390,11 @@ export const QuoteForm = () => {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-foreground">Få gratis tilbud</h3>
         <div className="text-sm text-muted-foreground">
-          {step}/3: {step === 1 && "Kunde"}
-          {step === 2 && "Kontaktinfo"}
-          {step === 3 && "Beskrivelse"}
+          {user ? "Beskrivelse" : `${step}/3: ${step === 1 ? "Kunde" : step === 2 ? "Kontaktinfo" : "Beskrivelse"}`}
         </div>
       </div>
 
-      {step === 1 && (
+      {step === 1 && !user && (
         <div className="space-y-4 animate-fade-in-up">
           <Label className="text-base font-medium">Privat eller bedrift?</Label>
           
@@ -461,7 +465,7 @@ export const QuoteForm = () => {
         </div>
       )}
 
-      {step === 2 && (
+      {step === 2 && !user && (
         <div className="space-y-4 animate-fade-in-up">
           <Label className="text-base font-medium">Dine kontaktopplysninger</Label>
           <div className="space-y-4">
@@ -588,7 +592,7 @@ export const QuoteForm = () => {
       )}
 
       <div className="flex justify-between pt-6 border-t">
-        {step > 1 && (
+        {step > 1 && !user && (
           <Button variant="outline" onClick={handleBack}>
             Tilbake
           </Button>

@@ -28,10 +28,11 @@ export const contactFormSchema = z.object({
   description: z.string()
     .trim()
     .min(10, { message: 'Beskrivelse må være minst 10 tegn' })
-    .max(2000, { message: 'Beskrivelse kan ikke være mer enn 2000 tegn' })
+    .max(2000, { message: 'Beskrivelse kan ikke være mer enn 2000 tegn' }),
+  isAuthenticated: z.boolean().optional(),
 }).superRefine((data, ctx) => {
-  // Address validation for private customers
-  if (data.type === 'private') {
+  // Address validation for private customers (only for non-authenticated users)
+  if (data.type === 'private' && !data.isAuthenticated) {
     if (!data.address || data.address.trim() === '') {
       ctx.addIssue({
         code: 'custom',
@@ -41,8 +42,8 @@ export const contactFormSchema = z.object({
     }
   }
   
-  // Organization number validation for business customers
-  if (data.type === 'business') {
+  // Organization number validation for business customers (only for non-authenticated users)
+  if (data.type === 'business' && !data.isAuthenticated) {
     if (!data.orgNumber || data.orgNumber.trim() === '') {
       ctx.addIssue({
         code: 'custom',
