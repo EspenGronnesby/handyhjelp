@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,6 +38,7 @@ interface FormData {
 export const QuoteForm = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -309,26 +311,8 @@ export const QuoteForm = () => {
 
       console.log('[QuoteForm] ✅ Quote saved and emails sent successfully');
 
-      toast({
-        title: "✅ Forespørsel sendt!",
-        description: "Takk for din henvendelse! Du vil motta en bekreftelses-e-post på " + formData.email + ". Vi kontakter deg innen 2 timer i åpningstiden med et uforpliktende tilbud.",
-        duration: 8000,
-      });
-
-      // Reset form
-      setStep(1);
-      setFormData({
-        type: null,
-        name: "",
-        email: "",
-        phone: "",
-        address: "",
-        orgNumber: "",
-        companyName: "",
-        selectedCompany: null,
-        description: ""
-      });
-      setErrors({});
+      // Navigate to thank you page with email and type parameters
+      navigate(`/takk?email=${encodeURIComponent(formData.email)}&type=${formData.type}`);
 
     } catch (error) {
       if (error instanceof z.ZodError) {
