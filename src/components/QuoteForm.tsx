@@ -333,21 +333,28 @@ export const QuoteForm = () => {
 
       // Send email notification using Supabase client
       console.log('[QuoteForm] Sending email notification for quote:', quoteRecord.id);
+      
+      // CRITICAL: Log data being sent to edge function
+      const emailPayload = {
+        quoteId: quoteRecord.id,
+        type: formData.type,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        ...(formData.type === 'private' && formData.address ? { address: formData.address } : {}),
+        orgNumber: formData.selectedCompany?.orgNumber,
+        companyName: formData.selectedCompany?.name,
+        description: formData.description
+      };
+      
+      console.log('⚡ Sender quote data:', emailPayload);
+      
       const { data: emailResult, error: emailError } = await supabase.functions.invoke('send-quote-notification', {
-        body: {
-          quoteId: quoteRecord.id,
-          type: formData.type,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          ...(formData.type === 'private' && formData.address ? { address: formData.address } : {}),
-          orgNumber: formData.selectedCompany?.orgNumber,
-          companyName: formData.selectedCompany?.name,
-          description: formData.description
-        }
+        body: emailPayload
       });
 
       console.log('[QuoteForm] Email notification result:', emailResult);
+      console.log('[QuoteForm] Email error (if any):', emailError);
 
       if (emailError) {
         console.error('[QuoteForm] Email function invocation error:', emailError);
@@ -365,6 +372,14 @@ export const QuoteForm = () => {
       navigate(`/takk?email=${encodeURIComponent(formData.email)}&type=${formData.type}`);
 
     } catch (error) {
+      // CRITICAL: Always log errors for debugging
+      console.error('❌ Edge Function feil:', error);
+      console.error('❌ Full error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        errorObject: error
+      });
+      
       if (error instanceof z.ZodError) {
         const zodErrors: Record<string, string> = {};
         error.errors.forEach((err) => {
@@ -373,7 +388,7 @@ export const QuoteForm = () => {
           }
         });
         setErrors(zodErrors);
-        console.error('[QuoteForm] Validation error:', zodErrors);
+        console.error('[QuoteForm] Zod validation error:', zodErrors);
       } else {
         console.error('[QuoteForm] ❌ Form submission error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Noe gikk galt. Prøv igjen senere.';
@@ -385,6 +400,8 @@ export const QuoteForm = () => {
         });
       }
     } finally {
+      // CRITICAL: Always reset isSubmitting, no matter what happens
+      console.log('[QuoteForm] Finally block: Resetting isSubmitting to false');
       setIsSubmitting(false);
     }
   };
