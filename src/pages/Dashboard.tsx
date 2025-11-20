@@ -34,7 +34,7 @@ const Dashboard = () => {
     { path: '/dashboard', label: 'Oversikt', icon: Home },
     { path: '/dashboard/quotes', label: 'Mine tilbud', icon: FileText },
     { path: '/dashboard/jobs', label: 'Mine jobber', icon: Briefcase },
-    { path: '/dashboard/loyalty', label: 'Kundeklubb', icon: Star },
+    // { path: '/dashboard/loyalty', label: 'Kundeklubb', icon: Star }, // Hidden temporarily
     { path: '/dashboard/profile', label: 'Profil', icon: User },
     { path: '/dashboard/notifications', label: 'Varsler', icon: Bell },
     ...(isAdmin ? [{ path: '/dashboard/admin', label: 'Admin', icon: Shield }] : [])

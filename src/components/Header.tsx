@@ -143,14 +143,7 @@ export const Header = () => {
                 >
                   Prosjekter
                 </Link>
-                <Link 
-                  to="/priser" 
-                  className="block text-foreground hover:text-primary transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Priser
-                </Link>
-                <Link 
+                <Link
                   to="/raad" 
                   className="block text-foreground hover:text-primary transition-colors py-2"
                   onClick={() => setIsMenuOpen(false)}

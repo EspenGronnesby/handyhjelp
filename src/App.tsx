@@ -46,7 +46,7 @@ const App = () => (
               <Route index element={<DashboardHome />} />
               <Route path="quotes" element={<DashboardQuotes />} />
               <Route path="jobs" element={<DashboardJobs />} />
-              <Route path="loyalty" element={<DashboardLoyalty />} />
+              {/* <Route path="loyalty" element={<DashboardLoyalty />} /> */} {/* Hidden temporarily */}
               <Route path="profile" element={<DashboardProfile />} />
               <Route path="notifications" element={<DashboardNotifications />} />
               <Route path="admin" element={<AdminDashboard />} />
