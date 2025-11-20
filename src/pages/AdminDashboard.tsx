@@ -6,7 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Users, FileText, Briefcase, Play, CheckCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Users, FileText, Briefcase, Play, CheckCircle, Mail, CheckCircle2, Clock, AlertCircle, XCircle, Eye } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -51,12 +54,32 @@ interface Profile {
   created_at: string;
 }
 
+interface EmailLog {
+  id: string;
+  email_id: string;
+  event_type: 'sent' | 'delivered' | 'bounced' | 'failed' | 'opened' | 'clicked' | 'delivery_delayed' | 'complained';
+  recipient: string;
+  subject: string | null;
+  from_email: string;
+  created_at: string;
+  resend_created_at: string | null;
+  metadata: any;
+  related_quote_id: string | null;
+  related_job_id: string | null;
+  error_message: string | null;
+}
+
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
+  const [filteredEmails, setFilteredEmails] = useState<EmailLog[]>([]);
+  const [emailFilter, setEmailFilter] = useState<string>('all');
+  const [searchEmail, setSearchEmail] = useState<string>('');
+  const [selectedEmail, setSelectedEmail] = useState<EmailLog | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -69,20 +92,77 @@ const AdminDashboard = () => {
     if (!isAdmin) return;
 
     const fetchData = async () => {
-      const [quotesResult, jobsResult, profilesResult] = await Promise.all([
+      const [quotesResult, jobsResult, profilesResult, emailLogsResult] = await Promise.all([
         supabase.from('quotes').select('*').order('created_at', { ascending: false }),
         supabase.from('jobs').select('*, quotes(name, company_name, description)').order('created_at', { ascending: false }),
-        supabase.from('profiles').select('*').order('created_at', { ascending: false })
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('email_logs').select('*').order('created_at', { ascending: false })
       ]);
 
       if (quotesResult.data) setQuotes(quotesResult.data);
       if (jobsResult.data) setJobs(jobsResult.data);
       if (profilesResult.data) setProfiles(profilesResult.data);
+      if (emailLogsResult.data) {
+        setEmailLogs(emailLogsResult.data as EmailLog[]);
+        setFilteredEmails(emailLogsResult.data as EmailLog[]);
+      }
       setLoading(false);
     };
 
     fetchData();
+
+    // Set up realtime subscription for email_logs
+    const channel = supabase
+      .channel('email-logs-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'email_logs'
+        },
+        (payload) => {
+          console.log('Email log change received:', payload);
+          if (payload.eventType === 'INSERT') {
+            setEmailLogs(prev => [payload.new as EmailLog, ...prev]);
+            setFilteredEmails(prev => [payload.new as EmailLog, ...prev]);
+            toast.success(`Ny e-post status: ${(payload.new as EmailLog).event_type}`);
+          } else if (payload.eventType === 'UPDATE') {
+            setEmailLogs(prev => prev.map(log => 
+              log.id === payload.new.id ? payload.new as EmailLog : log
+            ));
+            setFilteredEmails(prev => prev.map(log => 
+              log.id === payload.new.id ? payload.new as EmailLog : log
+            ));
+            toast.info(`E-post oppdatert: ${(payload.new as EmailLog).event_type}`);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [isAdmin]);
+
+  // Filter emails when filter or search changes
+  useEffect(() => {
+    let filtered = emailLogs;
+
+    // Filter by event type
+    if (emailFilter !== 'all') {
+      filtered = filtered.filter(log => log.event_type === emailFilter);
+    }
+
+    // Search by recipient
+    if (searchEmail) {
+      filtered = filtered.filter(log => 
+        log.recipient.toLowerCase().includes(searchEmail.toLowerCase())
+      );
+    }
+
+    setFilteredEmails(filtered);
+  }, [emailFilter, searchEmail, emailLogs]);
 
   if (adminLoading || loading) {
     return (
@@ -114,6 +194,35 @@ const AdminDashboard = () => {
     confirmed: 'Bekreftet',
     started: 'Startet',
     in_progress: 'Jobber med saken'
+  };
+
+  const emailStatusIcons: Record<string, JSX.Element> = {
+    sent: <Clock className="h-4 w-4 text-blue-500" />,
+    delivered: <CheckCircle2 className="h-4 w-4 text-green-500" />,
+    bounced: <AlertCircle className="h-4 w-4 text-orange-500" />,
+    failed: <XCircle className="h-4 w-4 text-red-500" />,
+    opened: <Eye className="h-4 w-4 text-purple-500" />,
+    clicked: <Mail className="h-4 w-4 text-indigo-500" />,
+    delivery_delayed: <Clock className="h-4 w-4 text-yellow-500" />,
+    complained: <AlertCircle className="h-4 w-4 text-red-600" />,
+  };
+
+  const emailStatusLabels: Record<string, string> = {
+    sent: 'Sendt',
+    delivered: 'Levert',
+    bounced: 'Returnert',
+    failed: 'Feilet',
+    opened: 'Åpnet',
+    clicked: 'Klikket',
+    delivery_delayed: 'Forsinket',
+    complained: 'Klage',
+  };
+
+  const emailStats = {
+    total: emailLogs.length,
+    delivered: emailLogs.filter(log => log.event_type === 'delivered').length,
+    failed: emailLogs.filter(log => log.event_type === 'failed').length,
+    bounced: emailLogs.filter(log => log.event_type === 'bounced').length,
   };
 
   const handleStartQuote = async (quoteId: string, userId: string) => {
@@ -268,6 +377,7 @@ const AdminDashboard = () => {
         <TabsList>
           <TabsTrigger value="quotes">Forespørsler</TabsTrigger>
           <TabsTrigger value="jobs">Pågående</TabsTrigger>
+          <TabsTrigger value="emails">E-poster</TabsTrigger>
           <TabsTrigger value="customers">Kunder</TabsTrigger>
         </TabsList>
 
@@ -320,6 +430,124 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           ))}
+        </TabsContent>
+
+        <TabsContent value="emails" className="space-y-4">
+          {/* Email Statistics */}
+          <div className="grid gap-4 md:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Totalt sendt</CardTitle>
+                <Mail className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{emailStats.total}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Levert</CardTitle>
+                <CheckCircle2 className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{emailStats.delivered}</div>
+                <p className="text-xs text-muted-foreground">
+                  {emailStats.total > 0 ? ((emailStats.delivered / emailStats.total) * 100).toFixed(1) : 0}% success rate
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Feilet</CardTitle>
+                <XCircle className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{emailStats.failed}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Returnert</CardTitle>
+                <AlertCircle className="h-4 w-4 text-orange-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{emailStats.bounced}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Filters */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <Input
+                    placeholder="Søk på mottaker e-post..."
+                    value={searchEmail}
+                    onChange={(e) => setSearchEmail(e.target.value)}
+                  />
+                </div>
+                <Select value={emailFilter} onValueChange={setEmailFilter}>
+                  <SelectTrigger className="w-full md:w-[200px]">
+                    <SelectValue placeholder="Filtrer status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Alle statuser</SelectItem>
+                    <SelectItem value="sent">Sendt</SelectItem>
+                    <SelectItem value="delivered">Levert</SelectItem>
+                    <SelectItem value="bounced">Returnert</SelectItem>
+                    <SelectItem value="failed">Feilet</SelectItem>
+                    <SelectItem value="opened">Åpnet</SelectItem>
+                    <SelectItem value="clicked">Klikket</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Email List */}
+          {filteredEmails.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Ingen e-poster funnet
+              </CardContent>
+            </Card>
+          ) : (
+            filteredEmails.map((email) => (
+              <Card key={email.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {emailStatusIcons[email.event_type]}
+                      <CardTitle className="text-lg">{email.recipient}</CardTitle>
+                    </div>
+                    <Badge variant="outline">
+                      {emailStatusLabels[email.event_type]}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    {formatDistanceToNow(new Date(email.created_at), { addSuffix: true, locale: nb })}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <p className="text-sm font-medium">{email.subject || 'Ingen emne'}</p>
+                  <p className="text-sm text-muted-foreground">Fra: {email.from_email}</p>
+                  {email.error_message && (
+                    <p className="text-sm text-red-600">Feil: {email.error_message}</p>
+                  )}
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      onClick={() => setSelectedEmail(email)}
+                      size="sm"
+                      variant="outline"
+                    >
+                      Se detaljer
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </TabsContent>
 
         <TabsContent value="jobs" className="space-y-4">
@@ -377,6 +605,89 @@ const AdminDashboard = () => {
           ))}
         </TabsContent>
       </Tabs>
+
+      {/* Email Details Modal */}
+      <Dialog open={!!selectedEmail} onOpenChange={() => setSelectedEmail(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>E-post detaljer</DialogTitle>
+            <DialogDescription>
+              Fullstendig informasjon om e-posten
+            </DialogDescription>
+          </DialogHeader>
+          {selectedEmail && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Status</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    {emailStatusIcons[selectedEmail.event_type]}
+                    <span>{emailStatusLabels[selectedEmail.event_type]}</span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">E-post ID</p>
+                  <p className="text-sm mt-1 font-mono">{selectedEmail.email_id}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Mottaker</p>
+                  <p className="text-sm mt-1">{selectedEmail.recipient}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Avsender</p>
+                  <p className="text-sm mt-1">{selectedEmail.from_email}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-muted-foreground">Emne</p>
+                  <p className="text-sm mt-1">{selectedEmail.subject || 'Ingen emne'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Sendt</p>
+                  <p className="text-sm mt-1">
+                    {new Date(selectedEmail.created_at).toLocaleString('nb-NO')}
+                  </p>
+                </div>
+                {selectedEmail.resend_created_at && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">Resend tidspunkt</p>
+                    <p className="text-sm mt-1">
+                      {new Date(selectedEmail.resend_created_at).toLocaleString('nb-NO')}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {selectedEmail.error_message && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm font-medium text-red-900">Feilmelding</p>
+                  <p className="text-sm text-red-700 mt-1">{selectedEmail.error_message}</p>
+                </div>
+              )}
+
+              {selectedEmail.related_quote_id && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm font-medium text-blue-900">Tilknyttet tilbudsforespørsel</p>
+                  <p className="text-sm text-blue-700 mt-1 font-mono">{selectedEmail.related_quote_id}</p>
+                </div>
+              )}
+
+              {selectedEmail.related_job_id && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm font-medium text-green-900">Tilknyttet jobb</p>
+                  <p className="text-sm text-green-700 mt-1 font-mono">{selectedEmail.related_job_id}</p>
+                </div>
+              )}
+
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-2">Full metadata fra Resend</p>
+                <pre className="text-xs bg-muted p-4 rounded-lg overflow-x-auto">
+                  {JSON.stringify(selectedEmail.metadata, null, 2)}
+                </pre>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

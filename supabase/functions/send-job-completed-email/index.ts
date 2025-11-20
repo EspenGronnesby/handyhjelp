@@ -196,6 +196,20 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Job completed email sent successfully:", emailResponse);
 
+    // Log email to database for tracking
+    if (emailResponse.data?.id) {
+      await supabaseAdmin.from('email_logs').insert({
+        email_id: emailResponse.data.id,
+        event_type: 'sent',
+        recipient: customerEmail,
+        subject: 'Prosjektet ditt er ferdigstilt! ✅',
+        from_email: 'team@handyhjelp.no',
+        related_job_id: jobId,
+        metadata: emailResponse.data
+      });
+      console.log("Email logged to database");
+    }
+
     return new Response(JSON.stringify({ success: true, emailResponse }), {
       status: 200,
       headers: {

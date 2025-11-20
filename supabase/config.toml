@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.send-quote-notification]
 verify_jwt = false
+
+[functions.resend-webhook]
+verify_jwt = false
