@@ -5,37 +5,15 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wrench, Hammer, Droplet, CheckCircle2, ArrowRight, Calculator } from "lucide-react";
+import { Wrench, Hammer, Droplet, CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 const Services = () => {
-  const [selectedService, setSelectedService] = useState<string>("vaktmester");
-  const [hours, setHours] = useState<number>(1);
-  const [distance, setDistance] = useState<number>(0);
-
-  const serviceRates = {
-    vaktmester: { rate: 650, name: "Vaktmester" },
-    tomrer: { rate: 750, name: "Tømrer" },
-    blikk: { rate: 800, name: "Blikk" }
-  };
-
-  const calculatePrice = () => {
-    const service = serviceRates[selectedService as keyof typeof serviceRates];
-    const laborCost = service.rate * hours;
-    const travelCost = distance > 5 ? (distance - 5) * 10 : 0;
-    return laborCost + travelCost;
-  };
-
   const services = [
     {
       id: "vaktmester",
       title: "Vaktmestertjenester",
       icon: Wrench,
-      price: "Fra 650 kr/time",
       services: [
         "Maling og flekksparkler",
         "Dekk skifte",
@@ -51,7 +29,6 @@ const Services = () => {
       id: "tomrer",
       title: "Tømrertjenester",
       icon: Hammer,
-      price: "Fra 750 kr/time",
       services: [
         "Terrasser og utvendig treverk",
         "Kjøkkenmontering",
@@ -67,7 +44,6 @@ const Services = () => {
       id: "blikk",
       title: "Blikkenslagertjenester",
       icon: Droplet,
-      price: "Fra 800 kr/time",
       services: [
         "Takrenner og nedløp",
         "Takreparasjoner",
@@ -137,7 +113,6 @@ const Services = () => {
                       <service.icon className="h-8 w-8 text-primary" />
                     </div>
                     <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
-                    <Badge variant="secondary">{service.price}</Badge>
                   </div>
                 </CardHeader>
                 <CardContent>

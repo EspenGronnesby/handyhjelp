@@ -46,10 +46,11 @@ const DashboardQuotes = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Fetch quotes by user_id OR by email (for quotes created before user registered)
       const { data, error } = await supabase
         .from('quotes')
         .select('*')
-        .eq('user_id', user.id)
+        .or(`user_id.eq.${user.id},email.eq.${user.email}`)
         .order('created_at', { ascending: false });
 
       if (!error && data) {

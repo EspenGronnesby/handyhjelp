@@ -34,7 +34,7 @@ export const FAQSchema = ({ faqItems }: FAQSchemaProps): JSX.Element => {
 export const defaultFAQItems: FAQItem[] = [
   {
     question: "Hva koster det?",
-    answer: "Timepris fra 600 kr inkl. mva. Minstetid 1 time, deretter per påbegynt 30. min. Vi avklarer pris før oppstart. Førstegangs-kunde får -10% på første oppdrag."
+    answer: "Vi lager skreddersydde pristilbud basert på ditt prosjekt. Kontakt oss for et gratis og uforpliktende tilbud tilpasset dine behov."
   },
   {
     question: "Tar dere med avfall?",
