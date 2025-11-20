@@ -139,6 +139,17 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Also update the related quote status to 'accepted' (job has been started)
+    const { error: quoteUpdateError } = await supabaseAdmin
+      .from('quotes')
+      .update({ status: 'accepted' })
+      .eq('id', job.quote_id);
+
+    if (quoteUpdateError) {
+      console.error("Error updating quote status:", quoteUpdateError);
+      // Don't fail the request, just log the error
+    }
+
     // Determine customer email (from quote or profile)
     const customerEmail = job.quotes?.email || job.profiles?.email;
     const customerName = job.quotes?.company_name || job.quotes?.name || job.profiles?.full_name || 'Kunde';

@@ -68,11 +68,6 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/priser" className="hover:text-primary transition-colors">
-                  Priser
-                </Link>
-              </li>
-              <li>
                 <Link to="/raad" className="hover:text-primary transition-colors">
                   Blogg
                 </Link>

@@ -55,7 +55,7 @@ const Index = () => {
                     "Inspeksjonsrapporter og dokumentasjon"
                   ],
                   target: "Borettslag, sameier, næringseiendom",
-                  price: "Fra 650 kr/time"
+                  cta: "Kontakt for pristilbud"
                 },
                 {
                   title: "Tømrertjenester",
@@ -69,7 +69,7 @@ const Index = () => {
                     "Laftekonstruksjoner og vedskjul"
                   ],
                   target: "Privatpersoner, bedrifter, boligselskaper",
-                  price: "Fra 750 kr/time"
+                  cta: "Kontakt for pristilbud"
                 },
                 {
                   title: "Blikkenslagertjenester",
@@ -83,7 +83,7 @@ const Index = () => {
                     "Inspeksjon av tak og blikkarbeider"
                   ],
                   target: "Eiendomsselskaper, borettslag, privatpersoner",
-                  price: "Fra 800 kr/time"
+                  cta: "Kontakt for pristilbud"
                 }
               ].map((service, index) => (
                 <div key={index} className="card-professional p-8 hover:shadow-xl transition-all duration-300">
@@ -104,7 +104,7 @@ const Index = () => {
                     <p className="text-sm text-muted-foreground">
                       <span className="font-semibold text-foreground">Målgruppe:</span> {service.target}
                     </p>
-                    <p className="text-lg font-bold text-primary">{service.price}</p>
+                    <p className="text-base font-semibold text-primary">{service.cta}</p>
                   </div>
                   
                   <Button 

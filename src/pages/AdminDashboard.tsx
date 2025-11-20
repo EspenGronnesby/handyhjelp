@@ -34,6 +34,7 @@ interface Job {
   created_at: string;
   scheduled_date?: string;
   estimated_completion?: string;
+  completed_date?: string;
   notes?: string;
   amount?: number;
   user_id: string;
@@ -398,28 +399,29 @@ const AdminDashboard = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Forespørsler</CardTitle>
+            <CardTitle className="text-sm font-medium">Nye forespørsler</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{quotes.length}</div>
+            <div className="text-2xl font-bold">{quotes.filter(q => q.status === 'pending').length}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pågående</CardTitle>
+            <CardTitle className="text-sm font-medium">Aktive jobber</CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{jobs.length}</div>
+            <div className="text-2xl font-bold">{jobs.filter(j => j.status === 'in_progress').length}</div>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="quotes" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="quotes">Forespørsler</TabsTrigger>
-          <TabsTrigger value="jobs">Pågående</TabsTrigger>
+          <TabsTrigger value="quotes">Nye forespørsler</TabsTrigger>
+          <TabsTrigger value="jobs">Aktive jobber</TabsTrigger>
+          <TabsTrigger value="completed">Ferdig</TabsTrigger>
           <TabsTrigger value="emails">E-poster</TabsTrigger>
           <TabsTrigger value="customers">Kunder</TabsTrigger>
         </TabsList>
@@ -594,40 +596,88 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <TabsContent value="jobs" className="space-y-4">
-          {jobs.map((job) => (
-            <Card key={job.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">
-                    {job.quotes?.company_name || job.quotes?.name || 'Kunde'}
-                  </CardTitle>
-                  <Badge className={statusColors[job.status]}>
-                    {statusLabels[job.status] || job.status}
-                  </Badge>
-                </div>
-                <CardDescription>
-                  Opprettet {formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: nb })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <p className="text-sm">{job.quotes?.description}</p>
-                {job.scheduled_date && (
-                  <p className="text-sm text-muted-foreground">
-                    Planlagt dato: {new Date(job.scheduled_date).toLocaleDateString('nb-NO')}
-                  </p>
-                )}
-                {job.estimated_completion && (
-                  <p className="text-sm text-muted-foreground">
-                    Estimert ferdig: {new Date(job.estimated_completion).toLocaleDateString('nb-NO')}
-                  </p>
-                )}
-                {job.amount && (
-                  <p className="text-sm font-semibold">Beløp: {job.amount.toLocaleString('nb-NO')} kr</p>
-                )}
-                {job.notes && <p className="text-sm text-muted-foreground">Notater: {job.notes}</p>}
+          {jobs.filter(job => job.status === 'in_progress').length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Ingen aktive jobber
               </CardContent>
             </Card>
-          ))}
+          ) : (
+            jobs.filter(job => job.status === 'in_progress').map((job) => (
+              <Card key={job.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">
+                      {job.quotes?.company_name || job.quotes?.name || 'Kunde'}
+                    </CardTitle>
+                    <Badge className={statusColors[job.status]}>
+                      {statusLabels[job.status] || job.status}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    Opprettet {formatDistanceToNow(new Date(job.created_at), { addSuffix: true, locale: nb })}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <p className="text-sm">{job.quotes?.description}</p>
+                  {job.scheduled_date && (
+                    <p className="text-sm text-muted-foreground">
+                      Planlagt dato: {new Date(job.scheduled_date).toLocaleDateString('nb-NO')}
+                    </p>
+                  )}
+                  {job.estimated_completion && (
+                    <p className="text-sm text-muted-foreground">
+                      Estimert ferdig: {new Date(job.estimated_completion).toLocaleDateString('nb-NO')}
+                    </p>
+                  )}
+                  {job.amount && (
+                    <p className="text-sm font-semibold">Beløp: {job.amount.toLocaleString('nb-NO')} kr</p>
+                  )}
+                  {job.notes && <p className="text-sm text-muted-foreground">Notater: {job.notes}</p>}
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="completed" className="space-y-4">
+          {jobs.filter(job => job.status === 'completed').length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Ingen ferdigstilte jobber
+              </CardContent>
+            </Card>
+          ) : (
+            jobs.filter(job => job.status === 'completed').map((job) => (
+              <Card key={job.id}>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">
+                      {job.quotes?.company_name || job.quotes?.name || 'Kunde'}
+                    </CardTitle>
+                    <Badge className={statusColors[job.status]}>
+                      {statusLabels[job.status] || job.status}
+                    </Badge>
+                  </div>
+                  <CardDescription>
+                    Fullført {job.completed_date ? formatDistanceToNow(new Date(job.completed_date), { addSuffix: true, locale: nb }) : 'Ukjent dato'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <p className="text-sm">{job.quotes?.description}</p>
+                  {job.completed_date && (
+                    <p className="text-sm text-muted-foreground">
+                      Fullført: {new Date(job.completed_date).toLocaleDateString('nb-NO')}
+                    </p>
+                  )}
+                  {job.amount && (
+                    <p className="text-sm font-semibold">Beløp: {job.amount.toLocaleString('nb-NO')} kr</p>
+                  )}
+                  {job.notes && <p className="text-sm text-muted-foreground">Notater: {job.notes}</p>}
+                </CardContent>
+              </Card>
+            ))
+          )}
         </TabsContent>
 
         <TabsContent value="customers" className="space-y-4">

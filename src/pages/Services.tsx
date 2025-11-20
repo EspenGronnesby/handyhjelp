@@ -101,76 +101,25 @@ const Services = () => {
         </div>
       </section>
 
-      {/* Price Calculator */}
+      {/* Pricing Information - Removed calculator, contact for quote */}
       <section className="py-12 bg-muted/30">
         <div className="container mx-auto px-4">
-          <Card className="max-w-2xl mx-auto">
+          <Card className="max-w-2xl mx-auto text-center">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-primary" />
-                <CardTitle>Priskalkulator</CardTitle>
-              </div>
+              <CardTitle>Trenger du et pristilbud?</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid sm:grid-cols-3 gap-4 mb-6">
-                <div>
-                  <Label htmlFor="service">Tjeneste</Label>
-                  <Select value={selectedService} onValueChange={setSelectedService}>
-                    <SelectTrigger id="service">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="vaktmester">Vaktmester</SelectItem>
-                      <SelectItem value="tomrer">Tømrer</SelectItem>
-                      <SelectItem value="blikk">Blikk</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div>
-                  <Label htmlFor="hours">Timer</Label>
-                  <Input
-                    id="hours"
-                    type="number"
-                    min="0.5"
-                    step="0.5"
-                    value={hours}
-                    onChange={(e) => setHours(parseFloat(e.target.value) || 0)}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="distance">Km (fra senter)</Label>
-                  <Input
-                    id="distance"
-                    type="number"
-                    min="0"
-                    value={distance}
-                    onChange={(e) => setDistance(parseInt(e.target.value) || 0)}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-muted-foreground">Arbeid ({hours}t × {serviceRates[selectedService as keyof typeof serviceRates].rate} kr):</span>
-                  <span className="font-semibold">{(serviceRates[selectedService as keyof typeof serviceRates].rate * hours).toLocaleString('nb-NO')} kr</span>
-                </div>
-                {distance > 5 && (
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-muted-foreground">Kjøring ({distance - 5} km × 10 kr):</span>
-                    <span className="font-semibold">{((distance - 5) * 10).toLocaleString('nb-NO')} kr</span>
-                  </div>
-                )}
-                <div className="pt-2 border-t border-primary/20 flex justify-between items-center">
-                  <span className="font-bold">Estimert totalt:</span>
-                  <span className="text-2xl font-bold text-primary">{calculatePrice().toLocaleString('nb-NO')} kr</span>
-                </div>
-              </div>
-
-              <p className="text-xs text-muted-foreground mt-4">
-                * Materialer faktureres separat. Første 5 km gratis.
+              <p className="text-muted-foreground mb-6">
+                Kontakt oss for et skreddersydd pristilbud basert på dine behov.
               </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button variant="cta" size="lg" onClick={() => window.location.href = '/tilbud'}>
+                  Få gratis tilbud
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'}>
+                  Ring oss: +47 41250553
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

@@ -218,45 +218,10 @@ export const QuoteForm = () => {
       // Final validation with zod schema
       const validatedData = contactFormSchema.parse(validationData);
 
-      // Auto-create user profile if not logged in
-      let userId = user?.id;
-      
-      if (!user) {
-        // Create a temporary user profile for guest quote requests
-        const { data: existingProfile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('email', formData.email)
-          .single();
-
-        if (existingProfile) {
-          userId = existingProfile.id;
-        } else {
-          // Generate a temporary user ID (guest account)
-          const tempUserId = crypto.randomUUID();
-          
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: tempUserId,
-              email: formData.email,
-              full_name: formData.name,
-              phone: formData.phone,
-              address: formData.type === 'private' ? formData.address : null
-            });
-
-          if (profileError) {
-            console.error('Profile creation failed:', profileError);
-          }
-          
-          // Always use tempUserId for consistency, even if profile creation failed
-          userId = tempUserId;
-        }
-      }
-
-      // Save quote to database
+      // Save quote to database - Allow NULL user_id for anonymous submissions
+      // Users can later register with the same email to claim their quotes
       const quoteData = {
-        user_id: userId || crypto.randomUUID(), // Fallback to random UUID if all else fails
+        user_id: user?.id || null, // NULL for anonymous users, will be linked when they register
         type: formData.type!,
         name: formData.name,
         email: formData.email,
