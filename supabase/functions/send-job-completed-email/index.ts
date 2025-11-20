@@ -19,8 +19,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    console.log('[send-job-completed-email] Function invoked');
+    
     // Verify authentication
     const authHeader = req.headers.get('Authorization');
+    console.log('[send-job-completed-email] Auth header present:', !!authHeader);
+    
     if (!authHeader) {
       console.error("No authorization header provided");
       return new Response(
@@ -36,8 +40,17 @@ const handler = async (req: Request): Promise<Response> => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
+    console.log('[send-job-completed-email] Attempting to verify user...');
+    
     // Verify user is authenticated
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    
+    console.log('[send-job-completed-email] User verification result:', {
+      hasUser: !!user,
+      userId: user?.id,
+      error: userError?.message
+    });
+    
     if (userError || !user) {
       console.error("Invalid authentication token:", userError);
       return new Response(
