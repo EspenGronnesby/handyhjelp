@@ -301,15 +301,10 @@ export const QuoteForm = () => {
         throw new Error('Failed to save quote');
       }
 
-      // Send email notification
+      // Send email notification using Supabase client
       console.log('[QuoteForm] Sending email notification for quote:', quoteRecord.id);
-      const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-quote-notification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
+      const { data: emailResult, error: emailError } = await supabase.functions.invoke('send-quote-notification', {
+        body: {
           quoteId: quoteRecord.id,
           type: formData.type,
           name: formData.name,
@@ -319,15 +314,18 @@ export const QuoteForm = () => {
           orgNumber: formData.selectedCompany?.orgNumber,
           companyName: formData.selectedCompany?.name,
           description: formData.description
-        }),
+        }
       });
 
-      const emailResult = await emailResponse.json();
       console.log('[QuoteForm] Email notification result:', emailResult);
 
-      if (!emailResult.success) {
+      if (emailError) {
+        console.error('[QuoteForm] Email function invocation error:', emailError);
+        throw new Error(`E-post kunne ikke sendes: ${emailError.message || 'Ukjent feil'}`);
+      }
+
+      if (emailResult && !emailResult.success) {
         console.error('[QuoteForm] Email sending failed:', emailResult.error);
-        // Show specific error to user
         throw new Error(`E-post kunne ikke sendes: ${emailResult.error || 'Ukjent feil'}`);
       }
 
