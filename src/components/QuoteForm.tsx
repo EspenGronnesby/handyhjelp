@@ -216,9 +216,42 @@ export const QuoteForm = () => {
       // Final validation with zod schema
       const validatedData = contactFormSchema.parse(validationData);
 
+      // Auto-create user profile if not logged in
+      let userId = user?.id;
+      
+      if (!user) {
+        // Create a temporary user profile for guest quote requests
+        const { data: existingProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', formData.email)
+          .single();
+
+        if (existingProfile) {
+          userId = existingProfile.id;
+        } else {
+          // Generate a temporary user ID (guest account)
+          const tempUserId = crypto.randomUUID();
+          
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: tempUserId,
+              email: formData.email,
+              full_name: formData.name,
+              phone: formData.phone,
+              address: formData.type === 'private' ? formData.address : null
+            });
+
+          if (!profileError) {
+            userId = tempUserId;
+          }
+        }
+      }
+
       // Save quote to database
       const quoteData = {
-        user_id: user?.id || null,
+        user_id: userId || crypto.randomUUID(), // Fallback to random UUID if all else fails
         type: formData.type!,
         name: formData.name,
         email: formData.email,
@@ -267,9 +300,9 @@ export const QuoteForm = () => {
       }
 
       toast({
-        title: "Takk for henvendelsen!",
-        description: "Vi kontakter deg innen 2 timer i åpningstiden med et uforpliktende tilbud.",
-        duration: 5000,
+        title: "✅ Forespørsel sendt!",
+        description: "Takk for din henvendelse! Du vil motta en bekreftelses-e-post på " + formData.email + ". Vi kontakter deg innen 2 timer i åpningstiden med et uforpliktende tilbud.",
+        duration: 8000,
       });
 
       // Reset form
