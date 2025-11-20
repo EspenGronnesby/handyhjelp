@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.58.0";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
@@ -49,6 +50,7 @@ interface QuoteRequest {
   orgNumber?: string;
   companyName?: string;
   description: string;
+  quoteId?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -210,7 +212,38 @@ const handler = async (req: Request): Promise<Response> => {
       error: customerEmailResponse.error
     });
 
-    console.log('[send-quote-notification] ✅ Both emails sent successfully');
+    // Log emails to database for tracking
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Log team email
+    if (emailResponse.data?.id) {
+      await supabase.from('email_logs').insert({
+        email_id: emailResponse.data.id,
+        event_type: 'sent',
+        recipient: 'Team@handyhjelp.no',
+        subject: `Ny tilbudsforespørsel fra ${escapeHtml(quoteData.name)}`,
+        from_email: 'team@handyhjelp.no',
+        related_quote_id: quoteData.quoteId || null,
+        metadata: emailResponse.data
+      });
+    }
+
+    // Log customer email
+    if (customerEmailResponse.data?.id) {
+      await supabase.from('email_logs').insert({
+        email_id: customerEmailResponse.data.id,
+        event_type: 'sent',
+        recipient: quoteData.email,
+        subject: 'Takk for din tilbudsforespørsel! 📋',
+        from_email: 'team@handyhjelp.no',
+        related_quote_id: quoteData.quoteId || null,
+        metadata: customerEmailResponse.data
+      });
+    }
+
+    console.log('[send-quote-notification] ✅ Both emails sent and logged successfully');
 
     return new Response(JSON.stringify({ 
       success: true,
