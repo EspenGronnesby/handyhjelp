@@ -1,16 +1,43 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import { Loader2, FileText, Briefcase, User, Bell, Home, Star, Shield } from 'lucide-react';
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
+import { CustomerTypeModal } from '@/components/CustomerTypeModal';
+import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
   const { isAdmin } = useAdmin();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showCustomerTypeModal, setShowCustomerTypeModal] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const checkCustomerType = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('customer_type')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (!error && data && !data.customer_type) {
+        setShowCustomerTypeModal(true);
+      }
+    };
+
+    checkCustomerType();
+  }, [user]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -42,6 +69,14 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {showCustomerTypeModal && user && (
+        <CustomerTypeModal 
+          isOpen={showCustomerTypeModal}
+          userId={user.id}
+          onComplete={() => setShowCustomerTypeModal(false)}
+        />
+      )}
+      
       {/* Top Navigation */}
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4">
