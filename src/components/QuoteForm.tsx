@@ -389,9 +389,11 @@ export const QuoteForm = () => {
     <Card className="form-professional">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-foreground">Få gratis tilbud</h3>
-        <div className="text-sm text-muted-foreground">
-          {user && userProfile?.customer_type ? "Beskrivelse" : `${step}/3: ${step === 1 ? "Kunde" : step === 2 ? "Kontaktinfo" : "Beskrivelse"}`}
-        </div>
+        {!(user && step === 3 && userProfile?.customer_type) && (
+          <div className="text-sm text-muted-foreground">
+            Steg {step} av 3
+          </div>
+        )}
       </div>
 
       {step === 1 && (
@@ -571,7 +573,16 @@ export const QuoteForm = () => {
 
       {step === 3 && (
         <div className="space-y-4 animate-fade-in-up">
-          <Label className="text-base font-medium">Beskriv oppdraget</Label>
+          {user && userProfile?.customer_type ? (
+            <div>
+              <Label className="text-base font-medium">Beskriv oppdraget</Label>
+              <p className="text-sm text-muted-foreground mt-1 mb-3">
+                Vi har allerede dine kontaktopplysninger. Fortell oss hva du ønsker hjelp til.
+              </p>
+            </div>
+          ) : (
+            <Label className="text-base font-medium">Beskriv oppdraget</Label>
+          )}
           <Textarea
             placeholder="Fortell oss om jobben som skal gjøres, når det passer og eventuelle spesielle ønsker..."
             className={`min-h-32 ${errors.description ? 'border-destructive' : ''}`}
