@@ -146,14 +146,47 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email to HandyHjelp
     const emailResponse = await resend.emails.send({
-      from: "HandyHjelp <noreply@handyhjelp.no>",
+      from: "HandyHjelp <team@handyhjelp.no>",
       to: ["Team@handyhjelp.no"],
       subject: `Ny tilbudsforespørsel fra ${escapeHtml(quoteData.name)} (${customerType})`,
       html: emailHtml,
       replyTo: quoteData.email,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    // Send confirmation email to customer
+    await resend.emails.send({
+      from: "HandyHjelp <team@handyhjelp.no>",
+      to: [quoteData.email],
+      subject: "Takk for din tilbudsforespørsel! 📋",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #0891B2;">Hei ${escapeHtml(quoteData.name)}!</h2>
+          
+          <p>Takk for at du tok kontakt med oss. Vi har mottatt din tilbudsforespørsel og vil svare deg så snart som mulig.</p>
+          
+          <div style="background-color: #f1f5f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #1e293b;">Din forespørsel:</h3>
+            <p style="white-space: pre-wrap;">${escapeHtml(quoteData.description)}</p>
+          </div>
+          
+          <p>Vi jobber for å gi deg et uforpliktende tilbud innen kort tid. Vanligvis svarer vi innen 2 timer på hverdager mellom 07:00-17:00.</p>
+          
+          <p>Trenger du raskere hjelp? Ring oss gjerne på:</p>
+          <p style="font-size: 20px; font-weight: bold; color: #0891B2;">📞 +47 41250553</p>
+          
+          <p style="margin-top: 30px;">Med vennlig hilsen,<br>
+          <strong>HandyHjelp teamet</strong></p>
+          
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+          
+          <p style="font-size: 12px; color: #64748b;">
+            HandyHjelp - Din pålitelige partner for alle typer eiendomsvedlikehold
+          </p>
+        </div>
+      `,
+    });
+
+    console.log("Emails sent successfully:", emailResponse);
 
     return new Response(JSON.stringify({ 
       success: true,
