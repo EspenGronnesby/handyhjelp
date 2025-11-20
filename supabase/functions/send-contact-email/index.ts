@@ -133,7 +133,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send email to HandyHjelp
     const emailResponse = await resend.emails.send({
       from: "HandyHjelp <onboarding@resend.dev>",
-      to: ["handyhjelp@gmail.com"],
+      to: ["Team@handyhjelp.no"],
       subject: `Ny kontaktmelding fra ${escapeHtml(name)}`,
       html: `
         <h2>Ny kontaktmelding fra nettsiden</h2>

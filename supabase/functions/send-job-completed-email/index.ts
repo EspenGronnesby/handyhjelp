@@ -177,7 +177,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p>Skulle det være noe du lurer på, er vi alltid tilgjengelige:</p>
           <ul>
             <li>📞 Telefon: +47 41250553</li>
-            <li>📧 E-post: handyhjelp@gmail.com</li>
+            <li>📧 E-post: Team@handyhjelp.no</li>
           </ul>
           
           <p style="margin-top: 30px;">Vi ser frem til å hjelpe deg igjen i fremtiden!</p>
