@@ -278,6 +278,7 @@ export const QuoteForm = () => {
       }
 
       // Send email notification
+      console.log('[QuoteForm] Sending email notification for quote:', quoteRecord.id);
       const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-quote-notification`, {
         method: 'POST',
         headers: {
@@ -297,10 +298,15 @@ export const QuoteForm = () => {
       });
 
       const emailResult = await emailResponse.json();
+      console.log('[QuoteForm] Email notification result:', emailResult);
 
       if (!emailResult.success) {
-        throw new Error(emailResult.error || 'Email sending failed');
+        console.error('[QuoteForm] Email sending failed:', emailResult.error);
+        // Show specific error to user
+        throw new Error(`E-post kunne ikke sendes: ${emailResult.error || 'Ukjent feil'}`);
       }
+
+      console.log('[QuoteForm] ✅ Quote saved and emails sent successfully');
 
       toast({
         title: "✅ Forespørsel sendt!",
@@ -332,11 +338,13 @@ export const QuoteForm = () => {
           }
         });
         setErrors(zodErrors);
+        console.error('[QuoteForm] Validation error:', zodErrors);
       } else {
-        console.error('Form submission error:', error);
+        console.error('[QuoteForm] ❌ Form submission error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Noe gikk galt. Prøv igjen senere.';
         toast({
           title: "Feil ved sending",
-          description: "Noe gikk galt. Prøv igjen senere.",
+          description: errorMessage,
           variant: "destructive",
           duration: 5000,
         });
