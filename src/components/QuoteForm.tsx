@@ -331,49 +331,46 @@ export const QuoteForm = () => {
 
       console.log('[QuoteForm] ✅ Quote saved to database, ID:', quoteRecord.id);
 
-      // Send email notification using Supabase client
-      console.log('[QuoteForm] Sending email notification for quote:', quoteRecord.id);
-      
-      // CRITICAL: Log data being sent to edge function
-      const emailPayload = {
-        quoteId: quoteRecord.id,
-        type: formData.type,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        ...(formData.type === 'private' && formData.address ? { address: formData.address } : {}),
-        orgNumber: formData.selectedCompany?.orgNumber,
-        companyName: formData.selectedCompany?.name,
-        description: formData.description
-      };
-      
-      console.log('⚡ Sender quote data:', emailPayload);
-      
-      const { data: emailResult, error: emailError } = await supabase.functions.invoke('send-quote-notification', {
-        body: emailPayload
-      });
+      // Send e-post via Web3Forms
+      console.log('[QuoteForm] Sending email via Web3Forms for quote:', quoteRecord.id);
+      const web3FormData = new FormData();
+      web3FormData.append('access_key', 'e73de942-c444-45b1-ba7a-1556f5862bfd');
+      web3FormData.append('subject', `Nytt tilbud fra ${formData.name} (${formData.type})`);
+      web3FormData.append('from_name', 'HandyHjelp Tilbudsskjema');
+      web3FormData.append('Navn', formData.name);
+      web3FormData.append('E-post', formData.email);
+      web3FormData.append('Telefon', formData.phone);
+      if (formData.address) {
+        web3FormData.append('Adresse', formData.address);
+      }
+      if (formData.selectedCompany?.name) {
+        web3FormData.append('Bedrift', formData.selectedCompany.name);
+      }
+      if (formData.selectedCompany?.orgNumber) {
+        web3FormData.append('Org.nummer', formData.selectedCompany.orgNumber);
+      }
+      web3FormData.append('Beskrivelse', formData.description);
+      web3FormData.append('Type', formData.type || 'private');
 
-      console.log('[QuoteForm] Email notification result:', emailResult);
-      console.log('[QuoteForm] Email error (if any):', emailError);
-
-      if (emailError) {
-        console.error('[QuoteForm] Email function invocation error:', emailError);
-        throw new Error(`E-post kunne ikke sendes: ${emailError.message || 'Ukjent feil'}`);
+      try {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: web3FormData
+        });
+        const result = await response.json();
+        console.log('✅ E-post sendt via Web3Forms:', result);
+      } catch (error) {
+        console.error('⚠️ E-post feilet, men tilbud er lagret:', error);
       }
 
-      if (emailResult && !emailResult.success) {
-        console.error('[QuoteForm] Email sending failed:', emailResult.error);
-        throw new Error(`E-post kunne ikke sendes: ${emailResult.error || 'Ukjent feil'}`);
-      }
+      console.log('[QuoteForm] ✅ Quote saved successfully');
 
-      console.log('[QuoteForm] ✅ Quote saved and emails sent successfully');
-
-      // Navigate to thank you page with email and type parameters
+      // Navigate to thank you page UANSETT
       navigate(`/takk?email=${encodeURIComponent(formData.email)}&type=${formData.type}`);
 
     } catch (error) {
       // CRITICAL: Always log errors for debugging
-      console.error('❌ Edge Function feil:', error);
+      console.error('❌ Form submission error:', error);
       console.error('❌ Full error details:', {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
