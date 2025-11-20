@@ -592,7 +592,7 @@ export const QuoteForm = () => {
       )}
 
       <div className="flex justify-between pt-6 border-t">
-        {step > 1 && (
+        {step > 1 && !(user && userProfile?.customer_type) && (
           <Button variant="outline" onClick={handleBack}>
             Tilbake
           </Button>
