@@ -203,10 +203,17 @@ export const QuoteForm = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault(); // Prevent page refresh
     console.log('[QuoteForm] 🔵 handleSubmit called');
     console.log('[QuoteForm] Current step:', step);
     console.log('[QuoteForm] Form data:', formData);
+    
+    // Only run validation and submission on step 3
+    if (step !== 3) {
+      console.log('[QuoteForm] ⚠️ Not on step 3, ignoring submit');
+      return;
+    }
     
     const isValid = validateCurrentStep();
     console.log('[QuoteForm] Validation result:', isValid);
@@ -646,13 +653,18 @@ export const QuoteForm = () => {
 
       <div className="flex justify-between pt-6 border-t">
         {step > 1 && !(user && userProfile?.customer_type) && (
-          <Button variant="outline" onClick={handleBack}>
+          <Button 
+            type="button"
+            variant="outline" 
+            onClick={handleBack}
+          >
             Tilbake
           </Button>
         )}
         <div className="ml-auto">
           {step < 3 ? (
             <Button 
+              type="button"
               onClick={handleNext} 
               disabled={!isStepValid()}
               className="bg-success hover:bg-success-hover text-success-foreground"
@@ -661,6 +673,7 @@ export const QuoteForm = () => {
             </Button>
           ) : (
             <Button 
+              type="submit"
               onClick={handleSubmit}
               disabled={!isStepValid() || isSubmitting}
               className="bg-success hover:bg-success-hover text-success-foreground"
