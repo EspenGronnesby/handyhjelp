@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Shield, LogOut } from 'lucide-react';
+import { Loader2, Shield, LogOut, Home, Building2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -15,6 +15,9 @@ interface Profile {
   email: string;
   phone: string;
   address: string;
+  customer_type: 'private' | 'business' | null;
+  org_number?: string;
+  company_name?: string;
 }
 
 const DashboardProfile = () => {
@@ -22,7 +25,10 @@ const DashboardProfile = () => {
     full_name: '',
     email: '',
     phone: '',
-    address: ''
+    address: '',
+    customer_type: null,
+    org_number: '',
+    company_name: ''
   });
   const [roles, setRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,14 +46,17 @@ const DashboardProfile = () => {
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         setProfile({
           full_name: data.full_name || '',
           email: data.email || '',
           phone: data.phone || '',
-          address: data.address || ''
+          address: data.address || '',
+          customer_type: data.customer_type as 'private' | 'business' | null,
+          org_number: data.org_number || '',
+          company_name: data.company_name || ''
         });
       }
 
@@ -118,16 +127,29 @@ const DashboardProfile = () => {
       <div>
         <div className="flex items-center gap-3 mb-2">
           <h1 className="text-3xl font-bold">Min profil</h1>
-          {roles.length > 0 && (
-            <div className="flex gap-2">
-              {roles.map((role) => (
-                <Badge key={role} variant="default" className="flex items-center gap-1">
-                  <Shield className="h-3 w-3" />
-                  {role.charAt(0).toUpperCase() + role.slice(1)}
-                </Badge>
-              ))}
-            </div>
-          )}
+          <div className="flex gap-2">
+            {profile.customer_type && (
+              <Badge variant="outline" className="flex items-center gap-1">
+                {profile.customer_type === 'private' ? (
+                  <>
+                    <Home className="h-3 w-3" />
+                    <span>Privatkunde</span>
+                  </>
+                ) : (
+                  <>
+                    <Building2 className="h-3 w-3" />
+                    <span>Bedriftskunde</span>
+                  </>
+                )}
+              </Badge>
+            )}
+            {roles.length > 0 && roles.map((role) => (
+              <Badge key={role} variant="default" className="flex items-center gap-1">
+                <Shield className="h-3 w-3" />
+                {role.charAt(0).toUpperCase() + role.slice(1)}
+              </Badge>
+            ))}
+          </div>
         </div>
         <p className="text-muted-foreground">
           Oppdater dine personlige opplysninger
@@ -180,6 +202,31 @@ const DashboardProfile = () => {
               onChange={(e) => setProfile({ ...profile, address: e.target.value })}
             />
           </div>
+          {profile.customer_type === 'business' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="company_name">Bedriftsnavn</Label>
+                <Input
+                  id="company_name"
+                  value={profile.company_name || ''}
+                  disabled
+                  className="bg-muted"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="org_number">Organisasjonsnummer</Label>
+                <Input
+                  id="org_number"
+                  value={profile.org_number || ''}
+                  disabled
+                  className="bg-muted"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Organisasjonsnummer kan ikke endres
+                </p>
+              </div>
+            </>
+          )}
           <Button onClick={handleSave} disabled={saving}>
             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Lagre endringer

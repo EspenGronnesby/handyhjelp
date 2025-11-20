@@ -343,31 +343,37 @@ export type Database = {
       profiles: {
         Row: {
           address: string | null
+          company_name: string | null
           created_at: string
           customer_type: string | null
           email: string
           full_name: string
           id: string
+          org_number: string | null
           phone: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
+          company_name?: string | null
           created_at?: string
           customer_type?: string | null
           email: string
           full_name: string
           id: string
+          org_number?: string | null
           phone?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
+          company_name?: string | null
           created_at?: string
           customer_type?: string | null
           email?: string
           full_name?: string
           id?: string
+          org_number?: string | null
           phone?: string | null
           updated_at?: string
         }
