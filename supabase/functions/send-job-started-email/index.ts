@@ -19,8 +19,12 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    // Verify authentication
+    console.log('[send-job-started-email] Function invoked');
+    
+    // Verify authentication using JWT
     const authHeader = req.headers.get('Authorization');
+    console.log('[send-job-started-email] Auth header present:', !!authHeader);
+    
     if (!authHeader) {
       console.error("No authorization header provided");
       return new Response(
@@ -29,15 +33,26 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Create client with user's auth
-    const supabaseClient = createClient(
+    // Use service role client to verify the JWT and check admin role
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Verify user is authenticated
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    // Extract JWT token from Bearer header
+    const token = authHeader.replace('Bearer ', '');
+    
+    console.log('[send-job-started-email] Verifying JWT token...');
+    
+    // Verify the JWT token to get user info
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    
+    console.log('[send-job-started-email] User verification result:', {
+      hasUser: !!user,
+      userId: user?.id,
+      error: userError?.message
+    });
+    
     if (userError || !user) {
       console.error("Invalid authentication token:", userError);
       return new Response(
@@ -46,8 +61,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // Check if user is admin
-    const { data: roleData, error: roleError } = await supabaseClient
+    // Check if user is admin using service role client
+    const { data: roleData, error: roleError } = await supabaseAdmin
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
@@ -63,12 +78,6 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     console.log("Admin verified:", user.id);
-
-    // Use service role for actual operations
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
 
     const { jobId }: JobStartRequest = await req.json();
 
