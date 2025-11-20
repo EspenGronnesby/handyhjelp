@@ -159,19 +159,26 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     // Send email to HandyHjelp
-    console.log('[send-quote-notification] Sending email to Team@handyhjelp.no');
+    console.log('[send-quote-notification] Sending email to team@handyhjelp.no');
     const emailResponse = await resend.emails.send({
       from: "HandyHjelp <team@handyhjelp.no>",
-      to: ["Team@handyhjelp.no"],
+      to: ["team@handyhjelp.no"],
       subject: `Ny tilbudsforespørsel fra ${escapeHtml(quoteData.name)} (${customerType})`,
       html: emailHtml,
       replyTo: quoteData.email,
     });
 
-    console.log('[send-quote-notification] Team email sent successfully:', {
+    console.log('[send-quote-notification] Team email response:', {
+      success: !!emailResponse.data,
       id: emailResponse.data?.id,
-      error: emailResponse.error
+      error: emailResponse.error,
+      fullResponse: emailResponse
     });
+
+    if (emailResponse.error) {
+      console.error('[send-quote-notification] Failed to send team email:', emailResponse.error);
+      throw new Error(`Kunne ikke sende e-post til HandyHjelp: ${emailResponse.error.message || 'Ukjent feil'}`);
+    }
 
     // Send confirmation email to customer
     console.log('[send-quote-notification] Sending confirmation email to customer:', quoteData.email);
@@ -207,10 +214,17 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log('[send-quote-notification] Customer email sent successfully:', {
+    console.log('[send-quote-notification] Customer email response:', {
+      success: !!customerEmailResponse.data,
       id: customerEmailResponse.data?.id,
-      error: customerEmailResponse.error
+      error: customerEmailResponse.error,
+      fullResponse: customerEmailResponse
     });
+
+    if (customerEmailResponse.error) {
+      console.error('[send-quote-notification] Failed to send customer email:', customerEmailResponse.error);
+      throw new Error(`Kunne ikke sende bekreftelse til kunde: ${customerEmailResponse.error.message || 'Ukjent feil'}`);
+    }
 
     // Log emails to database for tracking
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -261,12 +275,28 @@ const handler = async (req: Request): Promise<Response> => {
     console.error('[send-quote-notification] Error details:', {
       message: error.message,
       stack: error.stack,
-      name: error.name
+      name: error.name,
+      type: error.constructor.name
     });
+    
+    // Provide user-friendly error messages
+    let userMessage = "Det oppstod en feil ved sending av e-post. Vennligst prøv igjen eller kontakt oss direkte på +47 41250553.";
+    
+    if (error.message) {
+      if (error.message.includes('Resend') || error.message.includes('API')) {
+        userMessage = "E-posttjenesten er midlertidig utilgjengelig. Vennligst prøv igjen om litt eller ring oss på +47 41250553.";
+      } else if (error.message.includes('sende e-post til HandyHjelp')) {
+        userMessage = error.message; // Use our custom error message
+      } else if (error.message.includes('sende bekreftelse til kunde')) {
+        userMessage = error.message; // Use our custom error message
+      }
+    }
+    
     return new Response(
       JSON.stringify({ 
         success: false,
-        error: error.message || "Unknown error occurred"
+        error: userMessage,
+        technicalError: error.message || "Unknown error occurred"
       }),
       {
         status: 500,
