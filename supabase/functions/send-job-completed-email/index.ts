@@ -152,7 +152,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email to customer
     const emailResponse = await resend.emails.send({
-      from: "HandyHjelp <onboarding@resend.dev>",
+      from: "HandyHjelp <team@handyhjelp.no>",
       to: [customerEmail],
       subject: "Prosjektet ditt er ferdigstilt! ✅",
       html: `
