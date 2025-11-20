@@ -58,9 +58,26 @@ const Auth = () => {
         navigate('/dashboard');
       }
     } catch (error: any) {
+      console.error('Authentication error:', error);
+      
+      let errorMessage = 'Noe gikk galt. Prøv igjen.';
+      
+      // Provide specific error messages for known issues
+      if (error.message?.includes('already registered') || error.message?.includes('already exists')) {
+        errorMessage = 'Denne e-posten er allerede registrert. Prøv å logge inn i stedet.';
+      } else if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Ugyldig e-post eller passord. Vennligst prøv igjen.';
+      } else if (error.message?.includes('invalid email') || error.message?.includes('Email')) {
+        errorMessage = 'Ugyldig e-postadresse. Vennligst sjekk og prøv igjen.';
+      } else if (error.message?.includes('password') || error.message?.includes('Password')) {
+        errorMessage = 'Passordet må være minst 6 tegn langt.';
+      } else if (error.message?.includes('Database error') || error.message?.includes('constraint')) {
+        errorMessage = 'Kunne ikke opprette konto. Vennligst prøv igjen eller kontakt support hvis problemet vedvarer.';
+      }
+      
       toast({
         title: 'Feil',
-        description: error.message || 'Noe gikk galt. Prøv igjen.',
+        description: errorMessage,
         variant: 'destructive'
       });
     } finally {
