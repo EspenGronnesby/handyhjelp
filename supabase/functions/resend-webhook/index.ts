@@ -89,9 +89,14 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       if (!isValid) {
-        console.warn("Invalid webhook signature");
-        // For development, we'll log but not reject
-        // In production, you should return 401 here
+        console.error("Invalid webhook signature - rejecting request");
+        return new Response(
+          JSON.stringify({ error: "Invalid signature" }),
+          {
+            status: 401,
+            headers: { "Content-Type": "application/json", ...corsHeaders },
+          }
+        );
       }
     }
 
