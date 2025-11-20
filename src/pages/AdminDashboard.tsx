@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Users, FileText, Briefcase, Play, CheckCircle, Mail, CheckCircle2, Clock, AlertCircle, XCircle, Eye } from 'lucide-react';
+import { Loader2, Users, FileText, Briefcase, Play, CheckCircle, Mail, CheckCircle2, Clock, AlertCircle, XCircle, Eye, Home, Building2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -52,6 +52,7 @@ interface Profile {
   email: string;
   phone?: string;
   address?: string;
+  customer_type?: 'private' | 'business' | null;
   created_at: string;
 }
 
@@ -96,13 +97,20 @@ const AdminDashboard = () => {
       const [quotesResult, jobsResult, profilesResult, emailLogsResult] = await Promise.all([
         supabase.from('quotes').select('*').order('created_at', { ascending: false }),
         supabase.from('jobs').select('*, quotes(name, company_name, description)').order('created_at', { ascending: false }),
-        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('profiles').select('id, full_name, email, phone, address, customer_type, created_at').order('created_at', { ascending: false }),
         supabase.from('email_logs').select('*').order('created_at', { ascending: false })
       ]);
 
       if (quotesResult.data) setQuotes(quotesResult.data);
       if (jobsResult.data) setJobs(jobsResult.data);
-      if (profilesResult.data) setProfiles(profilesResult.data);
+      if (profilesResult.data) {
+        // Type cast customer_type to match our Profile interface
+        const typedProfiles = profilesResult.data.map(profile => ({
+          ...profile,
+          customer_type: profile.customer_type as 'private' | 'business' | null
+        }));
+        setProfiles(typedProfiles);
+      }
       if (emailLogsResult.data) {
         setEmailLogs(emailLogsResult.data as EmailLog[]);
         setFilteredEmails(emailLogsResult.data as EmailLog[]);
@@ -431,9 +439,24 @@ const AdminDashboard = () => {
             <Card key={quote.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">
-                    {quote.company_name || quote.name}
-                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-lg">
+                      {quote.company_name || quote.name}
+                    </CardTitle>
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      {quote.type === 'private' ? (
+                        <>
+                          <Home className="h-3 w-3" />
+                          <span>Privat</span>
+                        </>
+                      ) : (
+                        <>
+                          <Building2 className="h-3 w-3" />
+                          <span>Bedrift</span>
+                        </>
+                      )}
+                    </Badge>
+                  </div>
                   <Badge className={statusColors[quote.status]}>
                     {statusLabels[quote.status] || quote.status}
                   </Badge>
@@ -684,7 +707,26 @@ const AdminDashboard = () => {
           {profiles.map((profile) => (
             <Card key={profile.id}>
               <CardHeader>
-                <CardTitle className="text-lg">{profile.full_name}</CardTitle>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-lg">{profile.full_name}</CardTitle>
+                    {profile.customer_type && (
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        {profile.customer_type === 'private' ? (
+                          <>
+                            <Home className="h-3 w-3" />
+                            <span>Privat</span>
+                          </>
+                        ) : (
+                          <>
+                            <Building2 className="h-3 w-3" />
+                            <span>Bedrift</span>
+                          </>
+                        )}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
                 <CardDescription>
                   Medlem siden {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true, locale: nb })}
                 </CardDescription>
