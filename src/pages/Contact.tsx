@@ -1,67 +1,9 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Phone, Mail, MapPin, Clock, MessageSquare, Send } from "lucide-react";
-import { useState, useRef } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { Phone, Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 
 const Contact = () => {
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: ""
-  });
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const captchaRef = useRef<HCaptcha>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!captchaToken) {
-      toast({
-        title: "Vennligst bekreft at du ikke er en robot",
-        description: "Fullfør captcha-verifiseringen først.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    
-    try {
-      const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: { ...formData, captchaToken }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Melding sendt!",
-        description: "Vi tar kontakt med deg innen 2 timer."
-      });
-      setFormData({ name: "", email: "", phone: "", message: "" });
-      setCaptchaToken(null);
-      captchaRef.current?.resetCaptcha();
-    } catch (error) {
-      console.error('Error sending contact email:', error);
-      toast({
-        title: "Noe gikk galt",
-        description: "Prøv igjen eller ring oss på +47 41250553",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const faqItems = [
     {
       question: "Hvor raskt kan dere komme?",
@@ -104,71 +46,7 @@ const Contact = () => {
 
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 mb-20">
-            {/* Contact Form */}
-            <div>
-              <Card>
-                <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-6">Send oss en melding</h2>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Navn *</label>
-                      <Input 
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        placeholder="Ditt fulle navn"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">E-post *</label>
-                      <Input 
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        placeholder="din@epost.no"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Telefon *</label>
-                      <Input 
-                        type="tel"
-                        required
-                        value={formData.phone}
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                        placeholder="+47 ..."
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Melding *</label>
-                      <Textarea 
-                        required
-                        value={formData.message}
-                        onChange={(e) => setFormData({...formData, message: e.target.value})}
-                        placeholder="Beskriv hvordan vi kan hjelpe deg..."
-                        rows={5}
-                      />
-                    </div>
-                    
-                    <div className="flex justify-center my-4">
-                      <HCaptcha
-                        ref={captchaRef}
-                        sitekey="10000000-ffff-ffff-ffff-000000000001"
-                        onVerify={(token) => setCaptchaToken(token)}
-                        onExpire={() => setCaptchaToken(null)}
-                      />
-                    </div>
-                    
-                    <Button type="submit" variant="cta" className="w-full gap-2" disabled={isSubmitting || !captchaToken}>
-                      <Send className="h-4 w-4" />
-                      {isSubmitting ? "Sender..." : "Send melding"}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Contact Info & Map */}
+            {/* Contact Info */}
             <div className="space-y-6">
               <Card>
                 <CardContent className="pt-6">
@@ -237,6 +115,72 @@ const Contact = () => {
                       <MessageSquare className="h-4 w-4" />
                       Kontakt oss på WhatsApp
                     </a>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Info Section */}
+            <div>
+              <Card>
+                <CardContent className="pt-6">
+                  <h2 className="text-2xl font-bold mb-6">Hvordan vi jobber</h2>
+                  <div className="space-y-4">
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                        1
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Ta kontakt</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Ring eller send e-post med din forespørsel
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                        2
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Vi svarer raskt</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Vi kommer tilbake til deg innen 2 timer
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                        3
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Befaring</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Vi avtaler befaring og lager tilbud
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                        4
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Utførelse</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Vi utfører jobben profesjonelt og effektivt
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                        5
+                      </div>
+                      <div>
+                        <h3 className="font-semibold mb-1">Kvalitetskontroll</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Vi sikrer at alt er gjort etter dine ønsker
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

@@ -337,39 +337,6 @@ export const QuoteForm = () => {
       }
 
       console.log('[QuoteForm] ✅ Quote saved to database, ID:', quoteRecord.id);
-
-      // Send e-post via Web3Forms
-      console.log('[QuoteForm] Sending email via Web3Forms for quote:', quoteRecord.id);
-      const web3FormData = new FormData();
-      web3FormData.append('access_key', 'e73de942-c444-45b1-ba7a-1556f5862bfd');
-      web3FormData.append('subject', `Nytt tilbud fra ${formData.name} (${formData.type})`);
-      web3FormData.append('from_name', 'HandyHjelp Tilbudsskjema');
-      web3FormData.append('Navn', formData.name);
-      web3FormData.append('E-post', formData.email);
-      web3FormData.append('Telefon', formData.phone);
-      if (formData.address) {
-        web3FormData.append('Adresse', formData.address);
-      }
-      if (formData.selectedCompany?.name) {
-        web3FormData.append('Bedrift', formData.selectedCompany.name);
-      }
-      if (formData.selectedCompany?.orgNumber) {
-        web3FormData.append('Org.nummer', formData.selectedCompany.orgNumber);
-      }
-      web3FormData.append('Beskrivelse', formData.description);
-      web3FormData.append('Type', formData.type || 'private');
-
-      try {
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          body: web3FormData
-        });
-        const result = await response.json();
-        console.log('✅ E-post sendt via Web3Forms:', result);
-      } catch (error) {
-        console.error('⚠️ E-post feilet, men tilbud er lagret:', error);
-      }
-
       console.log('[QuoteForm] ✅ Quote saved successfully');
 
       // Navigate to thank you page UANSETT
