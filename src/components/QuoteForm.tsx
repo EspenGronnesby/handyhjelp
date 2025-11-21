@@ -8,9 +8,6 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building, CheckCircle } from "lucide-react";
 import { CompanySearch } from "./CompanySearch";
-import { contactFormSchema, type ContactFormData, sanitizeInput } from "@/lib/validation";
-import { formRateLimiter, detectSuspiciousActivity, logSecurityEvent } from "@/lib/security";
-import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -227,85 +224,6 @@ export const QuoteForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Rate limiting check
-      console.log('[QuoteForm] Checking rate limit...');
-      const userIdentifier = formData.email || 'anonymous';
-      if (!formRateLimiter.isAllowed(userIdentifier)) {
-        const remainingTime = Math.ceil(formRateLimiter.getRemainingTime(userIdentifier) / 60000);
-        toast({
-          title: "For mange forsøk",
-          description: `Vent ${remainingTime} minutter før du prøver igjen.`,
-          variant: "destructive",
-          duration: 5000,
-        });
-        return;
-      }
-
-      console.log('[QuoteForm] ✅ Rate limit passed');
-
-      // Check daily quote limit for authenticated users (2 quotes per day)
-      if (user) {
-        console.log('[QuoteForm] Checking daily quote limit for user:', user.id);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const { count, error: countError } = await supabase
-          .from('quotes')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .gte('created_at', today.toISOString());
-
-        if (countError) {
-          console.error('[QuoteForm] Error checking quote limit:', countError);
-        } else if (count !== null && count >= 2) {
-          console.log('[QuoteForm] ❌ Daily limit reached:', count);
-          toast({
-            title: "Daglig grense nådd",
-            description: "Du kan sende maks 2 tilbudsforespørsler per dag. Prøv igjen i morgen.",
-            variant: "destructive"
-          });
-          setIsSubmitting(false);
-          return;
-        }
-        console.log('[QuoteForm] ✅ Daily limit check passed, count:', count);
-      }
-
-      console.log('[QuoteForm] Starting security validation...');
-      // Security validation
-      const validationData: ContactFormData = {
-        type: formData.type!,
-        name: sanitizeInput(formData.name),
-        email: sanitizeInput(formData.email),
-        phone: sanitizeInput(formData.phone),
-        orgNumber: formData.selectedCompany?.orgNumber,
-        description: sanitizeInput(formData.description),
-        isAuthenticated: !!user,
-      };
-
-      console.log('[QuoteForm] Validation data prepared:', validationData);
-
-      // Check for suspicious activity
-      console.log('[QuoteForm] Checking for suspicious activity...');
-      if (detectSuspiciousActivity(validationData)) {
-        console.log('[QuoteForm] ❌ Suspicious activity detected');
-        logSecurityEvent('suspicious_form_submission', { 
-          userAgent: navigator.userAgent,
-          timestamp: new Date().toISOString()
-        });
-        toast({
-          title: "Sikkerhetsfeil",
-          description: "Forespørselen inneholder ugyldig innhold.",
-          variant: "destructive",
-          duration: 5000,
-        });
-        return;
-      }
-      console.log('[QuoteForm] ✅ No suspicious activity detected');
-
-      // Final validation with zod schema
-      console.log('[QuoteForm] Performing Zod schema validation...');
-      const validatedData = contactFormSchema.parse(validationData);
-      console.log('[QuoteForm] ✅ Zod validation passed');
 
       // Save quote to database - Allow NULL user_id for anonymous submissions
       // Users can later register with the same email to claim their quotes
@@ -351,25 +269,13 @@ export const QuoteForm = () => {
         errorObject: error
       });
       
-      if (error instanceof z.ZodError) {
-        const zodErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
-          if (err.path[0]) {
-            zodErrors[err.path[0] as string] = err.message;
-          }
-        });
-        setErrors(zodErrors);
-        console.error('[QuoteForm] Zod validation error:', zodErrors);
-      } else {
-        console.error('[QuoteForm] ❌ Form submission error:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Noe gikk galt. Prøv igjen senere.';
-        toast({
-          title: "Feil ved sending",
-          description: errorMessage,
-          variant: "destructive",
-          duration: 5000,
-        });
-      }
+      const errorMessage = error instanceof Error ? error.message : 'Noe gikk galt. Prøv igjen senere.';
+      toast({
+        title: "Feil ved sending",
+        description: errorMessage,
+        variant: "destructive",
+        duration: 5000,
+      });
     } finally {
       // CRITICAL: Always reset isSubmitting, no matter what happens
       console.log('[QuoteForm] Finally block: Resetting isSubmitting to false');
