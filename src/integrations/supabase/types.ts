@@ -14,66 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      email_logs: {
-        Row: {
-          created_at: string | null
-          email_id: string
-          error_message: string | null
-          event_type: string
-          from_email: string | null
-          id: string
-          metadata: Json | null
-          recipient: string
-          related_job_id: string | null
-          related_quote_id: string | null
-          resend_created_at: string | null
-          subject: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email_id: string
-          error_message?: string | null
-          event_type: string
-          from_email?: string | null
-          id?: string
-          metadata?: Json | null
-          recipient: string
-          related_job_id?: string | null
-          related_quote_id?: string | null
-          resend_created_at?: string | null
-          subject?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email_id?: string
-          error_message?: string | null
-          event_type?: string
-          from_email?: string | null
-          id?: string
-          metadata?: Json | null
-          recipient?: string
-          related_job_id?: string | null
-          related_quote_id?: string | null
-          resend_created_at?: string | null
-          subject?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "email_logs_related_job_id_fkey"
-            columns: ["related_job_id"]
-            isOneToOne: false
-            referencedRelation: "jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "email_logs_related_quote_id_fkey"
-            columns: ["related_quote_id"]
-            isOneToOne: false
-            referencedRelation: "quotes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       job_photos: {
         Row: {
           caption: string | null
