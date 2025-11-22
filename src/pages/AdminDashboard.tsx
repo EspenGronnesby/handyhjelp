@@ -126,6 +126,14 @@ const AdminDashboard = () => {
     setActionLoading(quote.id);
     
     try {
+      // Update quote status first
+      const { error: quoteError } = await supabase
+        .from('quotes')
+        .update({ status: 'in_progress' })
+        .eq('id', quote.id);
+
+      if (quoteError) throw quoteError;
+
       // Create job with in_progress status
       const { data: job, error: jobError } = await supabase
         .from('jobs')
@@ -140,44 +148,37 @@ const AdminDashboard = () => {
 
       if (jobError) throw jobError;
 
-      // Update quote status
-      await supabase
-        .from('quotes')
-        .update({ status: 'in_progress' })
-        .eq('id', quote.id);
+      // Update local state immediately for instant UI update
+      setQuotes(prevQuotes => 
+        prevQuotes.map(q => q.id === quote.id ? { ...q, status: 'in_progress' } : q)
+      );
 
-      // Send email
-      const { error: emailError } = await supabase.functions.invoke('send-job-status-email', {
+      // Refresh jobs list to include the new job
+      const jobsResponse = await supabase
+        .from('jobs')
+        .select('*, quotes(name, email, phone, description, type, company_name, org_number)')
+        .order('created_at', { ascending: false });
+      
+      if (jobsResponse.data) setJobs(jobsResponse.data);
+
+      // Send email (non-blocking)
+      supabase.functions.invoke('send-job-status-email', {
         body: {
           customerName: quote.type === 'business' ? quote.company_name : quote.name,
           customerEmail: quote.email,
           jobDescription: quote.description,
           status: 'started',
         },
+      }).then(({ error: emailError }) => {
+        if (emailError) {
+          console.error('Email error:', emailError);
+        }
       });
 
-      if (emailError) {
-        console.error('Email error:', emailError);
-        toast({
-          title: "Advarsel",
-          description: "Jobben er startet, men e-post kunne ikke sendes.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Suksess!",
-          description: "Jobben er startet og kunde har mottatt e-post.",
-        });
-      }
-
-      // Refresh data
-      const [quotesResponse, jobsResponse] = await Promise.all([
-        supabase.from('quotes').select('*').order('created_at', { ascending: false }),
-        supabase.from('jobs').select('*, quotes(name, email, phone, description, type, company_name, org_number)').order('created_at', { ascending: false })
-      ]);
-      
-      if (quotesResponse.data) setQuotes(quotesResponse.data);
-      if (jobsResponse.data) setJobs(jobsResponse.data);
+      toast({
+        title: "Suksess!",
+        description: "Jobben er startet og kunde vil motta e-post.",
+      });
 
     } catch (error: any) {
       console.error('Error starting job:', error);
@@ -197,7 +198,7 @@ const AdminDashboard = () => {
     
     try {
       // Update job status
-      await supabase
+      const { error: jobError } = await supabase
         .from('jobs')
         .update({ 
           status: 'completed',
@@ -205,45 +206,46 @@ const AdminDashboard = () => {
         })
         .eq('id', job.id);
 
+      if (jobError) throw jobError;
+
       // Update quote status
-      await supabase
+      const { error: quoteError } = await supabase
         .from('quotes')
         .update({ status: 'completed' })
         .eq('id', job.quote_id);
 
-      // Send email
+      if (quoteError) throw quoteError;
+
+      // Update local state immediately for instant UI update
+      setJobs(prevJobs => 
+        prevJobs.map(j => j.id === job.id 
+          ? { ...j, status: 'completed', completed_date: new Date().toISOString() } 
+          : j
+        )
+      );
+      setQuotes(prevQuotes => 
+        prevQuotes.map(q => q.id === job.quote_id ? { ...q, status: 'completed' } : q)
+      );
+
+      // Send email (non-blocking)
       const customerName = job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name;
-      const { error: emailError } = await supabase.functions.invoke('send-job-status-email', {
+      supabase.functions.invoke('send-job-status-email', {
         body: {
           customerName,
           customerEmail: job.quotes.email,
           jobDescription: job.quotes.description,
           status: 'completed',
         },
+      }).then(({ error: emailError }) => {
+        if (emailError) {
+          console.error('Email error:', emailError);
+        }
       });
 
-      if (emailError) {
-        console.error('Email error:', emailError);
-        toast({
-          title: "Advarsel",
-          description: "Jobben er fullført, men e-post kunne ikke sendes.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Suksess!",
-          description: "Jobben er fullført og kunde har mottatt e-post.",
-        });
-      }
-
-      // Refresh data
-      const [quotesResponse, jobsResponse] = await Promise.all([
-        supabase.from('quotes').select('*').order('created_at', { ascending: false }),
-        supabase.from('jobs').select('*, quotes(name, email, phone, description, type, company_name, org_number)').order('created_at', { ascending: false })
-      ]);
-      
-      if (quotesResponse.data) setQuotes(quotesResponse.data);
-      if (jobsResponse.data) setJobs(jobsResponse.data);
+      toast({
+        title: "Suksess!",
+        description: "Jobben er fullført og kunde vil motta e-post.",
+      });
 
     } catch (error: any) {
       console.error('Error completing job:', error);
@@ -262,20 +264,17 @@ const AdminDashboard = () => {
     setActionLoading(job.id);
     
     try {
-      await supabase.from('jobs').delete().eq('id', job.id);
+      const { error } = await supabase.from('jobs').delete().eq('id', job.id);
+      
+      if (error) throw error;
+
+      // Update local state immediately
+      setJobs(prevJobs => prevJobs.filter(j => j.id !== job.id));
       
       toast({
         title: "Slettet",
         description: "Jobben er slettet.",
       });
-
-      // Refresh data
-      const jobsResponse = await supabase
-        .from('jobs')
-        .select('*, quotes(name, email, phone, description, type, company_name, org_number)')
-        .order('created_at', { ascending: false });
-      
-      if (jobsResponse.data) setJobs(jobsResponse.data);
 
     } catch (error: any) {
       console.error('Error deleting job:', error);
