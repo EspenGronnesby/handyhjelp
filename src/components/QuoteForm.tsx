@@ -255,6 +255,28 @@ export const QuoteForm = () => {
         throw new Error(errorData.message || 'Kunne ikke sende tilbudsforespørsel');
       }
 
+      // Send confirmation email to customer via Resend (non-blocking)
+      try {
+        const { data: confirmationData, error: confirmationError } = await supabase.functions.invoke('send-confirmation-email', {
+          body: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            customerType: formData.type
+          }
+        });
+
+        if (confirmationError) {
+          console.error('Confirmation email error:', confirmationError);
+          // Don't block user flow - error notification is sent to team
+        } else {
+          console.log('Confirmation email sent:', confirmationData);
+        }
+      } catch (confirmationError) {
+        console.error('Failed to send confirmation email:', confirmationError);
+        // Don't block user flow - error notification is sent to team
+      }
+
       toast({
         title: "Tilbud sendt!",
         description: "Vi tar kontakt med deg innen 2 timer.",
