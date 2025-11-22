@@ -211,9 +211,23 @@ export const QuoteForm = () => {
     setIsSubmitting(true);
 
     try {
+      // Hardcoded access key (temporary solution - will be replaced)
+      const accessKey = 'a538bdee-7710-48bb-897c-b113576fd3a8';
+      
+      if (!accessKey) {
+        console.error('Web3Forms access key is missing!');
+        toast({
+          title: "Konfigurasjonsfeil",
+          description: "Kan ikke sende forespørsel. Kontakt support på +47 41250553",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       // Send email via Web3Forms only (no database)
       const web3FormData = {
-        access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+        access_key: accessKey,
         subject: `Ny tilbudsforespørsel fra ${formData.name}`,
         from_name: "HandyHjelp Nettside",
         type: formData.type === 'private' ? 'Privat' : 'Bedrift',

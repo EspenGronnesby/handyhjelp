@@ -24,8 +24,22 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
+      // Hardcoded access key (temporary solution - will be replaced)
+      const accessKey = 'a538bdee-7710-48bb-897c-b113576fd3a8';
+      
+      if (!accessKey) {
+        console.error('Web3Forms access key is missing!');
+        toast({
+          title: "Konfigurasjonsfeil",
+          description: "Kan ikke sende melding. Ring oss på +47 41250553",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const web3FormData = {
-        access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+        access_key: accessKey,
         subject: `Kontaktskjema fra ${formData.name}`,
         from_name: "HandyHjelp Nettside",
         name: formData.name,
