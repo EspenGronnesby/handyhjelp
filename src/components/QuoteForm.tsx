@@ -213,7 +213,7 @@ export const QuoteForm = () => {
     try {
       // Send email via Web3Forms only (no database)
       const web3FormData = {
-        access_key: import.meta.env.VITE_WEB3FORMS_QUOTE_ACCESS_KEY,
+        access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
         subject: `Ny tilbudsforespørsel fra ${formData.name}`,
         from_name: "HandyHjelp Nettside",
         type: formData.type === 'private' ? 'Privat' : 'Bedrift',

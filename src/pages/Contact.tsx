@@ -25,7 +25,7 @@ const Contact = () => {
 
     try {
       const web3FormData = {
-        access_key: import.meta.env.VITE_WEB3FORMS_CONTACT_ACCESS_KEY,
+        access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
         subject: `Kontaktskjema fra ${formData.name}`,
         from_name: "HandyHjelp Nettside",
         name: formData.name,
