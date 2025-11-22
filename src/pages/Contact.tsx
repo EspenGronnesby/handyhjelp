@@ -50,12 +50,17 @@ const Contact = () => {
 
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(web3FormData)
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(web3FormData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        const errorData = await response.json();
+        console.error('Web3Forms error:', errorData);
+        throw new Error(errorData.message || 'Failed to send message');
       }
 
       toast({
