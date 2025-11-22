@@ -212,7 +212,7 @@ export const QuoteForm = () => {
 
     try {
       // Hardcoded access key (temporary solution - will be replaced)
-      const accessKey = 'a538bdee-7710-48bb-897c-b113576fd3a8';
+      const accessKey = 'e73de942-c444-45b1-ba7a-1556f5862bfd';
       
       if (!accessKey) {
         console.error('Web3Forms access key is missing!');
