@@ -201,35 +201,19 @@ export const QuoteForm = () => {
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
-    e?.preventDefault(); // Prevent page refresh
-    console.log('[QuoteForm] 🔵 handleSubmit called');
-    console.log('[QuoteForm] Current step:', step);
-    console.log('[QuoteForm] Form data:', formData);
+    e?.preventDefault();
     
-    // Only run validation and submission on step 3
-    if (step !== 3) {
-      console.log('[QuoteForm] ⚠️ Not on step 3, ignoring submit');
-      return;
-    }
+    if (step !== 3) return;
     
     const isValid = validateCurrentStep();
-    console.log('[QuoteForm] Validation result:', isValid);
+    if (!isValid) return;
     
-    if (!isValid) {
-      console.log('[QuoteForm] ❌ Validation failed, stopping submission');
-      return;
-    }
-    
-    console.log('[QuoteForm] ✅ Validation passed, starting submission');
     setIsSubmitting(true);
 
     try {
-
-      // Save quote to database - Allow NULL user_id for anonymous submissions
-      // Users can later register with the same email to claim their quotes
-      console.log('[QuoteForm] Preparing to save quote to database...');
+      // Save to database
       const quoteData = {
-        user_id: user?.id || null, // NULL for anonymous users, will be linked when they register
+        user_id: user?.id || null,
         type: formData.type!,
         name: formData.name,
         email: formData.email,
@@ -240,8 +224,6 @@ export const QuoteForm = () => {
         description: formData.description,
         status: 'pending'
       };
-
-      console.log('[QuoteForm] Quote data to insert:', quoteData);
       
       const { data: quoteRecord, error: dbError } = await supabase
         .from('quotes')
@@ -250,25 +232,38 @@ export const QuoteForm = () => {
         .single();
 
       if (dbError) {
-        console.error('[QuoteForm] ❌ Database error:', dbError);
         throw new Error('Failed to save quote');
       }
 
-      console.log('[QuoteForm] ✅ Quote saved to database, ID:', quoteRecord.id);
-      console.log('[QuoteForm] ✅ Quote saved successfully');
+      // Send email via Web3Forms
+      const web3FormData = {
+        access_key: import.meta.env.VITE_WEB3FORMS_QUOTE_ACCESS_KEY,
+        subject: `Ny tilbudsforespørsel fra ${formData.name}`,
+        from_name: "HandyHjelp Nettside",
+        type: formData.type === 'private' ? 'Privat' : 'Bedrift',
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address || 'Ikke oppgitt',
+        company_name: formData.selectedCompany?.name || 'Ikke oppgitt',
+        org_number: formData.selectedCompany?.orgNumber || 'Ikke oppgitt',
+        description: formData.description,
+      };
 
-      // Navigate to thank you page UANSETT
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(web3FormData)
+      });
+
+      if (!response.ok) {
+        console.error('Web3Forms error:', await response.text());
+      }
+
       navigate(`/takk?email=${encodeURIComponent(formData.email)}&type=${formData.type}`);
 
     } catch (error) {
-      // CRITICAL: Always log errors for debugging
-      console.error('❌ Form submission error:', error);
-      console.error('❌ Full error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-        errorObject: error
-      });
-      
+      console.error('Form submission error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Noe gikk galt. Prøv igjen senere.';
       toast({
         title: "Feil ved sending",
@@ -277,8 +272,6 @@ export const QuoteForm = () => {
         duration: 5000,
       });
     } finally {
-      // CRITICAL: Always reset isSubmitting, no matter what happens
-      console.log('[QuoteForm] Finally block: Resetting isSubmitting to false');
       setIsSubmitting(false);
     }
   };

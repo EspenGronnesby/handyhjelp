@@ -1,9 +1,67 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { Phone, Mail, MapPin, Clock, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Phone, Mail, MapPin, Clock, MessageSquare, Loader2 } from "lucide-react";
 
 const Contact = () => {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: ""
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const web3FormData = {
+        access_key: import.meta.env.VITE_WEB3FORMS_CONTACT_ACCESS_KEY,
+        subject: `Kontaktskjema fra ${formData.name}`,
+        from_name: "HandyHjelp Nettside",
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
+      };
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(web3FormData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      toast({
+        title: "Melding sendt!",
+        description: "Vi svarer deg innen 2 timer.",
+      });
+
+      setFormData({ name: "", email: "", phone: "", message: "" });
+    } catch (error) {
+      console.error('Contact form error:', error);
+      toast({
+        title: "Feil ved sending",
+        description: "Prøv igjen eller ring oss direkte.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const faqItems = [
     {
       question: "Hvor raskt kan dere komme?",
@@ -46,6 +104,70 @@ const Contact = () => {
 
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 mb-20">
+            {/* Contact Form */}
+            <div>
+              <Card>
+                <CardContent className="pt-6">
+                  <h2 className="text-2xl font-bold mb-6">Send oss en melding</h2>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Navn</Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">E-post</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        required
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Telefon</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        required
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="message">Melding</Label>
+                      <Textarea
+                        id="message"
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        required
+                        disabled={isSubmitting}
+                        rows={5}
+                      />
+                    </div>
+                    <Button type="submit" className="w-full" disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sender...
+                        </>
+                      ) : (
+                        'Send melding'
+                      )}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Contact Info */}
             <div className="space-y-6">
               <Card>
@@ -118,10 +240,8 @@ const Contact = () => {
                   </div>
                 </CardContent>
               </Card>
-            </div>
 
-            {/* Info Section */}
-            <div>
+              {/* How We Work */}
               <Card>
                 <CardContent className="pt-6">
                   <h2 className="text-2xl font-bold mb-6">Hvordan vi jobber</h2>
