@@ -447,6 +447,75 @@ export type Database = {
           },
         ]
       }
+      service_agreements: {
+        Row: {
+          additional_info: string | null
+          address: string
+          contact_person: string
+          contact_role: string
+          contract_duration: string
+          created_at: string
+          current_situation: string
+          customer_type: string
+          email: string
+          fixed_contact_person: boolean
+          frequency: string
+          id: string
+          other_services: string | null
+          phone: string
+          services: Json
+          start_date: string | null
+          status: string
+          total_area: number | null
+          units_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          additional_info?: string | null
+          address: string
+          contact_person: string
+          contact_role: string
+          contract_duration: string
+          created_at?: string
+          current_situation: string
+          customer_type: string
+          email: string
+          fixed_contact_person?: boolean
+          frequency: string
+          id?: string
+          other_services?: string | null
+          phone: string
+          services?: Json
+          start_date?: string | null
+          status?: string
+          total_area?: number | null
+          units_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          additional_info?: string | null
+          address?: string
+          contact_person?: string
+          contact_role?: string
+          contract_duration?: string
+          created_at?: string
+          current_situation?: string
+          customer_type?: string
+          email?: string
+          fixed_contact_person?: boolean
+          frequency?: string
+          id?: string
+          other_services?: string | null
+          phone?: string
+          services?: Json
+          start_date?: string | null
+          status?: string
+          total_area?: number | null
+          units_count?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null

@@ -70,6 +70,29 @@ interface Profile {
   created_at: string;
 }
 
+interface ServiceAgreement {
+  id: string;
+  customer_type: string;
+  units_count: number | null;
+  total_area: number | null;
+  address: string;
+  services: string[];
+  other_services: string | null;
+  frequency: string;
+  fixed_contact_person: boolean;
+  contract_duration: string;
+  start_date: string | null;
+  current_situation: string;
+  contact_person: string;
+  contact_role: string;
+  email: string;
+  phone: string;
+  additional_info: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500',
   in_progress: 'bg-blue-500',
@@ -89,6 +112,7 @@ const AdminDashboard = () => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [agreements, setAgreements] = useState<ServiceAgreement[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -105,15 +129,17 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [quotesResponse, jobsResponse, profilesResponse] = await Promise.all([
+      const [quotesResponse, jobsResponse, profilesResponse, agreementsResponse] = await Promise.all([
         supabase.from('quotes').select('*').order('created_at', { ascending: false }),
         supabase.from('jobs').select('*, quotes(name, email, phone, description, type, company_name, org_number)').order('created_at', { ascending: false }),
-        supabase.from('profiles').select('*').order('created_at', { ascending: false })
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('service_agreements').select('*').order('created_at', { ascending: false })
       ]);
 
       if (quotesResponse.data) setQuotes(quotesResponse.data);
       if (jobsResponse.data) setJobs(jobsResponse.data);
       if (profilesResponse.data) setProfiles(profilesResponse.data);
+      if (agreementsResponse.data) setAgreements(agreementsResponse.data as any);
       setLoading(false);
     };
 
@@ -298,6 +324,60 @@ const AdminDashboard = () => {
   const pendingQuotes = quotes.filter(q => q.status === 'pending');
   const activeJobs = jobs.filter(j => j.status === 'in_progress');
   const completedJobs = jobs.filter(j => j.status === 'completed');
+  const newAgreements = agreements.filter(a => a.status === 'new');
+
+  const handleUpdateAgreementStatus = async (agreementId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('service_agreements')
+        .update({ status: newStatus })
+        .eq('id', agreementId);
+
+      if (error) throw error;
+
+      // Update local state
+      setAgreements(prev => prev.map(a => 
+        a.id === agreementId ? { ...a, status: newStatus } : a
+      ));
+
+      toast({
+        title: "Oppdatert",
+        description: "Status er oppdatert.",
+      });
+    } catch (error: any) {
+      console.error('Error updating agreement:', error);
+      toast({
+        title: "Feil",
+        description: "Kunne ikke oppdatere status.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const serviceLabels: Record<string, string> = {
+    maintenance: 'Generelt vedlikehold',
+    cleaning: 'Utvendig renhold',
+    winter: 'Snømåking og strøing',
+    summer: 'Gressklipping og hagearbeid',
+    inspection: 'Tilsyn og inspeksjoner',
+    other: 'Annet'
+  };
+
+  const agreementStatusLabels: Record<string, string> = {
+    new: 'Ny',
+    under_review: 'Under vurdering',
+    offer_sent: 'Tilbud sendt',
+    contract_signed: 'Avtale inngått',
+    rejected: 'Avslått'
+  };
+
+  const agreementStatusColors: Record<string, string> = {
+    new: 'bg-yellow-500',
+    under_review: 'bg-blue-500',
+    offer_sent: 'bg-purple-500',
+    contract_signed: 'bg-green-500',
+    rejected: 'bg-red-500'
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -339,6 +419,9 @@ const AdminDashboard = () => {
         <TabsList>
           <TabsTrigger value="requests">
             Nye forespørsler ({pendingQuotes.length})
+          </TabsTrigger>
+          <TabsTrigger value="agreements">
+            Avtaleforespørsler ({newAgreements.length})
           </TabsTrigger>
           <TabsTrigger value="active">
             Aktive jobber ({activeJobs.length})
@@ -563,6 +646,149 @@ const AdminDashboard = () => {
                       <><Trash2 className="mr-2 h-4 w-4" /> Slett jobb</>
                     )}
                   </Button>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        {/* Avtaleforespørsler */}
+        <TabsContent value="agreements" className="space-y-4">
+          {agreements.length === 0 ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Ingen avtaleforespørsler
+              </CardContent>
+            </Card>
+          ) : (
+            agreements.map((agreement) => (
+              <Card key={agreement.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg">
+                        {agreement.contact_person}
+                        <Badge className="ml-2" variant="outline">
+                          {agreement.customer_type === 'borettslag' ? 'Borettslag/Sameie' : 
+                           agreement.customer_type === 'bedrift' ? 'Bedrift' : 'Annet'}
+                        </Badge>
+                      </CardTitle>
+                      <CardDescription>
+                        Mottatt {formatDistanceToNow(new Date(agreement.created_at), { 
+                          addSuffix: true,
+                          locale: nb 
+                        })}
+                      </CardDescription>
+                    </div>
+                    <Badge className={agreementStatusColors[agreement.status]}>
+                      {agreementStatusLabels[agreement.status]}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium">Adresse:</p>
+                    <p className="text-sm text-muted-foreground">{agreement.address}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    {agreement.units_count && (
+                      <div>
+                        <span className="font-medium">Enheter:</span> {agreement.units_count}
+                      </div>
+                    )}
+                    {agreement.total_area && (
+                      <div>
+                        <span className="font-medium">Areal:</span> {agreement.total_area} m²
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium mb-2">Tjenester:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {agreement.services.map((service) => (
+                        <Badge key={service} variant="secondary">
+                          {serviceLabels[service] || service}
+                        </Badge>
+                      ))}
+                    </div>
+                    {agreement.other_services && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Andre tjenester: {agreement.other_services}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium">Frekvens:</span> {agreement.frequency}
+                    </div>
+                    <div>
+                      <span className="font-medium">Avtalevarighet:</span> {agreement.contract_duration}
+                    </div>
+                    <div>
+                      <span className="font-medium">Fast kontaktperson:</span> {agreement.fixed_contact_person ? 'Ja' : 'Nei'}
+                    </div>
+                    {agreement.start_date && (
+                      <div>
+                        <span className="font-medium">Oppstartsdato:</span> {agreement.start_date}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-4 text-sm flex-wrap">
+                    <div>
+                      <span className="font-medium">Kontakt:</span> {agreement.contact_person} ({agreement.contact_role})
+                    </div>
+                    <div>
+                      <span className="font-medium">E-post:</span> {agreement.email}
+                    </div>
+                    <div>
+                      <span className="font-medium">Telefon:</span> {agreement.phone}
+                    </div>
+                  </div>
+
+                  {agreement.additional_info && (
+                    <div>
+                      <p className="text-sm font-medium">Tilleggsinformasjon:</p>
+                      <p className="text-sm text-muted-foreground">{agreement.additional_info}</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-4">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleUpdateAgreementStatus(agreement.id, 'under_review')}
+                      disabled={agreement.status !== 'new'}
+                    >
+                      Under vurdering
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleUpdateAgreementStatus(agreement.id, 'offer_sent')}
+                      disabled={agreement.status === 'new'}
+                    >
+                      Tilbud sendt
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => handleUpdateAgreementStatus(agreement.id, 'contract_signed')}
+                      disabled={agreement.status === 'new'}
+                    >
+                      Avtale inngått
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleUpdateAgreementStatus(agreement.id, 'rejected')}
+                    >
+                      Avslå
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))

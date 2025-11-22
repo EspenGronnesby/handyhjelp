@@ -129,11 +129,11 @@ const Index = () => {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button 
+                    asChild
                     size="lg"
                     className="bg-success hover:bg-success-hover"
-                    onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
                   >
-                    Forespør fast avtale
+                    <Link to="/fast-avtale">Forespør fast avtale</Link>
                   </Button>
                   <Button 
                     size="lg"
