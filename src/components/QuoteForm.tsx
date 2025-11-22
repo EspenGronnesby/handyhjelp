@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building, CheckCircle } from "lucide-react";
+import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building, CheckCircle, Loader2 } from "lucide-react";
 import { CompanySearch } from "./CompanySearch";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -211,31 +211,7 @@ export const QuoteForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Save to database
-      const quoteData = {
-        user_id: user?.id || null,
-        type: formData.type!,
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address || null,
-        org_number: formData.selectedCompany?.orgNumber || null,
-        company_name: formData.selectedCompany?.name || null,
-        description: formData.description,
-        status: 'pending'
-      };
-      
-      const { data: quoteRecord, error: dbError } = await supabase
-        .from('quotes')
-        .insert(quoteData)
-        .select()
-        .single();
-
-      if (dbError) {
-        throw new Error('Failed to save quote');
-      }
-
-      // Send email via Web3Forms
+      // Send email via Web3Forms only (no database)
       const web3FormData = {
         access_key: import.meta.env.VITE_WEB3FORMS_QUOTE_ACCESS_KEY,
         subject: `Ny tilbudsforespørsel fra ${formData.name}`,
@@ -257,19 +233,22 @@ export const QuoteForm = () => {
       });
 
       if (!response.ok) {
-        console.error('Web3Forms error:', await response.text());
+        throw new Error('Kunne ikke sende tilbudsforespørsel');
       }
+
+      toast({
+        title: "Tilbud sendt!",
+        description: "Vi tar kontakt med deg innen 2 timer.",
+      });
 
       navigate(`/takk?email=${encodeURIComponent(formData.email)}&type=${formData.type}`);
 
     } catch (error) {
       console.error('Form submission error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Noe gikk galt. Prøv igjen senere.';
       toast({
         title: "Feil ved sending",
-        description: errorMessage,
+        description: "Prøv igjen eller ring oss direkte på +47 41250553.",
         variant: "destructive",
-        duration: 5000,
       });
     } finally {
       setIsSubmitting(false);
@@ -544,7 +523,14 @@ export const QuoteForm = () => {
               disabled={!isStepValid() || isSubmitting}
               className="bg-success hover:bg-success-hover text-success-foreground"
             >
-              {isSubmitting ? "Sender..." : "Send forespørsel"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sender...
+                </>
+              ) : (
+                'Send forespørsel'
+              )}
             </Button>
           )}
         </div>
