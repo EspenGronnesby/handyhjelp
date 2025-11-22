@@ -152,13 +152,18 @@ const AdminDashboard = () => {
     setActionLoading(quote.id);
     
     try {
+      console.log('Starting job for quote:', quote.id, 'Is admin:', isAdmin);
+      
       // Update quote status first
       const { error: quoteError } = await supabase
         .from('quotes')
         .update({ status: 'in_progress' })
         .eq('id', quote.id);
 
-      if (quoteError) throw quoteError;
+      if (quoteError) {
+        console.error('Error updating quote status:', quoteError);
+        throw quoteError;
+      }
 
       // Create job with in_progress status
       const { data: job, error: jobError } = await supabase
@@ -204,9 +209,11 @@ const AdminDashboard = () => {
 
     } catch (error: any) {
       console.error('Error starting job:', error);
+      const errorMessage = error?.message || 'Ukjent feil';
+      const errorCode = error?.code || '';
       toast({
         title: "Feil",
-        description: "Kunne ikke starte jobben. Prøv igjen.",
+        description: `Kunne ikke starte jobben: ${errorMessage}${errorCode ? ` (Kode: ${errorCode})` : ''}`,
         variant: "destructive",
       });
     } finally {
@@ -219,6 +226,8 @@ const AdminDashboard = () => {
     setActionLoading(job.id);
     
     try {
+      console.log('Completing job:', job.id, 'Is admin:', isAdmin);
+      
       // Update job status
       const { error: jobError } = await supabase
         .from('jobs')
@@ -228,7 +237,10 @@ const AdminDashboard = () => {
         })
         .eq('id', job.id);
 
-      if (jobError) throw jobError;
+      if (jobError) {
+        console.error('Error updating job status:', jobError);
+        throw jobError;
+      }
 
       // Update quote status
       const { error: quoteError } = await supabase
@@ -269,9 +281,11 @@ const AdminDashboard = () => {
 
     } catch (error: any) {
       console.error('Error completing job:', error);
+      const errorMessage = error?.message || 'Ukjent feil';
+      const errorCode = error?.code || '';
       toast({
         title: "Feil",
-        description: "Kunne ikke fullføre jobben. Prøv igjen.",
+        description: `Kunne ikke fullføre jobben: ${errorMessage}${errorCode ? ` (Kode: ${errorCode})` : ''}`,
         variant: "destructive",
       });
     } finally {
@@ -284,9 +298,14 @@ const AdminDashboard = () => {
     setActionLoading(job.id);
     
     try {
+      console.log('Deleting job:', job.id, 'Is admin:', isAdmin);
+      
       const { error } = await supabase.from('jobs').delete().eq('id', job.id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error deleting job:', error);
+        throw error;
+      }
 
       // Update local state immediately
       setJobs(prevJobs => prevJobs.filter(j => j.id !== job.id));
@@ -298,9 +317,11 @@ const AdminDashboard = () => {
 
     } catch (error: any) {
       console.error('Error deleting job:', error);
+      const errorMessage = error?.message || 'Ukjent feil';
+      const errorCode = error?.code || '';
       toast({
         title: "Feil",
-        description: "Kunne ikke slette jobben. Prøv igjen.",
+        description: `Kunne ikke slette jobben: ${errorMessage}${errorCode ? ` (Kode: ${errorCode})` : ''}`,
         variant: "destructive",
       });
     } finally {
