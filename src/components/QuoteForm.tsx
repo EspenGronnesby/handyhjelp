@@ -211,51 +211,68 @@ export const QuoteForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Hardcoded access key (temporary solution - will be replaced)
-      const accessKey = 'e73de942-c444-45b1-ba7a-1556f5862bfd';
-      
-      if (!accessKey) {
-        console.error('Web3Forms access key is missing!');
-        toast({
-          title: "Konfigurasjonsfeil",
-          description: "Kan ikke sende forespørsel. Kontakt support på +47 41250553",
-          variant: "destructive",
+      // STEP 1: Save to database FIRST
+      const { data: quoteData, error: dbError } = await supabase
+        .from('quotes')
+        .insert({
+          type: formData.type || 'private',
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address || null,
+          company_name: formData.selectedCompany?.name || null,
+          org_number: formData.selectedCompany?.orgNumber || null,
+          description: formData.description,
+          status: 'pending',
+          user_id: user?.id || null,
+        })
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw new Error('Kunne ikke lagre forespørselen. Prøv igjen.');
+      }
+
+      console.log('Quote saved to database:', quoteData);
+
+      // STEP 2: Send email to team via Web3Forms
+      try {
+        const accessKey = 'e73de942-c444-45b1-ba7a-1556f5862bfd';
+        
+        const web3FormData = {
+          access_key: accessKey,
+          subject: `Ny tilbudsforespørsel fra ${formData.name}`,
+          from_name: "HandyHjelp Nettside",
+          type: formData.type === 'private' ? 'Privat' : 'Bedrift',
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address || 'Ikke oppgitt',
+          company_name: formData.selectedCompany?.name || 'Ikke oppgitt',
+          org_number: formData.selectedCompany?.orgNumber || 'Ikke oppgitt',
+          description: formData.description,
+        };
+
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(web3FormData),
         });
-        setIsSubmitting(false);
-        return;
+
+        if (!response.ok) {
+          console.error('Web3Forms failed, but quote is saved in database');
+          // Continue anyway - quote is saved
+        }
+      } catch (web3Error) {
+        console.error('Web3Forms error:', web3Error);
+        // Continue anyway - quote is saved
       }
 
-      // Send email via Web3Forms only (no database)
-      const web3FormData = {
-        access_key: accessKey,
-        subject: `Ny tilbudsforespørsel fra ${formData.name}`,
-        from_name: "HandyHjelp Nettside",
-        type: formData.type === 'private' ? 'Privat' : 'Bedrift',
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address || 'Ikke oppgitt',
-        company_name: formData.selectedCompany?.name || 'Ikke oppgitt',
-        org_number: formData.selectedCompany?.orgNumber || 'Ikke oppgitt',
-        description: formData.description,
-      };
-
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify(web3FormData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Web3Forms error:', errorData);
-        throw new Error(errorData.message || 'Kunne ikke sende tilbudsforespørsel');
-      }
-
-      // Send confirmation email to customer via Resend (non-blocking)
+      // STEP 3: Send confirmation email to customer via Resend (non-blocking)
       try {
         const { data: confirmationData, error: confirmationError } = await supabase.functions.invoke('send-confirmation-email', {
           body: {
@@ -268,13 +285,11 @@ export const QuoteForm = () => {
 
         if (confirmationError) {
           console.error('Confirmation email error:', confirmationError);
-          // Don't block user flow - error notification is sent to team
         } else {
           console.log('Confirmation email sent:', confirmationData);
         }
       } catch (confirmationError) {
         console.error('Failed to send confirmation email:', confirmationError);
-        // Don't block user flow - error notification is sent to team
       }
 
       toast({
@@ -288,7 +303,7 @@ export const QuoteForm = () => {
       console.error('Form submission error:', error);
       toast({
         title: "Feil ved sending",
-        description: "Prøv igjen eller ring oss direkte på +47 41250553.",
+        description: error instanceof Error ? error.message : "Prøv igjen eller ring oss direkte på +47 41250553.",
         variant: "destructive",
       });
     } finally {
