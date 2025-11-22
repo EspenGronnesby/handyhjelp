@@ -69,6 +69,7 @@ export type Database = {
           notes: string | null
           quote_id: string
           scheduled_date: string | null
+          started_at: string | null
           status: string
           updated_at: string
           user_id: string
@@ -82,6 +83,7 @@ export type Database = {
           notes?: string | null
           quote_id: string
           scheduled_date?: string | null
+          started_at?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -95,6 +97,7 @@ export type Database = {
           notes?: string | null
           quote_id?: string
           scheduled_date?: string | null
+          started_at?: string | null
           status?: string
           updated_at?: string
           user_id?: string
