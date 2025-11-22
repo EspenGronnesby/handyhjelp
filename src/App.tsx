@@ -23,6 +23,8 @@ import Services from "./pages/Services";
 import Blog from "./pages/Blog";
 import ThankYou from "./pages/ThankYou";
 import QuotePage from "./pages/QuotePage";
+import ServiceAgreement from "./pages/ServiceAgreement";
+import ThankYouAgreement from "./pages/ThankYouAgreement";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tilbud" element={<QuotePage />} />
+            <Route path="/fast-avtale" element={<ServiceAgreement />} />
+            <Route path="/takk-avtale" element={<ThankYouAgreement />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/prosjekter" element={<Projects />} />
