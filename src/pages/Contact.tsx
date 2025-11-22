@@ -63,6 +63,29 @@ const Contact = () => {
         throw new Error(errorData.message || 'Failed to send message');
       }
 
+      // Send confirmation email to customer via Resend (non-blocking)
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data: confirmationData, error: confirmationError } = await supabase.functions.invoke('send-confirmation-email', {
+          body: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            customerType: 'private' // Contact form defaults to private
+          }
+        });
+
+        if (confirmationError) {
+          console.error('Confirmation email error:', confirmationError);
+          // Don't block user flow - error notification is sent to team
+        } else {
+          console.log('Confirmation email sent:', confirmationData);
+        }
+      } catch (confirmationError) {
+        console.error('Failed to send confirmation email:', confirmationError);
+        // Don't block user flow - error notification is sent to team
+      }
+
       toast({
         title: "Melding sendt!",
         description: "Vi svarer deg innen 2 timer.",
