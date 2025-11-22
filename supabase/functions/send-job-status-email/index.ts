@@ -30,7 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
     let html: string;
 
     if (status === "started") {
-      subject = "Ditt oppdrag er i gang – HandyHjelp";
+      subject = "Ditt oppdrag er i gang – HandyHjelp | Levert med kvalitet";
       html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2C3E50;">Hei ${customerName},</h2>
@@ -69,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
       `;
     } else {
-      subject = "Oppdraget er fullført – Takk for tilliten! ✓";
+      subject = "Oppdraget er fullført – Takk for tilliten! | Levert med kvalitet ✓";
       html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2C3E50;">Hei ${customerName},</h2>
