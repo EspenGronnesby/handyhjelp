@@ -148,17 +148,13 @@ const AdminDashboard = () => {
 
       if (jobError) throw jobError;
 
-      // Update local state immediately for instant UI update
-      setQuotes(prevQuotes => 
-        prevQuotes.map(q => q.id === quote.id ? { ...q, status: 'in_progress' } : q)
-      );
-
-      // Refresh jobs list to include the new job
-      const jobsResponse = await supabase
-        .from('jobs')
-        .select('*, quotes(name, email, phone, description, type, company_name, org_number)')
-        .order('created_at', { ascending: false });
+      // Refresh both quotes and jobs lists for accurate UI state
+      const [quotesResponse, jobsResponse] = await Promise.all([
+        supabase.from('quotes').select('*').order('created_at', { ascending: false }),
+        supabase.from('jobs').select('*, quotes(name, email, phone, description, type, company_name, org_number)').order('created_at', { ascending: false })
+      ]);
       
+      if (quotesResponse.data) setQuotes(quotesResponse.data);
       if (jobsResponse.data) setJobs(jobsResponse.data);
 
       // Send email (non-blocking)
@@ -216,16 +212,14 @@ const AdminDashboard = () => {
 
       if (quoteError) throw quoteError;
 
-      // Update local state immediately for instant UI update
-      setJobs(prevJobs => 
-        prevJobs.map(j => j.id === job.id 
-          ? { ...j, status: 'completed', completed_date: new Date().toISOString() } 
-          : j
-        )
-      );
-      setQuotes(prevQuotes => 
-        prevQuotes.map(q => q.id === job.quote_id ? { ...q, status: 'completed' } : q)
-      );
+      // Refresh both quotes and jobs lists for accurate UI state
+      const [quotesResponse, jobsResponse] = await Promise.all([
+        supabase.from('quotes').select('*').order('created_at', { ascending: false }),
+        supabase.from('jobs').select('*, quotes(name, email, phone, description, type, company_name, org_number)').order('created_at', { ascending: false })
+      ]);
+      
+      if (quotesResponse.data) setQuotes(quotesResponse.data);
+      if (jobsResponse.data) setJobs(jobsResponse.data);
 
       // Send email (non-blocking)
       const customerName = job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name;
