@@ -32,6 +32,9 @@ const Index = () => {
           <ProcessSection />
         </section>
 
+        {/* Projects Section */}
+        <ProjectsSection />
+
         {/* Services Section */}
         <section className="py-16 bg-background" id="services">
           <div className="container mx-auto px-4">
@@ -149,9 +152,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* Projects Section */}
-        <ProjectsSection />
 
         {/* Standalone Quote Form Section */}
         <section className="py-16 bg-muted/30" id="quote-standalone" aria-labelledby="quote-heading">
