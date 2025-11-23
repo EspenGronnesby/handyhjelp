@@ -20,8 +20,6 @@ interface Project {
 
 export const ProjectsSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
   const [touchedProject, setTouchedProject] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -51,31 +49,38 @@ export const ProjectsSection = () => {
   }, []);
 
   const fetchProjects = async () => {
-    console.log("🔍 Fetching projects...");
+    console.log("🔍 Fetching projects for homepage...");
     const { data, error } = await supabase
       .from("projects")
       .select("*")
       .eq("status", "published")
-      .order("display_order", { ascending: true })
-      .order("completed_date", { ascending: false })
-      .limit(6);
+      .order("completed_date", { ascending: false });
 
     if (error) {
       console.error("❌ Error fetching projects:", error);
+      setProjects([]);
     } else {
-      console.log("✅ Projects loaded:", data?.length || 0);
-      console.log("📊 Projects data:", data);
-      setProjects(data || []);
-      setFilteredProjects(data || []);
-    }
-  };
-
-  const handleCategoryFilter = (category: string | null) => {
-    setActiveCategory(category);
-    if (category === null) {
-      setFilteredProjects(projects);
-    } else {
-      setFilteredProjects(projects.filter(p => p.category === category));
+      console.log("✅ All projects loaded:", data?.length || 0);
+      
+      // Select 1 project from each category (vaktmester, tomrer, blikk)
+      const selectedProjects: Project[] = [];
+      const categories = ["vaktmester", "tomrer", "blikk"];
+      
+      categories.forEach(category => {
+        const categoryProject = data?.find(p => p.category === category && !selectedProjects.includes(p));
+        if (categoryProject) {
+          selectedProjects.push(categoryProject);
+        }
+      });
+      
+      // If we have less than 3 projects, fill with remaining projects
+      if (selectedProjects.length < 3 && data) {
+        const remaining = data.filter(p => !selectedProjects.includes(p));
+        selectedProjects.push(...remaining.slice(0, 3 - selectedProjects.length));
+      }
+      
+      console.log("📊 Selected projects for homepage:", selectedProjects.length);
+      setProjects(selectedProjects.slice(0, 3)); // Ensure max 3 projects
     }
   };
 
@@ -90,60 +95,25 @@ export const ProjectsSection = () => {
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-8">
+        <div className="text-center mb-12">
           <h2 className="heading-section font-heading mb-4">
             Våre prosjekter
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Se resultatet av vårt arbeid – før og etter bilder av våre siste prosjekter
           </p>
-          
-          {/* Category Filter */}
-          {projects.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <Button
-                variant={activeCategory === null ? "default" : "outline"}
-                onClick={() => handleCategoryFilter(null)}
-                className="px-6"
-              >
-                Alle
-              </Button>
-              <Button
-                variant={activeCategory === "vaktmester" ? "default" : "outline"}
-                onClick={() => handleCategoryFilter("vaktmester")}
-                className="px-6"
-              >
-                🔧 Vaktmester
-              </Button>
-              <Button
-                variant={activeCategory === "tomrer" ? "default" : "outline"}
-                onClick={() => handleCategoryFilter("tomrer")}
-                className="px-6"
-              >
-                🔨 Tømrer
-              </Button>
-              <Button
-                variant={activeCategory === "blikk" ? "default" : "outline"}
-                onClick={() => handleCategoryFilter("blikk")}
-                className="px-6"
-              >
-                💧 Blikk
-              </Button>
-            </div>
-          )}
         </div>
 
-        {filteredProjects.length === 0 ? (
+        {projects.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <p className="text-lg">
-              {projects.length === 0 
-                ? "Vi legger snart ut bilder fra våre prosjekter"
-                : "Ingen prosjekter i denne kategorien ennå"}
+              Vi legger snart ut bilder fra våre prosjekter
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {filteredProjects.map((project) => (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              {projects.map((project) => (
               <Link
                 key={project.id}
                 to={`/prosjekter/${project.id}`}
@@ -220,19 +190,18 @@ export const ProjectsSection = () => {
               </Link>
             ))}
           </div>
-        )}
 
-        {projects.length > 0 && (
-          <div className="text-center">
+          <div className="text-center mt-8">
             <Button
-              variant="outline"
+              variant="default"
               size="lg"
               onClick={() => navigate("/prosjekter")}
-              className="hover-scale"
+              className="hover-scale px-8"
             >
-              Se alle prosjekter
+              Se alle våre prosjekter →
             </Button>
           </div>
+          </>
         )}
       </div>
     </section>
