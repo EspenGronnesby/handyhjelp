@@ -26,7 +26,6 @@ import ThankYou from "./pages/ThankYou";
 import QuotePage from "./pages/QuotePage";
 import ServiceAgreement from "./pages/ServiceAgreement";
 import ThankYouAgreement from "./pages/ThankYouAgreement";
-import GenerateServiceBackground from "./pages/GenerateServiceBackground";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +50,6 @@ const App = () => (
             <Route path="/tjenester" element={<Services />} />
             <Route path="/raad" element={<Blog />} />
             <Route path="/takk" element={<ThankYou />} />
-            <Route path="/generer-bilde" element={<GenerateServiceBackground />} />
             <Route path="/dashboard" element={<Dashboard />}>
               <Route index element={<DashboardHome />} />
               <Route path="quotes" element={<DashboardQuotes />} />
