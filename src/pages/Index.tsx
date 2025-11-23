@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
 import { ProcessSection } from "@/components/ProcessSection";
 import { QuoteForm } from "@/components/QuoteForm";
+import { ProjectsSection } from "@/components/ProjectsSection";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
@@ -148,6 +149,9 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Projects Section */}
+        <ProjectsSection />
 
         {/* Standalone Quote Form Section */}
         <section className="py-16 bg-muted/30" id="quote-standalone" aria-labelledby="quote-heading">

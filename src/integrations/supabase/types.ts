@@ -322,6 +322,48 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          after_image_url: string
+          before_image_url: string
+          completed_date: string
+          created_at: string
+          description: string
+          display_order: number | null
+          id: string
+          location: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          after_image_url: string
+          before_image_url: string
+          completed_date: string
+          created_at?: string
+          description: string
+          display_order?: number | null
+          id?: string
+          location: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          after_image_url?: string
+          before_image_url?: string
+          completed_date?: string
+          created_at?: string
+          description?: string
+          display_order?: number | null
+          id?: string
+          location?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quotes: {
         Row: {
           address: string | null

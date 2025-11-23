@@ -10,6 +10,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { Loader2, Play, CheckCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ProjectManagement } from '@/components/admin/ProjectManagement';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -451,6 +452,7 @@ const AdminDashboard = () => {
             Ferdig ({completedJobs.length})
           </TabsTrigger>
           <TabsTrigger value="customers">Kunder ({profiles.length})</TabsTrigger>
+          <TabsTrigger value="projects">Prosjekter</TabsTrigger>
         </TabsList>
 
         {/* Nye forespørsler */}
@@ -862,6 +864,11 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           ))}
+        </TabsContent>
+
+        {/* Projects Tab */}
+        <TabsContent value="projects">
+          <ProjectManagement />
         </TabsContent>
       </Tabs>
 
