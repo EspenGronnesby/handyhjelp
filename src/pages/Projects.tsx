@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
@@ -183,12 +184,12 @@ const Projects = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProjects.map((project) => (
-                    <div
+                    <Link
                       key={project.id}
-                      className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in hover:shadow-2xl transition-shadow duration-300"
+                      to={`/prosjekter/${project.id}`}
+                      className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 block"
                       onMouseEnter={() => setHoveredProject(project.id)}
                       onMouseLeave={() => setHoveredProject(null)}
-                      onClick={() => handleTouch(project.id)}
                     >
                       {/* Image Container */}
                       <div className="relative aspect-[4/3] overflow-hidden">
@@ -256,7 +257,7 @@ const Projects = () => {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}

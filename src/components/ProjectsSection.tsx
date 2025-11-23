@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -143,80 +144,80 @@ export const ProjectsSection = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {filteredProjects.map((project) => (
-            <div
-              key={project.id}
-              className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in"
-              onMouseEnter={() => setHoveredProject(project.id)}
-              onMouseLeave={() => setHoveredProject(null)}
-              onClick={() => handleTouch(project.id)}
-            >
-              {/* Image Container */}
-              <div className="relative aspect-[4/3] overflow-hidden">
-                {/* Before Image */}
-                <img
-                  src={project.before_image_url}
-                  alt={`${project.title} - før`}
-                  loading="lazy"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-                    isShowingAfter(project.id) ? "opacity-0" : "opacity-100"
-                  }`}
-                />
-                {/* After Image */}
-                <img
-                  src={project.after_image_url}
-                  alt={`${project.title} - etter`}
-                  loading="lazy"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-                    isShowingAfter(project.id) ? "opacity-100" : "opacity-0"
-                  }`}
-                />
+              <Link
+                key={project.id}
+                to={`/prosjekter/${project.id}`}
+                className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 block"
+                onMouseEnter={() => setHoveredProject(project.id)}
+                onMouseLeave={() => setHoveredProject(null)}
+              >
+                {/* Image Container */}
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  {/* Before Image */}
+                  <img
+                    src={project.before_image_url}
+                    alt={`${project.title} - før`}
+                    loading="lazy"
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                      isShowingAfter(project.id) ? "opacity-0" : "opacity-100"
+                    }`}
+                  />
+                  {/* After Image */}
+                  <img
+                    src={project.after_image_url}
+                    alt={`${project.title} - etter`}
+                    loading="lazy"
+                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+                      isShowingAfter(project.id) ? "opacity-100" : "opacity-0"
+                    }`}
+                  />
 
-                {/* Badges */}
-                <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
-                  <Badge
-                    variant="secondary"
-                    className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
-                  >
-                    {project.category === "vaktmester" ? "🔧 Vaktmester" : 
-                     project.category === "tomrer" ? "🔨 Tømrer" : "💧 Blikk"}
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
-                  >
-                    {isShowingAfter(project.id) ? "ETTER" : "FØR"}
-                  </Badge>
+                  {/* Badges */}
+                  <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
+                    <Badge
+                      variant="secondary"
+                      className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
+                    >
+                      {project.category === "vaktmester" ? "🔧 Vaktmester" : 
+                       project.category === "tomrer" ? "🔨 Tømrer" : "💧 Blikk"}
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
+                    >
+                      {isShowingAfter(project.id) ? "ETTER" : "FØR"}
+                    </Badge>
+                  </div>
+
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
 
-                {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-
-              {/* Content */}
-              <div className="p-4 bg-card">
-                <h3 className="font-heading font-bold text-lg mb-2 text-foreground">
-                  {project.title}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-                  {project.description}
-                </p>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    <span>{project.location}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    <span>
-                      {new Date(project.completed_date).toLocaleDateString("nb-NO", {
-                        year: "numeric",
-                        month: "short",
-                      })}
-                    </span>
+                {/* Content */}
+                <div className="p-4 bg-card">
+                  <h3 className="font-heading font-bold text-lg mb-2 text-foreground">
+                    {project.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                    {project.description}
+                  </p>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      <span>{project.location}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      <span>
+                        {new Date(project.completed_date).toLocaleDateString("nb-NO", {
+                          year: "numeric",
+                          month: "short",
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </Link>
             ))}
           </div>
         )}

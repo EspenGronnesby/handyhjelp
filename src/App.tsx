@@ -17,6 +17,7 @@ import DashboardNotifications from "./pages/DashboardNotifications";
 import AdminDashboard from "./pages/AdminDashboard";
 import FAQ from "./pages/FAQ";
 import Projects from "./pages/Projects";
+import ProjectDetail from "./pages/ProjectDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Services from "./pages/Services";
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/prosjekter" element={<Projects />} />
+            <Route path="/prosjekter/:id" element={<ProjectDetail />} />
             <Route path="/om-oss" element={<About />} />
             <Route path="/kontakt" element={<Contact />} />
             <Route path="/tjenester" element={<Services />} />
