@@ -183,7 +183,7 @@ const ProjectDetail = () => {
           <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Before Image */}
             <div className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg bg-muted/30">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg bg-white/70 backdrop-blur-[10px] backdrop-saturate-[180%] border border-white/30">
                 <img
                   src={project.before_image_url}
                   alt={`${project.title} - før`}
@@ -200,7 +200,7 @@ const ProjectDetail = () => {
 
             {/* After Image */}
             <div className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg bg-muted/30">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg bg-white/70 backdrop-blur-[10px] backdrop-saturate-[180%] border border-white/30">
                 <img
                   src={project.after_image_url}
                   alt={`${project.title} - etter`}
