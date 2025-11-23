@@ -7,7 +7,6 @@ import { ProjectsSection } from "@/components/ProjectsSection";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -27,30 +26,6 @@ const Index = () => {
       {/* Hero Section with Integrated Quote Form */}
       <main>
         <HeroSection />
-        
-        {/* Pricing Information - Quick Contact */}
-        <section className="py-12 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <Card className="max-w-2xl mx-auto text-center">
-              <CardHeader>
-                <CardTitle>Trenger du et pristilbud?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  Kontakt oss for et skreddersydd pristilbud basert på dine behov.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button variant="cta" size="lg" onClick={() => window.location.href = '/tilbud'}>
-                    Få gratis tilbud
-                  </Button>
-                  <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'}>
-                    Ring oss: +47 41250553
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
         
         {/* How It Works Process Section */}
         <section id="process-section" aria-labelledby="process-heading">
