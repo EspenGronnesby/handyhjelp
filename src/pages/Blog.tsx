@@ -8,117 +8,78 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, Search, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  cover_image_url: string;
+  category: string;
+  published_at: string;
+  reading_time: number;
+}
+
+const categoryLabels: Record<string, string> = {
+  vaktmester: "Vaktmester",
+  tomrer: "Tømrer",
+  blikk: "Blikk",
+  sesongråd: "Sesongråd",
+  generelt: "Generelt",
+};
 
 const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("alle");
   const [email, setEmail] = useState("");
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const blogPosts = [
-    {
-      id: 1,
-      title: "5 tegn på at du trenger en vaktmester",
-      excerpt: "Oppdager du små problemer som bare blir verre? Her er tegnene på at det er på tide å få profesjonell hjelp.",
-      category: "Vaktmester",
-      date: "15. januar 2025",
-      readTime: "5 min",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 2,
-      title: "Slik forbereder du hjemmet for vinteren",
-      excerpt: "En komplett guide til vinterklarggjøring av boligen din. Unngå dyre reparasjoner med riktig forberedelse.",
-      category: "Sesongråd",
-      date: "12. januar 2025",
-      readTime: "8 min",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 3,
-      title: "Når må takrennene skiftes?",
-      excerpt: "Defekte takrenner kan føre til store vannsskader. Lær å kjenne igjen tegnene på at det er tid for skifte.",
-      category: "Blikk",
-      date: "10. januar 2025",
-      readTime: "6 min",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 4,
-      title: "DIY vs. Profesjonell hjelp - hva lønner seg?",
-      excerpt: "Når kan du gjøre det selv, og når bør du ringe en fagmann? Vi gir deg svaret på de vanligste oppgavene.",
-      category: "Vaktmester",
-      date: "8. januar 2025",
-      readTime: "7 min",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 5,
-      title: "Guide til kjøkkenrenovering på budsjett",
-      excerpt: "Drømmer du om nytt kjøkken? Her er våre beste tips for å få mest mulig ut av budsjettet ditt.",
-      category: "Tømrer",
-      date: "5. januar 2025",
-      readTime: "10 min",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 6,
-      title: "Vedlikehold av terrasse - årlig sjekkliste",
-      excerpt: "Hold terrassen din i toppform med denne enkle vedlikeholdsguiden. Forlenget levetid og bedre utseende garantert.",
-      category: "Tømrer",
-      date: "3. januar 2025",
-      readTime: "5 min",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 7,
-      title: "Hvordan oppdage og fikse taklekkasjer",
-      excerpt: "Taklekkasjer kan føre til store skader hvis de ikke oppdages i tide. Lær hvordan du finner og utbedrer problemet.",
-      category: "Blikk",
-      date: "29. desember 2024",
-      readTime: "8 min",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 8,
-      title: "Vårrens vedlikeholdsoppgaver - komplett liste",
-      excerpt: "Våren er perfekt tid for vedlikehold. Få oversikt over alle oppgavene som bør gjøres når snøen smelter.",
-      category: "Sesongråd",
-      date: "27. desember 2024",
-      readTime: "6 min",
-      image: "/placeholder.svg"
-    },
-    {
-      id: 9,
-      title: "Energisparing i hjemmet - 10 enkle tips",
-      excerpt: "Reduser strømregningen med disse enkle tiltakene. Små endringer kan gi store besparelser over tid.",
-      category: "Vaktmester",
-      date: "22. desember 2024",
-      readTime: "7 min",
-      image: "/placeholder.svg"
-    }
-  ];
+  useEffect(() => {
+    const fetchBlogPosts = async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false });
+
+      if (data && !error) {
+        setBlogPosts(data);
+      }
+      setLoading(false);
+    };
+
+    fetchBlogPosts();
+  }, []);
 
   const categories = [
-    { id: "alle", name: "Alle artikler", count: 9 },
-    { id: "Vaktmester", name: "Vaktmester", count: 3 },
-    { id: "Tømrer", name: "Tømrer", count: 2 },
-    { id: "Blikk", name: "Blikk", count: 2 },
-    { id: "Sesongråd", name: "Sesongråd", count: 2 }
+    { id: "alle", name: "Alle artikler", count: blogPosts.length },
+    { id: "vaktmester", name: "Vaktmester", count: blogPosts.filter(p => p.category === 'vaktmester').length },
+    { id: "tomrer", name: "Tømrer", count: blogPosts.filter(p => p.category === 'tomrer').length },
+    { id: "blikk", name: "Blikk", count: blogPosts.filter(p => p.category === 'blikk').length },
+    { id: "sesongråd", name: "Sesongråd", count: blogPosts.filter(p => p.category === 'sesongråd').length },
+    { id: "generelt", name: "Generelt", count: blogPosts.filter(p => p.category === 'generelt').length },
   ];
 
   const filteredPosts = blogPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+                         post.summary.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "alle" || post.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Newsletter signup logic would go here
     console.log("Newsletter signup:", email);
     setEmail("");
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   return (
@@ -222,58 +183,73 @@ const Blog = () => {
 
             {/* Blog Posts Grid */}
             <div className="lg:col-span-3">
-              {filteredPosts.length === 0 ? (
-                <Card className="p-12 text-center">
-                  <p className="text-muted-foreground">
-                    Ingen artikler funnet. Prøv et annet søk eller kategori.
-                  </p>
-                </Card>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-6">
-                  {filteredPosts.map((post) => (
-                    <Card key={post.id} className="hover:shadow-lg transition-shadow overflow-hidden group">
-                      <div className="aspect-video bg-muted relative overflow-hidden">
-                        <img 
-                          src={post.image} 
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
-                          {post.category}
-                        </Badge>
-                      </div>
+              {loading ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <Card key={i} className="overflow-hidden">
+                      <Skeleton className="aspect-video w-full" />
                       <CardHeader>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{post.date}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{post.readTime}</span>
-                          </div>
-                        </div>
-                        <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                          {post.title}
-                        </CardTitle>
+                        <Skeleton className="h-4 w-3/4 mb-2" />
+                        <Skeleton className="h-6 w-full" />
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          {post.excerpt}
-                        </p>
-                        <Link to={`/raad/${post.id}`}>
-                          <Button variant="link" className="p-0 h-auto">
-                            Les mer →
-                          </Button>
-                        </Link>
+                        <Skeleton className="h-4 w-full mb-2" />
+                        <Skeleton className="h-4 w-2/3" />
                       </CardContent>
                     </Card>
                   ))}
                 </div>
+              ) : filteredPosts.length === 0 ? (
+                <Card className="p-12 text-center">
+                  <p className="text-muted-foreground">
+                    {blogPosts.length === 0 
+                      ? "Vi legger snart ut nyttige råd og artikler om eiendomsvedlikehold."
+                      : "Ingen artikler funnet. Prøv et annet søk eller kategori."}
+                  </p>
+                </Card>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredPosts.map((post) => (
+                    <Link key={post.id} to={`/raad/${post.slug}`}>
+                      <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden group cursor-pointer">
+                        <div className="aspect-video bg-muted relative overflow-hidden">
+                          <img 
+                            src={post.cover_image_url} 
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
+                            {categoryLabels[post.category]}
+                          </Badge>
+                        </div>
+                        <CardHeader>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground mb-2">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              <span>{formatDate(post.published_at)}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{post.reading_time} min</span>
+                            </div>
+                          </div>
+                          <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
+                            {post.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-muted-foreground line-clamp-3">
+                            {post.summary}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
               )}
 
-              {/* Pagination placeholder */}
-              {filteredPosts.length > 0 && (
+              {/* Results count */}
+              {!loading && filteredPosts.length > 0 && (
                 <div className="mt-12 text-center">
                   <p className="text-sm text-muted-foreground">
                     Viser {filteredPosts.length} av {blogPosts.length} artikler

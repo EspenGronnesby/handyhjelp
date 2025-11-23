@@ -11,6 +11,7 @@ import { nb } from 'date-fns/locale';
 import { Loader2, Play, CheckCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProjectManagement } from '@/components/admin/ProjectManagement';
+import { BlogManagement } from '@/components/admin/BlogManagement';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -453,6 +454,7 @@ const AdminDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="customers">Kunder ({profiles.length})</TabsTrigger>
           <TabsTrigger value="projects">Prosjekter</TabsTrigger>
+          <TabsTrigger value="blog">Blogg / Råd</TabsTrigger>
         </TabsList>
 
         {/* Nye forespørsler */}
@@ -869,6 +871,11 @@ const AdminDashboard = () => {
         {/* Projects Tab */}
         <TabsContent value="projects">
           <ProjectManagement />
+        </TabsContent>
+
+        {/* Blog Tab */}
+        <TabsContent value="blog">
+          <BlogManagement />
         </TabsContent>
       </Tabs>
 
