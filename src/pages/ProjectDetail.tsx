@@ -181,13 +181,13 @@ const ProjectDetail = () => {
 
           {/* Before/After Images */}
           <div className="grid md:grid-cols-2 gap-6 mb-12">
-            {/* Before Image */}
+          {/* Before Image */}
             <div className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg bg-muted/30">
                 <img
                   src={project.before_image_url}
                   alt={`${project.title} - før`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain object-center"
                 />
                 <Badge
                   variant="secondary"
@@ -200,11 +200,11 @@ const ProjectDetail = () => {
 
             {/* After Image */}
             <div className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg bg-muted/30">
                 <img
                   src={project.after_image_url}
                   alt={`${project.title} - etter`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain object-center"
                 />
                 <Badge
                   variant="secondary"
