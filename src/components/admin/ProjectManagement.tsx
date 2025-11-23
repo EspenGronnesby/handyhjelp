@@ -63,7 +63,7 @@ export const ProjectManagement = () => {
     description: "",
     location: "",
     completed_date: new Date().toISOString().split("T")[0],
-    status: "draft",
+    status: "published",
   });
   const [beforeImage, setBeforeImage] = useState<File | null>(null);
   const [afterImage, setAfterImage] = useState<File | null>(null);
@@ -313,7 +313,7 @@ export const ProjectManagement = () => {
       description: "",
       location: "",
       completed_date: new Date().toISOString().split("T")[0],
-      status: "draft",
+      status: "published",
     });
     setBeforeImage(null);
     setAfterImage(null);
@@ -502,11 +502,11 @@ export const ProjectManagement = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-primary/10 border-2 border-primary/20 rounded-lg">
                 <div>
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status" className="font-semibold">Status</Label>
                   <p className="text-sm text-muted-foreground">
-                    Publiser prosjektet på nettsiden
+                    Publiser prosjektet på nettsiden (anbefalt)
                   </p>
                 </div>
                 <Switch

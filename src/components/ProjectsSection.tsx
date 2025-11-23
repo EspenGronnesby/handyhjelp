@@ -47,6 +47,7 @@ export const ProjectsSection = () => {
   }, []);
 
   const fetchProjects = async () => {
+    console.log("🔍 Fetching projects...");
     const { data, error } = await supabase
       .from("projects")
       .select("*")
@@ -55,8 +56,12 @@ export const ProjectsSection = () => {
       .order("completed_date", { ascending: false })
       .limit(6);
 
-    if (!error && data) {
-      setProjects(data);
+    if (error) {
+      console.error("❌ Error fetching projects:", error);
+    } else {
+      console.log("✅ Projects loaded:", data?.length || 0);
+      console.log("📊 Projects data:", data);
+      setProjects(data || []);
     }
   };
 
@@ -80,8 +85,13 @@ export const ProjectsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {projects.map((project) => (
+        {projects.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <p className="text-lg">Vi legger snart ut bilder fra våre prosjekter</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {projects.map((project) => (
             <div
               key={project.id}
               className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in"
@@ -149,19 +159,22 @@ export const ProjectsSection = () => {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        <div className="text-center">
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => navigate("/prosjekter")}
-            className="hover-scale"
-          >
-            Se alle prosjekter
-          </Button>
-        </div>
+        {projects.length > 0 && (
+          <div className="text-center">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate("/prosjekter")}
+              className="hover-scale"
+            >
+              Se alle prosjekter
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );
