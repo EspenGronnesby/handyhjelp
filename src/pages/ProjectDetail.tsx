@@ -183,12 +183,20 @@ const ProjectDetail = () => {
           <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Before Image */}
             <div className="relative">
-              <div className="relative rounded-xl p-8 shadow-lg" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%)' }}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+              <div 
+                className="relative rounded-2xl p-8 border border-white/40"
+                style={{ 
+                  background: 'linear-gradient(135deg, rgba(224, 242, 254, 0.8) 0%, rgba(240, 249, 255, 0.6) 50%, rgba(229, 246, 253, 0.7) 100%)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                }}
+              >
+                <div className="relative flex items-center justify-center min-h-[400px]">
                   <img
                     src={project.before_image_url}
                     alt={`${project.title} - før`}
-                    className="w-full h-full object-contain object-center"
+                    className="max-w-full max-h-[700px] object-contain object-center rounded-lg"
                   />
                 </div>
                 <Badge
@@ -202,12 +210,20 @@ const ProjectDetail = () => {
 
             {/* After Image */}
             <div className="relative">
-              <div className="relative rounded-xl p-8 shadow-lg" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%)' }}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+              <div 
+                className="relative rounded-2xl p-8 border border-white/40"
+                style={{ 
+                  background: 'linear-gradient(135deg, rgba(224, 242, 254, 0.8) 0%, rgba(240, 249, 255, 0.6) 50%, rgba(229, 246, 253, 0.7) 100%)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                }}
+              >
+                <div className="relative flex items-center justify-center min-h-[400px]">
                   <img
                     src={project.after_image_url}
                     alt={`${project.title} - etter`}
-                    className="w-full h-full object-contain object-center"
+                    className="max-w-full max-h-[700px] object-contain object-center rounded-lg"
                   />
                 </div>
                 <Badge
