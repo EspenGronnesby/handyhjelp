@@ -183,12 +183,14 @@ const ProjectDetail = () => {
           <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Before Image */}
             <div className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg bg-white/70 backdrop-blur-[10px] backdrop-saturate-[180%] border border-white/30">
-                <img
-                  src={project.before_image_url}
-                  alt={`${project.title} - før`}
-                  className="w-full h-full object-contain object-center"
-                />
+              <div className="relative rounded-xl p-8 shadow-lg" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%)' }}>
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                  <img
+                    src={project.before_image_url}
+                    alt={`${project.title} - før`}
+                    className="w-full h-full object-contain object-center"
+                  />
+                </div>
                 <Badge
                   variant="secondary"
                   className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm text-foreground font-semibold"
@@ -200,12 +202,14 @@ const ProjectDetail = () => {
 
             {/* After Image */}
             <div className="relative">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg shadow-lg bg-white/70 backdrop-blur-[10px] backdrop-saturate-[180%] border border-white/30">
-                <img
-                  src={project.after_image_url}
-                  alt={`${project.title} - etter`}
-                  className="w-full h-full object-contain object-center"
-                />
+              <div className="relative rounded-xl p-8 shadow-lg" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%)' }}>
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                  <img
+                    src={project.after_image_url}
+                    alt={`${project.title} - etter`}
+                    className="w-full h-full object-contain object-center"
+                  />
+                </div>
                 <Badge
                   variant="secondary"
                   className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm text-foreground font-semibold"
