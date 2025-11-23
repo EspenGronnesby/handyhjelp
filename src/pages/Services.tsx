@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Wrench, Hammer, Droplet, CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import servicesBackground from "@/assets/hero-services-background.png";
 
 const Services = () => {
   const services = [
@@ -63,8 +64,18 @@ const Services = () => {
       <Header />
       <BreadcrumbNavigation />
       
-      {/* Hero Section */}
-      <section className="pt-32 pb-12 bg-gradient-to-b from-background to-muted/30">
+      {/* Background wrapper with image and overlay */}
+      <div 
+        className="relative bg-cover bg-center bg-fixed bg-no-repeat"
+        style={{ backgroundImage: `url(${servicesBackground})` }}
+      >
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-background/85 backdrop-blur-[2px]"></div>
+        
+        {/* Content over background */}
+        <div className="relative z-10">
+          {/* Hero Section */}
+          <section className="pt-32 pb-12">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
@@ -78,7 +89,7 @@ const Services = () => {
       </section>
 
       {/* Pricing Information - Removed calculator, contact for quote */}
-      <section className="py-12 bg-muted/30">
+      <section className="py-12">
         <div className="container mx-auto px-4">
           <Card className="max-w-2xl mx-auto text-center">
             <CardHeader>
@@ -137,7 +148,7 @@ const Services = () => {
       </section>
 
       {/* Pricing Details */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-heading font-bold text-center mb-12">
@@ -254,6 +265,8 @@ const Services = () => {
           </div>
         </div>
       </section>
+        </div>
+      </div>
 
       <Footer />
     </div>
