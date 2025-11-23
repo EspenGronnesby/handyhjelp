@@ -216,7 +216,7 @@ const Blog = () => {
                           <img 
                             src={post.cover_image_url} 
                             alt={post.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                           />
                           <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
                             {categoryLabels[post.category]}

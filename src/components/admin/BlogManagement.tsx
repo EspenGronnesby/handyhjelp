@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Image as ImageIcon, Calendar } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -292,51 +292,65 @@ export const BlogManagement = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {posts.map((post) => (
-            <Card key={post.id} className="flex flex-col overflow-hidden">
-              <div className="aspect-video bg-muted relative">
+            <Card key={post.id} className="flex flex-col h-[400px]">
+              {/* Image Section - Fixed Height */}
+              <div className="relative h-[160px] flex-shrink-0">
                 <img 
                   src={post.cover_image_url} 
                   alt={post.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center rounded-t-lg"
                 />
-                <Badge className="absolute top-2 left-2">
+                <Badge 
+                  variant="secondary"
+                  className="absolute top-2 left-2 text-xs"
+                >
                   {categoryOptions.find(c => c.value === post.category)?.label}
                 </Badge>
                 <Badge 
-                  className="absolute top-2 right-2"
                   variant={post.status === 'published' ? 'default' : 'secondary'}
+                  className="absolute top-2 right-2 text-xs"
                 >
                   {post.status === 'published' ? 'Publisert' : 'Utkast'}
                 </Badge>
               </div>
-              <CardHeader>
-                <CardTitle className="text-lg line-clamp-2">{post.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+
+              {/* Content Section - Flexible */}
+              <div className="p-3 flex flex-col flex-1 min-h-0">
+                <h3 className="font-semibold text-base mb-1 line-clamp-2 overflow-hidden">
+                  {post.title}
+                </h3>
+                <p className="text-xs text-muted-foreground mb-2 line-clamp-3 overflow-hidden">
                   {post.summary}
                 </p>
-                <div className="flex gap-2 mt-auto">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+                  <Calendar className="w-3 h-3 flex-shrink-0" />
+                  <span>{post.published_at ? new Date(post.published_at).toLocaleDateString('nb-NO') : 'Ikke publisert'}</span>
+                </div>
+
+                {/* Button Section - Always at Bottom */}
+                <div className="flex gap-2 mt-auto pt-2">
                   <Button 
-                    size="sm" 
                     variant="outline" 
+                    size="sm" 
                     onClick={() => handleEdit(post)}
-                    className="flex-1"
+                    className="flex-1 h-9 text-xs"
                   >
-                    <Pencil className="h-4 w-4 mr-2" />
+                    <Pencil className="w-3 h-3 mr-1" />
                     Rediger
                   </Button>
                   <Button 
-                    size="sm" 
                     variant="destructive" 
+                    size="sm" 
                     onClick={() => setDeleteDialog({ open: true, postId: post.id })}
+                    className="flex-1 h-9 text-xs"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="w-3 h-3 mr-1" />
+                    Slett
                   </Button>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           ))}
         </div>
@@ -411,7 +425,7 @@ export const BlogManagement = () => {
                   />
                   {coverImagePreview && (
                     <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
-                      <img src={coverImagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <img src={coverImagePreview} alt="Preview" className="w-full h-full object-cover object-center" />
                     </div>
                   )}
                   <p className="text-xs text-muted-foreground">Maks 5 MB. JPG, PNG eller WebP</p>
