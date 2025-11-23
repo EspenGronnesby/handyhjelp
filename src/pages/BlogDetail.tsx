@@ -121,7 +121,7 @@ const BlogDetail = () => {
       <BreadcrumbNavigation />
       
       {/* Hero Image with Overlay */}
-      <div className="relative h-[400px] md:h-[500px] bg-cover bg-center" style={{ backgroundImage: `url(${post.cover_image_url})` }}>
+      <div className="relative h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${post.cover_image_url})`, backgroundPosition: 'center center' }}>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
         <div className="absolute inset-0 flex items-end">
           <div className="container mx-auto px-4 py-12">
@@ -199,7 +199,7 @@ const BlogDetail = () => {
                           <img 
                             src={related.cover_image_url} 
                             alt={related.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
                         <CardHeader>
