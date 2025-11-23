@@ -604,12 +604,13 @@ export const ProjectManagement = () => {
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredProjects.map((project) => (
-          <Card key={project.id} className="overflow-hidden flex flex-col h-[320px]">
-            <CardHeader className="p-0 relative flex-shrink-0">
+          <Card key={project.id} className="flex flex-col h-[400px]">
+            {/* Image Section - Fixed Height */}
+            <div className="relative h-[160px] flex-shrink-0">
               <img
                 src={project.before_image_url}
                 alt={project.title}
-                className="w-full h-[160px] object-cover"
+                className="w-full h-full object-cover rounded-t-lg"
               />
               <Badge 
                 variant={project.status === "published" ? "default" : "secondary"}
@@ -639,10 +640,12 @@ export const ProjectManagement = () => {
                   )}
                 </Badge>
               )}
-            </CardHeader>
-            <CardContent className="p-3 flex flex-col flex-1">
-              <h3 className="font-semibold text-base mb-1 line-clamp-2">{project.title}</h3>
-              <p className="text-xs text-muted-foreground mb-2 line-clamp-2 flex-1">
+            </div>
+
+            {/* Content Section - Flexible */}
+            <div className="p-3 flex flex-col flex-1 min-h-0">
+              <h3 className="font-semibold text-base mb-1 line-clamp-2 overflow-hidden">{project.title}</h3>
+              <p className="text-xs text-muted-foreground mb-2 line-clamp-3 overflow-hidden">
                 {project.description}
               </p>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
@@ -653,12 +656,14 @@ export const ProjectManagement = () => {
                 <Calendar className="w-3 h-3 flex-shrink-0" />
                 <span>{new Date(project.completed_date).toLocaleDateString('nb-NO')}</span>
               </div>
-              <div className="flex gap-2 mt-auto">
+
+              {/* Button Section - Always at Bottom */}
+              <div className="flex gap-2 mt-auto pt-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(project)}
-                  className="flex-1 h-8 text-xs"
+                  className="flex-1 h-9 text-xs"
                 >
                   <Edit className="w-3 h-3 mr-1" />
                   Rediger
@@ -667,13 +672,13 @@ export const ProjectManagement = () => {
                   variant="destructive"
                   size="sm"
                   onClick={() => setDeleteProjectId(project.id)}
-                  className="flex-1 h-8 text-xs"
+                  className="flex-1 h-9 text-xs"
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
                   Slett
                 </Button>
               </div>
-            </CardContent>
+            </div>
           </Card>
         ))}
       </div>
