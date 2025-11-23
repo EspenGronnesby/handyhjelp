@@ -44,6 +44,7 @@ interface Project {
   status: "published" | "draft";
   display_order: number;
   created_at: string;
+  category: string;
 }
 
 interface ProjectFormData {
@@ -52,6 +53,7 @@ interface ProjectFormData {
   location: string;
   completed_date: string;
   status: "published" | "draft";
+  category: "vaktmester" | "tomrer" | "blikk";
 }
 
 export const ProjectManagement = () => {
@@ -64,6 +66,7 @@ export const ProjectManagement = () => {
     location: "",
     completed_date: new Date().toISOString().split("T")[0],
     status: "published",
+    category: "vaktmester",
   });
   const [beforeImage, setBeforeImage] = useState<File | null>(null);
   const [afterImage, setAfterImage] = useState<File | null>(null);
@@ -278,6 +281,7 @@ export const ProjectManagement = () => {
       location: project.location,
       completed_date: project.completed_date,
       status: project.status,
+      category: (project.category || "vaktmester") as "vaktmester" | "tomrer" | "blikk",
     });
     setBeforePreview(project.before_image_url);
     setAfterPreview(project.after_image_url);
@@ -314,6 +318,7 @@ export const ProjectManagement = () => {
       location: "",
       completed_date: new Date().toISOString().split("T")[0],
       status: "published",
+      category: "vaktmester",
     });
     setBeforeImage(null);
     setAfterImage(null);
@@ -502,6 +507,31 @@ export const ProjectManagement = () => {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="category">Kategori *</Label>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { value: "vaktmester", label: "Vaktmester", icon: "🔧" },
+                    { value: "tomrer", label: "Tømrer", icon: "🔨" },
+                    { value: "blikk", label: "Blikk", icon: "💧" },
+                  ].map((cat) => (
+                    <button
+                      key={cat.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, category: cat.value as "vaktmester" | "tomrer" | "blikk" })}
+                      className={`p-4 rounded-lg border-2 transition-all ${
+                        formData.category === cat.value
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="text-2xl mb-1">{cat.icon}</div>
+                      <div className="font-semibold text-sm">{cat.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex items-center justify-between p-4 bg-primary/10 border-2 border-primary/20 rounded-lg">
                 <div>
                   <Label htmlFor="status" className="font-semibold">Status</Label>
@@ -582,12 +612,20 @@ export const ProjectManagement = () => {
                   alt={project.title}
                   className="w-full h-full object-cover rounded-t-lg"
                 />
-                <Badge
-                  variant={project.status === "published" ? "default" : "secondary"}
-                  className="absolute top-2 right-2"
-                >
-                  {project.status === "published" ? "Publisert" : "Utkast"}
-                </Badge>
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <Badge
+                    variant="secondary"
+                    className="bg-background/90 backdrop-blur-sm"
+                  >
+                    {project.category === "vaktmester" ? "🔧 Vaktmester" : 
+                     project.category === "tomrer" ? "🔨 Tømrer" : "💧 Blikk"}
+                  </Badge>
+                  <Badge
+                    variant={project.status === "published" ? "default" : "secondary"}
+                  >
+                    {project.status === "published" ? "Publisert" : "Utkast"}
+                  </Badge>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="p-4">

@@ -14,10 +14,13 @@ interface Project {
   before_image_url: string;
   after_image_url: string;
   display_order: number;
+  category: string;
 }
 
 export const ProjectsSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
   const [touchedProject, setTouchedProject] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -62,6 +65,16 @@ export const ProjectsSection = () => {
       console.log("✅ Projects loaded:", data?.length || 0);
       console.log("📊 Projects data:", data);
       setProjects(data || []);
+      setFilteredProjects(data || []);
+    }
+  };
+
+  const handleCategoryFilter = (category: string | null) => {
+    setActiveCategory(category);
+    if (category === null) {
+      setFilteredProjects(projects);
+    } else {
+      setFilteredProjects(projects.filter(p => p.category === category));
     }
   };
 
@@ -76,22 +89,60 @@ export const ProjectsSection = () => {
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="heading-section font-heading mb-4">
             Våre prosjekter
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
             Se resultatet av vårt arbeid – før og etter bilder av våre siste prosjekter
           </p>
+          
+          {/* Category Filter */}
+          {projects.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              <Button
+                variant={activeCategory === null ? "default" : "outline"}
+                onClick={() => handleCategoryFilter(null)}
+                className="px-6"
+              >
+                Alle
+              </Button>
+              <Button
+                variant={activeCategory === "vaktmester" ? "default" : "outline"}
+                onClick={() => handleCategoryFilter("vaktmester")}
+                className="px-6"
+              >
+                🔧 Vaktmester
+              </Button>
+              <Button
+                variant={activeCategory === "tomrer" ? "default" : "outline"}
+                onClick={() => handleCategoryFilter("tomrer")}
+                className="px-6"
+              >
+                🔨 Tømrer
+              </Button>
+              <Button
+                variant={activeCategory === "blikk" ? "default" : "outline"}
+                onClick={() => handleCategoryFilter("blikk")}
+                className="px-6"
+              >
+                💧 Blikk
+              </Button>
+            </div>
+          )}
         </div>
 
-        {projects.length === 0 ? (
+        {filteredProjects.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            <p className="text-lg">Vi legger snart ut bilder fra våre prosjekter</p>
+            <p className="text-lg">
+              {projects.length === 0 
+                ? "Vi legger snart ut bilder fra våre prosjekter"
+                : "Ingen prosjekter i denne kategorien ennå"}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {projects.map((project) => (
+            {filteredProjects.map((project) => (
             <div
               key={project.id}
               className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in"
@@ -120,8 +171,15 @@ export const ProjectsSection = () => {
                   }`}
                 />
 
-                {/* Badge */}
-                <div className="absolute top-4 right-4 z-10">
+                {/* Badges */}
+                <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
+                  <Badge
+                    variant="secondary"
+                    className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
+                  >
+                    {project.category === "vaktmester" ? "🔧 Vaktmester" : 
+                     project.category === "tomrer" ? "🔨 Tømrer" : "💧 Blikk"}
+                  </Badge>
                   <Badge
                     variant="secondary"
                     className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"

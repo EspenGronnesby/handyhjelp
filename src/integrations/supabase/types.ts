@@ -326,6 +326,7 @@ export type Database = {
         Row: {
           after_image_url: string
           before_image_url: string
+          category: string
           completed_date: string
           created_at: string
           description: string
@@ -339,6 +340,7 @@ export type Database = {
         Insert: {
           after_image_url: string
           before_image_url: string
+          category: string
           completed_date: string
           created_at?: string
           description: string
@@ -352,6 +354,7 @@ export type Database = {
         Update: {
           after_image_url?: string
           before_image_url?: string
+          category?: string
           completed_date?: string
           created_at?: string
           description?: string
