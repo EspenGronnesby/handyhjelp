@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Upload, X, GripVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Upload, X, GripVertical, MapPin, Calendar, Wrench, Hammer, Droplet } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
@@ -602,62 +602,78 @@ export const ProjectManagement = () => {
       </div>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredProjects.map((project) => (
-          <Card key={project.id}>
-            <CardHeader className="p-0">
-              <div className="relative aspect-video">
-                <img
-                  src={project.before_image_url}
-                  alt={project.title}
-                  className="w-full h-full object-cover rounded-t-lg"
-                />
-                <div className="absolute top-2 right-2 flex gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-background/90 backdrop-blur-sm"
-                  >
-                    {project.category === "vaktmester" ? "🔧 Vaktmester" : 
-                     project.category === "tomrer" ? "🔨 Tømrer" : "💧 Blikk"}
-                  </Badge>
-                  <Badge
-                    variant={project.status === "published" ? "default" : "secondary"}
-                  >
-                    {project.status === "published" ? "Publisert" : "Utkast"}
-                  </Badge>
-                </div>
-              </div>
+          <Card key={project.id} className="overflow-hidden flex flex-col h-[320px]">
+            <CardHeader className="p-0 relative flex-shrink-0">
+              <img
+                src={project.before_image_url}
+                alt={project.title}
+                className="w-full h-[160px] object-cover"
+              />
+              <Badge 
+                variant={project.status === "published" ? "default" : "secondary"}
+                className="absolute top-2 right-2 text-xs"
+              >
+                {project.status === "published" ? "Publisert" : "Utkast"}
+              </Badge>
+              {project.category && (
+                <Badge 
+                  className="absolute top-2 left-2 bg-background/90 backdrop-blur text-xs"
+                >
+                  {project.category === "vaktmester" ? (
+                    <>
+                      <Wrench className="w-3 h-3 mr-1" />
+                      Vaktmester
+                    </>
+                  ) : project.category === "tomrer" ? (
+                    <>
+                      <Hammer className="w-3 h-3 mr-1" />
+                      Tømrer
+                    </>
+                  ) : (
+                    <>
+                      <Droplet className="w-3 h-3 mr-1" />
+                      Blikk
+                    </>
+                  )}
+                </Badge>
+              )}
             </CardHeader>
-            <CardContent className="p-4">
-              <CardTitle className="text-lg mb-2">{project.title}</CardTitle>
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+            <CardContent className="p-3 flex flex-col flex-1">
+              <h3 className="font-semibold text-base mb-1 line-clamp-2">{project.title}</h3>
+              <p className="text-xs text-muted-foreground mb-2 line-clamp-2 flex-1">
                 {project.description}
               </p>
-              <div className="text-xs text-muted-foreground">
-                <p>{project.location}</p>
-                <p>
-                  {new Date(project.completed_date).toLocaleDateString("nb-NO")}
-                </p>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+                <MapPin className="w-3 h-3 flex-shrink-0" />
+                <span className="truncate">{project.location}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+                <Calendar className="w-3 h-3 flex-shrink-0" />
+                <span>{new Date(project.completed_date).toLocaleDateString('nb-NO')}</span>
+              </div>
+              <div className="flex gap-2 mt-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEdit(project)}
+                  className="flex-1 h-8 text-xs"
+                >
+                  <Edit className="w-3 h-3 mr-1" />
+                  Rediger
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setDeleteProjectId(project.id)}
+                  className="flex-1 h-8 text-xs"
+                >
+                  <Trash2 className="w-3 h-3 mr-1" />
+                  Slett
+                </Button>
               </div>
             </CardContent>
-            <CardFooter className="p-4 pt-0 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleEdit(project)}
-                className="flex-1"
-              >
-                <Edit className="w-4 h-4 mr-1" />
-                Rediger
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => setDeleteProjectId(project.id)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </CardFooter>
           </Card>
         ))}
       </div>
