@@ -620,21 +620,22 @@ export const ProjectManagement = () => {
               </Badge>
               {project.category && (
                 <Badge 
-                  className="absolute top-2 left-2 bg-background/90 backdrop-blur text-xs"
+                  variant="secondary"
+                  className="absolute top-2 left-2 text-xs flex items-center gap-1"
                 >
                   {project.category === "vaktmester" ? (
                     <>
-                      <Wrench className="w-3 h-3 mr-1" />
+                      <Wrench className="w-3 h-3" />
                       Vaktmester
                     </>
                   ) : project.category === "tomrer" ? (
                     <>
-                      <Hammer className="w-3 h-3 mr-1" />
+                      <Hammer className="w-3 h-3" />
                       Tømrer
                     </>
                   ) : (
                     <>
-                      <Droplet className="w-3 h-3 mr-1" />
+                      <Droplet className="w-3 h-3" />
                       Blikk
                     </>
                   )}
