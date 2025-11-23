@@ -158,12 +158,10 @@ const BlogDetail = () => {
             </Link>
 
             {/* Article Content */}
-            <div className="prose prose-lg max-w-none mb-12">
-              <div 
-                className="text-muted-foreground leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: post.content }}
-              />
-            </div>
+            <div 
+              className="blog-content"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
 
             {/* CTA Card */}
             <Card className="bg-primary/5 border-primary/20 mb-12">
