@@ -294,7 +294,7 @@ export const QuoteForm = () => {
 
       toast({
         title: "Tilbud sendt!",
-        description: "Vi tar kontakt med deg innen 2 timer.",
+        description: "Vi tar kontakt med deg innen 1-3 virkedager.",
       });
 
       navigate(`/takk?email=${encodeURIComponent(formData.email)}&type=${formData.type}`);

@@ -17,7 +17,7 @@ const QuotePage = () => {
                 Få gratis tilbud
               </h1>
               <p className="text-lg text-muted-foreground">
-                Send inn din forespørsel og få kontakt med lokale fagfolk. Vi svarer innen 2 timer.
+                Send inn din forespørsel og få kontakt med lokale fagfolk. Vi svarer innen 1-3 virkedager.
               </p>
             </div>
             <QuoteForm />

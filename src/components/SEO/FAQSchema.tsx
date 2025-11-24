@@ -46,7 +46,7 @@ export const defaultFAQItems: FAQItem[] = [
   },
   {
     question: "Hvor raskt kan dere komme?",
-    answer: "Ofte samme uke – noen ganger samme dag. Vi svarer som regel innen 2 timer i åpningstiden. Ta kontakt, så finner vi et tidspunkt som passer."
+    answer: "Ofte samme uke – noen ganger samme dag. Vi svarer som regel innen 1-3 virkedager i åpningstiden. Ta kontakt, så finner vi et tidspunkt som passer."
   },
   {
     question: "Hvilke områder dekker dere?",

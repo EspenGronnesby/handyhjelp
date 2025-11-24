@@ -259,7 +259,7 @@ const Services = () => {
           </div>
 
           <div className="text-center mt-8">
-            <Link to="/tilbud">
+            <Link to="/fast-avtale">
               <Button variant="cta" size="lg">
                 Få tilbud på fast avtale
               </Button>

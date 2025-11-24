@@ -88,7 +88,7 @@ const Contact = () => {
 
       toast({
         title: "Melding sendt!",
-        description: "Vi svarer deg innen 2 timer.",
+        description: "Vi svarer deg innen 1-3 virkedager.",
       });
 
       setFormData({ name: "", email: "", phone: "", message: "" });
@@ -119,7 +119,7 @@ const Contact = () => {
     },
     {
       question: "Hvor lang er responstiden?",
-      answer: "Vi svarer på alle henvendelser innen 2 timer i åpningstiden, ofte raskere."
+      answer: "Vi svarer på alle henvendelser innen 1-3 virkedager i åpningstiden."
     }
   ];
 
@@ -139,7 +139,7 @@ const Contact = () => {
               Kontakt oss for en uforpliktende samtale.
             </p>
             <p className="text-lg font-semibold text-primary">
-              ⏱️ Vi svarer innen 2 timer
+              ⏱️ Vi svarer innen 1-3 virkedager
             </p>
           </div>
         </section>
@@ -306,7 +306,7 @@ const Contact = () => {
                       <div>
                         <h3 className="font-semibold mb-1">Vi svarer raskt</h3>
                         <p className="text-sm text-muted-foreground">
-                          Vi kommer tilbake til deg innen 2 timer
+                          Vi kommer tilbake til deg innen 1-3 virkedager
                         </p>
                       </div>
                     </div>
