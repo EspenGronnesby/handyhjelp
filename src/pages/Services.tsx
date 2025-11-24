@@ -5,7 +5,7 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Wrench, Hammer, Droplet, CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import servicesBackground from "@/assets/hero-services-background.png";
 
@@ -14,7 +14,7 @@ const Services = () => {
     {
       id: "vaktmester",
       title: "Vaktmestertjenester",
-      icon: Wrench,
+      icon: "🔧",
       services: [
         "Maling og flekksparkler",
         "Dekk skifte",
@@ -29,7 +29,7 @@ const Services = () => {
     {
       id: "tomrer",
       title: "Tømrertjenester",
-      icon: Hammer,
+      icon: "🔨",
       services: [
         "Terrasser og utvendig treverk",
         "Kjøkkenmontering",
@@ -44,7 +44,7 @@ const Services = () => {
     {
       id: "blikk",
       title: "Blikkenslagertjenester",
-      icon: Droplet,
+      icon: "💧",
       services: [
         "Takrenner og nedløp",
         "Takreparasjoner",
@@ -53,7 +53,7 @@ const Services = () => {
         "Pipe-inndekning",
         "Takvinduer",
         "Ventilasjon",
-        "Akutte lekkasjeutbedringer"
+        "Akutte lekkasjutbedringer"
       ]
     }
   ];
@@ -123,7 +123,7 @@ const Services = () => {
                 <CardHeader>
                   <div className="flex flex-col items-center text-center">
                     <div className="p-4 rounded-full bg-primary/10 mb-4">
-                      <service.icon className="h-8 w-8 text-primary" />
+                      <span className="text-5xl">{service.icon}</span>
                     </div>
                     <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
                   </div>
