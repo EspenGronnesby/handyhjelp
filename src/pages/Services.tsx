@@ -14,47 +14,67 @@ const Services = () => {
     {
       id: "vaktmester",
       title: "Vaktmestertjenester",
+      subtitle: "Profesjonell eiendomspleie og vedlikehold",
       icon: "🔧",
       services: [
-        "Maling og flekksparkler",
-        "Dekk skifte",
-        "Kjøring og transport",
-        "Plenklipp og opprydding",
-        "Snømåking og strøing",
-        "Vask (utvendig/innvendig)",
-        "Installasjon hvitevarer",
-        "Flytte møbler"
-      ]
+        "Daglig/ukentlig/månedlig tilsyn av bygg",
+        "Renhold av fellesarealer og uteområder",
+        "Mindre reparasjoner og vedlikehold",
+        "Vintervedlikehold (strøing, snørydding)",
+        "Inspeksjonsrapporter og dokumentasjon"
+      ],
+      targetAudience: "Borettslag, sameier, næringseiendom"
     },
     {
       id: "tomrer",
       title: "Tømrertjenester",
+      subtitle: "Kvalitetssnekring og konstruksjonsarbeid",
       icon: "🔨",
       services: [
-        "Terrasser og utvendig treverk",
-        "Kjøkkenmontering",
-        "Vindusskift og dørmontasje",
-        "Gulvlegging",
-        "Listverk og panel",
-        "Garasjer og uthus",
-        "Takarbeid",
-        "Trapper og rekkverk"
-      ]
+        "Bygging og reparasjon av terrasser",
+        "Montering av dører, vinduer og innredning",
+        "Takarbeid og taktekking",
+        "Renovering av bad og kjøkken (trearbeid)",
+        "Laftekonstruksjoner og vedskjul"
+      ],
+      targetAudience: "Privatpersoner, bedrifter, boligselskaper"
     },
     {
       id: "blikk",
       title: "Blikkenslagertjenester",
+      subtitle: "Sikker taktekningsløsninger og vannsystemer",
       icon: "💧",
       services: [
-        "Takrenner og nedløp",
-        "Takreparasjoner",
-        "Gesimser i metall",
-        "Beslag og fasadekledning",
-        "Pipe-inndekning",
-        "Takvinduer",
-        "Ventilasjon",
-        "Akutte lekkasjutbedringer"
-      ]
+        "Montering og vedlikehold av takrenner",
+        "Beslag og blikk på tak og vegger",
+        "Tetting og vannsikring",
+        "Ventilasjonsarbeider",
+        "Inspeksjon av tak og blikkarbeider"
+      ],
+      targetAudience: "Eiendomsselskaper, borettslag, privatpersoner"
+    },
+    {
+      id: "takrennerens",
+      title: "Takrennerens",
+      subtitle: "Profesjonell rensing og vedlikehold av takrenner",
+      icon: "🌧️",
+      description: "Hold takrennene dine i topp stand! Vi fjerner løv, skitt og blokkering for å sikre god drenering og unngå vannskader.",
+      services: [
+        "Grundig rensing av alle takrenner",
+        "Inspeksjon av beslag og feste",
+        "Fjerning av løv, mose og rusk",
+        "Sjekk av nedløpsrør",
+        "Rapport om eventuelle skader"
+      ],
+      price: "3 390 kr",
+      priceIncludes: [
+        "Oppmøte og arbeid",
+        "Bortføring av avfall",
+        "Fast pris – ingen skjulte kostnader",
+        "Ferdig på under 2 timer"
+      ],
+      targetAudience: "Eneboligeiere, rekkehus, mindre bygg",
+      popular: true
     }
   ];
 
@@ -117,16 +137,40 @@ const Services = () => {
       {/* Services Grid - White background */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service) => (
-              <Card key={service.id} className="hover:shadow-lg transition-shadow">
+              <Card 
+                key={service.id} 
+                className={`hover:shadow-lg transition-shadow relative ${
+                  service.popular ? 'border-success border-2' : ''
+                }`}
+              >
+                {service.popular && (
+                  <Badge className="absolute top-4 right-4 bg-success text-success-foreground">
+                    Populær
+                  </Badge>
+                )}
                 <CardHeader>
                   <div className="flex flex-col items-center text-center">
                     <div className="text-5xl mb-4">{service.icon}</div>
                     <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
+                    {service.subtitle && (
+                      <p className="text-sm text-muted-foreground">{service.subtitle}</p>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
+                  {service.description && (
+                    <p className="text-sm mb-4 text-center">{service.description}</p>
+                  )}
+                  
+                  {service.price && (
+                    <div className="mb-4 p-4 bg-muted/50 rounded-lg text-center">
+                      <p className="text-xs text-muted-foreground mb-1">Fast pris for enebolig</p>
+                      <p className="text-2xl font-bold text-success">{service.price}</p>
+                    </div>
+                  )}
+                  
                   <div className="space-y-2 mb-6">
                     {service.services.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2">
@@ -135,9 +179,27 @@ const Services = () => {
                       </div>
                     ))}
                   </div>
+                  
+                  {service.priceIncludes && (
+                    <div className="mb-4 space-y-1">
+                      {service.priceIncludes.map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <CheckCircle2 className="h-3 w-3 text-success shrink-0" />
+                          <span className="text-xs text-muted-foreground">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {service.targetAudience && (
+                    <p className="text-xs text-muted-foreground mb-4 text-center italic">
+                      Målgruppe: {service.targetAudience}
+                    </p>
+                  )}
+                  
                   <Link to="/tilbud">
                     <Button variant="cta" className="w-full">
-                      Bestill tjeneste
+                      {service.id === 'takrennerens' ? 'Bestill takrennerens' : 'Bestill tjeneste'}
                     </Button>
                   </Link>
                 </CardContent>
