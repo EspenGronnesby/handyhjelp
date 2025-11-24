@@ -122,8 +122,8 @@ const Services = () => {
               <Card key={service.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex flex-col items-center text-center">
-                    <div className="p-4 rounded-full bg-primary/10 mb-4">
-                      <service.icon className="h-8 w-8 text-primary" />
+                    <div className="p-6 rounded-full bg-primary/10 mb-6">
+                      <service.icon className="h-16 w-16 text-primary" strokeWidth={1.5} />
                     </div>
                     <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
                   </div>
