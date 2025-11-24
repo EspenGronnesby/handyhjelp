@@ -37,7 +37,7 @@ const handler = async (req: Request): Promise<Response> => {
           </p>
           
           <p style="font-size: 16px; line-height: 1.6;">
-            Vi har mottatt forespørselen deres og vil gjennomgå den grundig. Dere kan forvente å bli kontaktet <strong>innen 1-2 virkedager</strong> for en uforpliktende samtale om deres behov.
+            Vi har mottatt forespørselen deres og vil gjennomgå den grundig. Dere kan forvente å bli kontaktet <strong>innen 1-3 virkedager</strong> for en uforpliktende samtale om deres behov.
           </p>
           
           <div style="margin: 30px 0; padding: 20px; background-color: #F8FAFC; border-radius: 8px;">

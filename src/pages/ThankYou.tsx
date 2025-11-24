@@ -59,7 +59,7 @@ const ThankYou = () => {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Forventet responstid</h3>
                   <p className="text-gray-700">
-                    Vi kontakter deg <strong>innen 2 timer</strong> i våre åpningstider (man-fre 07:00-17:00)
+                    Vi kontakter deg <strong>innen 1-3 virkedager</strong> i våre åpningstider (man-fre 09:00-17:00)
                   </p>
                   <p className="text-sm text-gray-600 mt-2">
                     Du vil motta et uforpliktende tilbud tilpasset dine behov.

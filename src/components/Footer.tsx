@@ -107,7 +107,7 @@ export const Footer = () => {
               </li>
               <li className="flex items-start gap-2">
                 <Clock className="h-4 w-4 mt-1 flex-shrink-0" />
-                <span>Man-Fre 07:00-17:00</span>
+                <span>Man-Fre 09:00-17:00</span>
               </li>
             </ul>
           </div>

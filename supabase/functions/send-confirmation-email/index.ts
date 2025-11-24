@@ -120,7 +120,7 @@ const handler = async (req: Request): Promise<Response> => {
               
               <p>Takk for at du kontaktet HandyHjelp! 🏠</p>
               
-              <p>Vi har mottatt din forespørsel og vil gjennomgå den så snart som mulig. Du kan forvente å høre fra oss <strong>innen 2 timer</strong> i vår åpningstid.</p>
+              <p>Vi har mottatt din forespørsel og vil gjennomgå den så snart som mulig. Du kan forvente å høre fra oss <strong>innen 1-3 virkedager</strong> i vår åpningstid.</p>
               
               <div class="steps">
                 <h3 style="margin-top: 0; color: #0891B2;">Hva skjer videre?</h3>
@@ -147,7 +147,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <span class="contact-label">✉️ E-post:</span> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a>
                 </div>
                 <div class="contact-item">
-                  <span class="contact-label">⏰ Åpningstid:</span> Man-Fre 07:00-17:00
+                  <span class="contact-label">⏰ Åpningstid:</span> Man-Fre 09:00-17:00
                 </div>
               </div>
               
