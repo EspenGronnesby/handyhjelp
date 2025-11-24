@@ -122,9 +122,7 @@ const Services = () => {
               <Card key={service.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex flex-col items-center text-center">
-                    <div className="p-4 rounded-full bg-primary/10 mb-4">
-                      <span className="text-5xl">{service.icon}</span>
-                    </div>
+                    <div className="text-5xl mb-4">{service.icon}</div>
                     <CardTitle className="text-xl mb-2">{service.title}</CardTitle>
                   </div>
                 </CardHeader>
