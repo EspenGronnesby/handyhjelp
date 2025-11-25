@@ -21,6 +21,10 @@ import ProjectDetail from "./pages/ProjectDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Services from "./pages/Services";
+import ServiceVaktmester from "./pages/ServiceVaktmester";
+import ServiceTakrennerens from "./pages/ServiceTakrennerens";
+import ServiceTomrer from "./pages/ServiceTomrer";
+import ServiceBlikk from "./pages/ServiceBlikk";
 import Blog from "./pages/Blog";
 import BlogDetail from "./pages/BlogDetail";
 import ThankYou from "./pages/ThankYou";
@@ -49,6 +53,10 @@ const App = () => (
             <Route path="/om-oss" element={<About />} />
             <Route path="/kontakt" element={<Contact />} />
             <Route path="/tjenester" element={<Services />} />
+            <Route path="/tjenester/vaktmester" element={<ServiceVaktmester />} />
+            <Route path="/tjenester/takrennerens" element={<ServiceTakrennerens />} />
+            <Route path="/tjenester/tomrer" element={<ServiceTomrer />} />
+            <Route path="/tjenester/blikk" element={<ServiceBlikk />} />
             <Route path="/raad" element={<Blog />} />
             <Route path="/raad/:slug" element={<BlogDetail />} />
             <Route path="/takk" element={<ThankYou />} />

@@ -123,7 +123,7 @@ const Index = () => {
                     ))}
                   </ul>
                   
-                  <Link to={`/tjenester#${service.id}`}>
+                  <Link to={`/tjenester/${service.id}`}>
                     <Button 
                       variant="outline" 
                       className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
