@@ -35,88 +35,102 @@ const Index = () => {
         {/* Projects Section */}
         <ProjectsSection />
 
-        {/* Services Section */}
+        {/* Services Section - Compact Overview */}
         <section className="py-16 bg-background" id="services">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="heading-section font-heading">Våre hovedtjenester</h2>
+              <h2 className="heading-section font-heading">Våre tjenester</h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Profesjonell eiendomspleie skreddersydd for dine behov
+                Profesjonell håndverksarbeid for alle behov
               </p>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
               {[
                 {
+                  id: "vaktmester",
                   title: "Vaktmestertjenester",
+                  subtitle: "Profesjonell eiendomspleie og vedlikehold",
                   icon: "🔧",
-                  description: "Profesjonell eiendomspleie og vedlikehold",
-                  details: [
+                  highlights: [
                     "Daglig/ukentlig/månedlig tilsyn av bygg",
                     "Renhold av fellesarealer og uteområder",
-                    "Mindre reparasjoner og vedlikehold",
-                    "Vintervedlikehold (strøing, snørydding)",
-                    "Inspeksjonsrapporter og dokumentasjon"
-                  ],
-                  target: "Borettslag, sameier, næringseiendom",
-                  cta: "Kontakt for pristilbud"
+                    "Vintervedlikehold (strøing, snørydding)"
+                  ]
                 },
                 {
+                  id: "takrennerens",
+                  title: "Takrennerens",
+                  subtitle: "Profesjonell rensing og vedlikehold av takrenner",
+                  icon: "🌧️",
+                  popular: true,
+                  highlights: [
+                    "Grundig rensing av alle takrenner",
+                    "Fjerning av løv, mose og rusk",
+                    "Fast pris: 3 390 kr for enebolig"
+                  ]
+                },
+                {
+                  id: "tomrer",
                   title: "Tømrertjenester",
+                  subtitle: "Kvalitetssnekring og konstruksjonsarbeid",
                   icon: "🔨",
-                  description: "Kvalitetssnekring og konstruksjonsarbeid",
-                  details: [
+                  highlights: [
                     "Bygging og reparasjon av terrasser",
                     "Montering av dører, vinduer og innredning",
-                    "Takarbeid og taktekking",
-                    "Renovering av bad og kjøkken (trearbeid)",
-                    "Laftekonstruksjoner og vedskjul"
-                  ],
-                  target: "Privatpersoner, bedrifter, boligselskaper",
-                  cta: "Kontakt for pristilbud"
+                    "Takarbeid og taktekking"
+                  ]
                 },
                 {
+                  id: "blikk",
                   title: "Blikkenslagertjenester",
+                  subtitle: "Sikker taktekningsløsninger og vannsystemer",
                   icon: "💧",
-                  description: "Sikker taktekkningsløsninger og vannsystemer",
-                  details: [
+                  highlights: [
                     "Montering og vedlikehold av takrenner",
                     "Beslag og blikk på tak og vegger",
-                    "Tetting og vannsikring",
-                    "Ventilasjonsarbeider",
-                    "Inspeksjon av tak og blikkarbeider"
-                  ],
-                  target: "Eiendomsselskaper, borettslag, privatpersoner",
-                  cta: "Kontakt for pristilbud"
+                    "Tetting og vannsikring"
+                  ]
                 }
-              ].map((service, index) => (
-                <div key={index} className="card-professional p-8 hover:shadow-xl transition-all duration-300">
-                  <div className="text-5xl mb-4">{service.icon}</div>
-                  <h3 className="text-2xl font-bold text-foreground mb-2 font-heading">{service.title}</h3>
-                  <p className="text-primary font-medium mb-4">{service.description}</p>
+              ].map((service) => (
+                <div 
+                  key={service.id} 
+                  className={`relative bg-card rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 border ${
+                    service.popular ? 'border-success border-2' : 'border-border'
+                  }`}
+                >
+                  {service.popular && (
+                    <div className="absolute top-4 right-4 bg-success text-success-foreground text-xs font-semibold px-3 py-1 rounded-full">
+                      Populær
+                    </div>
+                  )}
                   
-                  <ul className="space-y-2 mb-6 text-sm text-muted-foreground">
-                    {service.details.map((detail, idx) => (
-                      <li key={idx} className="flex items-start">
-                        <span className="text-success mr-2">✓</span>
-                        <span>{detail}</span>
+                  <div className="text-4xl mb-3">{service.icon}</div>
+                  
+                  <h3 className="text-xl font-bold text-foreground mb-1 font-heading">
+                    {service.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {service.subtitle}
+                  </p>
+                  
+                  <ul className="space-y-2 mb-6">
+                    {service.highlights.map((highlight, idx) => (
+                      <li key={idx} className="flex items-start text-sm">
+                        <span className="text-success mr-2 mt-0.5">✓</span>
+                        <span className="text-muted-foreground">{highlight}</span>
                       </li>
                     ))}
                   </ul>
                   
-                  <div className="border-t border-border pt-4 space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      <span className="font-semibold text-foreground">Målgruppe:</span> {service.target}
-                    </p>
-                    <p className="text-base font-semibold text-primary">{service.cta}</p>
-                  </div>
-                  
-                  <Button 
-                    className="w-full mt-4 bg-primary hover:bg-primary-hover"
-                    onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
-                  >
-                    Bestill tjeneste
-                  </Button>
+                  <Link to={`/tjenester#${service.id}`}>
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    >
+                      Les mer
+                    </Button>
+                  </Link>
                 </div>
               ))}
             </div>
