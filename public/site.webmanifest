@@ -1,11 +1,11 @@
 {
   "name": "HandyHjelp",
   "short_name": "HandyHjelp",
-  "description": "Lokal handyhjelp i Kristiansand. Flytting, montering, rydding og småjobber.",
+  "description": "Profesjonell vaktmester, tømrer og blikkenslagertjenester i Kristiansand.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a202c",
-  "theme_color": "#1a202c",
+  "background_color": "#0ea5e9",
+  "theme_color": "#0ea5e9",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -20,10 +20,16 @@
     },
     {
       "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
+      "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/favicon-base.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
   "categories": ["business", "productivity"],
-  "lang": "en-US"
+  "lang": "no-NO"
 }
