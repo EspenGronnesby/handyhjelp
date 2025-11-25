@@ -7,9 +7,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import servicesBackground from "@/assets/hero-services-background.png";
 
 const Services = () => {
+  // Handle smooth scroll to anchor on load
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const id = hash.replace('#', '');
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    }
+  }, []);
+
   const services = [
     {
       id: "vaktmester",
@@ -140,8 +155,9 @@ const Services = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {services.map((service) => (
               <Card 
-                key={service.id} 
-                className={`hover:shadow-lg transition-shadow relative ${
+                key={service.id}
+                id={service.id}
+                className={`hover:shadow-lg transition-shadow relative scroll-mt-24 ${
                   service.popular ? 'border-success border-2' : ''
                 }`}
               >
