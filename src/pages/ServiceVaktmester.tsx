@@ -12,7 +12,7 @@ import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 
 const ServiceVaktmester = () => {
-  const { heroImage, opacity, refetch } = useHeroImage('services-vaktmester', servicesBackground);
+  const { heroImage, refetch } = useHeroImage('services-vaktmester', servicesBackground);
   const benefits = [
     "Erfarne fagfolk med mange års erfaring",
     "Fast kontaktperson for din eiendom",
@@ -45,11 +45,8 @@ const ServiceVaktmester = () => {
         className="relative bg-cover bg-center bg-fixed bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div 
-          className="absolute inset-0 bg-background backdrop-blur-[2px]"
-          style={{ opacity }}
-        ></div>
-        <HeroImageEditor page="services-vaktmester" currentImageUrl={heroImage} currentOpacity={opacity} onImageUpdate={refetch} />
+        <div className="absolute inset-0 bg-background/85 backdrop-blur-[2px]"></div>
+        <HeroImageEditor page="services-vaktmester" currentImageUrl={heroImage} onImageUpdate={refetch} />
         
         <div className="relative z-10">
           <section className="pt-32 pb-16">
