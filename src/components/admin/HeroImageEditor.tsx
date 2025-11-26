@@ -18,6 +18,9 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
+  // Debug logging for admin status
+  console.log('HeroImageEditor - isAdmin:', isAdmin, 'page:', page);
+
   if (!isAdmin) return null;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,10 +100,10 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="absolute top-4 right-4 z-10 p-2 rounded-full bg-background/60 backdrop-blur-sm hover:bg-background/80 transition-all"
+        className="absolute top-4 right-4 z-[100] p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all border-2 border-primary"
         title="Rediger hero-bilde"
       >
-        <Camera className="w-5 h-5 text-primary" />
+        <Camera className="w-6 h-6 text-primary" />
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

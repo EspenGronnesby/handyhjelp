@@ -8,6 +8,7 @@ export const useAdmin = () => {
   useEffect(() => {
     const checkAdminStatus = async (userId: string | undefined) => {
       if (!userId) {
+        console.log('useAdmin: No userId, setting isAdmin to false');
         setIsAdmin(false);
         setLoading(false);
         return;
@@ -21,9 +22,14 @@ export const useAdmin = () => {
           .eq('role', 'admin')
           .single();
 
+        console.log('useAdmin: Checking role for userId:', userId);
+        console.log('useAdmin: Query result - data:', data, 'error:', error);
+
         if (!error && data) {
+          console.log('useAdmin: User is admin!');
           setIsAdmin(true);
         } else {
+          console.log('useAdmin: User is NOT admin');
           setIsAdmin(false);
         }
       } catch (error) {
