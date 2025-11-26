@@ -1,9 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { QuoteForm } from "@/components/QuoteForm";
-import heroImage from "@/assets/hero-building-maintenance.jpg";
 import { Phone } from "lucide-react";
+import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
+import { useHeroImage } from "@/hooks/useHeroImage";
+import heroDefaultImage from "@/assets/hero-building-maintenance.jpg";
 
 export const HeroSection = () => {
+  const { heroImage, refetch } = useHeroImage('home', heroDefaultImage);
+
   return (
     <section className="min-h-screen relative flex items-center pt-32 md:pt-20">
       {/* Background Image */}
@@ -13,6 +17,8 @@ export const HeroSection = () => {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-secondary/80 to-secondary/60"></div>
       </div>
+      
+      <HeroImageEditor page="home" currentImageUrl={heroImage} onImageUpdate={refetch} />
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-8rem)] py-12 md:py-20">

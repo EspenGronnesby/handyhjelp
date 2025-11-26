@@ -7,9 +7,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
+import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 
 const ServiceVaktmester = () => {
+  const { heroImage, refetch } = useHeroImage('services-vaktmester', servicesBackground);
   const benefits = [
     "Erfarne fagfolk med mange års erfaring",
     "Fast kontaktperson for din eiendom",
@@ -40,9 +43,10 @@ const ServiceVaktmester = () => {
       {/* Hero Section with Background */}
       <div 
         className="relative bg-cover bg-center bg-fixed bg-no-repeat"
-        style={{ backgroundImage: `url(${servicesBackground})` }}
+        style={{ backgroundImage: `url(${heroImage})` }}
       >
         <div className="absolute inset-0 bg-background/85 backdrop-blur-[2px]"></div>
+        <HeroImageEditor page="services-vaktmester" currentImageUrl={heroImage} onImageUpdate={refetch} />
         
         <div className="relative z-10">
           <section className="pt-32 pb-16">
