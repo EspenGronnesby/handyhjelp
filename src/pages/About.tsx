@@ -14,7 +14,7 @@ import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import heroAboutImg from "@/assets/hero-caretaker.jpg";
 
 const About = () => {
-  const { heroImage, refetch: refetchHero } = useHeroImage('about', heroAboutImg);
+  const { heroImage, opacity, refetch: refetchHero } = useHeroImage('about', heroAboutImg);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -101,8 +101,11 @@ const About = () => {
             backgroundRepeat: 'no-repeat'
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50"></div>
-          <HeroImageEditor page="about" currentImageUrl={heroImage} onImageUpdate={refetchHero} />
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-black to-black"
+            style={{ opacity }}
+          ></div>
+          <HeroImageEditor page="about" currentImageUrl={heroImage} currentOpacity={opacity} onImageUpdate={refetchHero} />
           
           <div className="relative z-10 text-center max-w-3xl mx-auto px-4">
             <h1 className="text-5xl font-bold mb-6 text-white">
