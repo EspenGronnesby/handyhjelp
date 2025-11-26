@@ -12,7 +12,7 @@ import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 
 const ServiceBlikk = () => {
-  const { heroImage, refetch } = useHeroImage('services-blikk', servicesBackground);
+  const { heroImage, opacity, refetch } = useHeroImage('services-blikk', servicesBackground);
   const benefits = [
     "Erfarne fagfolk med mange års erfaring",
     "Fast kontaktperson for din eiendom",
@@ -45,7 +45,10 @@ const ServiceBlikk = () => {
         className="relative bg-cover bg-center bg-fixed bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-background/85 backdrop-blur-[2px]"></div>
+        <div 
+          className="absolute inset-0 bg-background backdrop-blur-[2px]"
+          style={{ opacity }}
+        ></div>
         <HeroImageEditor page="services-blikk" currentImageUrl={heroImage} onImageUpdate={refetch} />
         
         <div className="relative z-10">

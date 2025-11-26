@@ -13,7 +13,7 @@ import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 
 const Services = () => {
-  const { heroImage, refetch: refetchHero } = useHeroImage('services', servicesBackground);
+  const { heroImage, opacity, refetch: refetchHero } = useHeroImage('services', servicesBackground);
 
   // Handle smooth scroll to anchor on load
   useEffect(() => {
@@ -109,7 +109,10 @@ const Services = () => {
         style={{ backgroundImage: `url(${heroImage})` }}
       >
         {/* Enhanced gradient overlay for better readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/85 to-background/90 backdrop-blur-[3px]"></div>
+        <div 
+          className="absolute inset-0 bg-gradient-to-b from-background via-background to-background backdrop-blur-[3px]"
+          style={{ opacity }}
+        ></div>
         
         <HeroImageEditor page="services" currentImageUrl={heroImage} onImageUpdate={refetchHero} />
         

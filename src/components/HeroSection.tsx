@@ -6,7 +6,7 @@ import { useHeroImage } from "@/hooks/useHeroImage";
 import heroDefaultImage from "@/assets/hero-building-maintenance.jpg";
 
 export const HeroSection = () => {
-  const { heroImage, refetch } = useHeroImage('home', heroDefaultImage);
+  const { heroImage, opacity, refetch } = useHeroImage('home', heroDefaultImage);
 
   return (
     <section className="min-h-screen relative flex items-center pt-32 md:pt-20">
@@ -15,7 +15,10 @@ export const HeroSection = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary/80 to-secondary/60"></div>
+        <div 
+          className="absolute inset-0 bg-gradient-to-br from-secondary to-secondary"
+          style={{ opacity }}
+        ></div>
       </div>
       
       <HeroImageEditor page="home" currentImageUrl={heroImage} onImageUpdate={refetch} />
