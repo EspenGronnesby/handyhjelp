@@ -100,10 +100,10 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="absolute top-4 right-4 z-[100] p-3 rounded-full bg-white shadow-lg hover:shadow-xl transition-all border-2 border-primary"
+        className="absolute top-2 right-2 z-[100] p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-all border border-border shadow-sm hover:shadow-md"
         title="Rediger hero-bilde"
       >
-        <Camera className="w-6 h-6 text-primary" />
+        <Camera className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors" />
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
