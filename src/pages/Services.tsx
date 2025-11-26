@@ -8,9 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
+import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 
 const Services = () => {
+  const { heroImage, refetch: refetchHero } = useHeroImage('services', servicesBackground);
+
   // Handle smooth scroll to anchor on load
   useEffect(() => {
     const hash = window.location.hash;
@@ -102,10 +106,12 @@ const Services = () => {
       {/* Hero Section - Enhanced with gradient overlay */}
       <div 
         className="relative min-h-[600px] flex items-center bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${servicesBackground})` }}
+        style={{ backgroundImage: `url(${heroImage})` }}
       >
         {/* Enhanced gradient overlay for better readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/85 to-background/90 backdrop-blur-[3px]"></div>
+        
+        <HeroImageEditor page="services" currentImageUrl={heroImage} onImageUpdate={refetchHero} />
         
         {/* Content over background */}
         <div className="relative z-10 w-full py-20">

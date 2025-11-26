@@ -220,7 +220,14 @@ const Contact = () => {
                       <MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                       <div>
                         <p className="font-semibold">Adresse</p>
-                        <p className="text-muted-foreground">Kristiansand, Norge</p>
+                        <a 
+                          href="https://www.google.com/maps/place/Ægirsvei+3,+Kristiansand" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          Ægirsvei 3, Kristiansand
+                        </a>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -245,26 +252,29 @@ const Contact = () => {
                       <Clock className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                       <div>
                         <p className="font-semibold">Åpningstider</p>
-                        <p className="text-muted-foreground">Mandag - Fredag: 07:00 - 17:00</p>
-                        <p className="text-muted-foreground text-sm">Kveld/helg etter avtale</p>
+                        <p className="text-muted-foreground">Mandag - Fredag: 09:00 - 17:00</p>
+                        <p className="text-muted-foreground text-sm">Responstid: 1-3 virkedager</p>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Map Placeholder */}
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                    <div className="text-center">
-                      <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-muted-foreground">Kart over Kristiansand</p>
-                      <p className="text-sm text-muted-foreground">Google Maps integrering</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Map Section with Google Maps Embed */}
+            <Card>
+              <CardContent className="pt-6 p-0">
+                <iframe
+                  width="100%"
+                  height="450"
+                  style={{ border: 0, borderRadius: '0.5rem' }}
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Ægirsvei+3,+Kristiansand&zoom=15"
+                  title="HandyHjelp lokasjon - Ægirsvei 3, Kristiansand"
+                ></iframe>
+              </CardContent>
+            </Card>
 
               {/* Alternative Contact */}
               <Card className="bg-accent/10 border-accent">
