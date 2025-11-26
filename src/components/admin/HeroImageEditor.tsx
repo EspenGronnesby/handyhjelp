@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Camera, Upload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAdmin } from '@/hooks/useAdmin';
@@ -17,6 +19,7 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [opacity, setOpacity] = useState<number>(85);
 
   // Debug logging for admin status
   console.log('HeroImageEditor - isAdmin:', isAdmin, 'page:', page);
@@ -33,9 +36,9 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
       return;
     }
 
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Filen er for stor. Maks 2MB.');
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Filen er for stor. Maks 5MB.');
       return;
     }
 
@@ -76,6 +79,7 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
         .upsert({
           page,
           image_url: publicUrl,
+          opacity: opacity / 100, // Convert percentage to decimal (0-1)
           updated_by: user?.id,
           updated_at: new Date().toISOString()
         }, {
@@ -154,9 +158,31 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
                   Klikk for å laste opp nytt bilde
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  JPG, PNG eller WebP (maks 2MB)
+                  JPG, PNG eller WebP (maks 5MB)
                 </p>
               </label>
+            </div>
+
+            {/* Opacity Slider */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="opacity-slider" className="text-sm font-medium">
+                  Bakgrunns-opasitet (overlay)
+                </Label>
+                <span className="text-sm text-muted-foreground">{opacity}%</span>
+              </div>
+              <Slider
+                id="opacity-slider"
+                min={0}
+                max={100}
+                step={5}
+                value={[opacity]}
+                onValueChange={(value) => setOpacity(value[0])}
+                className="w-full"
+              />
+              <p className="text-xs text-muted-foreground">
+                Justerer hvor mørk overlayen er over bakgrunnsbildet. Høyere verdi = mørkere.
+              </p>
             </div>
 
             <div className="flex gap-2">
