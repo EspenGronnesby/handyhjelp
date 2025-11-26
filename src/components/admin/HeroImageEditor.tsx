@@ -9,17 +9,24 @@ import { useAdmin } from '@/hooks/useAdmin';
 interface HeroImageEditorProps {
   page: string;
   currentImageUrl?: string;
+  currentOpacity?: number;
   onImageUpdate?: () => void;
 }
 
-export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroImageEditorProps) => {
+export const HeroImageEditor = ({ page, currentImageUrl, currentOpacity = 0.7, onImageUpdate }: HeroImageEditorProps) => {
   const { isAdmin } = useAdmin();
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [opacity, setOpacity] = useState<number>(currentOpacity);
 
   // Debug logging for admin status
   console.log('HeroImageEditor - isAdmin:', isAdmin, 'page:', page);
+
+  // Update opacity when currentOpacity prop changes
+  useState(() => {
+    setOpacity(currentOpacity);
+  });
 
   if (!isAdmin) return null;
 
@@ -33,9 +40,9 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
       return;
     }
 
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Filen er for stor. Maks 2MB.');
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Filen er for stor. Maks 5MB.');
       return;
     }
 
@@ -76,6 +83,7 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
         .upsert({
           page,
           image_url: publicUrl,
+          opacity: opacity,
           updated_by: user?.id,
           updated_at: new Date().toISOString()
         }, {
@@ -154,9 +162,27 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
                   Klikk for å laste opp nytt bilde
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  JPG, PNG eller WebP (maks 2MB)
+                  JPG, PNG eller WebP (maks 5MB)
                 </p>
               </label>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Overlay opacity: {Math.round(opacity * 100)}%
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={opacity}
+                onChange={(e) => setOpacity(parseFloat(e.target.value))}
+                className="w-full"
+              />
+              <p className="text-xs text-muted-foreground">
+                Juster gjennomsiktigheten på det mørke overlaget
+              </p>
             </div>
 
             <div className="flex gap-2">
