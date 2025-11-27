@@ -5,6 +5,8 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin } from "lucide-react";
+import { EditableWrapper } from "./EditableWrapper";
+import { useEditableContent } from "@/hooks/useEditableContent";
 
 interface Project {
   id: string;
@@ -23,6 +25,8 @@ export const ProjectsSection = () => {
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
   const [touchedProject, setTouchedProject] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { content: heading } = useEditableContent('home-sections', 'projects-heading');
+  const { content: subheading } = useEditableContent('home-sections', 'projects-subheading');
 
   useEffect(() => {
     fetchProjects();
@@ -96,12 +100,28 @@ export const ProjectsSection = () => {
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="heading-section font-heading mb-4">
-            Våre prosjekter
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Se resultatet av vårt arbeid – før og etter bilder av våre siste prosjekter
-          </p>
+          <EditableWrapper
+            section="home-sections"
+            contentKey="projects-heading"
+            label="Overskrift: Våre prosjekter"
+            maxLength={50}
+          >
+            <h2 className="heading-section font-heading mb-4">
+              {heading || 'Våre prosjekter'}
+            </h2>
+          </EditableWrapper>
+          
+          <EditableWrapper
+            section="home-sections"
+            contentKey="projects-subheading"
+            label="Underoverskrift: Våre prosjekter"
+            maxLength={150}
+            multiline
+          >
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              {subheading || 'Se resultatet av vårt arbeid – før og etter bilder av våre siste prosjekter'}
+            </p>
+          </EditableWrapper>
         </div>
 
         {projects.length === 0 ? (
