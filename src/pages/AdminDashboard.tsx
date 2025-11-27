@@ -12,6 +12,7 @@ import { Loader2, Play, CheckCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { ProjectManagement } from '@/components/admin/ProjectManagement';
 import { BlogManagement } from '@/components/admin/BlogManagement';
+import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -455,6 +456,7 @@ const AdminDashboard = () => {
           <TabsTrigger value="customers">Kunder ({profiles.length})</TabsTrigger>
           <TabsTrigger value="projects">Prosjekter</TabsTrigger>
           <TabsTrigger value="blog">Blogg / Råd</TabsTrigger>
+          <TabsTrigger value="site-editing">Nettstedredigering</TabsTrigger>
         </TabsList>
 
         {/* Nye forespørsler */}
@@ -876,6 +878,11 @@ const AdminDashboard = () => {
         {/* Blog Tab */}
         <TabsContent value="blog">
           <BlogManagement />
+        </TabsContent>
+
+        {/* Site Editing Tab */}
+        <TabsContent value="site-editing">
+          <SiteEditingPanel />
         </TabsContent>
       </Tabs>
 
