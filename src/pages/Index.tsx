@@ -9,6 +9,42 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { EditableServiceCard } from "@/components/EditableServiceCard";
+import { EditableWrapper } from "@/components/EditableWrapper";
+import { useEditableContent } from "@/hooks/useEditableContent";
+
+// Component for Services Section Heading
+const ServicesHeading = () => {
+  const { content: heading } = useEditableContent('home-sections', 'services-heading');
+  const { content: subheading } = useEditableContent('home-sections', 'services-subheading');
+  
+  return (
+    <div className="text-center mb-12">
+      <EditableWrapper
+        section="home-sections"
+        contentKey="services-heading"
+        label="Overskrift: Våre tjenester"
+        maxLength={50}
+      >
+        <h2 className="heading-section font-heading">
+          {heading || 'Våre tjenester'}
+        </h2>
+      </EditableWrapper>
+      
+      <EditableWrapper
+        section="home-sections"
+        contentKey="services-subheading"
+        label="Underoverskrift: Våre tjenester"
+        maxLength={150}
+        multiline
+      >
+        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          {subheading || 'Profesjonell håndverksarbeid for alle behov'}
+        </p>
+      </EditableWrapper>
+    </div>
+  );
+};
 
 const Index = () => {
   const { user } = useAuth();
@@ -38,101 +74,62 @@ const Index = () => {
         {/* Services Section - Compact Overview */}
         <section className="py-16 bg-background" id="services">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="heading-section font-heading">Våre tjenester</h2>
-              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Profesjonell håndverksarbeid for alle behov
-              </p>
-            </div>
+            <ServicesHeading />
+
             
             <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
-              {[
-                {
-                  id: "vaktmester",
-                  title: "Vaktmestertjenester",
-                  subtitle: "Profesjonell eiendomspleie og vedlikehold",
-                  icon: "🔧",
-                  highlights: [
-                    "Daglig/ukentlig/månedlig tilsyn av bygg",
-                    "Renhold av fellesarealer og uteområder",
-                    "Vintervedlikehold (strøing, snørydding)"
-                  ]
-                },
-                {
-                  id: "takrennerens",
-                  title: "Takrennerens",
-                  subtitle: "Profesjonell rensing og vedlikehold av takrenner",
-                  icon: "🌧️",
-                  popular: true,
-                  highlights: [
-                    "Grundig rensing av alle takrenner",
-                    "Fjerning av løv, mose og rusk",
-                    "Fast pris: 3 390 kr for enebolig"
-                  ]
-                },
-                {
-                  id: "tomrer",
-                  title: "Tømrertjenester",
-                  subtitle: "Kvalitetssnekring og konstruksjonsarbeid",
-                  icon: "🔨",
-                  highlights: [
-                    "Bygging og reparasjon av terrasser",
-                    "Montering av dører, vinduer og innredning",
-                    "Takarbeid og taktekking"
-                  ]
-                },
-                {
-                  id: "blikk",
-                  title: "Blikkenslagertjenester",
-                  subtitle: "Sikker taktekningsløsninger og vannsystemer",
-                  icon: "💧",
-                  highlights: [
-                    "Montering og vedlikehold av takrenner",
-                    "Beslag og blikk på tak og vegger",
-                    "Tetting og vannsikring"
-                  ]
-                }
-              ].map((service) => (
-                <div 
-                  key={service.id} 
-                  className={`relative bg-card rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 border ${
-                    service.popular ? 'border-success border-2' : 'border-border'
-                  }`}
-                >
-                  {service.popular && (
-                    <div className="absolute top-4 right-4 bg-success text-success-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                      Populær
-                    </div>
-                  )}
-                  
-                  <div className="text-4xl mb-3">{service.icon}</div>
-                  
-                  <h3 className="text-xl font-bold text-foreground mb-1 font-heading">
-                    {service.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {service.subtitle}
-                  </p>
-                  
-                  <ul className="space-y-2 mb-6">
-                    {service.highlights.map((highlight, idx) => (
-                      <li key={idx} className="flex items-start text-sm">
-                        <span className="text-success mr-2 mt-0.5">✓</span>
-                        <span className="text-muted-foreground">{highlight}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <Link to={`/tjenester/${service.id}`}>
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                    >
-                      Les mer
-                    </Button>
-                  </Link>
-                </div>
-              ))}
+              <EditableServiceCard
+                section="service-vaktmester"
+                id="vaktmester"
+                icon="🔧"
+                defaultTitle="Vaktmestertjenester"
+                defaultSubtitle="Profesjonell eiendomspleie og vedlikehold"
+                defaultBullets={[
+                  "Daglig/ukentlig/månedlig tilsyn av bygg",
+                  "Renhold av fellesarealer og uteområder",
+                  "Vintervedlikehold (strøing, snørydding)"
+                ]}
+              />
+
+              <EditableServiceCard
+                section="service-takrennerens"
+                id="takrennerens"
+                icon="🌧️"
+                popular={true}
+                defaultTitle="Takrennerens"
+                defaultSubtitle="Profesjonell rensing og vedlikehold av takrenner"
+                defaultBullets={[
+                  "Grundig rensing av alle takrenner",
+                  "Fjerning av løv, mose og rusk",
+                  "Fast pris: 3 390 kr for enebolig"
+                ]}
+              />
+
+              <EditableServiceCard
+                section="service-tomrer"
+                id="tomrer"
+                icon="🔨"
+                defaultTitle="Tømrertjenester"
+                defaultSubtitle="Kvalitetssnekring og konstruksjonsarbeid"
+                defaultBullets={[
+                  "Bygging og reparasjon av terrasser",
+                  "Montering av dører, vinduer og innredning",
+                  "Takarbeid og taktekking"
+                ]}
+              />
+
+              <EditableServiceCard
+                section="service-blikk"
+                id="blikk"
+                icon="💧"
+                defaultTitle="Blikkenslagertjenester"
+                defaultSubtitle="Sikker taktekningsløsninger og vannsystemer"
+                defaultBullets={[
+                  "Montering og vedlikehold av takrenner",
+                  "Beslag og blikk på tak og vegger",
+                  "Tetting og vannsikring"
+                ]}
+              />
             </div>
 
             <div className="text-center">
