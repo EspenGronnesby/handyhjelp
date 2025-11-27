@@ -4,10 +4,14 @@ import { Phone } from "lucide-react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import { EditableWrapper } from "@/components/EditableWrapper";
+import { useEditableContent } from "@/hooks/useEditableContent";
 import heroDefaultImage from "@/assets/hero-building-maintenance.jpg";
 
 export const HeroSection = () => {
   const { heroImage, opacity, refetch } = useHeroImage('home', heroDefaultImage);
+  const { content: title } = useEditableContent('hero-home', 'title');
+  const { content: subtitle } = useEditableContent('hero-home', 'subtitle');
+  const { content: ctaText } = useEditableContent('hero-home', 'cta-button');
 
   return (
     <section className="min-h-screen relative flex items-center pt-32 md:pt-20">
@@ -29,29 +33,50 @@ export const HeroSection = () => {
           {/* Left Content */}
           <div className="text-left">
             {/* Main Heading - Minimalist */}
-            <EditableWrapper section="hero-home" contentKey="title" type="text">
+            <EditableWrapper 
+              section="hero-home" 
+              contentKey="title" 
+              type="text"
+              label="Hero-overskrift"
+              maxLength={100}
+            >
               <h1 className="text-4xl md:text-7xl font-bold mb-6 md:mb-8 animate-fade-in-left font-heading text-white leading-tight">
-                Vi tar vare på <br className="hidden md:block" />dine bygg
+                {title || 'Vi tar vare på dine bygg'}
               </h1>
             </EditableWrapper>
             
             {/* Short Tagline */}
-            <EditableWrapper section="hero-home" contentKey="subtitle" type="text">
+            <EditableWrapper 
+              section="hero-home" 
+              contentKey="subtitle" 
+              type="text"
+              label="Hero-undertekst"
+              maxLength={200}
+              multiline
+            >
               <p className="text-white/90 text-xl md:text-2xl mb-8 md:mb-12 animate-fade-in-left">
-                Vaktmester • Tømrer • Blikk
+                {subtitle || 'Vaktmester • Tømrer • Blikk'}
               </p>
             </EditableWrapper>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-left mb-12">
-              <Button 
-                size="lg" 
-                variant="cta"
-                className="text-lg px-8 py-6"
-                onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+              <EditableWrapper 
+                section="hero-home" 
+                contentKey="cta-button" 
+                type="text"
+                label="CTA-knapp tekst"
+                maxLength={50}
               >
-                Få tilbud
-              </Button>
+                <Button 
+                  size="lg" 
+                  variant="cta"
+                  className="text-lg px-8 py-6"
+                  onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  {ctaText || 'Få tilbud'}
+                </Button>
+              </EditableWrapper>
               <Button 
                 variant="cta-outline" 
                 size="lg" 
