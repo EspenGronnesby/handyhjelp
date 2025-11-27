@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { EditModeProvider } from "./contexts/EditModeContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -39,10 +40,11 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner position="top-center" duration={2000} />
-        <BrowserRouter>
-          <ScrollToTop />
+        <EditModeProvider>
+          <Toaster />
+          <Sonner position="top-center" duration={2000} />
+          <BrowserRouter>
+            <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/tilbud" element={<QuotePage />} />
@@ -75,6 +77,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        </EditModeProvider>
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>

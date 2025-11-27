@@ -381,6 +381,7 @@ export type Database = {
           company_name: string | null
           created_at: string
           customer_type: string | null
+          edit_mode_enabled: boolean | null
           email: string
           full_name: string
           id: string
@@ -393,6 +394,7 @@ export type Database = {
           company_name?: string | null
           created_at?: string
           customer_type?: string | null
+          edit_mode_enabled?: boolean | null
           email: string
           full_name: string
           id: string
@@ -405,6 +407,7 @@ export type Database = {
           company_name?: string | null
           created_at?: string
           customer_type?: string | null
+          edit_mode_enabled?: boolean | null
           email?: string
           full_name?: string
           id?: string
@@ -650,6 +653,84 @@ export type Database = {
           total_area?: number | null
           units_count?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      site_colors: {
+        Row: {
+          color_key: string
+          color_value: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          color_key: string
+          color_value: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          color_key?: string
+          color_value?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          content_key: string
+          content_type: string | null
+          content_value: string
+          id: string
+          section: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          content_key: string
+          content_type?: string | null
+          content_value: string
+          id?: string
+          section: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          content_key?: string
+          content_type?: string | null
+          content_value?: string
+          id?: string
+          section?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      site_images: {
+        Row: {
+          alt_text: string | null
+          id: string
+          image_key: string
+          image_url: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          id?: string
+          image_key: string
+          image_url: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          id?: string
+          image_key?: string
+          image_url?: string
+          updated_at?: string | null
+          updated_by?: string | null
         }
         Relationships: []
       }

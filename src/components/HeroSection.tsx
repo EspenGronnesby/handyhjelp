@@ -3,6 +3,7 @@ import { QuoteForm } from "@/components/QuoteForm";
 import { Phone } from "lucide-react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
+import { EditableWrapper } from "@/components/EditableWrapper";
 import heroDefaultImage from "@/assets/hero-building-maintenance.jpg";
 
 export const HeroSection = () => {
@@ -28,14 +29,18 @@ export const HeroSection = () => {
           {/* Left Content */}
           <div className="text-left">
             {/* Main Heading - Minimalist */}
-            <h1 className="text-4xl md:text-7xl font-bold mb-6 md:mb-8 animate-fade-in-left font-heading text-white leading-tight">
-              Vi tar vare på <br className="hidden md:block" />dine bygg
-            </h1>
+            <EditableWrapper section="hero-home" contentKey="title" type="text">
+              <h1 className="text-4xl md:text-7xl font-bold mb-6 md:mb-8 animate-fade-in-left font-heading text-white leading-tight">
+                Vi tar vare på <br className="hidden md:block" />dine bygg
+              </h1>
+            </EditableWrapper>
             
             {/* Short Tagline */}
-            <p className="text-white/90 text-xl md:text-2xl mb-8 md:mb-12 animate-fade-in-left">
-              Vaktmester • Tømrer • Blikk
-            </p>
+            <EditableWrapper section="hero-home" contentKey="subtitle" type="text">
+              <p className="text-white/90 text-xl md:text-2xl mb-8 md:mb-12 animate-fade-in-left">
+                Vaktmester • Tømrer • Blikk
+              </p>
+            </EditableWrapper>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-left mb-12">
