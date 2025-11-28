@@ -1,40 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export const useEditableContent = (section: string, contentKey: string) => {
-  const [content, setContent] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('site_content')
-          .select('content_value')
-          .eq('section', section)
-          .eq('content_key', contentKey)
-          .maybeSingle();
+  const { data: content = '', isLoading } = useQuery({
+    queryKey: ['site-content', section, contentKey],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('content_value')
+        .eq('section', section)
+        .eq('content_key', contentKey)
+        .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') {
-          throw error;
-        }
-        
-        if (data) {
-          setContent(data.content_value);
-        }
-      } catch (error) {
-        console.log('No content found, using default');
-      } finally {
-        setIsLoading(false);
+      if (error && error.code !== 'PGRST116') {
+        throw error;
       }
-    };
-
-    fetchContent();
-  }, [section, contentKey]);
+      
+      return data?.content_value || '';
+    },
+    staleTime: 1000 * 60 * 5, // Cache i 5 minutter
+  });
 
   const updateContent = async (newValue: string) => {
+    // Optimistic update
+    queryClient.setQueryData(
+      ['site-content', section, contentKey],
+      newValue
+    );
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -56,7 +53,10 @@ export const useEditableContent = (section: string, contentKey: string) => {
 
       if (error) throw error;
 
-      setContent(newValue);
+      // Invalider queries for å sikre synkronisering
+      queryClient.invalidateQueries({ 
+        queryKey: ['site-content', section] 
+      });
       
       toast({
         title: "✅ Lagret",
@@ -65,6 +65,11 @@ export const useEditableContent = (section: string, contentKey: string) => {
 
       return true;
     } catch (error) {
+      // Revert optimistic update ved feil
+      queryClient.invalidateQueries({ 
+        queryKey: ['site-content', section, contentKey] 
+      });
+
       console.error('Update error:', error);
       toast({
         title: "❌ Feil ved lagring",
