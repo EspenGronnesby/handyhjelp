@@ -13,6 +13,7 @@ import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
+import { EditableHero } from "@/components/EditableHero";
 
 const Services = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('services', servicesBackground);
@@ -121,17 +122,12 @@ const Services = () => {
         {/* Content over background */}
         <div className="relative z-10 w-full py-20">
           <div className="container mx-auto px-4">
-            <div className="text-center max-w-4xl mx-auto mb-12">
-              <h1 className="text-5xl md:text-6xl font-heading font-bold mb-6 tracking-tight">
-                Våre tjenester
-              </h1>
-              <p className="text-xl md:text-2xl text-foreground/90 mb-4">
-                Fra vaktmester til tømrer – vi har ekspertisen du trenger
-              </p>
-              <p className="text-lg text-muted-foreground">
-                Profesjonelle håndverkstjenester til konkurransedyktige priser
-              </p>
-            </div>
+            <EditableHero
+              section="hero-tjenester"
+              defaultHeading="Våre tjenester"
+              defaultSubtext="Fra vaktmester til tømrer – vi har ekspertisen du trenger. Profesjonelle håndverkstjenester til konkurransedyktige priser"
+              className="max-w-4xl mx-auto mb-12"
+            />
 
             {/* Editable CTA Box */}
             <EditableCTABox />

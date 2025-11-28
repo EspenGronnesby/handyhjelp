@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EditableHero } from "@/components/EditableHero";
 
 interface BlogPost {
   id: string;
@@ -91,14 +92,12 @@ const Blog = () => {
       {/* Hero Section */}
       <section className="pt-32 pb-12 bg-gradient-to-b from-background to-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
-              Gode råd for eiendomsvedlikehold
-            </h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Praktiske tips og veiledning fra våre erfarne fagfolk
-            </p>
-          </div>
+          <EditableHero
+            section="hero-rad"
+            defaultHeading="Gode råd for eiendomsvedlikehold"
+            defaultSubtext="Praktiske tips og veiledning fra våre erfarne fagfolk"
+            className="max-w-3xl mx-auto"
+          />
         </div>
       </section>
 
