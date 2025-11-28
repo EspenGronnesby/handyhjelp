@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Loader2 } from "lucide-react";
+import { EditableHero } from "@/components/EditableHero";
+import { EditableContactInfo } from "@/components/EditableContactInfo";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -130,18 +132,15 @@ const Contact = () => {
       <main className="pt-32 pb-16">
         {/* Hero Section */}
         <section className="container mx-auto px-4 mb-16">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-5xl font-bold mb-6 text-foreground">
-              Ta kontakt i dag
-            </h1>
-            <p className="text-xl text-muted-foreground mb-4">
-              Vi er her for å hjelpe deg med alle dine eiendomsbehov. 
-              Kontakt oss for en uforpliktende samtale.
-            </p>
-            <p className="text-lg font-semibold text-primary">
-              ⏱️ Vi svarer innen 1-3 virkedager
-            </p>
-          </div>
+          <EditableHero
+            section="hero-kontakt"
+            defaultHeading="Ta kontakt i dag"
+            defaultSubtext="Vi er her for å hjelpe deg med alle dine eiendomsbehov. Kontakt oss for en uforpliktende samtale."
+            className="max-w-3xl mx-auto"
+          />
+          <p className="text-lg font-semibold text-primary text-center mt-4">
+            ⏱️ Vi svarer innen 1-3 virkedager
+          </p>
         </section>
 
         <div className="container mx-auto px-4">
@@ -215,48 +214,7 @@ const Contact = () => {
               <Card>
                 <CardContent className="pt-6">
                   <h2 className="text-2xl font-bold mb-6">Kontaktinformasjon</h2>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3">
-                      <MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                      <div>
-                        <p className="font-semibold">Adresse</p>
-                        <a 
-                          href="https://www.google.com/maps/place/Ægirsvei+3,+Kristiansand" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline"
-                        >
-                          Ægirsvei 3, Kristiansand
-                        </a>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Phone className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                      <div>
-                        <p className="font-semibold">Telefon</p>
-                        <a href="tel:+4741250553" className="text-primary hover:underline">
-                          +47 41250553
-                        </a>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Mail className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                      <div>
-                        <p className="font-semibold">E-post</p>
-                        <a href="mailto:Team@handyhjelp.no" className="text-primary hover:underline">
-                          Team@handyhjelp.no
-                        </a>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Clock className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                      <div>
-                        <p className="font-semibold">Åpningstider</p>
-                        <p className="text-muted-foreground">Mandag - Fredag: 09:00 - 17:00</p>
-                        <p className="text-muted-foreground text-sm">Responstid: 1-3 virkedager</p>
-                      </div>
-                    </div>
-                  </div>
+                  <EditableContactInfo />
                 </CardContent>
               </Card>
 

@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin } from "lucide-react";
+import { EditableHero } from "@/components/EditableHero";
 
 interface Project {
   id: string;
@@ -111,48 +112,46 @@ const Projects = () => {
       <main className="pt-32 pb-16">
         <div className="container mx-auto px-4">
           {/* Header Section */}
-          <div className="text-center mb-12">
-            <h1 className="heading-section font-heading mb-4">
-              Våre prosjekter
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
-              Se hvordan vi transformerer eiendom med kvalitetsarbeid – før og etter bilder fra våre beste prosjekter
-            </p>
+          <EditableHero
+            section="hero-prosjekter"
+            defaultHeading="Våre prosjekter"
+            defaultSubtext="Se hvordan vi transformerer eiendom med kvalitetsarbeid – før og etter bilder fra våre beste prosjekter"
+            className="mb-12"
+          />
 
-            {/* Category Filter */}
-            {projects.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-3 mb-8">
-                <Button
-                  variant={activeCategory === null ? "default" : "outline"}
-                  onClick={() => handleCategoryFilter(null)}
-                  className="px-6"
-                >
-                  Alle ({projects.length})
-                </Button>
-                <Button
-                  variant={activeCategory === "vaktmester" ? "default" : "outline"}
-                  onClick={() => handleCategoryFilter("vaktmester")}
-                  className="px-6"
-                >
-                  🔧 Vaktmester ({projects.filter(p => p.category === "vaktmester").length})
-                </Button>
-                <Button
-                  variant={activeCategory === "tomrer" ? "default" : "outline"}
-                  onClick={() => handleCategoryFilter("tomrer")}
-                  className="px-6"
-                >
-                  🔨 Tømrer ({projects.filter(p => p.category === "tomrer").length})
-                </Button>
-                <Button
-                  variant={activeCategory === "blikk" ? "default" : "outline"}
-                  onClick={() => handleCategoryFilter("blikk")}
-                  className="px-6"
-                >
-                  💧 Blikk ({projects.filter(p => p.category === "blikk").length})
-                </Button>
-              </div>
-            )}
-          </div>
+          {/* Category Filter */}
+          {projects.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              <Button
+                variant={activeCategory === null ? "default" : "outline"}
+                onClick={() => handleCategoryFilter(null)}
+                className="px-6"
+              >
+                Alle ({projects.length})
+              </Button>
+              <Button
+                variant={activeCategory === "vaktmester" ? "default" : "outline"}
+                onClick={() => handleCategoryFilter("vaktmester")}
+                className="px-6"
+              >
+                🔧 Vaktmester ({projects.filter(p => p.category === "vaktmester").length})
+              </Button>
+              <Button
+                variant={activeCategory === "tomrer" ? "default" : "outline"}
+                onClick={() => handleCategoryFilter("tomrer")}
+                className="px-6"
+              >
+                🔨 Tømrer ({projects.filter(p => p.category === "tomrer").length})
+              </Button>
+              <Button
+                variant={activeCategory === "blikk" ? "default" : "outline"}
+                onClick={() => handleCategoryFilter("blikk")}
+                className="px-6"
+              >
+                💧 Blikk ({projects.filter(p => p.category === "blikk").length})
+              </Button>
+            </div>
+          )}
 
           {/* Loading State */}
           {isLoading ? (

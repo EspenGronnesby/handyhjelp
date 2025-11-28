@@ -1,7 +1,8 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Accordion } from "@/components/ui/accordion";
 import { FAQSchema, defaultFAQItems } from "@/components/SEO/FAQSchema";
 import { Button } from "@/components/ui/button";
 import { Phone } from "lucide-react";
+import { EditableFAQItem } from "@/components/EditableFAQItem";
 
 export const FAQSection = () => {
   return (
@@ -19,14 +20,13 @@ export const FAQSection = () => {
         <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="space-y-4">
             {defaultFAQItems.map((item, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="card-professional px-6">
-                <AccordionTrigger className="text-left py-6 hover:no-underline">
-                  <span className="font-semibold text-foreground">{item.question}</span>
-                </AccordionTrigger>
-                <AccordionContent className="pb-6 text-muted-foreground leading-relaxed">
-                  {item.answer}
-                </AccordionContent>
-              </AccordionItem>
+              <EditableFAQItem
+                key={index}
+                section={`faq-item-${index + 1}`}
+                defaultQuestion={item.question}
+                defaultAnswer={item.answer}
+                index={index}
+              />
             ))}
           </Accordion>
 
