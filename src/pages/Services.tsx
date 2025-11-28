@@ -11,6 +11,8 @@ import { useEffect } from "react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
+import { EditableCTABox } from "@/components/EditableCTABox";
+import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 
 const Services = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('services', servicesBackground);
@@ -131,25 +133,8 @@ const Services = () => {
               </p>
             </div>
 
-            {/* CTA Box with subtle animation */}
-            <Card className="max-w-2xl mx-auto text-center shadow-xl border-primary/20 animate-fade-in">
-              <CardHeader>
-                <CardTitle className="text-2xl">Trenger du et pristilbud?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6 text-lg">
-                  Kontakt oss for et skreddersydd pristilbud basert på dine behov.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button variant="cta" size="lg" onClick={() => window.location.href = '/tilbud'} className="text-lg px-8">
-                    Få gratis tilbud
-                  </Button>
-                  <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'} className="text-lg px-8">
-                    Ring oss: +47 41250553
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Editable CTA Box */}
+            <EditableCTABox />
           </div>
         </div>
       </div>
@@ -385,36 +370,8 @@ const Services = () => {
         </div>
       </section>
 
-      {/* CTA Section - Full width with gradient */}
-      <section className="py-20 bg-gradient-to-r from-primary/90 to-primary text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-heading font-bold mb-6">
-            Klar til å komme i gang?
-          </h2>
-          <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto opacity-95">
-            Få et uforpliktende tilbud på dine håndverksbehov i dag
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/tilbud">
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="bg-background text-primary hover:bg-background/90 border-background text-lg px-10"
-              >
-                Få tilbud
-              </Button>
-            </Link>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={() => window.location.href = 'tel:+4741250553'}
-              className="border-background/50 text-background hover:bg-background/10 text-lg px-10"
-            >
-              Ring oss: +47 412 50 553
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* Editable Bottom CTA Section */}
+      <EditableBottomCTA />
 
       <Footer />
     </div>
