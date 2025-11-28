@@ -5,8 +5,10 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin } from "lucide-react";
-import { EditableWrapper } from "./EditableWrapper";
 import { useEditableContent } from "@/hooks/useEditableContent";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { Pencil } from "lucide-react";
+import { SectionHeadingEditModal } from "./SectionHeadingEditModal";
 
 interface Project {
   id: string;
@@ -25,8 +27,13 @@ export const ProjectsSection = () => {
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
   const [touchedProject, setTouchedProject] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { editMode, isAdmin } = useEditMode();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { content: heading } = useEditableContent('home-sections', 'projects-heading');
   const { content: subheading } = useEditableContent('home-sections', 'projects-subheading');
+  
+  const displayHeading = heading || 'Våre prosjekter';
+  const displaySubheading = subheading || 'Se resultatet av vårt arbeid – før og etter bilder av våre siste prosjekter';
 
   useEffect(() => {
     fetchProjects();
@@ -99,29 +106,24 @@ export const ProjectsSection = () => {
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <EditableWrapper
-            section="home-sections"
-            contentKey="projects-heading"
-            label="Overskrift: Våre prosjekter"
-            maxLength={50}
-          >
-            <h2 className="heading-section font-heading mb-4">
-              {heading || 'Våre prosjekter'}
-            </h2>
-          </EditableWrapper>
+        <div className="relative text-center mb-12">
+          {isAdmin && editMode && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="absolute top-0 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
+              aria-label="Rediger Våre prosjekter overskrift"
+            >
+              <Pencil className="h-5 w-5 text-primary" />
+            </button>
+          )}
           
-          <EditableWrapper
-            section="home-sections"
-            contentKey="projects-subheading"
-            label="Underoverskrift: Våre prosjekter"
-            maxLength={150}
-            multiline
-          >
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              {subheading || 'Se resultatet av vårt arbeid – før og etter bilder av våre siste prosjekter'}
-            </p>
-          </EditableWrapper>
+          <h2 className="heading-section font-heading mb-4">
+            {displayHeading}
+          </h2>
+          
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            {displaySubheading}
+          </p>
         </div>
 
         {projects.length === 0 ? (
@@ -224,6 +226,17 @@ export const ProjectsSection = () => {
           </>
         )}
       </div>
+      
+      <SectionHeadingEditModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        section="home-sections"
+        currentData={{
+          heading: displayHeading,
+          subheading: displaySubheading
+        }}
+        sectionLabel="Våre prosjekter"
+      />
     </section>
   );
 };

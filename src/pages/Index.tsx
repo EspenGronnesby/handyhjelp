@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
@@ -10,39 +11,55 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { EditableServiceCard } from "@/components/EditableServiceCard";
-import { EditableWrapper } from "@/components/EditableWrapper";
 import { useEditableContent } from "@/hooks/useEditableContent";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { Pencil } from "lucide-react";
+import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
 
 // Component for Services Section Heading
 const ServicesHeading = () => {
+  const { editMode, isAdmin } = useEditMode();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const { content: heading } = useEditableContent('home-sections', 'services-heading');
   const { content: subheading } = useEditableContent('home-sections', 'services-subheading');
   
+  const displayHeading = heading || 'Våre tjenester';
+  const displaySubheading = subheading || 'Profesjonell håndverksarbeid for alle behov';
+  
   return (
-    <div className="text-center mb-12">
-      <EditableWrapper
-        section="home-sections"
-        contentKey="services-heading"
-        label="Overskrift: Våre tjenester"
-        maxLength={50}
-      >
+    <>
+      <div className="relative text-center mb-12">
+        {isAdmin && editMode && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="absolute top-0 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
+            aria-label="Rediger Våre tjenester overskrift"
+          >
+            <Pencil className="h-5 w-5 text-primary" />
+          </button>
+        )}
+        
         <h2 className="heading-section font-heading">
-          {heading || 'Våre tjenester'}
+          {displayHeading}
         </h2>
-      </EditableWrapper>
-      
-      <EditableWrapper
-        section="home-sections"
-        contentKey="services-subheading"
-        label="Underoverskrift: Våre tjenester"
-        maxLength={150}
-        multiline
-      >
+        
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          {subheading || 'Profesjonell håndverksarbeid for alle behov'}
+          {displaySubheading}
         </p>
-      </EditableWrapper>
-    </div>
+      </div>
+
+      <SectionHeadingEditModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        section="home-sections"
+        currentData={{
+          heading: displayHeading,
+          subheading: displaySubheading
+        }}
+        sectionLabel="Våre tjenester"
+      />
+    </>
   );
 };
 
