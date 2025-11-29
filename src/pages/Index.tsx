@@ -15,6 +15,8 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { Pencil } from "lucide-react";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
+import { EditableCTABox } from "@/components/EditableCTABox";
+import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 
 // Component for Services Section Heading
 const ServicesHeading = () => {
@@ -150,51 +152,13 @@ const Index = () => {
             </div>
 
             <div className="text-center">
-              <div className="bg-primary/5 p-8 rounded-xl max-w-3xl mx-auto border-2 border-primary shadow-lg">
-                <h3 className="text-2xl font-bold text-foreground mb-4 font-heading">Faste avtaler for bedrifter</h3>
-                <div className="space-y-3 text-muted-foreground mb-6">
-                  <p className="text-lg">
-                    <span className="font-semibold text-foreground">Spar tid og penger</span> med en fast serviceavtale
-                  </p>
-                  <p>Få fast kontaktperson, prioritert service og forutsigbare kostnader</p>
-                  <p className="text-sm">Avtaler fra 1 dag til 5 år • Automatisk fakturering • Fleksible betingelser</p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button 
-                    asChild
-                    size="lg"
-                    className="bg-success hover:bg-success-hover"
-                  >
-                    <Link to="/fast-avtale">Forespør fast avtale</Link>
-                  </Button>
-                  <Button 
-                    size="lg"
-                    variant="outline"
-                    className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                    onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
-                  >
-                    Engangsjobb
-                  </Button>
-                </div>
-              </div>
+              <EditableCTABox />
             </div>
           </div>
         </section>
 
         {/* Standalone Quote Form Section */}
-        <section className="py-16 bg-muted/30" id="quote-standalone" aria-labelledby="quote-heading">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto">
-              <div className="text-center mb-8">
-                <h2 id="quote-heading" className="heading-section">Klar for å komme i gang?</h2>
-                <p className="text-muted-foreground text-lg">
-                  Send inn din forespørsel og få kontakt med lokale fagfolk.
-                </p>
-              </div>
-              <QuoteForm />
-            </div>
-          </div>
-        </section>
+        <EditableBottomCTA />
       </main>
 
       {/* Customer Portal Link */}
