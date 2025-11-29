@@ -30,7 +30,7 @@ export const EditableHero = ({
 
   return (
     <>
-      <section className={`relative text-center ${className}`}>
+      <section className={`relative flex items-center justify-center text-center ${className}`}>
         {/* Edit icon - always visible in edit mode */}
         {isAdmin && editMode && (
           <button
@@ -51,10 +51,10 @@ export const EditableHero = ({
         )}
 
         <div className="relative z-10">
-          <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
+          <h1 className={`text-4xl md:text-5xl font-heading font-bold mb-4 ${backgroundImage ? 'text-white' : ''}`}>
             {displayHeading}
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className={`text-lg max-w-2xl mx-auto ${backgroundImage ? 'text-white/90' : 'text-muted-foreground'}`}>
             {displaySubtext}
           </p>
         </div>

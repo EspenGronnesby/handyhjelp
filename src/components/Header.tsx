@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Menu, Phone, Mail, User, LogOut } from "lucide-react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
@@ -10,7 +10,10 @@ export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+
+  const isActive = (path: string) => location.pathname === path;
 
   const handleSignOut = async () => {
     await signOut();
@@ -58,25 +61,25 @@ export const Header = () => {
           <div className="flex items-center space-x-4 relative z-10">
             {/* Navigation Links */}
             <nav className="hidden md:flex items-center space-x-6">
-              <Link to="/" className="text-foreground hover:text-primary transition-colors text-sm">
+              <Link to="/" className={`transition-colors text-sm ${isActive('/') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
                 Hjem
               </Link>
-              <Link to="/tjenester" className="text-foreground hover:text-primary transition-colors text-sm">
+              <Link to="/tjenester" className={`transition-colors text-sm ${isActive('/tjenester') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
                 Tjenester
               </Link>
-              <Link to="/prosjekter" className="text-foreground hover:text-primary transition-colors text-sm">
+              <Link to="/prosjekter" className={`transition-colors text-sm ${isActive('/prosjekter') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
                 Prosjekter
               </Link>
-              <Link to="/raad" className="text-foreground hover:text-primary transition-colors text-sm">
+              <Link to="/raad" className={`transition-colors text-sm ${isActive('/raad') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
                 Råd
               </Link>
-              <Link to="/om-oss" className="text-foreground hover:text-primary transition-colors text-sm">
+              <Link to="/om-oss" className={`transition-colors text-sm ${isActive('/om-oss') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
                 Om oss
               </Link>
-              <Link to="/kontakt" className="text-foreground hover:text-primary transition-colors text-sm">
+              <Link to="/kontakt" className={`transition-colors text-sm ${isActive('/kontakt') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
                 Kontakt
               </Link>
-              <Link to="/faq" className="text-foreground hover:text-primary transition-colors text-sm">
+              <Link to="/faq" className={`transition-colors text-sm ${isActive('/faq') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
                 FAQ
               </Link>
             </nav>
@@ -133,49 +136,49 @@ export const Header = () => {
               <div className="container mx-auto px-4 py-4 space-y-4">
                 <Link 
                   to="/" 
-                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  className={`block transition-colors py-2 ${isActive('/') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Hjem
                 </Link>
                 <Link 
                   to="/tjenester" 
-                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  className={`block transition-colors py-2 ${isActive('/tjenester') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Tjenester
                 </Link>
                 <Link 
                   to="/prosjekter" 
-                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  className={`block transition-colors py-2 ${isActive('/prosjekter') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Prosjekter
                 </Link>
                 <Link
                   to="/raad" 
-                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  className={`block transition-colors py-2 ${isActive('/raad') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Råd
                 </Link>
                 <Link 
                   to="/om-oss" 
-                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  className={`block transition-colors py-2 ${isActive('/om-oss') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Om oss
                 </Link>
                 <Link 
                   to="/kontakt" 
-                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  className={`block transition-colors py-2 ${isActive('/kontakt') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Kontakt
                 </Link>
                 <Link 
                   to="/faq" 
-                  className="block text-foreground hover:text-primary transition-colors py-2"
+                  className={`block transition-colors py-2 ${isActive('/faq') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   FAQ
