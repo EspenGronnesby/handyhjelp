@@ -31,6 +31,13 @@ export const EditableTimeline = () => {
     { year: year6 || '2025', event: event6 || 'Over 200 faste kunder og 20+ års erfaring' },
   ];
 
+  // Filter out empty timeline items
+  const filteredTimeline = timeline.filter(item => {
+    const hasYear = item.year && item.year.trim() !== '';
+    const hasEvent = item.event && item.event.trim() !== '';
+    return hasYear || hasEvent;
+  });
+
   return (
     <>
       <div className="bg-muted rounded-2xl p-12 mb-20 relative">
@@ -46,7 +53,7 @@ export const EditableTimeline = () => {
         <h2 className="text-3xl font-bold text-center mb-12">{heading || 'Vår reise'}</h2>
         <div className="max-w-4xl mx-auto">
           <div className="space-y-8">
-            {timeline.map((item, index) => (
+            {filteredTimeline.map((item, index) => (
               <div key={index} className="flex gap-6 items-start">
                 <div className="flex-shrink-0 w-20 text-right">
                   <span className="text-2xl font-bold text-primary">{item.year}</span>
