@@ -14,9 +14,10 @@ import { EditableTimeline } from "@/components/EditableTimeline";
 import { EditableWhyUs } from "@/components/EditableWhyUs";
 import { EditableCertifications } from "@/components/EditableCertifications";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
+import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 
 const About = () => {
-  const { heroImage } = useHeroImage('about', heroAboutImg);
+  const { heroImage, opacity, refetch: refetchHero } = useHeroImage('about', heroAboutImg);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,13 +53,16 @@ const About = () => {
       
       <main>
         {/* Hero Section with Background Image */}
-        <EditableHero 
-          section="hero-om-oss"
-          defaultHeading="Om HandyHjelp"
-          defaultSubtext="Din pålitelige partner for eiendomspleie og håndverksarbeid"
-          backgroundImage={heroImage}
-          className="h-[500px]"
-        />
+        <div className="relative">
+          <HeroImageEditor page="about" currentImageUrl={heroImage} onImageUpdate={refetchHero} />
+          <EditableHero 
+            section="hero-om-oss"
+            defaultHeading="Om HandyHjelp"
+            defaultSubtext="Din pålitelige partner for eiendomspleie og håndverksarbeid"
+            backgroundImage={heroImage}
+            className="h-[500px]"
+          />
+        </div>
 
         {/* Main Content */}
         <section className="container mx-auto px-4 py-20">
