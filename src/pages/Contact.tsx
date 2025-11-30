@@ -10,6 +10,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Loader2 } from "lucide-react";
 import { EditableHero } from "@/components/EditableHero";
 import { EditableContactInfo } from "@/components/EditableContactInfo";
+import { EditableHowWeWork } from "@/components/EditableHowWeWork";
+import { EditableFAQItem } from "@/components/EditableFAQItem";
+import { Accordion } from "@/components/ui/accordion";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -254,64 +257,7 @@ const Contact = () => {
               {/* How We Work */}
               <Card>
                 <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-6">Hvordan vi jobber</h2>
-                  <div className="space-y-4">
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                        1
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Ta kontakt</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Ring eller send e-post med din forespørsel
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                        2
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Vi svarer raskt</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Vi kommer tilbake til deg innen 1-3 virkedager
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                        3
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Befaring</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Vi avtaler befaring og lager tilbud
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                        4
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Utførelse</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Vi utfører jobben profesjonelt og effektivt
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                        5
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Kvalitetskontroll</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Vi sikrer at alt er gjort etter dine ønsker
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <EditableHowWeWork />
                 </CardContent>
               </Card>
             </div>
@@ -322,16 +268,32 @@ const Contact = () => {
             <h2 className="text-3xl font-bold text-center mb-8">
               Ofte stilte spørsmål før du kontakter oss
             </h2>
-            <div className="space-y-4">
-              {faqItems.map((item, index) => (
-                <Card key={index}>
-                  <CardContent className="pt-6">
-                    <h3 className="font-semibold mb-2 text-lg">{item.question}</h3>
-                    <p className="text-muted-foreground">{item.answer}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <Accordion type="single" collapsible className="space-y-4">
+              <EditableFAQItem
+                section="faq-contact"
+                defaultQuestion="Hvor raskt kan dere komme?"
+                defaultAnswer="For akutte henvendelser kan vi ofte være på stedet samme dag. Planlagte oppdrag avtales etter dine ønsker."
+                index={1}
+              />
+              <EditableFAQItem
+                section="faq-contact"
+                defaultQuestion="Tar dere oppdrag på kveldstid?"
+                defaultAnswer="Ja, vi tilbyr både kveldstjenester og helgetjenester mot et lite tillegg."
+                index={2}
+              />
+              <EditableFAQItem
+                section="faq-contact"
+                defaultQuestion="Må jeg være hjemme under arbeidet?"
+                defaultAnswer="Det er ikke nødvendig. Mange av våre kunder gir oss nøkkel eller kode til jobben."
+                index={3}
+              />
+              <EditableFAQItem
+                section="faq-contact"
+                defaultQuestion="Hvor lang er responstiden?"
+                defaultAnswer="Vi svarer på alle henvendelser innen 1-3 virkedager i åpningstiden."
+                index={4}
+              />
+            </Accordion>
           </section>
         </div>
       </main>
