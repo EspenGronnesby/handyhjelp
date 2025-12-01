@@ -10,25 +10,16 @@ import { Helmet } from "react-helmet";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
+import { EditableServiceHero } from "@/components/service-edit/EditableServiceHero";
+import { EditableServiceAbout } from "@/components/service-edit/EditableServiceAbout";
+import { EditableServiceIncluded } from "@/components/service-edit/EditableServiceIncluded";
+import { EditableServiceTarget } from "@/components/service-edit/EditableServiceTarget";
+import { EditableServicePricing } from "@/components/service-edit/EditableServicePricing";
+import { EditableServiceBenefits } from "@/components/service-edit/EditableServiceBenefits";
+import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 
 const ServiceVaktmester = () => {
   const { heroImage, opacity, refetch } = useHeroImage('services-vaktmester', servicesBackground);
-  const benefits = [
-    "Erfarne fagfolk med mange års erfaring",
-    "Fast kontaktperson for din eiendom",
-    "Konkurransedyktige priser",
-    "Rask respons på henvendelser"
-  ];
-
-  const included = [
-    "Daglig, ukentlig eller månedlig tilsyn av bygg",
-    "Renhold av fellesarealer og uteområder",
-    "Mindre reparasjoner og vedlikehold",
-    "Vintervedlikehold (strøing, snørydding)",
-    "Inspeksjonsrapporter og dokumentasjon",
-    "Fast kontaktperson",
-    "Akutt utrykning ved behov"
-  ];
 
   return (
     <div className="min-h-screen">
@@ -54,20 +45,12 @@ const ServiceVaktmester = () => {
         <div className="relative z-10">
           <section className="pt-32 pb-16">
             <div className="container mx-auto px-4">
-              <div className="text-center max-w-3xl mx-auto">
-                <div className="text-5xl mb-4">🔧</div>
-                <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
-                  Vaktmestertjenester
-                </h1>
-                <p className="text-lg text-muted-foreground mb-8">
-                  Profesjonell eiendomspleie og vedlikehold
-                </p>
-                <Link to="/tilbud">
-                  <Button variant="cta" size="lg">
-                    Bestill tjeneste
-                  </Button>
-                </Link>
-              </div>
+              <EditableServiceHero 
+                section="service-vaktmester"
+                defaultIcon="🔧"
+                defaultTitle="Vaktmestertjenester"
+                defaultSubtitle="Profesjonell eiendomspleie og vedlikehold"
+              />
             </div>
           </section>
         </div>
@@ -76,112 +59,51 @@ const ServiceVaktmester = () => {
       {/* Main Content */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 max-w-4xl">
-          {/* About Section */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Om vaktmestertjenester</h2>
-            <div className="space-y-4 text-muted-foreground">
-              <p>
-                Profesjonell eiendomspleie for borettslag, sameier og næringseiendom. Vi sørger for at ditt bygg holder seg i topp stand gjennom året med jevnlig tilsyn, vedlikehold og rask respons på akutte behov.
-              </p>
-              <p>
-                Våre erfarne vaktmestere har lang erfaring med alle typer eiendommer og sørger for at bygget ditt får den oppmerksomheten det fortjener. Vi tilbyr skreddersydde løsninger tilpasset dine behov, enten det er daglig, ukentlig eller månedlig service.
-              </p>
-              <p>
-                Med oss får du trygghet og forutsigbarhet. Vi følger opp, dokumenterer og sørger for at alle oppgaver blir utført til avtalt tid. Din eiendom er i trygge hender.
-              </p>
-            </div>
-          </div>
+          <EditableServiceAbout 
+            section="service-vaktmester"
+            defaultParagraph1="Profesjonell eiendomspleie for borettslag, sameier og næringseiendom. Vi sørger for at ditt bygg holder seg i topp stand gjennom året med jevnlig tilsyn, vedlikehold og rask respons på akutte behov."
+            defaultParagraph2="Våre erfarne vaktmestere har lang erfaring med alle typer eiendommer og sørger for at bygget ditt får den oppmerksomheten det fortjener. Vi tilbyr skreddersydde løsninger tilpasset dine behov, enten det er daglig, ukentlig eller månedlig service."
+            defaultParagraph3="Med oss får du trygghet og forutsigbarhet. Vi følger opp, dokumenterer og sørger for at alle oppgaver blir utført til avtalt tid. Din eiendom er i trygge hender."
+          />
 
-          {/* What's Included */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Hva er inkludert?</h2>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  {included.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <EditableServiceIncluded 
+            section="service-vaktmester"
+            defaultItems={[
+              "Daglig, ukentlig eller månedlig tilsyn av bygg",
+              "Renhold av fellesarealer og uteområder",
+              "Mindre reparasjoner og vedlikehold",
+              "Vintervedlikehold (strøing, snørydding)",
+              "Inspeksjonsrapporter og dokumentasjon",
+              "Fast kontaktperson",
+              "Akutt utrykning ved behov"
+            ]}
+          />
 
-          {/* Target Audience */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Hvem er dette for?</h2>
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-lg">
-                  <strong>Passer for:</strong> Borettslag, sameier, næringseiendom
-                </p>
-                <p className="text-muted-foreground mt-4">
-                  Våre vaktmestertjenester er spesielt tilpasset for større eiendommer med behov for jevnlig tilsyn og vedlikehold. Vi jobber tett med styrer, eiendomsforvaltere og ansvarlige for å sikre best mulig eiendomspleie.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <EditableServiceTarget 
+            section="service-vaktmester"
+            defaultTargetLabel="Borettslag, sameier, næringseiendom"
+            defaultDescription="Våre vaktmestertjenester er spesielt tilpasset for større eiendommer med behov for jevnlig tilsyn og vedlikehold. Vi jobber tett med styrer, eiendomsforvaltere og ansvarlige for å sikre best mulig eiendomspleie."
+          />
 
-          {/* Pricing */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Priser</h2>
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <p className="text-lg mb-4">
-                  Kontakt oss for et skreddersydd tilbud
-                </p>
-                <p className="text-muted-foreground">
-                  Priser varierer basert på størrelse, frekvens og omfang av tjenestene. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <EditableServicePricing 
+            section="service-vaktmester"
+            defaultPriceText="Kontakt oss for et skreddersydd tilbud"
+            defaultDescription="Priser varierer basert på størrelse, frekvens og omfang av tjenestene. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett."
+          />
 
-          {/* Why Choose Us */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Hvorfor velge oss?</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {benefits.map((benefit, idx) => (
-                <Card key={idx}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-success shrink-0 mt-0.5" />
-                      <span className="text-lg">{benefit}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <EditableServiceBenefits 
+            section="service-vaktmester"
+            defaultBenefits={[
+              "Erfarne fagfolk med mange års erfaring",
+              "Fast kontaktperson for din eiendom",
+              "Konkurransedyktige priser",
+              "Rask respons på henvendelser"
+            ]}
+          />
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-heading font-bold mb-4">
-              Klar til å komme i gang?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Få et uforpliktende tilbud i dag
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/tilbud">
-                <Button variant="cta" size="lg">
-                  Bestill tjeneste
-                </Button>
-              </Link>
-              <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'}>
-                <Phone className="mr-2 h-5 w-5" />
-                Ring oss: +47 412 50 553
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <EditableBottomCTA />
 
       <Footer />
     </div>

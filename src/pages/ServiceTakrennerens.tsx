@@ -11,33 +11,16 @@ import { Helmet } from "react-helmet";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
+import { EditableServiceHero } from "@/components/service-edit/EditableServiceHero";
+import { EditableServiceAbout } from "@/components/service-edit/EditableServiceAbout";
+import { EditableServiceIncluded } from "@/components/service-edit/EditableServiceIncluded";
+import { EditableServiceTarget } from "@/components/service-edit/EditableServiceTarget";
+import { EditableServicePricing } from "@/components/service-edit/EditableServicePricing";
+import { EditableServiceBenefits } from "@/components/service-edit/EditableServiceBenefits";
+import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 
 const ServiceTakrennerens = () => {
   const { heroImage, opacity, refetch } = useHeroImage('services-takrennerens', servicesBackground);
-  const benefits = [
-    "Erfarne fagfolk med mange års erfaring",
-    "Fast kontaktperson for din eiendom",
-    "Konkurransedyktige priser",
-    "Rask respons på henvendelser"
-  ];
-
-  const included = [
-    "Grundig rensing av alle takrenner",
-    "Inspeksjon av beslag og feste",
-    "Fjerning av løv, mose og rusk",
-    "Sjekk av nedløpsrør",
-    "Rapport om eventuelle skader",
-    "Oppmøte og arbeid",
-    "Bortføring av avfall",
-    "Ferdig på under 2 timer"
-  ];
-
-  const priceIncludes = [
-    "Oppmøte og arbeid",
-    "Bortføring av avfall",
-    "Fast pris – ingen skjulte kostnader",
-    "Ferdig på under 2 timer"
-  ];
 
   return (
     <div className="min-h-screen">
@@ -63,23 +46,13 @@ const ServiceTakrennerens = () => {
         <div className="relative z-10">
           <section className="pt-32 pb-16">
             <div className="container mx-auto px-4">
-              <div className="text-center max-w-3xl mx-auto">
-                <Badge className="mb-4 bg-success text-success-foreground">
-                  Populær
-                </Badge>
-                <div className="text-5xl mb-4">🌧️</div>
-                <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
-                  Takrennerens
-                </h1>
-                <p className="text-lg text-muted-foreground mb-8">
-                  Profesjonell rensing og vedlikehold av takrenner
-                </p>
-                <Link to="/tilbud">
-                  <Button variant="cta" size="lg">
-                    Bestill takrennerens
-                  </Button>
-                </Link>
-              </div>
+              <EditableServiceHero 
+                section="service-takrennerens"
+                defaultIcon="🌧️"
+                defaultTitle="Takrennerens"
+                defaultSubtitle="Profesjonell rensing og vedlikehold av takrenner"
+                showPopularBadge={true}
+              />
             </div>
           </section>
         </div>
@@ -88,120 +61,53 @@ const ServiceTakrennerens = () => {
       {/* Main Content */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 max-w-4xl">
-          {/* About Section */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Om takrennerens</h2>
-            <div className="space-y-4 text-muted-foreground">
-              <p>
-                Hold takrennene i topp stand! Tilstoppede takrenner kan føre til vannskader, fuktproblemer og dyre reparasjoner. Vi sørger for grundig rensing og vedlikehold slik at vannet dreneres riktig.
-              </p>
-              <p>
-                Våre erfarne fagfolk fjerner alle typer avfall fra takrennene dine – løv, mose, rusk og annet som kan blokkere for god drenering. Vi inspiserer samtidig beslag, feste og nedløpsrør for å sikre at alt fungerer som det skal.
-              </p>
-              <p>
-                Med vår tjeneste får du trygghet mot vannskader og lange levetid på takrennene. Vi leverer rask og profesjonell service til en fast, konkurransedyktig pris.
-              </p>
-            </div>
-          </div>
+          <EditableServiceAbout 
+            section="service-takrennerens"
+            defaultParagraph1="Hold takrennene i topp stand! Tilstoppede takrenner kan føre til vannskader, fuktproblemer og dyre reparasjoner. Vi sørger for grundig rensing og vedlikehold slik at vannet dreneres riktig."
+            defaultParagraph2="Våre erfarne fagfolk fjerner alle typer avfall fra takrennene dine – løv, mose, rusk og annet som kan blokkere for god drenering. Vi inspiserer samtidig beslag, feste og nedløpsrør for å sikre at alt fungerer som det skal."
+            defaultParagraph3="Med vår tjeneste får du trygghet mot vannskader og lange levetid på takrennene. Vi leverer rask og profesjonell service til en fast, konkurransedyktig pris."
+          />
 
-          {/* What's Included */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Hva er inkludert?</h2>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  {included.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <EditableServiceIncluded 
+            section="service-takrennerens"
+            defaultItems={[
+              "Grundig rensing av alle takrenner",
+              "Inspeksjon av beslag og feste",
+              "Fjerning av løv, mose og rusk",
+              "Sjekk av nedløpsrør",
+              "Rapport om eventuelle skader",
+              "Oppmøte og arbeid",
+              "Bortføring av avfall",
+              "Ferdig på under 2 timer"
+            ]}
+          />
 
-          {/* Target Audience */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Hvem er dette for?</h2>
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-lg">
-                  <strong>Passer for:</strong> Eneboligeiere, rekkehus, mindre bygg
-                </p>
-                <p className="text-muted-foreground mt-4">
-                  Vår takrennerens-tjeneste er perfekt for deg som ønsker å unngå kostbare vannskader og holde eiendommen i god stand. Vi anbefaler rensing minst 1-2 ganger i året, spesielt på høsten etter løvfall.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <EditableServiceTarget 
+            section="service-takrennerens"
+            defaultTargetLabel="Eneboligeiere, rekkehus, mindre bygg"
+            defaultDescription="Vår takrennerens-tjeneste er perfekt for deg som ønsker å unngå kostbare vannskader og holde eiendommen i god stand. Vi anbefaler rensing minst 1-2 ganger i året, spesielt på høsten etter løvfall."
+          />
 
-          {/* Pricing - Featured */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Priser</h2>
-            <Card className="border-success border-2">
-              <CardContent className="pt-6">
-                <div className="text-center mb-6">
-                  <p className="text-sm text-muted-foreground mb-2">Fast pris for enebolig</p>
-                  <p className="text-5xl font-bold text-success mb-4">3 390 kr</p>
-                  <p className="text-muted-foreground">Ingen skjulte kostnader</p>
-                </div>
-                <div className="space-y-3">
-                  <p className="font-semibold mb-3">Prisen inkluderer:</p>
-                  {priceIncludes.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <EditableServicePricing 
+            section="service-takrennerens"
+            defaultPriceText="3 390 kr"
+            defaultDescription="Fast pris for enebolig – ingen skjulte kostnader"
+            showFixedPrice={true}
+          />
 
-          {/* Why Choose Us */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-heading font-bold mb-6">Hvorfor velge oss?</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {benefits.map((benefit, idx) => (
-                <Card key={idx}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-success shrink-0 mt-0.5" />
-                      <span className="text-lg">{benefit}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <EditableServiceBenefits 
+            section="service-takrennerens"
+            defaultBenefits={[
+              "Erfarne fagfolk med mange års erfaring",
+              "Fast kontaktperson for din eiendom",
+              "Konkurransedyktige priser",
+              "Rask respons på henvendelser"
+            ]}
+          />
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-heading font-bold mb-4">
-              Klar til å komme i gang?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Få et uforpliktende tilbud i dag
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/tilbud">
-                <Button variant="cta" size="lg">
-                  Bestill takrennerens
-                </Button>
-              </Link>
-              <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'}>
-                <Phone className="mr-2 h-5 w-5" />
-                Ring oss: +47 412 50 553
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <EditableBottomCTA />
 
       <Footer />
     </div>
