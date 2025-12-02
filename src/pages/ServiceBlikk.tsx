@@ -33,27 +33,22 @@ const ServiceBlikk = () => {
       
       {/* Hero Section with Background */}
       <div 
-        className="relative bg-cover bg-center bg-fixed bg-no-repeat"
+        className="relative bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
         <div 
-          className="absolute inset-0 bg-background backdrop-blur-[2px]"
-          style={{ opacity }}
+          className="absolute inset-0 bg-black/60"
         ></div>
         <HeroImageEditor page="services-blikk" currentImageUrl={heroImage} onImageUpdate={refetch} />
         
         <div className="relative z-10">
-          <section className="pt-32 pb-16">
-            <div className="container mx-auto px-4">
-              <EditableServiceHero 
-                section="service-blikk-hero"
-                defaultIcon="💧"
-                defaultTitle="Blikkenslagertjenester"
-                defaultSubtitle="Sikker taktekningsløsninger og vannsystemer"
-                defaultButtonText="Bestill blikkenslager"
-              />
-            </div>
-          </section>
+          <EditableServiceHero 
+            section="service-blikk-hero"
+            defaultIcon="💧"
+            defaultTitle="Blikkenslagertjenester"
+            defaultSubtitle="Sikker taktekningsløsninger og vannsystemer"
+            defaultButtonText="Bestill blikkenslager"
+          />
         </div>
       </div>
 

@@ -93,6 +93,7 @@ const Index = () => {
         {/* Services Section - Compact Overview */}
         <section className="py-16 bg-background" id="services">
           <div className="container mx-auto px-4">
+            <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12">
             <ServicesHeading />
 
             
@@ -153,6 +154,7 @@ const Index = () => {
 
             <div className="text-center">
               <EditableCTABox />
+            </div>
             </div>
           </div>
         </section>
