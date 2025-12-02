@@ -46,10 +46,11 @@ const ServiceTomrer = () => {
           <section className="pt-32 pb-16">
             <div className="container mx-auto px-4">
               <EditableServiceHero 
-                section="service-tomrer"
+                section="service-tomrer-hero"
                 defaultIcon="🔨"
                 defaultTitle="Tømrertjenester"
                 defaultSubtitle="Kvalitetssnekring og konstruksjonsarbeid"
+                defaultButtonText="Bestill tømrer"
               />
             </div>
           </section>
@@ -81,13 +82,15 @@ const ServiceTomrer = () => {
 
           <EditableServiceTarget 
             section="service-tomrer"
-            defaultTargetLabel="Privatpersoner, bedrifter, boligselskaper"
+            defaultTarget="Privatpersoner, bedrifter, boligselskaper"
             defaultDescription="Våre tømrertjenester passer for alle som ønsker profesjonelt trearbeid, enten det er for bolig, hytte, næringseiendom eller offentlige bygg. Vi har erfaring med både store og små prosjekter."
           />
 
           <EditableServicePricing 
             section="service-tomrer"
-            defaultPriceText="Kontakt oss for et skreddersydd tilbud"
+            hasFixedPrice={false}
+            defaultPrice="Kontakt oss for et skreddersydd tilbud"
+            defaultPriceIncludes={[]}
             defaultDescription="Priser varierer basert på størrelse, kompleksitet og materialvalg. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett."
           />
 

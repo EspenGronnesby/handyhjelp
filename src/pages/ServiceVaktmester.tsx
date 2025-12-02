@@ -46,10 +46,11 @@ const ServiceVaktmester = () => {
           <section className="pt-32 pb-16">
             <div className="container mx-auto px-4">
               <EditableServiceHero 
-                section="service-vaktmester"
+                section="service-vaktmester-hero"
                 defaultIcon="🔧"
                 defaultTitle="Vaktmestertjenester"
                 defaultSubtitle="Profesjonell eiendomspleie og vedlikehold"
+                defaultButtonText="Bestill vaktmester"
               />
             </div>
           </section>
@@ -81,13 +82,15 @@ const ServiceVaktmester = () => {
 
           <EditableServiceTarget 
             section="service-vaktmester"
-            defaultTargetLabel="Borettslag, sameier, næringseiendom"
+            defaultTarget="Borettslag, sameier, næringseiendom"
             defaultDescription="Våre vaktmestertjenester er spesielt tilpasset for større eiendommer med behov for jevnlig tilsyn og vedlikehold. Vi jobber tett med styrer, eiendomsforvaltere og ansvarlige for å sikre best mulig eiendomspleie."
           />
 
           <EditableServicePricing 
             section="service-vaktmester"
-            defaultPriceText="Kontakt oss for et skreddersydd tilbud"
+            hasFixedPrice={false}
+            defaultPrice="Kontakt oss for et skreddersydd tilbud"
+            defaultPriceIncludes={[]}
             defaultDescription="Priser varierer basert på størrelse, frekvens og omfang av tjenestene. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett."
           />
 

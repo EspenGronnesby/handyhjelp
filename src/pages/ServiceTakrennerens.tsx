@@ -47,11 +47,13 @@ const ServiceTakrennerens = () => {
           <section className="pt-32 pb-16">
             <div className="container mx-auto px-4">
               <EditableServiceHero 
-                section="service-takrennerens"
+                section="service-takrennerens-hero"
                 defaultIcon="🌧️"
                 defaultTitle="Takrennerens"
                 defaultSubtitle="Profesjonell rensing og vedlikehold av takrenner"
-                showPopularBadge={true}
+                defaultButtonText="Bestill takrennerens"
+                showBadge={true}
+                badgeText="Populær"
               />
             </div>
           </section>
@@ -84,15 +86,16 @@ const ServiceTakrennerens = () => {
 
           <EditableServiceTarget 
             section="service-takrennerens"
-            defaultTargetLabel="Eneboligeiere, rekkehus, mindre bygg"
+            defaultTarget="Eneboligeiere, rekkehus, mindre bygg"
             defaultDescription="Vår takrennerens-tjeneste er perfekt for deg som ønsker å unngå kostbare vannskader og holde eiendommen i god stand. Vi anbefaler rensing minst 1-2 ganger i året, spesielt på høsten etter løvfall."
           />
 
           <EditableServicePricing 
             section="service-takrennerens"
-            defaultPriceText="3 390 kr"
+            hasFixedPrice={true}
+            defaultPrice="3 390 kr"
+            defaultPriceIncludes={["Fast pris for enebolig"]}
             defaultDescription="Fast pris for enebolig – ingen skjulte kostnader"
-            showFixedPrice={true}
           />
 
           <EditableServiceBenefits 

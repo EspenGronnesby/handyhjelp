@@ -22,9 +22,9 @@ interface ComparisonData {
 }
 
 const EditableComparisonSection = () => {
-  const { isEditMode } = useEditMode();
+  const { editMode } = useEditMode();
   const [isEditing, setIsEditing] = useState(false);
-  const { content, updateContent } = useEditableContent("comparison-section");
+  const { content, updateContent } = useEditableContent("comparison-section", "data");
 
   const defaultData: ComparisonData = {
     mainHeading: "Fast avtale = 10% rabatt",
@@ -65,7 +65,7 @@ const EditableComparisonSection = () => {
     <>
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4 relative">
-          {isEditMode && (
+          {editMode && (
             <button
               onClick={() => setIsEditing(true)}
               className="absolute top-2 right-2 z-10 p-2 bg-primary/10 hover:bg-primary/20 rounded-full border-2 border-primary transition-all hover:scale-110"
