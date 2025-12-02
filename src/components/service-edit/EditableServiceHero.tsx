@@ -90,7 +90,7 @@ export const EditableServiceHero = ({
 
   return (
     <>
-      <section className="pt-32 pb-16 relative">
+      <div className="h-[500px] flex items-center justify-center relative">
         {isAdmin && editMode && (
           <button
             onClick={() => setIsModalOpen(true)}
@@ -100,21 +100,29 @@ export const EditableServiceHero = ({
           </button>
         )}
         
+        {showBadge && (
+          <div className="absolute top-8 left-1/2 -translate-x-1/2 z-10">
+            <span className="bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+              {badgeText}
+            </span>
+          </div>
+        )}
+        
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="text-5xl mb-4">{displayData.icon}</div>
-            <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
+            <div className="text-6xl mb-6">{displayData.icon}</div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6 text-white drop-shadow-lg">
               {displayData.title}
             </h1>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-xl text-white/90 mb-8 drop-shadow-md">
               {displayData.subtitle}
             </p>
-            <Button variant="cta" size="lg">
+            <Button variant="cta" size="lg" className="text-lg px-8 py-6">
               {displayData.buttonText}
             </Button>
           </div>
         </div>
-      </section>
+      </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>

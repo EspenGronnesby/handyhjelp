@@ -80,8 +80,9 @@ export const ProcessSection = () => {
   const displayHeading = heading || 'Slik fungerer det';
   
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-16">
       <div className="container mx-auto px-4">
+        <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12">
         <div className="relative text-center mb-12">
           {isAdmin && editMode && (
             <button
@@ -135,6 +136,7 @@ export const ProcessSection = () => {
           >
             Kom i gang nå
           </Button>
+        </div>
         </div>
       </div>
       
