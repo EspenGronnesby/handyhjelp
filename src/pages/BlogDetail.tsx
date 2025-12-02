@@ -11,6 +11,7 @@ import { Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Helmet } from 'react-helmet';
 import { Skeleton } from '@/components/ui/skeleton';
+import DOMPurify from 'dompurify';
 
 interface BlogPost {
   id: string;
@@ -160,7 +161,7 @@ const BlogDetail = () => {
             {/* Article Content */}
             <div 
               className="blog-content"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
             />
 
             {/* CTA Card */}
