@@ -132,7 +132,7 @@ export const ProcessSection = () => {
           <Button 
             size="lg" 
             className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4"
-            onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={() => window.location.href = '/tilbud'}
           >
             Kom i gang nå
           </Button>

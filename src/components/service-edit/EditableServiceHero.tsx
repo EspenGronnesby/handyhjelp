@@ -117,7 +117,12 @@ export const EditableServiceHero = ({
             <p className="text-xl text-white/90 mb-8 drop-shadow-md">
               {displayData.subtitle}
             </p>
-            <Button variant="cta" size="lg" className="text-lg px-8 py-6">
+            <Button 
+              variant="cta" 
+              size="lg" 
+              className="text-lg px-8 py-6"
+              onClick={() => window.location.href = '/tilbud'}
+            >
               {displayData.buttonText}
             </Button>
           </div>
