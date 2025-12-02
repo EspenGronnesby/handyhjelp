@@ -17,9 +17,9 @@ interface PricingData {
 }
 
 const EditablePricingDetails = () => {
-  const { isEditMode } = useEditMode();
+  const { editMode } = useEditMode();
   const [isEditing, setIsEditing] = useState(false);
-  const { content, updateContent } = useEditableContent("pricing-details");
+  const { content, updateContent } = useEditableContent("pricing-details", "data");
 
   const defaultData: PricingData = {
     heading: "Hva inkluderer prisen?",
@@ -59,7 +59,7 @@ const EditablePricingDetails = () => {
     <>
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 relative">
-          {isEditMode && (
+          {editMode && (
             <button
               onClick={() => setIsEditing(true)}
               className="absolute top-2 right-2 z-10 p-2 bg-primary/10 hover:bg-primary/20 rounded-full border-2 border-primary transition-all hover:scale-110"

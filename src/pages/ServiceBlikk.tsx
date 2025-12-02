@@ -46,10 +46,11 @@ const ServiceBlikk = () => {
           <section className="pt-32 pb-16">
             <div className="container mx-auto px-4">
               <EditableServiceHero 
-                section="service-blikk"
+                section="service-blikk-hero"
                 defaultIcon="💧"
                 defaultTitle="Blikkenslagertjenester"
                 defaultSubtitle="Sikker taktekningsløsninger og vannsystemer"
+                defaultButtonText="Bestill blikkenslager"
               />
             </div>
           </section>
@@ -81,13 +82,15 @@ const ServiceBlikk = () => {
 
           <EditableServiceTarget 
             section="service-blikk"
-            defaultTargetLabel="Eiendomsselskaper, borettslag, privatpersoner"
+            defaultTarget="Eiendomsselskaper, borettslag, privatpersoner"
             defaultDescription="Våre blikkenslagertjenester passer for alle som ønsker profesjonell vannsikring og taktekking, enten det er for bolig, næringseiendom eller offentlige bygg. Vi har erfaring med både store og små prosjekter."
           />
 
           <EditableServicePricing 
             section="service-blikk"
-            defaultPriceText="Kontakt oss for et skreddersydd tilbud"
+            hasFixedPrice={false}
+            defaultPrice="Kontakt oss for et skreddersydd tilbud"
+            defaultPriceIncludes={[]}
             defaultDescription="Priser varierer basert på størrelse, kompleksitet og materialvalg. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett."
           />
 
