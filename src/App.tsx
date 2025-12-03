@@ -64,14 +64,22 @@ const App = () => (
             <Route path="/raad" element={<Blog />} />
             <Route path="/raad/:slug" element={<BlogDetail />} />
             <Route path="/takk" element={<ThankYou />} />
-            <Route path="/dashboard" element={<Dashboard />}>
+            <Route path="/dashboard" element={
+              <ErrorBoundary>
+                <Dashboard />
+              </ErrorBoundary>
+            }>
               <Route index element={<DashboardHome />} />
               <Route path="quotes" element={<DashboardQuotes />} />
               <Route path="jobs" element={<DashboardJobs />} />
               {/* <Route path="loyalty" element={<DashboardLoyalty />} /> */} {/* Hidden temporarily */}
               <Route path="profile" element={<DashboardProfile />} />
               <Route path="notifications" element={<DashboardNotifications />} />
-              <Route path="admin" element={<AdminDashboard />} />
+              <Route path="admin" element={
+                <ErrorBoundary>
+                  <AdminDashboard />
+                </ErrorBoundary>
+              } />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
