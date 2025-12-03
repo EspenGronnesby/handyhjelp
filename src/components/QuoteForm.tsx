@@ -10,6 +10,12 @@ import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building
 import { CompanySearch } from "./CompanySearch";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { 
+  validateCustomerType, 
+  validateContactInfo, 
+  validateDescription,
+  validateFullForm 
+} from "@/lib/validations/quoteFormSchema";
 
 interface Company {
   orgNumber: string;
@@ -122,77 +128,31 @@ export const QuoteForm = () => {
   };
 
   const validateCurrentStep = (): boolean => {
-    const currentErrors: Record<string, string> = {};
-
     try {
       if (step === 1) {
-        if (!formData.type) {
-          currentErrors.type = "Velg kunde type";
-          setErrors(currentErrors);
-          return false;
-        }
+        const result = validateCustomerType(formData.type);
+        setErrors(result.errors);
+        return result.success;
       } else if (step === 2) {
-        // Validate step 2 fields
-        const step2Data = {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone
-        };
-
-        if (!step2Data.name.trim()) {
-          currentErrors.name = "Navn er påkrevd";
-        } else if (step2Data.name.length < 2) {
-          currentErrors.name = "Navn må være minst 2 tegn";
-        } else if (step2Data.name.length > 100) {
-          currentErrors.name = "Navn kan ikke være mer enn 100 tegn";
-        } else if (!/^[a-zA-ZæøåÆØÅ\s\-'\.]+$/.test(step2Data.name)) {
-          currentErrors.name = "Navn kan kun inneholde bokstaver";
-        }
-
-        if (!step2Data.email.trim()) {
-          currentErrors.email = "E-post er påkrevd";
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(step2Data.email)) {
-          currentErrors.email = "Ugyldig e-postadresse";
-        } else if (step2Data.email.length > 255) {
-          currentErrors.email = "E-post kan ikke være mer enn 255 tegn";
-        }
-
-        if (!step2Data.phone.trim()) {
-          currentErrors.phone = "Telefonnummer er påkrevd";
-        } else if (!/^[\+]?[0-9\s\-\(\)]{8,15}$/.test(step2Data.phone.trim())) {
-          currentErrors.phone = "Ugyldig telefonnummer";
-        }
-
-        // Address validation for private customers
-        if (formData.type === 'private') {
-          if (!formData.address.trim()) {
-            currentErrors.address = "Adresse er påkrevd";
-          } else if (formData.address.length < 5) {
-            currentErrors.address = "Adresse må være minst 5 tegn";
-          } else if (formData.address.length > 200) {
-            currentErrors.address = "Adresse kan ikke være mer enn 200 tegn";
-          }
-        }
-
-        // Organization number and company validation for business customers (only for non-logged-in users)
-        if (formData.type === 'business' && !user) {
-          if (!formData.selectedCompany) {
-            currentErrors.company = "Vennligst finn og velg din bedrift fra Brønnøysundregistrene";
-          }
-        }
-
+        const result = validateContactInfo(
+          {
+            type: formData.type,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+            selectedCompany: formData.selectedCompany,
+          },
+          !!user
+        );
+        setErrors(result.errors);
+        return result.success;
       } else if (step === 3) {
-        if (!formData.description.trim()) {
-          currentErrors.description = "Beskrivelse er påkrevd";
-        } else if (formData.description.length < 10) {
-          currentErrors.description = "Beskrivelse må være minst 10 tegn";
-        } else if (formData.description.length > 2000) {
-          currentErrors.description = "Beskrivelse kan ikke være mer enn 2000 tegn";
-        }
+        const result = validateDescription(formData.description);
+        setErrors(result.errors);
+        return result.success;
       }
-
-      setErrors(currentErrors);
-      return Object.keys(currentErrors).length === 0;
+      return true;
     } catch (error) {
       console.error('Validation error:', error);
       setErrors({ general: "Validering feilet. Prøv igjen." });
