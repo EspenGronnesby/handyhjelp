@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { toast } from "sonner";
@@ -548,27 +548,36 @@ export const ServiceAgreementForm = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {renderStep()}
+          <div className="animate-fade-in">
+            {renderStep()}
+          </div>
 
-          <div className="flex justify-between pt-6">
+          <div className="flex justify-between pt-6 border-t">
             <Button
               type="button"
               variant="outline"
               onClick={prevStep}
-              disabled={currentStep === 1}
+              disabled={currentStep === 1 || isSubmitting}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Tilbake
             </Button>
 
             {currentStep < totalSteps ? (
-              <Button type="button" onClick={nextStep}>
+              <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90">
                 Neste
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={isSubmitting} className="bg-success hover:bg-success/90">
-                {isSubmitting ? "Sender..." : "Send forespørsel"}
+              <Button type="submit" disabled={isSubmitting} className="bg-success hover:bg-success/90 text-success-foreground">
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sender...
+                  </>
+                ) : (
+                  'Send forespørsel'
+                )}
               </Button>
             )}
           </div>
