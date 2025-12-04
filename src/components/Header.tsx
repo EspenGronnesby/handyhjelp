@@ -108,12 +108,11 @@ export const Header = () => {
                       Logg inn
                     </Button>
                   </Link>
-                  <Button 
-                    className="bg-success hover:bg-success-hover text-success-foreground"
-                    onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
-                  >
-                    Få tilbud
-                  </Button>
+                  <Link to="/tilbud">
+                    <Button className="bg-success hover:bg-success-hover text-success-foreground">
+                      Få tilbud
+                    </Button>
+                  </Link>
                 </>
               )}
             </div>
@@ -235,15 +234,14 @@ export const Header = () => {
                         Logg inn
                       </Button>
                     </Link>
-                    <Button 
-                      className="w-full bg-success hover:bg-success-hover text-success-foreground mt-4"
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                    >
-                      Få tilbud
-                    </Button>
+                    <Link to="/tilbud" className="block w-full mt-4">
+                      <Button 
+                        className="w-full bg-success hover:bg-success-hover text-success-foreground"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Få tilbud
+                      </Button>
+                    </Link>
                   </>
                 )}
               </div>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,27 +17,7 @@ import { nb } from "date-fns/locale";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-
-const formSchema = z.object({
-  customerType: z.enum(["borettslag", "bedrift", "annet"]),
-  unitsCount: z.string().optional(),
-  totalArea: z.string().optional(),
-  address: z.string().min(1, "Adresse er påkrevd"),
-  services: z.array(z.string()).min(1, "Velg minst én tjeneste"),
-  otherServices: z.string().optional(),
-  frequency: z.string().min(1, "Frekvens er påkrevd"),
-  fixedContactPerson: z.boolean(),
-  contractDuration: z.string().min(1, "Avtalevarighet er påkrevd"),
-  startDate: z.date().optional(),
-  currentSituation: z.string().min(1, "Vennligst velg et alternativ"),
-  contactPerson: z.string().min(1, "Kontaktperson er påkrevd"),
-  contactRole: z.string().min(1, "Rolle er påkrevd"),
-  email: z.string().email("Ugyldig e-postadresse"),
-  phone: z.string().min(8, "Telefonnummer er påkrevd"),
-  additionalInfo: z.string().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { serviceAgreementSchema, type ServiceAgreementFormData } from "@/lib/validations/serviceAgreementSchema";
 
 const serviceOptions = [
   { id: "maintenance", label: "Generelt vedlikehold og småreperasjoner" },
@@ -54,8 +33,8 @@ export const ServiceAgreementForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ServiceAgreementFormData>({
+    resolver: zodResolver(serviceAgreementSchema),
     defaultValues: {
       customerType: "borettslag",
       services: [],
@@ -80,7 +59,7 @@ export const ServiceAgreementForm = () => {
     }
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: ServiceAgreementFormData) => {
     setIsSubmitting(true);
 
     try {
