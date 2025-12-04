@@ -1,13 +1,67 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const FUNCTION_NAME = "send-job-status-email";
+
+// Structured logging utility
+const log = {
+  info: (message: string, data?: Record<string, unknown>) => {
+    console.log(JSON.stringify({
+      level: "INFO",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  },
+  error: (message: string, error?: unknown, data?: Record<string, unknown>) => {
+    console.error(JSON.stringify({
+      level: "ERROR",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      } : error,
+      ...data
+    }));
+  },
+  warn: (message: string, data?: Record<string, unknown>) => {
+    console.warn(JSON.stringify({
+      level: "WARN",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  }
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Error response helper
+const errorResponse = (message: string, status: number, requestId: string, details?: unknown) => {
+  return new Response(
+    JSON.stringify({
+      success: false,
+      error: message,
+      details: details instanceof Error ? details.message : details,
+      requestId,
+      timestamp: new Date().toISOString()
+    }),
+    {
+      status,
+      headers: { "Content-Type": "application/json", ...corsHeaders }
+    }
+  );
+};
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 interface JobStatusEmailRequest {
   customerName: string;
@@ -17,15 +71,58 @@ interface JobStatusEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const requestId = crypto.randomUUID();
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  try {
-    const { customerName, customerEmail, jobDescription, status }: JobStatusEmailRequest = await req.json();
-    
-    console.log(`Sending ${status} email to: ${customerEmail}`);
+  log.info("Request received", { requestId, method: req.method });
 
+  if (req.method !== "POST") {
+    log.warn("Invalid request method", { requestId, method: req.method });
+    return errorResponse("Method not allowed", 405, requestId);
+  }
+
+  let requestData: JobStatusEmailRequest;
+
+  try {
+    requestData = await req.json();
+  } catch (parseError) {
+    log.error("Failed to parse request body", parseError, { requestId });
+    return errorResponse("Invalid JSON in request body", 400, requestId);
+  }
+
+  const { customerName, customerEmail, jobDescription, status } = requestData;
+
+  // Validate required fields
+  if (!customerName || !customerEmail || !jobDescription || !status) {
+    log.warn("Missing required fields", { 
+      requestId, 
+      customerName: !!customerName, 
+      customerEmail: !!customerEmail, 
+      jobDescription: !!jobDescription, 
+      status: !!status 
+    });
+    return errorResponse("Missing required fields", 400, requestId);
+  }
+
+  // Validate status
+  if (!["started", "completed"].includes(status)) {
+    log.warn("Invalid status value", { requestId, status });
+    return errorResponse("Status must be 'started' or 'completed'", 400, requestId);
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(customerEmail)) {
+    log.warn("Invalid email format", { requestId, customerEmail });
+    return errorResponse("Invalid email format", 400, requestId);
+  }
+
+  log.info("Sending job status email", { requestId, customerEmail, status });
+
+  try {
     let subject: string;
     let html: string;
 
@@ -118,44 +215,50 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (error) {
-      console.error("Resend error:", error);
-      
-      // Send error notification to team
-      try {
-        await resend.emails.send({
-          from: "HandyHjelp System <team@handyhjelp.no>",
-          to: ["team@handyhjelp.no"],
-          subject: "⚠️ Feil ved sending av jobbstatus-epost",
-          html: `
-            <h2>Feil ved sending av jobbstatus-epost</h2>
-            <p><strong>Kunde:</strong> ${customerName} (${customerEmail})</p>
-            <p><strong>Status:</strong> ${status}</p>
-            <p><strong>Jobbeskrivelse:</strong> ${jobDescription}</p>
-            <p><strong>Feilmelding:</strong> ${error.message}</p>
-          `,
-        });
-      } catch (notificationError) {
-        console.error("Failed to send error notification:", notificationError);
-      }
-      
       throw error;
     }
 
-    console.log(`${status} email sent successfully:`, data);
+    log.info("Job status email sent successfully", { 
+      requestId, 
+      messageId: data?.id,
+      recipient: customerEmail,
+      status 
+    });
 
-    return new Response(JSON.stringify({ success: true, data }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      data,
+      requestId 
+    }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
-  } catch (error: any) {
-    console.error(`Error in send-job-status-email function:`, error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+
+  } catch (error) {
+    log.error("Failed to send job status email", error, { requestId, customerEmail, status });
+
+    // Send error notification to team
+    try {
+      await resend.emails.send({
+        from: "HandyHjelp System <team@handyhjelp.no>",
+        to: ["team@handyhjelp.no"],
+        subject: "⚠️ Feil ved sending av jobbstatus-epost",
+        html: `
+          <h2>Feil ved sending av jobbstatus-epost</h2>
+          <p><strong>Request ID:</strong> ${requestId}</p>
+          <p><strong>Kunde:</strong> ${customerName} (${customerEmail})</p>
+          <p><strong>Status:</strong> ${status}</p>
+          <p><strong>Jobbeskrivelse:</strong> ${jobDescription}</p>
+          <p><strong>Feilmelding:</strong> ${error instanceof Error ? error.message : 'Ukjent feil'}</p>
+          <p><strong>⚠️ Vennligst informer kunden manuelt.</strong></p>
+        `,
+      });
+      log.info("Error notification sent to team", { requestId });
+    } catch (notificationError) {
+      log.error("Failed to send error notification", notificationError, { requestId });
+    }
+
+    return errorResponse("Failed to send job status email", 500, requestId, error);
   }
 };
 

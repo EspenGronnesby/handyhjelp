@@ -1,6 +1,60 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 
+const FUNCTION_NAME = "send-confirmation-email";
+
+// Structured logging utility
+const log = {
+  info: (message: string, data?: Record<string, unknown>) => {
+    console.log(JSON.stringify({
+      level: "INFO",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  },
+  error: (message: string, error?: unknown, data?: Record<string, unknown>) => {
+    console.error(JSON.stringify({
+      level: "ERROR",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      } : error,
+      ...data
+    }));
+  },
+  warn: (message: string, data?: Record<string, unknown>) => {
+    console.warn(JSON.stringify({
+      level: "WARN",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  }
+};
+
+// Error response helper
+const errorResponse = (message: string, status: number, details?: unknown) => {
+  return new Response(
+    JSON.stringify({
+      success: false,
+      error: message,
+      details: details instanceof Error ? details.message : details,
+      timestamp: new Date().toISOString()
+    }),
+    {
+      status,
+      headers: { "Content-Type": "application/json", ...corsHeaders }
+    }
+  );
+};
+
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
@@ -16,17 +70,48 @@ interface ConfirmationEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const requestId = crypto.randomUUID();
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  log.info("Request received", { requestId, method: req.method });
+
+  // Validate request method
+  if (req.method !== "POST") {
+    log.warn("Invalid request method", { requestId, method: req.method });
+    return errorResponse("Method not allowed", 405);
+  }
+
+  let requestData: ConfirmationEmailRequest;
+
   try {
-    const { name, email, phone, customerType }: ConfirmationEmailRequest = await req.json();
+    requestData = await req.json();
+  } catch (parseError) {
+    log.error("Failed to parse request body", parseError, { requestId });
+    return errorResponse("Invalid JSON in request body", 400);
+  }
 
-    console.log(`Sending confirmation email to: ${email}`);
+  const { name, email, phone, customerType } = requestData;
 
-    // Send confirmation email to customer
+  // Validate required fields
+  if (!name || !email || !customerType) {
+    log.warn("Missing required fields", { requestId, name: !!name, email: !!email, customerType: !!customerType });
+    return errorResponse("Missing required fields: name, email, customerType", 400);
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    log.warn("Invalid email format", { requestId, email });
+    return errorResponse("Invalid email format", 400);
+  }
+
+  log.info("Sending confirmation email", { requestId, email, customerType });
+
+  try {
     const customerEmailResponse = await resend.emails.send({
       from: "HandyHjelp <team@handyhjelp.no>",
       to: [email],
@@ -163,26 +248,30 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Customer email sent successfully:", customerEmailResponse);
+    if (customerEmailResponse.error) {
+      throw customerEmailResponse.error;
+    }
+
+    log.info("Email sent successfully", { 
+      requestId, 
+      messageId: customerEmailResponse.data?.id,
+      recipient: email 
+    });
 
     return new Response(JSON.stringify({ 
       success: true,
-      messageId: customerEmailResponse.data?.id 
+      messageId: customerEmailResponse.data?.id,
+      requestId
     }), {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
 
-  } catch (error: any) {
-    console.error("Error in send-confirmation-email function:", error);
+  } catch (error) {
+    log.error("Failed to send confirmation email", error, { requestId, email });
 
     // Try to send error notification email to team
     try {
-      const { name, email, phone, customerType } = await req.json();
-      
       await resend.emails.send({
         from: "HandyHjelp System <team@handyhjelp.no>",
         to: ["team@handyhjelp.no"],
@@ -193,77 +282,37 @@ const handler = async (req: Request): Promise<Response> => {
             <head>
               <meta charset="utf-8">
               <style>
-                body {
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                  line-height: 1.6;
-                  color: #333;
-                  padding: 20px;
-                }
-                .alert {
-                  background: #fef2f2;
-                  border: 2px solid #dc2626;
-                  border-radius: 8px;
-                  padding: 20px;
-                  margin: 20px 0;
-                }
-                .info-box {
-                  background: #f8fafc;
-                  padding: 15px;
-                  border-radius: 6px;
-                  margin: 15px 0;
-                }
-                .info-row {
-                  margin-bottom: 8px;
-                }
-                .label {
-                  font-weight: 600;
-                  color: #0891B2;
-                }
+                body { font-family: sans-serif; padding: 20px; }
+                .alert { background: #fef2f2; border: 2px solid #dc2626; border-radius: 8px; padding: 20px; }
+                .info-box { background: #f8fafc; padding: 15px; border-radius: 6px; margin: 15px 0; }
               </style>
             </head>
             <body>
               <div class="alert">
-                <h2 style="margin-top: 0; color: #dc2626;">⚠️ Feil ved sending av bekreftelsesmail</h2>
-                <p>En bekreftelsesmail kunne ikke sendes til kunde.</p>
+                <h2 style="color: #dc2626;">⚠️ Feil ved sending av bekreftelsesmail</h2>
+                <p>Request ID: ${requestId}</p>
               </div>
-              
               <div class="info-box">
-                <h3 style="margin-top: 0;">Kundeinfo:</h3>
-                <div class="info-row"><span class="label">Navn:</span> ${name}</div>
-                <div class="info-row"><span class="label">E-post:</span> ${email}</div>
-                <div class="info-row"><span class="label">Telefon:</span> ${phone || 'Ikke oppgitt'}</div>
-                <div class="info-row"><span class="label">Type:</span> ${customerType === 'private' ? 'Privat' : 'Bedrift'}</div>
+                <p><strong>Navn:</strong> ${name}</p>
+                <p><strong>E-post:</strong> ${email}</p>
+                <p><strong>Telefon:</strong> ${phone || 'Ikke oppgitt'}</p>
+                <p><strong>Type:</strong> ${customerType === 'private' ? 'Privat' : 'Bedrift'}</p>
               </div>
-              
               <div class="info-box">
-                <h3 style="margin-top: 0;">Feilmelding:</h3>
-                <pre style="background: #1f2937; color: #f9fafb; padding: 12px; border-radius: 4px; overflow-x: auto;">${error.message || 'Ukjent feil'}</pre>
+                <p><strong>Feil:</strong></p>
+                <pre style="background: #1f2937; color: #f9fafb; padding: 12px; border-radius: 4px;">${error instanceof Error ? error.message : 'Ukjent feil'}</pre>
               </div>
-              
-              <p><strong>⚠️ Vennligst kontakt kunden manuelt for å bekrefte at forespørselen er mottatt.</strong></p>
+              <p><strong>⚠️ Vennligst kontakt kunden manuelt.</strong></p>
             </body>
           </html>
         `,
       });
-
-      console.log("Error notification sent to team");
+      log.info("Error notification sent to team", { requestId });
     } catch (notificationError) {
-      console.error("Failed to send error notification:", notificationError);
+      log.error("Failed to send error notification", notificationError, { requestId });
     }
 
-    return new Response(
-      JSON.stringify({ 
-        success: false,
-        error: error.message 
-      }),
-      {
-        status: 500,
-        headers: { 
-          "Content-Type": "application/json", 
-          ...corsHeaders 
-        },
-      }
-    );
+    return errorResponse("Failed to send confirmation email", 500, error);
   }
 };
 

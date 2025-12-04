@@ -1,8 +1,63 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
+const FUNCTION_NAME = "company-search";
+
+// Structured logging utility
+const log = {
+  info: (message: string, data?: Record<string, unknown>) => {
+    console.log(JSON.stringify({
+      level: "INFO",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  },
+  error: (message: string, error?: unknown, data?: Record<string, unknown>) => {
+    console.error(JSON.stringify({
+      level: "ERROR",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      } : error,
+      ...data
+    }));
+  },
+  warn: (message: string, data?: Record<string, unknown>) => {
+    console.warn(JSON.stringify({
+      level: "WARN",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  }
+};
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Error response helper
+const errorResponse = (message: string, status: number, requestId: string, details?: unknown) => {
+  return new Response(
+    JSON.stringify({
+      success: false,
+      error: message,
+      details: details instanceof Error ? details.message : details,
+      requestId,
+      timestamp: new Date().toISOString()
+    }),
+    {
+      status,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    }
+  );
 };
 
 interface CompanySearchRequest {
@@ -30,57 +85,56 @@ interface BrrregCompany {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const requestId = crypto.randomUUID();
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  log.info("Request received", { requestId, method: req.method });
+
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { 
-      status: 405, 
-      headers: corsHeaders 
-    });
+    log.warn("Invalid request method", { requestId, method: req.method });
+    return errorResponse('Method not allowed', 405, requestId);
   }
 
+  let requestData: CompanySearchRequest;
+
   try {
-    const { query, type }: CompanySearchRequest = await req.json();
+    requestData = await req.json();
+  } catch (parseError) {
+    log.error("Failed to parse request body", parseError, { requestId });
+    return errorResponse("Invalid JSON in request body", 400, requestId);
+  }
 
-    if (!query || query.trim().length < 2) {
-      return new Response(
-        JSON.stringify({ error: 'Query must be at least 2 characters' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        }
-      );
-    }
+  const { query, type } = requestData;
 
-    console.log(`Searching Brønnøysundregistrene for: ${query} (type: ${type})`);
+  if (!query || query.trim().length < 2) {
+    log.warn("Query too short", { requestId, queryLength: query?.length });
+    return errorResponse('Query must be at least 2 characters', 400, requestId);
+  }
 
+  log.info("Searching Brønnøysundregistrene", { requestId, query, type });
+
+  try {
     let searchUrl: string;
     
     if (type === 'orgNumber') {
-      // Clean organization number (remove spaces)
       const cleanOrgNumber = query.replace(/\s/g, '');
       if (!/^\d{9}$/.test(cleanOrgNumber)) {
-        return new Response(
-          JSON.stringify({ error: 'Invalid organization number format' }),
-          {
-            status: 400,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders },
-          }
-        );
+        log.warn("Invalid organization number format", { requestId, query });
+        return errorResponse('Invalid organization number format (must be 9 digits)', 400, requestId);
       }
-      // Direct lookup by organization number
       searchUrl = `https://data.brreg.no/enhetsregisteret/api/enheter/${cleanOrgNumber}`;
     } else {
-      // Search by name
       const encodedQuery = encodeURIComponent(query);
       searchUrl = `https://data.brreg.no/enhetsregisteret/api/enheter?navn=${encodedQuery}&size=10`;
     }
 
-    console.log(`Calling Brønnøysundregistrene API: ${searchUrl}`);
+    log.info("Calling Brønnøysundregistrene API", { requestId, searchUrl });
 
+    const startTime = Date.now();
     const response = await fetch(searchUrl, {
       method: 'GET',
       headers: {
@@ -88,11 +142,23 @@ const handler = async (req: Request): Promise<Response> => {
         'User-Agent': 'Handyhjelp-Website/1.0'
       },
     });
+    const responseTime = Date.now() - startTime;
+
+    log.info("API response received", { 
+      requestId, 
+      status: response.status, 
+      responseTimeMs: responseTime 
+    });
 
     if (!response.ok) {
       if (response.status === 404 && type === 'orgNumber') {
+        log.info("No company found with org number", { requestId, query });
         return new Response(
-          JSON.stringify({ companies: [], message: 'Ingen bedrift funnet med dette organisasjonsnummeret' }),
+          JSON.stringify({ 
+            companies: [], 
+            message: 'Ingen bedrift funnet med dette organisasjonsnummeret',
+            requestId 
+          }),
           {
             status: 200,
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -100,28 +166,23 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
       
-      console.error(`Brønnøysundregistrene API error: ${response.status} ${response.statusText}`);
-      return new Response(
-        JSON.stringify({ error: 'Failed to search company registry' }),
-        {
-          status: 500,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders },
-        }
-      );
+      log.error("Brønnøysundregistrene API error", null, { 
+        requestId, 
+        status: response.status, 
+        statusText: response.statusText 
+      });
+      return errorResponse('Failed to search company registry', 502, requestId);
     }
 
     const data = await response.json();
     let companies: BrrregCompany[] = [];
 
     if (type === 'orgNumber') {
-      // Single company result
       companies = [data as BrrregCompany];
     } else {
-      // Multiple companies result
       companies = data._embedded?.enheter || [];
     }
 
-    // Format the results for frontend
     const formattedCompanies = companies.map((company: BrrregCompany) => ({
       orgNumber: company.organisasjonsnummer,
       name: company.navn,
@@ -134,12 +195,16 @@ const handler = async (req: Request): Promise<Response> => {
             company.postadresse?.poststed || ''
     }));
 
-    console.log(`Found ${formattedCompanies.length} companies`);
+    log.info("Search completed successfully", { 
+      requestId, 
+      resultsCount: formattedCompanies.length 
+    });
 
     return new Response(
       JSON.stringify({ 
         companies: formattedCompanies,
-        message: formattedCompanies.length === 0 ? 'Ingen bedrifter funnet' : undefined
+        message: formattedCompanies.length === 0 ? 'Ingen bedrifter funnet' : undefined,
+        requestId
       }),
       {
         status: 200,
@@ -147,15 +212,9 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-  } catch (error: any) {
-    console.error('Company search error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      }
-    );
+  } catch (error) {
+    log.error('Company search failed', error, { requestId, query, type });
+    return errorResponse('Internal server error', 500, requestId, error);
   }
 };
 
