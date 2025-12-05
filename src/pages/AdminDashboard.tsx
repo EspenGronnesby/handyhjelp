@@ -89,23 +89,31 @@ const AdminDashboard = () => {
       />
 
       <Tabs defaultValue="requests" className="space-y-4">
-        <TabsList className="flex-wrap">
-          <TabsTrigger value="requests">
-            Nye forespørsler ({pendingQuotes.length})
+        <TabsList className="h-auto flex-wrap gap-2 p-2 bg-muted/50">
+          <TabsTrigger value="requests" className="text-sm whitespace-nowrap">
+            Forespørsler ({pendingQuotes.length})
           </TabsTrigger>
-          <TabsTrigger value="agreements">
-            Avtaleforespørsler ({newAgreements.length})
+          <TabsTrigger value="agreements" className="text-sm whitespace-nowrap">
+            Avtaler ({newAgreements.length})
           </TabsTrigger>
-          <TabsTrigger value="active">
-            Aktive jobber ({activeJobs.length})
+          <TabsTrigger value="active" className="text-sm whitespace-nowrap">
+            Aktive ({activeJobs.length})
           </TabsTrigger>
-          <TabsTrigger value="completed">
+          <TabsTrigger value="completed" className="text-sm whitespace-nowrap">
             Ferdig ({completedJobs.length})
           </TabsTrigger>
-          <TabsTrigger value="customers">Kunder ({profiles.length})</TabsTrigger>
-          <TabsTrigger value="projects">Prosjekter</TabsTrigger>
-          <TabsTrigger value="blog">Blogg / Råd</TabsTrigger>
-          <TabsTrigger value="site-editing">Nettstedredigering</TabsTrigger>
+          <TabsTrigger value="customers" className="text-sm whitespace-nowrap">
+            Kunder ({profiles.length})
+          </TabsTrigger>
+          <TabsTrigger value="projects" className="text-sm whitespace-nowrap">
+            Prosjekter
+          </TabsTrigger>
+          <TabsTrigger value="blog" className="text-sm whitespace-nowrap">
+            Blogg
+          </TabsTrigger>
+          <TabsTrigger value="site-editing" className="text-sm whitespace-nowrap">
+            Redigering
+          </TabsTrigger>
         </TabsList>
 
         {/* Nye forespørsler */}
