@@ -160,7 +160,9 @@ const Index = () => {
         </section>
 
         {/* Standalone Quote Form Section */}
-        <EditableBottomCTA />
+        <div id="quote-standalone">
+          <EditableBottomCTA />
+        </div>
       </main>
 
       {/* Customer Portal Link */}
