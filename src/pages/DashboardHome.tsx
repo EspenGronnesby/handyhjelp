@@ -1,47 +1,11 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Briefcase, Star, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 const DashboardHome = () => {
-  const [stats, setStats] = useState({
-    totalQuotes: 0,
-    activeJobs: 0,
-    completedJobs: 0,
-    unreadNotifications: 0
-  });
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const [quotesResult, jobsResult, notificationsResult] = await Promise.all([
-        supabase.from('quotes').select('*', { count: 'exact' }).eq('user_id', user.id),
-        supabase.from('jobs').select('*').eq('user_id', user.id),
-        supabase.from('notifications').select('*', { count: 'exact' }).eq('user_id', user.id).eq('read', false)
-      ]);
-
-      const activeJobs = jobsResult.data?.filter(job => 
-        ['confirmed', 'started', 'in_progress'].includes(job.status)
-      ).length || 0;
-
-      const completedJobs = jobsResult.data?.filter(job => 
-        job.status === 'completed'
-      ).length || 0;
-
-      setStats({
-        totalQuotes: quotesResult.count || 0,
-        activeJobs,
-        completedJobs,
-        unreadNotifications: notificationsResult.count || 0
-      });
-    };
-
-    fetchStats();
-  }, []);
+  const { stats } = useDashboardStats();
 
   const statCards = [
     {

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -14,10 +13,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { serviceAgreementSchema, type ServiceAgreementFormData } from "@/lib/validations/serviceAgreementSchema";
+import { useMultiStepForm } from "@/hooks/useMultiStepForm";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useWeb3Forms } from "@/hooks/useWeb3Forms";
 
 const serviceOptions = [
   { id: "maintenance", label: "Generelt vedlikehold og småreperasjoner" },
@@ -28,10 +29,11 @@ const serviceOptions = [
   { id: "other", label: "Annet" },
 ];
 
+const TOTAL_STEPS = 7;
+
 export const ServiceAgreementForm = () => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { submitToWeb3Forms, sendAgreementConfirmation } = useWeb3Forms();
 
   const form = useForm<ServiceAgreementFormData>({
     resolver: zodResolver(serviceAgreementSchema),
@@ -42,27 +44,20 @@ export const ServiceAgreementForm = () => {
     },
   });
 
+  const { step, next, back, progress, isFirstStep, isLastStep } = useMultiStepForm({
+    totalSteps: TOTAL_STEPS,
+  });
+
+  const { submit, isSubmitting } = useFormSubmit({
+    successMessage: "Forespørsel sendt!",
+    successDescription: "Vi tar kontakt med deg snart.",
+  });
+
   const selectedServices = form.watch("services");
   const customerType = form.watch("customerType");
 
-  const totalSteps = 7;
-
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
   const onSubmit = async (data: ServiceAgreementFormData) => {
-    setIsSubmitting(true);
-
-    try {
+    await submit(async () => {
       // Save to database
       const { error: dbError } = await supabase.from("service_agreements").insert([
         {
@@ -88,47 +83,26 @@ export const ServiceAgreementForm = () => {
       if (dbError) throw dbError;
 
       // Send to Web3Forms
-      const web3FormsData = {
-        access_key: "e73de942-c444-45b1-ba7a-1556f5862bfd",
+      await submitToWeb3Forms({
         subject: `Ny avtaleforespørsel fra ${data.contactPerson} - ${data.customerType}`,
         from_name: data.contactPerson,
         ...data,
         services: data.services.join(", "),
         startDate: data.startDate ? format(data.startDate, "dd.MM.yyyy") : "Ikke angitt",
-      };
-
-      const web3Response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(web3FormsData),
       });
 
-      if (!web3Response.ok) throw new Error("Web3Forms submission failed");
-
-      // Send confirmation email
-      const { error: emailError } = await supabase.functions.invoke("send-agreement-confirmation", {
-        body: {
-          contactPerson: data.contactPerson,
-          email: data.email,
-        },
+      // Send confirmation email (non-blocking)
+      sendAgreementConfirmation({
+        contactPerson: data.contactPerson,
+        email: data.email,
       });
-
-      if (emailError) {
-        console.error("Email error:", emailError);
-        // Continue anyway - the main submission succeeded
-      }
 
       navigate("/takk-avtale");
-    } catch (error: any) {
-      console.error("Submission error:", error);
-      toast.error("Noe gikk galt. Vennligst prøv igjen.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   const renderStep = () => {
-    switch (currentStep) {
+    switch (step) {
       case 1:
         return (
           <FormField
@@ -452,7 +426,7 @@ export const ServiceAgreementForm = () => {
               name="contactRole"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Rolle *</FormLabel>
+                  <FormLabel>Din rolle *</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
@@ -460,8 +434,10 @@ export const ServiceAgreementForm = () => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="board_leader">Styreleder</SelectItem>
-                      <SelectItem value="ceo">Daglig leder</SelectItem>
+                      <SelectItem value="styreleder">Styreleder</SelectItem>
+                      <SelectItem value="daglig_leder">Daglig leder</SelectItem>
+                      <SelectItem value="driftsleder">Driftsleder</SelectItem>
+                      <SelectItem value="eier">Eier</SelectItem>
                       <SelectItem value="other">Annet</SelectItem>
                     </SelectContent>
                   </Select>
@@ -491,7 +467,7 @@ export const ServiceAgreementForm = () => {
                 <FormItem>
                   <FormLabel>Telefon *</FormLabel>
                   <FormControl>
-                    <Input type="tel" placeholder="123 45 678" {...field} />
+                    <Input type="tel" placeholder="+47 123 45 678" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -503,18 +479,18 @@ export const ServiceAgreementForm = () => {
       case 7:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-heading font-semibold">Eventuelt</h2>
+            <h2 className="text-xl font-heading font-semibold">Tilleggsinformasjon</h2>
 
             <FormField
               control={form.control}
               name="additionalInfo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Er det noe spesielt vi bør vite?</FormLabel>
+                  <FormLabel>Er det noe annet vi bør vite?</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="F.eks. spesielle behov, utfordringer, eller ønsker..."
-                      className="min-h-[120px]"
+                      placeholder="Spesielle ønsker, utfordringer eller andre detaljer som kan være nyttige for oss å vite"
+                      className="min-h-[150px]"
                       {...field}
                     />
                   </FormControl>
@@ -524,60 +500,58 @@ export const ServiceAgreementForm = () => {
             />
           </div>
         );
+
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="bg-background rounded-lg shadow-lg p-8">
+    <div className="max-w-2xl mx-auto">
+      {/* Progress bar */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm font-medium text-muted-foreground">
-            Steg {currentStep} av {totalSteps}
-          </span>
-          <span className="text-sm font-medium text-primary">
-            {Math.round((currentStep / totalSteps) * 100)}%
-          </span>
+        <div className="flex justify-between text-sm text-muted-foreground mb-2">
+          <span>Steg {step} av {TOTAL_STEPS}</span>
+          <span>{Math.round(progress)}% fullført</span>
         </div>
-        <div className="w-full bg-muted rounded-full h-2">
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
           <div
-            className="bg-primary h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            className="h-full bg-primary transition-all duration-300"
+            style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="animate-fade-in">
-            {renderStep()}
-          </div>
+          {renderStep()}
 
-          <div className="flex justify-between pt-6 border-t">
+          <div className="flex justify-between pt-6">
             <Button
               type="button"
               variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 1 || isSubmitting}
+              onClick={back}
+              disabled={isFirstStep || isSubmitting}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Tilbake
             </Button>
 
-            {currentStep < totalSteps ? (
-              <Button type="button" onClick={nextStep} className="bg-primary hover:bg-primary/90">
-                Neste
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            ) : (
-              <Button type="submit" disabled={isSubmitting} className="bg-success hover:bg-success/90 text-success-foreground">
+            {isLastStep ? (
+              <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Sender...
                   </>
                 ) : (
-                  'Send forespørsel'
+                  "Send forespørsel"
                 )}
+              </Button>
+            ) : (
+              <Button type="button" onClick={next}>
+                Neste
+                <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             )}
           </div>

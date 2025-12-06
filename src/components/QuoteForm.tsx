@@ -10,11 +10,12 @@ import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building
 import { CompanySearch } from "./CompanySearch";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useWeb3Forms } from "@/hooks/useWeb3Forms";
 import { 
   validateCustomerType, 
   validateContactInfo, 
   validateDescription,
-  validateFullForm 
 } from "@/lib/validations/quoteFormSchema";
 
 interface Company {
@@ -41,17 +42,12 @@ interface FormData {
 export const QuoteForm = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { profile } = useUserProfile();
+  const { submitToWeb3Forms, sendConfirmationEmail } = useWeb3Forms();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userProfile, setUserProfile] = useState<{
-    full_name: string;
-    email: string;
-    phone: string;
-    address: string;
-    customer_type: 'private' | 'business' | null;
-  } | null>(null);
   const [formData, setFormData] = useState<FormData>({
     type: null,
     name: "",
@@ -64,54 +60,28 @@ export const QuoteForm = () => {
     description: ""
   });
 
-  // Fetch user profile data if logged in
+  // Auto-fill profile data when available
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) return;
+    if (!profile) return;
 
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('full_name, email, phone, address, customer_type')
-          .eq('id', user.id)
-          .single();
-
-        if (error) {
-          console.error('Error fetching profile:', error);
-          return;
-        }
-
-        if (data) {
-          setUserProfile({
-            ...data,
-            customer_type: data.customer_type as 'private' | 'business' | null
-          });
-          
-          // Auto-skip step 1 if customer_type exists
-          if (data.customer_type && (data.customer_type === 'private' || data.customer_type === 'business')) {
-            setFormData(prev => ({
-              ...prev,
-              type: data.customer_type as 'private' | 'business',
-              name: data.full_name || '',
-              email: data.email || '',
-              phone: data.phone || '',
-              address: data.customer_type === 'private' ? (data.address || '') : ''
-            }));
-            setStep(3);
-            
-            toast({
-              title: "Informasjon hentet",
-              description: "Dine kontaktopplysninger er automatisk fylt ut. Skriv kun beskrivelsen av jobben.",
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Error in fetchProfile:', error);
-      }
-    };
-
-    fetchProfile();
-  }, [user]);
+    // Auto-skip step 1 if customer_type exists
+    if (profile.customer_type === 'private' || profile.customer_type === 'business') {
+      setFormData(prev => ({
+        ...prev,
+        type: profile.customer_type,
+        name: profile.full_name || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+        address: profile.customer_type === 'private' ? (profile.address || '') : ''
+      }));
+      setStep(3);
+      
+      toast({
+        title: "Informasjon hentet",
+        description: "Dine kontaktopplysninger er automatisk fylt ut. Skriv kun beskrivelsen av jobben.",
+      });
+    }
+  }, [profile]);
 
   const handleNext = () => {
     if (validateCurrentStep() && step < 3) {
@@ -197,60 +167,25 @@ export const QuoteForm = () => {
       console.log('Quote saved to database:', quoteData);
 
       // STEP 2: Send email to team via Web3Forms
-      try {
-        const accessKey = 'e73de942-c444-45b1-ba7a-1556f5862bfd';
-        
-        const web3FormData = {
-          access_key: accessKey,
-          subject: `Ny tilbudsforespørsel fra ${formData.name}`,
-          from_name: "HandyHjelp Nettside",
-          type: formData.type === 'private' ? 'Privat' : 'Bedrift',
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address || 'Ikke oppgitt',
-          company_name: formData.selectedCompany?.name || 'Ikke oppgitt',
-          org_number: formData.selectedCompany?.orgNumber || 'Ikke oppgitt',
-          description: formData.description,
-        };
+      await submitToWeb3Forms({
+        subject: `Ny tilbudsforespørsel fra ${formData.name}`,
+        type: formData.type === 'private' ? 'Privat' : 'Bedrift',
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address || 'Ikke oppgitt',
+        company_name: formData.selectedCompany?.name || 'Ikke oppgitt',
+        org_number: formData.selectedCompany?.orgNumber || 'Ikke oppgitt',
+        description: formData.description,
+      });
 
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify(web3FormData),
-        });
-
-        if (!response.ok) {
-          console.error('Web3Forms failed, but quote is saved in database');
-          // Continue anyway - quote is saved
-        }
-      } catch (web3Error) {
-        console.error('Web3Forms error:', web3Error);
-        // Continue anyway - quote is saved
-      }
-
-      // STEP 3: Send confirmation email to customer via Resend (non-blocking)
-      try {
-        const { data: confirmationData, error: confirmationError } = await supabase.functions.invoke('send-confirmation-email', {
-          body: {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            customerType: formData.type
-          }
-        });
-
-        if (confirmationError) {
-          console.error('Confirmation email error:', confirmationError);
-        } else {
-          console.log('Confirmation email sent:', confirmationData);
-        }
-      } catch (confirmationError) {
-        console.error('Failed to send confirmation email:', confirmationError);
-      }
+      // STEP 3: Send confirmation email to customer (non-blocking)
+      sendConfirmationEmail({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        customerType: formData.type || 'private',
+      });
 
       toast({
         title: "Tilbud sendt!",
@@ -289,9 +224,26 @@ export const QuoteForm = () => {
 
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData({ ...formData, [field]: value });
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors({ ...errors, [field]: '' });
+    }
+  };
+
+  const handleTypeSelect = (type: 'private' | 'business') => {
+    handleInputChange('type', type);
+    if (profile) {
+      setFormData(prev => ({
+        ...prev,
+        type,
+        name: profile.full_name || '',
+        email: profile.email || '',
+        phone: profile.phone || '',
+        address: type === 'private' ? (profile.address || '') : ''
+      }));
+      toast({
+        title: "Kontaktinfo fylt ut",
+        description: "Dine opplysninger er hentet fra profilen din",
+      });
     }
   };
 
@@ -299,7 +251,7 @@ export const QuoteForm = () => {
     <Card className="form-professional">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-foreground">Få gratis tilbud</h3>
-        {!(user && step === 3 && userProfile?.customer_type) && (
+        {!(user && step === 3 && profile?.customer_type) && (
           <div className="text-sm text-muted-foreground">
             Steg {step} av 3
           </div>
@@ -310,7 +262,7 @@ export const QuoteForm = () => {
         <div className="space-y-4 animate-fade-in-up">
           <Label className="text-base font-medium">Privat eller bedrift?</Label>
           
-          {user && userProfile && (
+          {user && profile && (
             <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-md text-sm text-success-foreground">
               <CheckCircle className="h-4 w-4 text-success" />
               <span>Dine kontaktopplysninger vil bli fylt ut automatisk</span>
@@ -321,24 +273,7 @@ export const QuoteForm = () => {
             <Button
               variant={formData.type === "private" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center space-y-2"
-              onClick={() => {
-                handleInputChange('type', 'private');
-                // Auto-fill for logged-in users
-                if (user && userProfile) {
-                  setFormData(prev => ({
-                    ...prev,
-                    type: 'private',
-                    name: userProfile.full_name || '',
-                    email: userProfile.email || '',
-                    phone: userProfile.phone || '',
-                    address: userProfile.address || ''
-                  }));
-                  toast({
-                    title: "Kontaktinfo fylt ut",
-                    description: "Dine opplysninger er hentet fra profilen din",
-                  });
-                }
-              }}
+              onClick={() => handleTypeSelect('private')}
             >
               <Home className="h-6 w-6" />
               <span>Privat</span>
@@ -346,23 +281,7 @@ export const QuoteForm = () => {
             <Button
               variant={formData.type === "business" ? "default" : "outline"}
               className="h-20 flex flex-col items-center justify-center space-y-2"
-              onClick={() => {
-                handleInputChange('type', 'business');
-                // Auto-fill for logged-in users (not address for business)
-                if (user && userProfile) {
-                  setFormData(prev => ({
-                    ...prev,
-                    type: 'business',
-                    name: userProfile.full_name || '',
-                    email: userProfile.email || '',
-                    phone: userProfile.phone || ''
-                  }));
-                  toast({
-                    title: "Kontaktinfo fylt ut",
-                    description: "Dine opplysninger er hentet fra profilen din",
-                  });
-                }
-              }}
+              onClick={() => handleTypeSelect('business')}
             >
               <Building2 className="h-6 w-6" />
               <span>Bedrift</span>
@@ -461,7 +380,6 @@ export const QuoteForm = () => {
                     
                     setFormData(prev => ({ ...prev, ...updates }));
                     
-                    // Clear company error when selecting a company
                     if (company && errors.company) {
                       setErrors(prev => ({ ...prev, company: '' }));
                     }
@@ -483,7 +401,7 @@ export const QuoteForm = () => {
 
       {step === 3 && (
         <div className="space-y-4 animate-fade-in-up">
-          {user && userProfile?.customer_type ? (
+          {user && profile?.customer_type ? (
             <div>
               <Label className="text-base font-medium">Beskriv oppdraget</Label>
               <p className="text-sm text-muted-foreground mt-1 mb-3">
@@ -513,7 +431,7 @@ export const QuoteForm = () => {
       )}
 
       <div className="flex justify-between pt-6 border-t">
-        {step > 1 && !(user && userProfile?.customer_type) && (
+        {step > 1 && !(user && profile?.customer_type) && (
           <Button 
             type="button"
             variant="outline" 
@@ -552,14 +470,12 @@ export const QuoteForm = () => {
         </div>
       </div>
 
-      {/* Error message for general errors */}
       {errors.general && (
         <div className="flex items-center gap-2 mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
           <AlertCircle className="h-4 w-4 text-destructive" />
           <span className="text-sm text-destructive">{errors.general}</span>
         </div>
       )}
-
     </Card>
   );
 };
