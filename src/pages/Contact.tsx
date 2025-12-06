@@ -6,17 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import { Phone, Mail, MapPin, Clock, MessageSquare, Loader2 } from "lucide-react";
+import { MessageSquare, Loader2 } from "lucide-react";
 import { EditableHero } from "@/components/EditableHero";
 import { EditableContactInfo } from "@/components/EditableContactInfo";
 import { EditableHowWeWork } from "@/components/EditableHowWeWork";
 import { EditableFAQItem } from "@/components/EditableFAQItem";
 import { Accordion } from "@/components/ui/accordion";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
+import { useWeb3Forms } from "@/hooks/useWeb3Forms";
 
 const Contact = () => {
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,109 +23,43 @@ const Contact = () => {
     message: ""
   });
 
+  const { submitToWeb3Forms, sendConfirmationEmail } = useWeb3Forms();
+  const { submit, isSubmitting } = useFormSubmit({
+    successMessage: "Melding sendt!",
+    successDescription: "Vi svarer deg innen 1-3 virkedager.",
+    errorMessage: "Feil ved sending",
+    errorDescription: "Prøv igjen eller ring oss direkte.",
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    try {
-      // Hardcoded access key (temporary solution - will be replaced)
-      const accessKey = 'e73de942-c444-45b1-ba7a-1556f5862bfd';
-      
-      if (!accessKey) {
-        console.error('Web3Forms access key is missing!');
-        toast({
-          title: "Konfigurasjonsfeil",
-          description: "Kan ikke sende melding. Ring oss på +47 41250553",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      const web3FormData = {
-        access_key: accessKey,
+    await submit(async () => {
+      // Send to Web3Forms
+      const success = await submitToWeb3Forms({
         subject: `Kontaktskjema fra ${formData.name}`,
-        from_name: "HandyHjelp Nettside",
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         message: formData.message,
-      };
-
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify(web3FormData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Web3Forms error:', errorData);
-        throw new Error(errorData.message || 'Failed to send message');
+      if (!success) {
+        throw new Error("Kan ikke sende melding. Ring oss på +47 41250553");
       }
 
-      // Send confirmation email to customer via Resend (non-blocking)
-      try {
-        const { supabase } = await import("@/integrations/supabase/client");
-        const { data: confirmationData, error: confirmationError } = await supabase.functions.invoke('send-confirmation-email', {
-          body: {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            customerType: 'private' // Contact form defaults to private
-          }
-        });
-
-        if (confirmationError) {
-          console.error('Confirmation email error:', confirmationError);
-          // Don't block user flow - error notification is sent to team
-        } else {
-          console.log('Confirmation email sent:', confirmationData);
-        }
-      } catch (confirmationError) {
-        console.error('Failed to send confirmation email:', confirmationError);
-        // Don't block user flow - error notification is sent to team
-      }
-
-      toast({
-        title: "Melding sendt!",
-        description: "Vi svarer deg innen 1-3 virkedager.",
+      // Send confirmation email (non-blocking)
+      sendConfirmationEmail({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        customerType: "private",
       });
 
+      // Reset form
       setFormData({ name: "", email: "", phone: "", message: "" });
-    } catch (error) {
-      console.error('Contact form error:', error);
-      toast({
-        title: "Feil ved sending",
-        description: "Prøv igjen eller ring oss direkte.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
-
-  const faqItems = [
-    {
-      question: "Hvor raskt kan dere komme?",
-      answer: "For akutte henvendelser kan vi ofte være på stedet samme dag. Planlagte oppdrag avtales etter dine ønsker."
-    },
-    {
-      question: "Tar dere oppdrag på kveldstid?",
-      answer: "Ja, vi tilbyr både kveldstjenester og helgetjenester mot et lite tillegg."
-    },
-    {
-      question: "Må jeg være hjemme under arbeidet?",
-      answer: "Det er ikke nødvendig. Mange av våre kunder gir oss nøkkel eller kode til jobben."
-    },
-    {
-      question: "Hvor lang er responstiden?",
-      answer: "Vi svarer på alle henvendelser innen 1-3 virkedager i åpningstiden."
-    }
-  ];
 
   return (
     <div className="min-h-screen">
