@@ -8,15 +8,8 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building, CheckCircle, Loader2 } from "lucide-react";
 import { CompanySearch } from "./CompanySearch";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { useWeb3Forms } from "@/hooks/useWeb3Forms";
-import { 
-  validateCustomerType, 
-  validateContactInfo, 
-  validateDescription,
-} from "@/lib/validations/quoteFormSchema";
 
 interface Company {
   orgNumber: string;
@@ -39,11 +32,13 @@ interface FormData {
   description: string;
 }
 
+// Hardkodet Web3Forms access key - IKKE BRUK ENVIRONMENT VARIABLE
+const WEB3FORMS_ACCESS_KEY = "e73de942-c444-45b1-ba7a-1556f5862bfd";
+
 export const QuoteForm = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { profile } = useUserProfile();
-  const { submitToWeb3Forms, sendConfirmationEmail } = useWeb3Forms();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -64,7 +59,6 @@ export const QuoteForm = () => {
   useEffect(() => {
     if (!profile) return;
 
-    // Auto-skip step 1 if customer_type exists
     if (profile.customer_type === 'private' || profile.customer_type === 'business') {
       setFormData(prev => ({
         ...prev,
@@ -78,7 +72,7 @@ export const QuoteForm = () => {
       
       toast({
         title: "Informasjon hentet",
-        description: "Dine kontaktopplysninger er automatisk fylt ut. Skriv kun beskrivelsen av jobben.",
+        description: "Dine kontaktopplysninger er automatisk fylt ut.",
       });
     }
   }, [profile]);
@@ -98,77 +92,53 @@ export const QuoteForm = () => {
   };
 
   const validateCurrentStep = (): boolean => {
-    try {
-      if (step === 1) {
-        const result = validateCustomerType(formData.type);
-        setErrors(result.errors);
-        return result.success;
-      } else if (step === 2) {
-        const result = validateContactInfo(
-          {
-            type: formData.type,
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            address: formData.address,
-            selectedCompany: formData.selectedCompany,
-          },
-          !!user
-        );
-        setErrors(result.errors);
-        return result.success;
-      } else if (step === 3) {
-        const result = validateDescription(formData.description);
-        setErrors(result.errors);
-        return result.success;
+    const currentErrors: Record<string, string> = {};
+
+    if (step === 1) {
+      if (!formData.type) {
+        currentErrors.type = "Velg kundetype";
       }
-      return true;
-    } catch (error) {
-      console.error('Validation error:', error);
-      setErrors({ general: "Validering feilet. Prøv igjen." });
-      return false;
+    } else if (step === 2) {
+      if (!formData.name.trim()) {
+        currentErrors.name = "Navn er påkrevd";
+      }
+      if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        currentErrors.email = "Ugyldig e-postadresse";
+      }
+      if (!formData.phone.trim()) {
+        currentErrors.phone = "Telefonnummer er påkrevd";
+      }
+      if (formData.type === 'private' && !formData.address.trim()) {
+        currentErrors.address = "Adresse er påkrevd";
+      }
+      if (formData.type === 'business' && !formData.selectedCompany) {
+        currentErrors.company = "Vennligst velg din bedrift";
+      }
+    } else if (step === 3) {
+      if (!formData.description.trim()) {
+        currentErrors.description = "Beskrivelse er påkrevd";
+      } else if (formData.description.length < 10) {
+        currentErrors.description = "Beskrivelse må være minst 10 tegn";
+      }
     }
+
+    setErrors(currentErrors);
+    return Object.keys(currentErrors).length === 0;
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     
-    if (step !== 3) return;
-    
-    const isValid = validateCurrentStep();
-    if (!isValid) return;
+    if (step !== 3 || !validateCurrentStep()) return;
     
     setIsSubmitting(true);
 
     try {
-      // STEP 1: Save to database FIRST
-      const { data: quoteData, error: dbError } = await supabase
-        .from('quotes')
-        .insert({
-          type: formData.type || 'private',
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address || null,
-          company_name: formData.selectedCompany?.name || null,
-          org_number: formData.selectedCompany?.orgNumber || null,
-          description: formData.description,
-          status: 'pending',
-          user_id: user?.id || null,
-        })
-        .select()
-        .single();
-
-      if (dbError) {
-        console.error('Database error:', dbError);
-        throw new Error('Kunne ikke lagre forespørselen. Prøv igjen.');
-      }
-
-      console.log('Quote saved to database:', quoteData);
-
-      // STEP 2: Send email to team via Web3Forms
-      await submitToWeb3Forms({
+      // SEND KUN TIL WEB3FORMS - INGEN DATABASE
+      const web3FormData = {
+        access_key: WEB3FORMS_ACCESS_KEY,
         subject: `Ny tilbudsforespørsel fra ${formData.name}`,
+        from_name: "HandyHjelp Nettside",
         type: formData.type === 'private' ? 'Privat' : 'Bedrift',
         name: formData.name,
         email: formData.email,
@@ -177,16 +147,26 @@ export const QuoteForm = () => {
         company_name: formData.selectedCompany?.name || 'Ikke oppgitt',
         org_number: formData.selectedCompany?.orgNumber || 'Ikke oppgitt',
         description: formData.description,
+      };
+
+      console.log('=== QUOTE FORM SUBMIT ===');
+      console.log('Sending to Web3Forms:', web3FormData);
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(web3FormData)
       });
 
-      // STEP 3: Send confirmation email to customer (non-blocking)
-      sendConfirmationEmail({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        customerType: formData.type || 'private',
-      });
+      console.log('Response status:', response.status);
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
 
+      if (!response.ok || !responseData.success) {
+        throw new Error(responseData.message || 'Kunne ikke sende forespørsel');
+      }
+
+      // SUCCESS!
       toast({
         title: "Tilbud sendt!",
         description: "Vi tar kontakt med deg innen 1-3 virkedager.",
@@ -198,7 +178,7 @@ export const QuoteForm = () => {
       console.error('Form submission error:', error);
       toast({
         title: "Feil ved sending",
-        description: error instanceof Error ? error.message : "Prøv igjen eller ring oss direkte på +47 41250553.",
+        description: "Prøv igjen eller ring oss direkte på +47 41250553.",
         variant: "destructive",
       });
     } finally {
@@ -207,19 +187,15 @@ export const QuoteForm = () => {
   };
 
   const isStepValid = (): boolean => {
-    switch (step) {
-      case 1:
-        return formData.type !== null;
-      case 2:
-        const basicFieldsValid = !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
-        const companyValid = formData.type === 'business' ? !!formData.selectedCompany : true;
-        const addressValid = formData.type === 'private' ? !!(formData.address.trim() && formData.address.length >= 5) : true;
-        return basicFieldsValid && companyValid && addressValid;
-      case 3:
-        return formData.description.trim().length >= 10;
-      default:
-        return false;
+    if (step === 1) return formData.type !== null;
+    if (step === 2) {
+      const basicValid = !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
+      const companyValid = formData.type === 'business' ? !!formData.selectedCompany : true;
+      const addressValid = formData.type === 'private' ? !!formData.address.trim() : true;
+      return basicValid && companyValid && addressValid;
     }
+    if (step === 3) return formData.description.trim().length >= 10;
+    return false;
   };
 
   const handleInputChange = (field: keyof FormData, value: any) => {
@@ -240,10 +216,6 @@ export const QuoteForm = () => {
         phone: profile.phone || '',
         address: type === 'private' ? (profile.address || '') : ''
       }));
-      toast({
-        title: "Kontaktinfo fylt ut",
-        description: "Dine opplysninger er hentet fra profilen din",
-      });
     }
   };
 
@@ -372,14 +344,12 @@ export const QuoteForm = () => {
               <div className="space-y-4">
                 <CompanySearch
                   onCompanySelect={(company) => {
-                    const updates: Partial<FormData> = {
+                    setFormData(prev => ({
+                      ...prev,
                       selectedCompany: company,
                       orgNumber: company?.orgNumber || '',
                       companyName: company?.name || ''
-                    };
-                    
-                    setFormData(prev => ({ ...prev, ...updates }));
-                    
+                    }));
                     if (company && errors.company) {
                       setErrors(prev => ({ ...prev, company: '' }));
                     }
@@ -412,7 +382,7 @@ export const QuoteForm = () => {
             <Label className="text-base font-medium">Beskriv oppdraget</Label>
           )}
           <Textarea
-            placeholder="Fortell oss om jobben som skal gjøres, når det passer og eventuelle spesielle ønsker..."
+            placeholder="Fortell oss om jobben som skal gjøres..."
             className={`min-h-32 ${errors.description ? 'border-destructive' : ''}`}
             value={formData.description}
             onChange={(e) => handleInputChange('description', e.target.value)}
@@ -425,12 +395,12 @@ export const QuoteForm = () => {
             </div>
           )}
           <p className="text-sm text-muted-foreground">
-            Jo mer detaljer, desto mer nøyaktig blir tilbudet. ({formData.description.length}/2000 tegn)
+            {formData.description.length}/2000 tegn
           </p>
         </div>
       )}
 
-      <div className="flex justify-between pt-6 border-t">
+      <div className="flex justify-between pt-6 border-t mt-6">
         {step > 1 && !(user && profile?.customer_type) && (
           <Button 
             type="button"
@@ -452,7 +422,7 @@ export const QuoteForm = () => {
             </Button>
           ) : (
             <Button 
-              type="submit"
+              type="button"
               onClick={handleSubmit}
               disabled={!isStepValid() || isSubmitting}
               className="bg-success hover:bg-success-hover text-success-foreground"
@@ -469,13 +439,6 @@ export const QuoteForm = () => {
           )}
         </div>
       </div>
-
-      {errors.general && (
-        <div className="flex items-center gap-2 mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-          <AlertCircle className="h-4 w-4 text-destructive" />
-          <span className="text-sm text-destructive">{errors.general}</span>
-        </div>
-      )}
     </Card>
   );
 };
