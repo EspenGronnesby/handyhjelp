@@ -10,6 +10,7 @@ import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building
 import { CompanySearch } from "./CompanySearch";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Company {
   orgNumber: string;
@@ -164,6 +165,28 @@ export const QuoteForm = () => {
 
       if (!response.ok || !responseData.success) {
         throw new Error(responseData.message || 'Kunne ikke sende forespørsel');
+      }
+
+      // Send bekreftelsesmail til kunden (non-blocking)
+      try {
+        console.log('Sending confirmation email to:', formData.email);
+        const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
+          body: {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            customerType: formData.type || 'private',
+          },
+        });
+
+        if (emailError) {
+          console.error('Confirmation email failed:', emailError);
+        } else {
+          console.log('Confirmation email sent successfully');
+        }
+      } catch (emailErr) {
+        console.error('Failed to send confirmation email:', emailErr);
+        // Don't block success - Web3Forms already worked
       }
 
       // SUCCESS!
