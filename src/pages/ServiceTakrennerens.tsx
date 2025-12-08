@@ -45,7 +45,7 @@ const ServiceTakrennerens = () => {
         <div className="relative z-10">
           <EditableServiceHero 
             section="service-takrennerens-hero"
-            defaultIcon="🌧️"
+            iconName="cloudrain"
             defaultTitle="Takrennerens"
             defaultSubtitle="Profesjonell rensing og vedlikehold av takrenner"
             defaultButtonText="Bestill takrennerens"

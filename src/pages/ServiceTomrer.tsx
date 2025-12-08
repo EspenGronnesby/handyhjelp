@@ -44,7 +44,7 @@ const ServiceTomrer = () => {
         <div className="relative z-10">
           <EditableServiceHero 
             section="service-tomrer-hero"
-            defaultIcon="🔨"
+            iconName="hammer"
             defaultTitle="Tømrertjenester"
             defaultSubtitle="Kvalitetssnekring og konstruksjonsarbeid"
             defaultButtonText="Bestill tømrer"

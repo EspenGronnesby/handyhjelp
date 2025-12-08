@@ -44,7 +44,7 @@ const ServiceBlikk = () => {
         <div className="relative z-10">
           <EditableServiceHero 
             section="service-blikk-hero"
-            defaultIcon="💧"
+            iconName="droplets"
             defaultTitle="Blikkenslagertjenester"
             defaultSubtitle="Sikker taktekningsløsninger og vannsystemer"
             defaultButtonText="Bestill blikkenslager"
