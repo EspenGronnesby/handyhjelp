@@ -78,9 +78,9 @@ export const HeroSection = () => {
               </div>
 
               {/* 24/7 Contact - Prominent */}
-              <div className="backdrop-blur-sm rounded-lg p-6 inline-block animate-fade-in-left bg-secondary-hover">
-                <p className="text-white/80 text-sm mb-2">24/7 Service</p>
-                <a href="tel:+4741250553" className="text-white text-2xl md:text-3xl font-bold flex items-center gap-3 hover:text-white/90 transition-colors">
+              <div className="backdrop-blur-sm rounded-lg p-6 inline-block animate-fade-in-left bg-secondary dark:bg-card border border-border/30">
+                <p className="text-white/80 dark:text-muted-foreground text-sm mb-2">24/7 Service</p>
+                <a href="tel:+4741250553" className="text-white dark:text-foreground text-2xl md:text-3xl font-bold flex items-center gap-3 hover:text-white/90 dark:hover:text-primary transition-colors">
                   <Phone className="h-7 w-7" />
                   <span>+47 41250553</span>
                 </a>
