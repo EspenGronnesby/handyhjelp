@@ -121,32 +121,32 @@ const Projects = () => {
 
           {/* Category Filter */}
           {projects.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
+            <div className="flex overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap md:justify-center gap-2 md:gap-3 mb-6 md:mb-8">
               <Button
                 variant={activeCategory === null ? "default" : "outline"}
                 onClick={() => handleCategoryFilter(null)}
-                className="px-6"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
                 Alle ({projects.length})
               </Button>
               <Button
                 variant={activeCategory === "vaktmester" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("vaktmester")}
-                className="px-6"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
                 🔧 Vaktmester ({projects.filter(p => p.category === "vaktmester").length})
               </Button>
               <Button
                 variant={activeCategory === "tomrer" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("tomrer")}
-                className="px-6"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
                 🔨 Tømrer ({projects.filter(p => p.category === "tomrer").length})
               </Button>
               <Button
                 variant={activeCategory === "blikk" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("blikk")}
-                className="px-6"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
                 💧 Blikk ({projects.filter(p => p.category === "blikk").length})
               </Button>

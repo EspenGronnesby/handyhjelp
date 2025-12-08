@@ -156,10 +156,11 @@ const Contact = () => {
 
             {/* Map Section with Google Maps Embed */}
             <Card>
-              <CardContent className="pt-6 p-0">
+              <CardContent className="pt-4 md:pt-6 p-0">
                 <iframe
                   width="100%"
-                  height="450"
+                  height="300"
+                  className="md:h-[450px]"
                   style={{ border: 0, borderRadius: '0.5rem' }}
                   loading="lazy"
                   allowFullScreen

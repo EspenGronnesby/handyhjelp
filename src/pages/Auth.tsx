@@ -126,24 +126,24 @@ const Auth = () => {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-base font-medium">Privat eller bedrift?</Label>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <Button
                       type="button"
                       variant={customerType === "private" ? "default" : "outline"}
-                      className="h-20 flex flex-col items-center justify-center space-y-2"
+                      className="h-24 md:h-20 flex flex-col items-center justify-center space-y-2 active:scale-95"
                       onClick={() => setCustomerType('private')}
                     >
-                      <Home className="h-6 w-6" />
-                      <span>Privat</span>
+                      <Home className="h-7 w-7 md:h-6 md:w-6" />
+                      <span className="text-sm md:text-base">Privat</span>
                     </Button>
                     <Button
                       type="button"
                       variant={customerType === "business" ? "default" : "outline"}
-                      className="h-20 flex flex-col items-center justify-center space-y-2"
+                      className="h-24 md:h-20 flex flex-col items-center justify-center space-y-2 active:scale-95"
                       onClick={() => setCustomerType('business')}
                     >
-                      <Building2 className="h-6 w-6" />
-                      <span>Bedrift</span>
+                      <Building2 className="h-7 w-7 md:h-6 md:w-6" />
+                      <span className="text-sm md:text-base">Bedrift</span>
                     </Button>
                   </div>
                 </div>
