@@ -185,7 +185,13 @@ export const useAdminData = (isAdmin: boolean) => {
   };
 
   const handleUpdateAgreementStatus = async (agreementId: string, newStatus: string) => {
+    setActionLoading(agreementId);
+    
     try {
+      // Find the agreement to get email details
+      const agreement = agreements.find(a => a.id === agreementId);
+      if (!agreement) throw new Error('Avtale ikke funnet');
+
       const { error } = await supabase
         .from('service_agreements')
         .update({ status: newStatus })
@@ -197,17 +203,51 @@ export const useAdminData = (isAdmin: boolean) => {
         a.id === agreementId ? { ...a, status: newStatus } : a
       ));
 
+      // Send notification to user if they have a user_id
+      if (agreement.user_id) {
+        const statusMessages: Record<string, { title: string; message: string }> = {
+          under_review: { title: 'Avtaleforespørsel under vurdering', message: 'Vi ser på din forespørsel og kontakter deg snart.' },
+          offer_sent: { title: 'Du har mottatt et tilbud!', message: 'Vi har sendt deg et tilbud på serviceavtale. Sjekk e-posten din.' },
+          contract_signed: { title: 'Avtale inngått! 🎉', message: 'Velkommen som avtalekunde hos HandyHjelp!' },
+          rejected: { title: 'Forespørsel behandlet', message: 'Vi har behandlet din forespørsel. Se e-post for detaljer.' }
+        };
+
+        const notif = statusMessages[newStatus];
+        if (notif) {
+          await supabase.from('notifications').insert({
+            user_id: agreement.user_id,
+            type: 'agreement_update',
+            title: notif.title,
+            message: notif.message,
+            read: false
+          });
+        }
+      }
+
+      // Send email to customer
+      supabase.functions.invoke('send-agreement-status-email', {
+        body: {
+          contactPerson: agreement.contact_person,
+          email: agreement.email,
+          address: agreement.address,
+          services: agreement.services,
+          status: newStatus,
+        },
+      }).catch(console.error);
+
       toast({
         title: "Oppdatert",
-        description: "Status er oppdatert.",
+        description: "Status er oppdatert og e-post sendt til kunde.",
       });
     } catch (error: any) {
       console.error('Error updating agreement:', error);
       toast({
         title: "Feil",
-        description: "Kunne ikke oppdatere status.",
+        description: `Kunne ikke oppdatere status: ${error?.message || 'Ukjent feil'}`,
         variant: "destructive",
       });
+    } finally {
+      setActionLoading(null);
     }
   };
 

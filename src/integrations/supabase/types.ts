@@ -609,6 +609,7 @@ export type Database = {
           total_area: number | null
           units_count: number | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           additional_info?: string | null
@@ -631,6 +632,7 @@ export type Database = {
           total_area?: number | null
           units_count?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           additional_info?: string | null
@@ -653,6 +655,7 @@ export type Database = {
           total_area?: number | null
           units_count?: number | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

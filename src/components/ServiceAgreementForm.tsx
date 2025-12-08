@@ -59,12 +59,13 @@ export const ServiceAgreementForm = () => {
 
   const onSubmit = async (data: ServiceAgreementFormData) => {
     await submit(async () => {
+      // Get current user if logged in
+      const { data: { user } } = await supabase.auth.getUser();
+
       // Save to database
       const { error: dbError } = await supabase.from("service_agreements").insert([
         {
           customer_type: data.customerType,
-          units_count: data.unitsCount ? parseInt(data.unitsCount) : null,
-          total_area: data.totalArea ? parseInt(data.totalArea) : null,
           address: data.address,
           services: data.services,
           other_services: data.otherServices,
@@ -78,6 +79,7 @@ export const ServiceAgreementForm = () => {
           email: data.email,
           phone: data.phone,
           additional_info: data.additionalInfo,
+          user_id: user?.id || null,
         }
       ] as any);
 
@@ -143,46 +145,16 @@ export const ServiceAgreementForm = () => {
       case 2:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-heading font-semibold">Om eiendommen</h2>
+            <h2 className="text-xl font-heading font-semibold">Lokasjon</h2>
             
-            {customerType === "borettslag" && (
-              <FormField
-                control={form.control}
-                name="unitsCount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Antall enheter/leiligheter</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="F.eks. 20" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            <FormField
-              control={form.control}
-              name="totalArea"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Totalt areal ca. m²</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="F.eks. 1500" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Adresse *</FormLabel>
+                  <FormLabel>Adresse (gateadresse, postnummer og sted) *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Gateadresse, postnummer og sted" {...field} />
+                    <Input placeholder="F.eks. Storgata 1, 4612 Kristiansand" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -41,18 +41,6 @@ export const ServiceAgreementCard = ({ agreement, onUpdateStatus }: ServiceAgree
           <p className="text-sm text-muted-foreground">{agreement.address}</p>
         </div>
         
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          {agreement.units_count && (
-            <div>
-              <span className="font-medium">Enheter:</span> {agreement.units_count}
-            </div>
-          )}
-          {agreement.total_area && (
-            <div>
-              <span className="font-medium">Areal:</span> {agreement.total_area} m²
-            </div>
-          )}
-        </div>
 
         <div>
           <p className="text-sm font-medium mb-2">Tjenester:</p>
