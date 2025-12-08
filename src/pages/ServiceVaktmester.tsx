@@ -44,7 +44,7 @@ const ServiceVaktmester = () => {
         <div className="relative z-10">
           <EditableServiceHero 
             section="service-vaktmester-hero"
-            defaultIcon="🔧"
+            iconName="wrench"
             defaultTitle="Vaktmestertjenester"
             defaultSubtitle="Profesjonell eiendomspleie og vedlikehold"
             defaultButtonText="Bestill vaktmester"

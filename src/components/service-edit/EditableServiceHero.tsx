@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, Wrench, Hammer, Droplets, CloudRain, LucideIcon } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -10,9 +10,17 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 
+// Map of icon names to Lucide components
+const iconMap: Record<string, LucideIcon> = {
+  wrench: Wrench,
+  hammer: Hammer,
+  droplets: Droplets,
+  cloudrain: CloudRain,
+};
+
 interface EditableServiceHeroProps {
   section: string;
-  defaultIcon: string;
+  iconName?: keyof typeof iconMap;
   defaultTitle: string;
   defaultSubtitle: string;
   defaultButtonText: string;
@@ -22,7 +30,7 @@ interface EditableServiceHeroProps {
 
 export const EditableServiceHero = ({
   section,
-  defaultIcon,
+  iconName = 'wrench',
   defaultTitle,
   defaultSubtitle,
   defaultButtonText,
@@ -34,13 +42,13 @@ export const EditableServiceHero = ({
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
 
-  const { content: icon } = useEditableContent(section, 'icon');
   const { content: title } = useEditableContent(section, 'title');
   const { content: subtitle } = useEditableContent(section, 'subtitle');
   const { content: buttonText } = useEditableContent(section, 'button_text');
 
+  const IconComponent = iconMap[iconName] || Wrench;
+
   const displayData = {
-    icon: icon || defaultIcon,
     title: title || defaultTitle,
     subtitle: subtitle || defaultSubtitle,
     buttonText: buttonText || defaultButtonText,
@@ -55,7 +63,6 @@ export const EditableServiceHero = ({
       if (!user) throw new Error('Not authenticated');
 
       const updates = [
-        { content_key: 'icon', content_value: formData.icon },
         { content_key: 'title', content_value: formData.title },
         { content_key: 'subtitle', content_value: formData.subtitle },
         { content_key: 'button_text', content_value: formData.buttonText },
@@ -110,17 +117,21 @@ export const EditableServiceHero = ({
         
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="text-6xl mb-6">{displayData.icon}</div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold mb-6 text-white drop-shadow-lg">
+            <div className="mb-6 flex justify-center">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
+                <IconComponent className="h-12 w-12 md:h-16 md:w-16 text-white" strokeWidth={1.5} />
+              </div>
+            </div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-bold mb-4 md:mb-6 text-white drop-shadow-lg">
               {displayData.title}
             </h1>
-            <p className="text-xl text-white/90 mb-8 drop-shadow-md">
+            <p className="text-lg md:text-xl text-white/90 mb-6 md:mb-8 drop-shadow-md max-w-2xl mx-auto">
               {displayData.subtitle}
             </p>
             <Button 
               variant="cta" 
               size="lg" 
-              className="text-lg px-8 py-6"
+              className="text-base md:text-lg px-6 md:px-8 py-5 md:py-6 min-h-[48px]"
               onClick={() => window.location.href = '/tilbud'}
             >
               {displayData.buttonText}
@@ -136,14 +147,6 @@ export const EditableServiceHero = ({
           </DialogHeader>
 
           <div className="space-y-4">
-            <div>
-              <Label>Ikon (emoji)</Label>
-              <Input
-                value={formData.icon}
-                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                maxLength={10}
-              />
-            </div>
             <div>
               <Label>Tittel</Label>
               <Input
