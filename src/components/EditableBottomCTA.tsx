@@ -49,7 +49,7 @@ export const EditableBottomCTA = () => {
                 {defaultData.button1}
               </Button>
             </Link>
-            <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'} className="bg-background text-primary hover:bg-background/90 text-lg px-10 border-primary-foreground">
+            <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'} className="bg-background text-primary hover:bg-success hover:text-success-foreground text-lg px-10 border-primary-foreground">
               {defaultData.button2}
             </Button>
           </div>
