@@ -19,6 +19,7 @@ import { serviceAgreementSchema, type ServiceAgreementFormData } from "@/lib/val
 import { useMultiStepForm } from "@/hooks/useMultiStepForm";
 import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { useWeb3Forms } from "@/hooks/useWeb3Forms";
+import { FormProgress } from "@/components/ui/form-progress";
 
 const serviceOptions = [
   { id: "maintenance", label: "Generelt vedlikehold og småreperasjoner" },
@@ -508,19 +509,21 @@ export const ServiceAgreementForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Progress bar */}
-      <div className="mb-8">
-        <div className="flex justify-between text-sm text-muted-foreground mb-2">
-          <span>Steg {step} av {TOTAL_STEPS}</span>
-          <span>{Math.round(progress)}% fullført</span>
-        </div>
-        <div className="h-2 bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
+      {/* Enhanced progress indicator */}
+      <FormProgress 
+        currentStep={step} 
+        totalSteps={TOTAL_STEPS}
+        labels={[
+          "Type",
+          "Eiendom", 
+          "Tjenester",
+          "Frekvens",
+          "Situasjon",
+          "Kontakt",
+          "Tillegg"
+        ]}
+        className="mb-8"
+      />
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

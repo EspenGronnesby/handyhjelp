@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import { Briefcase } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { CardGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeleton-loaders';
 
 interface Job {
   id: string;
@@ -72,22 +73,30 @@ const DashboardJobs = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <PageHeaderSkeleton />
+        <CardGridSkeleton count={3} />
       </div>
     );
   }
 
   if (jobs.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Mine jobber</CardTitle>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Mine jobber</h1>
+          <p className="text-muted-foreground">
+            Oversikt over alle dine aktive og fullførte jobber
+          </p>
+        </div>
+        <Card className="p-8 text-center">
+          <Briefcase className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <CardTitle className="mb-2">Ingen jobber ennå</CardTitle>
           <CardDescription>
-            Du har ingen aktive eller fullførte jobber ennå
+            Når dine tilbudsforespørsler blir godkjent, vil jobbene vises her.
           </CardDescription>
-        </CardHeader>
-      </Card>
+        </Card>
+      </div>
     );
   }
 

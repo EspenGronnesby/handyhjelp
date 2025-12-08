@@ -117,134 +117,139 @@ export const Header = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button - Improved touch target */}
             <Button
               variant="ghost"
-              size="sm"
-              className="md:hidden"
+              size="icon"
+              className="md:hidden min-h-[44px] min-w-[44px] touch-manipulation"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label={isMenuOpen ? "Lukk meny" : "Åpne meny"}
+              aria-expanded={isMenuOpen}
             >
               <Menu className="h-6 w-6" />
             </Button>
           </div>
         </div>
 
-          {/* Mobile Navigation Menu */}
+          {/* Mobile Navigation Menu - Improved touch targets */}
           {isMenuOpen && (
             <div className="md:hidden absolute top-full left-0 right-0 bg-background border-t border-border shadow-lg z-50">
-              <div className="container mx-auto px-4 py-4 space-y-4">
+              <nav className="container mx-auto px-4 py-2" aria-label="Mobilmeny">
                 <Link 
                   to="/" 
-                  className={`block transition-colors py-2 ${isActive('/') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
+                  className={`block transition-colors py-3 min-h-[44px] flex items-center touch-manipulation ${isActive('/') ? 'text-primary font-medium' : 'text-foreground hover:text-primary active:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Hjem
                 </Link>
                 <Link 
                   to="/tjenester" 
-                  className={`block transition-colors py-2 ${isActive('/tjenester') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
+                  className={`block transition-colors py-3 min-h-[44px] flex items-center touch-manipulation ${isActive('/tjenester') ? 'text-primary font-medium' : 'text-foreground hover:text-primary active:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Tjenester
                 </Link>
                 <Link 
                   to="/prosjekter" 
-                  className={`block transition-colors py-2 ${isActive('/prosjekter') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
+                  className={`block transition-colors py-3 min-h-[44px] flex items-center touch-manipulation ${isActive('/prosjekter') ? 'text-primary font-medium' : 'text-foreground hover:text-primary active:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Prosjekter
                 </Link>
                 <Link
                   to="/raad" 
-                  className={`block transition-colors py-2 ${isActive('/raad') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
+                  className={`block transition-colors py-3 min-h-[44px] flex items-center touch-manipulation ${isActive('/raad') ? 'text-primary font-medium' : 'text-foreground hover:text-primary active:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Råd
                 </Link>
                 <Link 
                   to="/om-oss" 
-                  className={`block transition-colors py-2 ${isActive('/om-oss') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
+                  className={`block transition-colors py-3 min-h-[44px] flex items-center touch-manipulation ${isActive('/om-oss') ? 'text-primary font-medium' : 'text-foreground hover:text-primary active:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Om oss
                 </Link>
                 <Link 
                   to="/kontakt" 
-                  className={`block transition-colors py-2 ${isActive('/kontakt') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
+                  className={`block transition-colors py-3 min-h-[44px] flex items-center touch-manipulation ${isActive('/kontakt') ? 'text-primary font-medium' : 'text-foreground hover:text-primary active:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Kontakt
                 </Link>
                 <Link 
                   to="/faq" 
-                  className={`block transition-colors py-2 ${isActive('/faq') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}
+                  className={`block transition-colors py-3 min-h-[44px] flex items-center touch-manipulation ${isActive('/faq') ? 'text-primary font-medium' : 'text-foreground hover:text-primary active:text-primary'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   FAQ
                 </Link>
                 
-                {/* Mobile Contact Info */}
-                <div className="pt-4 border-t border-border space-y-3">
+                {/* Mobile Contact Info - Improved touch targets */}
+                <div className="pt-4 mt-2 border-t border-border space-y-1">
                   <a 
                     href="tel:+4741250553" 
-                    className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                    className="flex items-center space-x-3 py-3 min-h-[44px] text-foreground hover:text-primary active:text-primary transition-colors touch-manipulation"
                   >
-                    <Phone className="h-4 w-4" />
+                    <Phone className="h-5 w-5" />
                     <span>+47 41250553</span>
                   </a>
                   <a 
                     href="mailto:Team@handyhjelp.no" 
-                    className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                    className="flex items-center space-x-3 py-3 min-h-[44px] text-foreground hover:text-primary active:text-primary transition-colors touch-manipulation"
                   >
-                    <Mail className="h-4 w-4" />
+                    <Mail className="h-5 w-5" />
                     <span>Team@handyhjelp.no</span>
                   </a>
                 </div>
                 
-                {user ? (
-                  <>
-                    <Link to="/dashboard" className="block w-full">
-                      <Button 
-                        variant="outline"
-                        className="w-full gap-2 justify-start"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <User className="h-4 w-4" />
-                        Profil
-                      </Button>
-                    </Link>
-                    <Link to="/tilbud" className="block w-full mt-2">
-                      <Button 
-                        className="w-full bg-success hover:bg-success-hover text-success-foreground"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Få tilbud
-                      </Button>
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/auth" className="block w-full">
-                      <Button 
-                        variant="outline"
-                        className="w-full gap-2 justify-start"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <User className="h-4 w-4" />
-                        Logg inn
-                      </Button>
-                    </Link>
-                    <Link to="/tilbud" className="block w-full mt-4">
-                      <Button 
-                        className="w-full bg-success hover:bg-success-hover text-success-foreground"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Få tilbud
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </div>
+                {/* Auth buttons - Improved touch targets */}
+                <div className="pt-4 mt-2 border-t border-border space-y-3">
+                  {user ? (
+                    <>
+                      <Link to="/dashboard" className="block w-full">
+                        <Button 
+                          variant="outline"
+                          className="w-full min-h-[48px] gap-2 justify-start touch-manipulation"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <User className="h-5 w-5" />
+                          Profil
+                        </Button>
+                      </Link>
+                      <Link to="/tilbud" className="block w-full">
+                        <Button 
+                          className="w-full min-h-[48px] bg-success hover:bg-success-hover active:bg-success-hover text-success-foreground touch-manipulation"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Få tilbud
+                        </Button>
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/auth" className="block w-full">
+                        <Button 
+                          variant="outline"
+                          className="w-full min-h-[48px] gap-2 justify-start touch-manipulation"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <User className="h-5 w-5" />
+                          Logg inn
+                        </Button>
+                      </Link>
+                      <Link to="/tilbud" className="block w-full">
+                        <Button 
+                          className="w-full min-h-[48px] bg-success hover:bg-success-hover active:bg-success-hover text-success-foreground touch-manipulation"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Få tilbud
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </nav>
             </div>
           )}
       </div>

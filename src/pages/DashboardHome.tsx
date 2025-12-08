@@ -3,9 +3,11 @@ import { FileText, Briefcase, Star, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { StatsSkeleton, PageHeaderSkeleton } from '@/components/ui/skeleton-loaders';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const DashboardHome = () => {
-  const { stats } = useDashboardStats();
+  const { stats, isLoading } = useDashboardStats();
 
   const statCards = [
     {
@@ -37,6 +39,16 @@ const DashboardHome = () => {
       description: 'Nye oppdateringer'
     }
   ];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeaderSkeleton />
+        <StatsSkeleton />
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

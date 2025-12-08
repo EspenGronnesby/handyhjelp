@@ -11,6 +11,7 @@ import { CompanySearch } from "./CompanySearch";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { supabase } from "@/integrations/supabase/client";
+import { LinearProgress } from "@/components/ui/form-progress";
 
 interface Company {
   orgNumber: string;
@@ -268,13 +269,17 @@ export const QuoteForm = () => {
 
   return (
     <Card className="form-professional">
+      {/* Progress indicator */}
+      {!(user && profile?.customer_type) && (
+        <LinearProgress 
+          currentStep={step} 
+          totalSteps={3} 
+          className="mb-6"
+        />
+      )}
+      
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-bold text-foreground">Få gratis tilbud</h3>
-        {!(user && step === 3 && profile?.customer_type) && (
-          <div className="text-sm text-muted-foreground">
-            Steg {step} av 3
-          </div>
-        )}
       </div>
 
       {step === 1 && (

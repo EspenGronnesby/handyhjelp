@@ -4,7 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { Loader2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
+import { CardGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeleton-loaders';
 
 interface Quote {
   id: string;
@@ -64,22 +65,31 @@ const DashboardQuotes = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <PageHeaderSkeleton />
+        <CardGridSkeleton count={3} />
       </div>
     );
   }
 
   if (quotes.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Mine tilbud</CardTitle>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Mine tilbud</h1>
+          <p className="text-muted-foreground">
+            Oversikt over alle dine tilbudsforespørsler
+          </p>
+        </div>
+        <Card className="p-8 text-center">
+          <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <CardTitle className="mb-2">Ingen forespørsler ennå</CardTitle>
           <CardDescription>
-            Du har ikke sendt inn noen tilbudsforespørsler ennå
+            Du har ikke sendt inn noen tilbudsforespørsler ennå. 
+            <a href="/tilbud" className="text-primary hover:underline ml-1">Send din første forespørsel</a>
           </CardDescription>
-        </CardHeader>
-      </Card>
+        </Card>
+      </div>
     );
   }
 
