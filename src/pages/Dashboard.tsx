@@ -59,7 +59,7 @@ const Dashboard = () => {
 
   const navItems = [
     { path: '/dashboard', label: 'Oversikt', icon: Home },
-    { path: '/dashboard/activity', label: 'Mine forespørsler', icon: ClipboardList },
+    { path: '/dashboard/activity', label: 'Forespørsler', icon: ClipboardList },
     // { path: '/dashboard/loyalty', label: 'Kundeklubb', icon: Star }, // Hidden temporarily
     { path: '/dashboard/profile', label: 'Profil', icon: User },
     { path: '/dashboard/notifications', label: 'Varsler', icon: Bell },
