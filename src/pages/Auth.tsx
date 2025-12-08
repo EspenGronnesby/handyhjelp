@@ -118,9 +118,15 @@ const Auth = () => {
                   <Input
                     id="phone"
                     type="tel"
-                    placeholder="+47 123 45 678"
+                    placeholder="8 siffer"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '');
+                      setPhone(value);
+                    }}
+                    maxLength={8}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     required={!isLogin}
                   />
                 </div>
