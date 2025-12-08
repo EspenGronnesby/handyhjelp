@@ -117,11 +117,6 @@ export const EditableServiceHero = ({
         
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <div className="mb-6 flex justify-center">
-              <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-                <IconComponent className="h-12 w-12 md:h-16 md:w-16 text-white" strokeWidth={1.5} />
-              </div>
-            </div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-bold mb-4 md:mb-6 text-white drop-shadow-lg">
               {displayData.title}
             </h1>
