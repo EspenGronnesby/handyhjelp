@@ -11,24 +11,24 @@ const DashboardHome = () => {
 
   const statCards = [
     {
-      title: 'Totalt tilbud',
+      title: 'Totalt forespørsler',
       value: stats.totalQuotes,
       icon: FileText,
-      link: '/dashboard/quotes',
-      description: 'Se alle dine tilbudsforespørsler'
+      link: '/dashboard/activity',
+      description: 'Se alle dine forespørsler'
     },
     {
       title: 'Aktive jobber',
       value: stats.activeJobs,
       icon: Briefcase,
-      link: '/dashboard/jobs',
+      link: '/dashboard/activity',
       description: 'Jobber under arbeid'
     },
     {
       title: 'Fullførte jobber',
       value: stats.completedJobs,
       icon: Star,
-      link: '/dashboard/jobs',
+      link: '/dashboard/activity',
       description: 'Ferdigstilte prosjekter'
     },
     {
