@@ -152,15 +152,28 @@ export const QuoteForm = () => {
 
       console.log('Saving quote to database:', quoteData);
       
-      const { error: dbError } = await supabase
+      const { data: savedQuote, error: dbError } = await supabase
         .from('quotes')
-        .insert(quoteData);
+        .insert(quoteData)
+        .select()
+        .single();
 
       if (dbError) {
         console.error('Database save failed:', dbError);
         // Fortsett likevel - Web3Forms er backup
       } else {
         console.log('Quote saved to database successfully');
+        
+        // Opprett notifikasjon for innlogget bruker
+        if (user?.id) {
+          await supabase.from('notifications').insert({
+            user_id: user.id,
+            type: 'quote_update',
+            title: 'Forespørsel mottatt',
+            message: 'Vi har mottatt din forespørsel og vil ta kontakt innen 1-3 virkedager.',
+            read: false
+          });
+        }
       }
 
       // 2. Send til Web3Forms

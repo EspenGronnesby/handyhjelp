@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,13 +37,14 @@ interface Job {
   };
 }
 
+// Forespørsel skal ikke vise "Fullført" - det er kun for jobber
 const quoteStatusColors: Record<string, string> = {
   pending: 'bg-yellow-500',
   under_review: 'bg-blue-500',
   quoted: 'bg-purple-500',
   accepted: 'bg-green-500',
   rejected: 'bg-red-500',
-  completed: 'bg-gray-500'
+  in_progress: 'bg-orange-500'
 };
 
 const quoteStatusLabels: Record<string, string> = {
@@ -52,7 +53,7 @@ const quoteStatusLabels: Record<string, string> = {
   quoted: 'Tilbud mottatt',
   accepted: 'Akseptert',
   rejected: 'Avvist',
-  completed: 'Fullført'
+  in_progress: 'Under arbeid'
 };
 
 const jobStatusColors: Record<string, string> = {
@@ -75,41 +76,77 @@ const DashboardActivity = () => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    
+    setUserId(user.id);
+
+    // Fetch quotes - filtrer bort completed (vises kun i jobber)
+    const { data: quotesData } = await supabase
+      .from('quotes')
+      .select('*')
+      .or(`user_id.eq.${user.id},email.eq.${user.email}`)
+      .neq('status', 'completed')
+      .order('created_at', { ascending: false });
+
+    // Fetch jobs
+    const { data: jobsData } = await supabase
+      .from('jobs')
+      .select(`
+        *,
+        quotes (
+          description,
+          type,
+          name,
+          company_name
+        )
+      `)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (quotesData) setQuotes(quotesData);
+    if (jobsData) setJobs(jobsData);
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Fetch quotes
-      const { data: quotesData } = await supabase
-        .from('quotes')
-        .select('*')
-        .or(`user_id.eq.${user.id},email.eq.${user.email}`)
-        .order('created_at', { ascending: false });
-
-      // Fetch jobs
-      const { data: jobsData } = await supabase
-        .from('jobs')
-        .select(`
-          *,
-          quotes (
-            description,
-            type,
-            name,
-            company_name
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (quotesData) setQuotes(quotesData);
-      if (jobsData) setJobs(jobsData);
-      setLoading(false);
-    };
-
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  // Realtime subscription for quotes and jobs
+  useEffect(() => {
+    if (!userId) return;
+
+    const quotesChannel = supabase
+      .channel('quotes-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'quotes' },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    const jobsChannel = supabase
+      .channel('jobs-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'jobs' },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(quotesChannel);
+      supabase.removeChannel(jobsChannel);
+    };
+  }, [userId, fetchData]);
 
   if (loading) {
     return (
@@ -156,7 +193,7 @@ const DashboardActivity = () => {
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="quotes" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            Tilbud ({quotes.length})
+            Forespørsel ({quotes.length})
           </TabsTrigger>
           <TabsTrigger value="jobs" className="flex items-center gap-2">
             <Briefcase className="h-4 w-4" />
@@ -168,7 +205,7 @@ const DashboardActivity = () => {
           {quotes.length === 0 ? (
             <Card className="p-6 text-center">
               <FileText className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">Ingen tilbudsforespørsler ennå</p>
+              <p className="text-muted-foreground">Ingen forespørsler ennå</p>
             </Card>
           ) : (
             quotes.map((quote) => (
@@ -182,7 +219,7 @@ const DashboardActivity = () => {
                       <div>
                         <div className="flex items-center gap-2">
                           <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50">
-                            Tilbud
+                            Forespørsel
                           </Badge>
                         </div>
                         <CardTitle className="text-lg mt-1">
@@ -197,7 +234,7 @@ const DashboardActivity = () => {
                       </div>
                     </div>
                     <Badge className={quoteStatusColors[quote.status]}>
-                      {quoteStatusLabels[quote.status]}
+                      {quoteStatusLabels[quote.status] || quote.status}
                     </Badge>
                   </div>
                 </CardHeader>
