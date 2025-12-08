@@ -183,16 +183,30 @@ const Auth = () => {
               {isLogin ? 'Logg inn' : 'Opprett konto'}
             </Button>
           </form>
-          <div className="mt-4 text-center text-sm">
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-primary hover:underline"
-            >
-              {isLogin
-                ? 'Har du ikke en konto? Opprett en her'
-                : 'Har du allerede en konto? Logg inn'}
-            </button>
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            {isLogin ? (
+              <>
+                Ingen konto?{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(false)}
+                  className="text-primary hover:underline font-medium"
+                >
+                  Opprett her
+                </button>
+              </>
+            ) : (
+              <>
+                Har konto?{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsLogin(true)}
+                  className="text-primary hover:underline font-medium"
+                >
+                  Logg inn
+                </button>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
