@@ -4,7 +4,9 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "next-themes";
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
+import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,6 +14,7 @@ export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { resolvedTheme } = useTheme();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -52,7 +55,7 @@ export const Header = () => {
           {/* Logo - Centered on mobile, left-aligned on desktop */}
           <Link to="/" className="flex items-center absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none z-20">
             <img 
-              src={handyhjelpLogo} 
+              src={resolvedTheme === 'dark' ? handyhjelpLogoWhite : handyhjelpLogo} 
               alt="HandyHjelp - Levert med kvalitet" 
               className="h-14 md:h-16 w-auto object-contain"
             />
