@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
 import { Loader2, ClipboardList, User, Bell, Home, Star, Shield } from 'lucide-react';
-import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
+import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { CustomerTypeModal } from '@/components/CustomerTypeModal';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -81,7 +81,7 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <img src={handyhjelpLogo} alt="HandyHjelp" className="h-10" />
+              <img src={handyhjelpLogoWhite} alt="HandyHjelp" className="h-10" />
             </Link>
             <Button variant="outline" onClick={() => navigate('/')}>
               Tilbake til hjemmeside
