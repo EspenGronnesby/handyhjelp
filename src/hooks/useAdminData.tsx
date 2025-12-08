@@ -57,6 +57,17 @@ export const useAdminData = (isAdmin: boolean) => {
 
       if (jobError) throw jobError;
 
+      // Opprett notifikasjon for bruker
+      if (quote.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: quote.user_id,
+          type: 'job_update',
+          title: 'Jobben din er startet',
+          message: `Vi har begynt arbeidet med: "${quote.description.substring(0, 100)}". Du vil få beskjed når jobben er fullført.`,
+          read: false
+        });
+      }
+
       await fetchData();
 
       supabase.functions.invoke('send-job-status-email', {
@@ -105,6 +116,17 @@ export const useAdminData = (isAdmin: boolean) => {
         .eq('id', job.quote_id);
 
       if (quoteError) throw quoteError;
+
+      // Opprett notifikasjon for bruker
+      if (job.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: job.user_id,
+          type: 'job_update',
+          title: 'Jobben din er fullført',
+          message: `Oppdraget "${job.quotes.description.substring(0, 100)}" er nå ferdig. Takk for at du valgte HandyHjelp!`,
+          read: false
+        });
+      }
 
       await fetchData();
 
