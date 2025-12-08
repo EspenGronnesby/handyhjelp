@@ -143,6 +143,8 @@ export const ProjectsSection = () => {
                 className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 block"
                 onMouseEnter={() => setHoveredProject(project.id)}
                 onMouseLeave={() => setHoveredProject(null)}
+                onTouchStart={() => setTouchedProject(project.id)}
+                onTouchEnd={() => setTouchedProject(null)}
               >
                 {/* Image Container */}
                 <div className="relative aspect-[4/3] overflow-hidden">
