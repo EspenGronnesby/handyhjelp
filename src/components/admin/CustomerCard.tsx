@@ -1,22 +1,28 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { Profile } from '@/types/admin';
+import { ChevronRight } from 'lucide-react';
 
 interface CustomerCardProps {
   profile: Profile;
+  onClick?: () => void;
 }
 
-export const CustomerCard = ({ profile }: CustomerCardProps) => {
+export const CustomerCard = ({ profile, onClick }: CustomerCardProps) => {
   return (
-    <Card>
+    <Card 
+      className="cursor-pointer hover:shadow-md transition-shadow hover:border-primary/50"
+      onClick={onClick}
+    >
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg">
+          <div className="flex-1">
+            <CardTitle className="text-lg flex items-center gap-2">
               {profile.full_name}
-              <Badge className="ml-2" variant="outline">
+              <Badge className="ml-1" variant="outline">
                 {profile.customer_type === 'business' ? 'Bedrift' : 'Privat'}
               </Badge>
             </CardTitle>
@@ -27,6 +33,9 @@ export const CustomerCard = ({ profile }: CustomerCardProps) => {
               })}
             </CardDescription>
           </div>
+          <Button variant="ghost" size="icon" className="shrink-0">
+            <ChevronRight className="h-5 w-5" />
+          </Button>
         </div>
       </CardHeader>
       <CardContent>

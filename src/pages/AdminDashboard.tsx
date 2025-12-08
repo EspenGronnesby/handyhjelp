@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
-import { Quote, Job } from '@/types/admin';
+import { Quote, Job, Profile } from '@/types/admin';
 
 // Admin components
 import { AdminSummaryCards } from '@/components/admin/AdminSummaryCards';
@@ -13,6 +13,7 @@ import { QuoteCard } from '@/components/admin/QuoteCard';
 import { JobCard } from '@/components/admin/JobCard';
 import { ServiceAgreementCard } from '@/components/admin/ServiceAgreementCard';
 import { CustomerCard } from '@/components/admin/CustomerCard';
+import { CustomerDetailModal } from '@/components/admin/CustomerDetailModal';
 import { AdminConfirmDialog } from '@/components/admin/AdminConfirmDialog';
 import { ProjectManagement } from '@/components/admin/ProjectManagement';
 import { BlogManagement } from '@/components/admin/BlogManagement';
@@ -26,6 +27,7 @@ const AdminDashboard = () => {
     type: 'start' | 'complete' | 'delete' | null;
     item: Quote | Job | null;
   }>({ open: false, type: null, item: null });
+  const [selectedCustomer, setSelectedCustomer] = useState<Profile | null>(null);
 
   const {
     profiles,
@@ -200,7 +202,11 @@ const AdminDashboard = () => {
         {/* Kunder */}
         <TabsContent value="customers" className="space-y-4">
           {profiles.map((profile) => (
-            <CustomerCard key={profile.id} profile={profile} />
+            <CustomerCard 
+              key={profile.id} 
+              profile={profile} 
+              onClick={() => setSelectedCustomer(profile)}
+            />
           ))}
         </TabsContent>
 
@@ -226,6 +232,12 @@ const AdminDashboard = () => {
         onStartJob={handleConfirmedStartJob}
         onCompleteJob={handleConfirmedCompleteJob}
         onDeleteJob={handleConfirmedDeleteJob}
+      />
+
+      <CustomerDetailModal
+        profile={selectedCustomer}
+        open={!!selectedCustomer}
+        onClose={() => setSelectedCustomer(null)}
       />
     </div>
   );
