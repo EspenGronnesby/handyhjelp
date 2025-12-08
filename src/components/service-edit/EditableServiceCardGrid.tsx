@@ -110,76 +110,78 @@ const EditableServiceCardGrid = () => {
 
   return (
     <>
-      <section className="py-20 bg-background">
+      <section className="py-20 bg-muted">
         <div className="container mx-auto px-4 max-w-7xl relative">
-          {editMode && (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="absolute top-2 right-2 z-10 p-2 bg-primary/10 hover:bg-primary/20 rounded-full border-2 border-primary transition-all hover:scale-110"
-              aria-label="Rediger tjenestekort"
-            >
-              <Pencil className="h-5 w-5 text-primary" />
-            </button>
-          )}
-
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-            {services.map((service, index) => (
-              <Card 
-                key={service.id}
-                id={service.id}
-                className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-8 h-[520px] flex flex-col animate-fade-in ${
-                  service.popular ? 'border-primary border-2 shadow-lg' : 'border-border'
-                }`}
-                style={{ animationDelay: `${index * 100}ms` }}
+          <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12">
+            {editMode && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="absolute top-6 right-6 z-10 p-2 bg-primary/10 hover:bg-primary/20 rounded-full border-2 border-primary transition-all hover:scale-110"
+                aria-label="Rediger tjenestekort"
               >
-                {service.popular && (
-                  <Badge className="absolute top-6 right-6 bg-primary text-primary-foreground px-4 py-1 text-sm">
-                    Populær
-                  </Badge>
-                )}
-                
-                <div className="flex justify-start mb-6">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
-                    <span className="text-4xl group-hover:scale-110 transition-transform duration-300">{service.icon}</span>
-                  </div>
-                </div>
+                <Pencil className="h-5 w-5 text-primary" />
+              </button>
+            )}
 
-                <div className="mb-4">
-                  <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
-                  {service.subtitle && (
-                    <p className="text-base text-muted-foreground font-light italic">{service.subtitle}</p>
+            <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+              {services.map((service, index) => (
+                <Card 
+                  key={service.id}
+                  id={service.id}
+                  className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-6 min-h-[520px] flex flex-col animate-fade-in overflow-hidden ${
+                    service.popular ? 'border-primary border-2 shadow-lg' : 'border-border'
+                  }`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  {service.popular && (
+                    <Badge className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 text-xs z-10">
+                      Populær
+                    </Badge>
                   )}
-                </div>
-
-                {service.price && (
-                  <div className="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
-                    <p className="text-xs text-muted-foreground mb-1">Fast pris for enebolig</p>
-                    <p className="text-3xl font-bold text-primary">Fra {service.price}</p>
-                  </div>
-                )}
-
-                <div className="space-y-2 mb-6 flex-grow">
-                  {service.services.slice(0, 5).map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                      <span className="text-sm leading-relaxed">{item}</span>
+                  
+                  <div className="flex justify-start mb-4">
+                    <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
+                      <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{service.icon}</span>
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                {service.targetAudience && (
-                  <p className="text-xs text-muted-foreground mb-4 italic border-t border-border pt-4">
-                    <span className="font-semibold">Målgruppe:</span> {service.targetAudience}
-                  </p>
-                )}
+                  <div className="mb-3">
+                    <h3 className="text-xl font-bold mb-1 line-clamp-1">{service.title}</h3>
+                    {service.subtitle && (
+                      <p className="text-sm text-muted-foreground font-light italic line-clamp-2">{service.subtitle}</p>
+                    )}
+                  </div>
 
-                <Link to={`/tjenester/${service.id}`} className="mt-auto">
-                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                    Les mer
-                  </Button>
-                </Link>
-              </Card>
-            ))}
+                  {service.price && (
+                    <div className="mb-3 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                      <p className="text-xs text-muted-foreground mb-1">Fast pris for enebolig</p>
+                      <p className="text-2xl font-bold text-primary">Fra {service.price}</p>
+                    </div>
+                  )}
+
+                  <div className="space-y-2 mb-4 flex-grow overflow-hidden">
+                    {service.services.slice(0, 5).map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        <span className="text-sm leading-snug line-clamp-1">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {service.targetAudience && (
+                    <p className="text-xs text-muted-foreground mb-4 italic border-t border-border pt-3 line-clamp-1">
+                      <span className="font-semibold">Målgruppe:</span> {service.targetAudience}
+                    </p>
+                  )}
+
+                  <Link to={`/tjenester/${service.id}`} className="mt-auto">
+                    <Button variant="outline" className="w-full hover:bg-accent hover:text-accent-foreground hover:border-accent transition-colors duration-300">
+                      Les mer
+                    </Button>
+                  </Link>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -41,8 +41,9 @@
     --muted-hover: 210 40% 92%;
     --muted-foreground: 217 19% 45%;
 
-    /* Accent - Warm Orange (minimal use) */
+    /* Accent - Warm Orange (hover on white elements) */
     --accent: 24 95% 53%;
+    --accent-hover: 24 95% 45%;
     --accent-foreground: 0 0% 98%;
 
     /* Status Colors */
