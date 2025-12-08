@@ -85,7 +85,7 @@ export const EditableServiceBenefits = ({
         {isAdmin && editMode && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
+            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
           >
             <Pencil className="h-5 w-5 text-primary" />
           </button>

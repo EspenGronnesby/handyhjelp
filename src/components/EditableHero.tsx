@@ -35,7 +35,7 @@ export const EditableHero = ({
         {isAdmin && editMode && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
+            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
           >
             <Pencil className="h-5 w-5 text-primary" />
           </button>
@@ -51,10 +51,10 @@ export const EditableHero = ({
         )}
 
         <div className="relative z-10">
-          <h1 className={`text-4xl md:text-5xl font-heading font-bold mb-4 ${backgroundImage ? 'text-white' : ''}`}>
+          <h1 className={`text-4xl md:text-5xl font-heading font-bold mb-4 ${backgroundImage ? 'text-white drop-shadow-lg' : 'text-foreground'}`}>
             {displayHeading}
           </h1>
-          <p className={`text-lg max-w-2xl mx-auto ${backgroundImage ? 'text-white/90' : 'text-muted-foreground'}`}>
+          <p className={`text-lg max-w-2xl mx-auto ${backgroundImage ? 'text-white/90 drop-shadow' : 'text-muted-foreground'}`}>
             {displaySubtext}
           </p>
         </div>
