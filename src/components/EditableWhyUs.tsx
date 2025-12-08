@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, Clock, Shield, Award, Users, CheckCircle2, Star } from 'lucide-react';
+import { Pencil, Clock, Shield, Award, Users, CheckCircle2, Star, EyeOff } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { WhyUsEditModal } from './WhyUsEditModal';
@@ -28,13 +28,28 @@ export const EditableWhyUs = () => {
   const { content: desc6 } = useEditableContent('about-why-us', 'desc_6');
 
   const items = [
-    { icon: 'Clock', title: title1 || '20+ års erfaring', description: desc1 || 'To tiår med profesjonell eiendomspleie i Kristiansand-regionen' },
-    { icon: 'Shield', title: title2 || 'Fullt forsikret', description: desc2 || 'Omfattende forsikringsdekning for alle typer oppdrag' },
-    { icon: 'Award', title: title3 || 'Sertifisert kvalitet', description: desc3 || 'Godkjent av Direktoratet for byggkvalitet (DiBK)' },
-    { icon: 'Users', title: title4 || 'Erfarne fagfolk', description: desc4 || 'Alle våre ansatte har fagbrev og dokumentert erfaring' },
-    { icon: 'CheckCircle2', title: title5 || '100% tilfredsgaranti', description: desc5 || 'Vi står for arbeidet vårt og fikser eventuelle mangler kostnadsfritt' },
-    { icon: 'Star', title: title6 || 'Høy kundetilfredshet', description: desc6 || '4.8/5 stjerner basert på 200+ kundeanmeldelser' },
+    { icon: 'Clock', title: title1, description: desc1, defaultTitle: '20+ års erfaring', defaultDesc: 'To tiår med profesjonell eiendomspleie i Kristiansand-regionen' },
+    { icon: 'Shield', title: title2, description: desc2, defaultTitle: 'Fullt forsikret', defaultDesc: 'Omfattende forsikringsdekning for alle typer oppdrag' },
+    { icon: 'Award', title: title3, description: desc3, defaultTitle: 'Sertifisert kvalitet', defaultDesc: 'Godkjent av Direktoratet for byggkvalitet (DiBK)' },
+    { icon: 'Users', title: title4, description: desc4, defaultTitle: 'Erfarne fagfolk', defaultDesc: 'Alle våre ansatte har fagbrev og dokumentert erfaring' },
+    { icon: 'CheckCircle2', title: title5, description: desc5, defaultTitle: '100% tilfredsgaranti', defaultDesc: 'Vi står for arbeidet vårt og fikser eventuelle mangler kostnadsfritt' },
+    { icon: 'Star', title: title6, description: desc6, defaultTitle: 'Høy kundetilfredshet', defaultDesc: '4.8/5 stjerner basert på 200+ kundeanmeldelser' },
   ];
+
+  // Sjekk om et item er tomt (både tittel og beskrivelse er tomme strenger)
+  const isItemHidden = (item: typeof items[0]) => {
+    return item.title?.trim() === '' && item.description?.trim() === '';
+  };
+
+  // Filtrer ut skjulte items når ikke i edit mode
+  const visibleItems = isAdmin && editMode 
+    ? items 
+    : items.filter(item => !isItemHidden(item));
+
+  // Hvis alle items er skjult og ikke i edit mode, skjul hele seksjonen
+  if (visibleItems.length === 0 && (!isAdmin || !editMode)) {
+    return null;
+  }
 
   return (
     <>
@@ -52,12 +67,33 @@ export const EditableWhyUs = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {items.map((item, index) => {
             const IconComponent = iconMap[item.icon as keyof typeof iconMap];
+            const isHidden = isItemHidden(item);
+            
+            // I edit mode: vis alle, men marker skjulte
+            if (!isAdmin || !editMode) {
+              if (isHidden) return null;
+            }
+
+            const displayTitle = item.title?.trim() || item.defaultTitle;
+            const displayDesc = item.description?.trim() || item.defaultDesc;
+
             return (
-              <Card key={index} className="border-2 hover:border-primary transition-colors">
+              <Card 
+                key={index} 
+                className={`border-2 hover:border-primary transition-colors relative ${
+                  isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''
+                }`}
+              >
+                {isHidden && isAdmin && editMode && (
+                  <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                    <EyeOff className="h-3 w-3" />
+                    <span>Skjult</span>
+                  </div>
+                )}
                 <CardContent className="pt-6">
                   <IconComponent className="h-12 w-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.description}</p>
+                  <h3 className="text-xl font-semibold mb-2">{displayTitle}</h3>
+                  <p className="text-muted-foreground">{displayDesc}</p>
                 </CardContent>
               </Card>
             );
@@ -69,7 +105,11 @@ export const EditableWhyUs = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         section="about-why-us"
-        currentData={{ heading: heading || 'Hvorfor velge oss?', items }}
+        currentData={{ heading: heading || 'Hvorfor velge oss?', items: items.map(i => ({
+          icon: i.icon,
+          title: i.title || i.defaultTitle,
+          description: i.description || i.defaultDesc
+        })) }}
       />
     </>
   );

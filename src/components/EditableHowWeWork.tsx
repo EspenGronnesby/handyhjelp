@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, EyeOff } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -14,6 +14,8 @@ import { useQueryClient } from '@tanstack/react-query';
 interface HowWeWorkStep {
   title: string;
   description: string;
+  defaultTitle: string;
+  defaultDesc: string;
 }
 
 export const EditableHowWeWork = () => {
@@ -34,15 +36,30 @@ export const EditableHowWeWork = () => {
   const { content: step5Title } = useEditableContent('how-we-work-contact', 'step_5_title');
   const { content: step5Desc } = useEditableContent('how-we-work-contact', 'step_5_desc');
 
+  const steps: HowWeWorkStep[] = [
+    { title: step1Title || '', description: step1Desc || '', defaultTitle: 'Ta kontakt', defaultDesc: 'Ring eller send e-post med din forespørsel' },
+    { title: step2Title || '', description: step2Desc || '', defaultTitle: 'Vi svarer raskt', defaultDesc: 'Vi kommer tilbake til deg innen 1-3 virkedager' },
+    { title: step3Title || '', description: step3Desc || '', defaultTitle: 'Befaring', defaultDesc: 'Vi avtaler befaring og lager tilbud' },
+    { title: step4Title || '', description: step4Desc || '', defaultTitle: 'Utførelse', defaultDesc: 'Vi utfører jobben profesjonelt og effektivt' },
+    { title: step5Title || '', description: step5Desc || '', defaultTitle: 'Kvalitetskontroll', defaultDesc: 'Vi sikrer at alt er gjort etter dine ønsker' },
+  ];
+
+  // Sjekk om et steg er skjult (både tittel og beskrivelse er tomme strenger)
+  const isStepHidden = (step: HowWeWorkStep) => {
+    return step.title?.trim() === '' && step.description?.trim() === '';
+  };
+
+  // Filtrer ut skjulte steps når ikke i edit mode
+  const visibleSteps = isAdmin && editMode 
+    ? steps 
+    : steps.filter(step => !isStepHidden(step));
+
   const defaultData = {
     heading: heading || 'Hvordan vi jobber',
-    steps: [
-      { title: step1Title || 'Ta kontakt', description: step1Desc || 'Ring eller send e-post med din forespørsel' },
-      { title: step2Title || 'Vi svarer raskt', description: step2Desc || 'Vi kommer tilbake til deg innen 1-3 virkedager' },
-      { title: step3Title || 'Befaring', description: step3Desc || 'Vi avtaler befaring og lager tilbud' },
-      { title: step4Title || 'Utførelse', description: step4Desc || 'Vi utfører jobben profesjonelt og effektivt' },
-      { title: step5Title || 'Kvalitetskontroll', description: step5Desc || 'Vi sikrer at alt er gjort etter dine ønsker' },
-    ],
+    steps: steps.map(s => ({
+      title: s.title?.trim() || s.defaultTitle,
+      description: s.description?.trim() || s.defaultDesc
+    })),
   };
 
   const [formData, setFormData] = useState(defaultData);
@@ -94,6 +111,11 @@ export const EditableHowWeWork = () => {
     }
   };
 
+  // Hvis alle steps er skjult og ikke i edit mode, skjul hele seksjonen
+  if (visibleSteps.length === 0 && (!isAdmin || !editMode)) {
+    return null;
+  }
+
   return (
     <>
       <div className="relative">
@@ -108,17 +130,46 @@ export const EditableHowWeWork = () => {
 
         <h2 className="text-2xl font-bold mb-6">{defaultData.heading}</h2>
         <div className="space-y-4">
-          {defaultData.steps.map((step, index) => (
-            <div key={index} className="flex gap-3">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                {index + 1}
+          {steps.map((step, index) => {
+            const isHidden = isStepHidden(step);
+            
+            // I edit mode: vis alle, men marker skjulte
+            if (!isAdmin || !editMode) {
+              if (isHidden) return null;
+            }
+
+            const displayTitle = step.title?.trim() || step.defaultTitle;
+            const displayDesc = step.description?.trim() || step.defaultDesc;
+
+            // Beregn riktig nummer basert på synlige steg
+            const visibleIndex = visibleSteps.findIndex(s => 
+              (s.title?.trim() || s.defaultTitle) === displayTitle
+            );
+            const stepNumber = isAdmin && editMode ? index + 1 : visibleIndex + 1;
+
+            return (
+              <div 
+                key={index} 
+                className={`flex gap-3 relative ${
+                  isHidden && isAdmin && editMode ? 'opacity-50' : ''
+                }`}
+              >
+                {isHidden && isAdmin && editMode && (
+                  <div className="absolute -top-2 right-0 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded z-10">
+                    <EyeOff className="h-3 w-3" />
+                    <span>Skjult</span>
+                  </div>
+                )}
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                  {stepNumber}
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-1">{displayTitle}</h3>
+                  <p className="text-sm text-muted-foreground">{displayDesc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold mb-1">{step.title}</h3>
-                <p className="text-sm text-muted-foreground">{step.description}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
