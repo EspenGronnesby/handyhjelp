@@ -157,7 +157,10 @@ const DashboardActivity = () => {
     );
   }
 
-  const isEmpty = quotes.length === 0 && jobs.length === 0;
+  // Filtrer jobber: kun vis fullførte i Jobber-fanen
+  const completedJobs = jobs.filter(job => job.status === 'completed');
+  
+  const isEmpty = quotes.length === 0 && completedJobs.length === 0;
 
   if (isEmpty) {
     return (
@@ -165,14 +168,14 @@ const DashboardActivity = () => {
         <div>
           <h1 className="text-3xl font-bold mb-2">Mine forespørsler</h1>
           <p className="text-muted-foreground">
-            Oversikt over dine tilbud og aktive jobber
+            Oversikt over dine forespørsler og fullførte oppdrag
           </p>
         </div>
         <Card className="p-8 text-center">
           <ClipboardList className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <CardTitle className="mb-2">Ingen forespørsler ennå</CardTitle>
           <CardDescription>
-            Du har ikke sendt inn noen tilbudsforespørsler ennå.
+            Du har ikke sendt inn noen forespørsler ennå.
             <a href="/tilbud" className="text-primary hover:underline ml-1">Send din første forespørsel</a>
           </CardDescription>
         </Card>
@@ -185,7 +188,7 @@ const DashboardActivity = () => {
       <div>
         <h1 className="text-3xl font-bold mb-2">Mine forespørsler</h1>
         <p className="text-muted-foreground">
-          Oversikt over dine tilbud og aktive jobber
+          Oversikt over dine forespørsler og fullførte oppdrag
         </p>
       </div>
 
@@ -197,7 +200,7 @@ const DashboardActivity = () => {
           </TabsTrigger>
           <TabsTrigger value="jobs" className="flex items-center gap-2">
             <Briefcase className="h-4 w-4" />
-            Jobber ({jobs.length})
+            Fullført ({completedJobs.length})
           </TabsTrigger>
         </TabsList>
 
@@ -264,41 +267,44 @@ const DashboardActivity = () => {
         </TabsContent>
 
         <TabsContent value="jobs" className="space-y-4">
-          {jobs.length === 0 ? (
+          {completedJobs.length === 0 ? (
             <Card className="p-6 text-center">
               <Briefcase className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground">
-                Ingen aktive jobber ennå. Når dine tilbud blir akseptert, vises jobbene her.
+                Ingen fullførte oppdrag ennå. Når jobbene dine er ferdige, vises de her.
               </p>
             </Card>
           ) : (
-            jobs.map((job) => (
-              <Card key={job.id} className="border-l-4 border-l-primary">
+            completedJobs.map((job) => (
+              <Card key={job.id} className="border-l-4 border-l-green-500">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Briefcase className="h-5 w-5 text-primary" />
+                      <div className="p-2 rounded-lg bg-green-500/10">
+                        <Briefcase className="h-5 w-5 text-green-600" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-primary border-primary/30 bg-primary/5">
-                            Jobb
+                          <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50">
+                            Fullført
                           </Badge>
                         </div>
                         <CardTitle className="text-lg mt-1">
                           {job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name}
                         </CardTitle>
                         <CardDescription>
-                          Opprettet {formatDistanceToNow(new Date(job.created_at), { 
+                          Fullført {job.completed_date ? formatDistanceToNow(new Date(job.completed_date), { 
+                            addSuffix: true,
+                            locale: nb 
+                          }) : formatDistanceToNow(new Date(job.created_at), { 
                             addSuffix: true,
                             locale: nb 
                           })}
                         </CardDescription>
                       </div>
                     </div>
-                    <Badge className={jobStatusColors[job.status]}>
-                      {jobStatusLabels[job.status]}
+                    <Badge className="bg-green-500">
+                      Fullført
                     </Badge>
                   </div>
                 </CardHeader>
