@@ -3,7 +3,7 @@ import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdmin } from '@/hooks/useAdmin';
 import { Button } from '@/components/ui/button';
-import { Loader2, FileText, Briefcase, User, Bell, Home, Star, Shield } from 'lucide-react';
+import { Loader2, ClipboardList, User, Bell, Home, Star, Shield } from 'lucide-react';
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 import { CustomerTypeModal } from '@/components/CustomerTypeModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -59,8 +59,7 @@ const Dashboard = () => {
 
   const navItems = [
     { path: '/dashboard', label: 'Oversikt', icon: Home },
-    { path: '/dashboard/quotes', label: 'Mine tilbud', icon: FileText },
-    { path: '/dashboard/jobs', label: 'Mine jobber', icon: Briefcase },
+    { path: '/dashboard/activity', label: 'Mine forespørsler', icon: ClipboardList },
     // { path: '/dashboard/loyalty', label: 'Kundeklubb', icon: Star }, // Hidden temporarily
     { path: '/dashboard/profile', label: 'Profil', icon: User },
     { path: '/dashboard/notifications', label: 'Varsler', icon: Bell },
