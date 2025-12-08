@@ -135,9 +135,36 @@ export const QuoteForm = () => {
     setIsSubmitting(true);
 
     try {
-      // SEND KUN TIL WEB3FORMS - INGEN DATABASE
+      // 1. Lagre til database FØRST
+      const quoteData = {
+        type: formData.type || 'private',
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.type === 'private' ? formData.address : (formData.selectedCompany?.address || ''),
+        company_name: formData.selectedCompany?.name || null,
+        org_number: formData.selectedCompany?.orgNumber || null,
+        description: formData.description,
+        status: 'pending',
+        user_id: user?.id || null,
+      };
+
+      console.log('Saving quote to database:', quoteData);
+      
+      const { error: dbError } = await supabase
+        .from('quotes')
+        .insert(quoteData);
+
+      if (dbError) {
+        console.error('Database save failed:', dbError);
+        // Fortsett likevel - Web3Forms er backup
+      } else {
+        console.log('Quote saved to database successfully');
+      }
+
+      // 2. Send til Web3Forms
       const web3FormData = {
-        access_key: WEB3FORMS_ACCESS_KEY,
+        access_key: 'e73de942-c444-45b1-ba7a-1556f5862bfd',
         subject: `Ny tilbudsforespørsel fra ${formData.name}`,
         from_name: "HandyHjelp Nettside",
         type: formData.type === 'private' ? 'Privat' : 'Bedrift',
@@ -150,7 +177,6 @@ export const QuoteForm = () => {
         description: formData.description,
       };
 
-      console.log('=== QUOTE FORM SUBMIT ===');
       console.log('Sending to Web3Forms:', web3FormData);
 
       const response = await fetch('https://api.web3forms.com/submit', {
@@ -167,7 +193,7 @@ export const QuoteForm = () => {
         throw new Error(responseData.message || 'Kunne ikke sende forespørsel');
       }
 
-      // Send bekreftelsesmail til kunden (non-blocking)
+      // 3. Send bekreftelsesmail til kunden (non-blocking)
       try {
         console.log('Sending confirmation email to:', formData.email);
         const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
@@ -186,9 +212,7 @@ export const QuoteForm = () => {
         }
       } catch (emailErr) {
         console.error('Failed to send confirmation email:', emailErr);
-        // Don't block success - Web3Forms already worked
       }
-
       // SUCCESS!
       toast({
         title: "Tilbud sendt!",
