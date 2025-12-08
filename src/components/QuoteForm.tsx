@@ -374,11 +374,16 @@ export const QuoteForm = () => {
               <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 type="tel"
-                placeholder="Telefonnummer"
+                placeholder="8 siffer"
                 className={`pl-10 ${errors.phone ? 'border-destructive' : ''}`}
                 value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-                maxLength={15}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, '');
+                  handleInputChange('phone', value);
+                }}
+                maxLength={8}
+                inputMode="numeric"
+                pattern="[0-9]*"
               />
               {errors.phone && (
                 <div className="flex items-center gap-1 mt-1 text-sm text-destructive">

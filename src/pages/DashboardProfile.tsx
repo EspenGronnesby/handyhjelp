@@ -191,8 +191,15 @@ const DashboardProfile = () => {
             <Input
               id="phone"
               type="tel"
+              placeholder="8 siffer"
               value={profile.phone}
-              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '');
+                setProfile({ ...profile, phone: value });
+              }}
+              maxLength={8}
+              inputMode="numeric"
+              pattern="[0-9]*"
             />
           </div>
           <div className="space-y-2">

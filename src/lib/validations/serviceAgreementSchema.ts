@@ -2,11 +2,11 @@ import { z } from 'zod';
 
 // Sanitization helpers
 const sanitizeString = (value: string) => value.trim().replace(/\s+/g, ' ');
-const sanitizePhone = (value: string) => value.replace(/[^\d\+\-\s\(\)]/g, '').trim();
+const sanitizePhone = (value: string) => value.replace(/[^0-9]/g, '');
 
 // Custom validators
 const norwegianNameRegex = /^[a-zA-ZæøåÆØÅ\s\-'\.]+$/;
-const phoneRegex = /^[\+]?[0-9\s\-\(\)]{8,15}$/;
+const phoneRegex = /^[0-9]{8}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const serviceAgreementSchema = z.object({
@@ -86,7 +86,7 @@ export const serviceAgreementSchema = z.object({
     .min(1, "Telefonnummer er påkrevd")
     .transform(sanitizePhone)
     .refine((val) => phoneRegex.test(val), {
-      message: "Ugyldig telefonnummer (8-15 siffer)",
+      message: "Telefonnummer må være nøyaktig 8 siffer",
     }),
 
   additionalInfo: z

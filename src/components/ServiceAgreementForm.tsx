@@ -468,7 +468,18 @@ export const ServiceAgreementForm = () => {
                 <FormItem>
                   <FormLabel>Telefon *</FormLabel>
                   <FormControl>
-                    <Input type="tel" placeholder="+47 123 45 678" {...field} />
+                    <Input 
+                      type="tel" 
+                      placeholder="8 siffer" 
+                      maxLength={8}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      {...field}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, '');
+                        field.onChange(value);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -113,8 +113,15 @@ const Contact = () => {
                       <Input
                         id="phone"
                         type="tel"
+                        placeholder="8 siffer"
                         value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '');
+                          setFormData({ ...formData, phone: value });
+                        }}
+                        maxLength={8}
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         required
                         disabled={isSubmitting}
                       />
