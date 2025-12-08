@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, EyeOff } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Button } from '@/components/ui/button';
@@ -34,18 +34,27 @@ export const EditableServiceCard = ({
   const { content: bullet2 } = useEditableContent(section, 'bullet_2');
   const { content: bullet3 } = useEditableContent(section, 'bullet_3');
 
-  const displayTitle = title || defaultTitle;
-  const displaySubtitle = subtitle || defaultSubtitle;
-  const displayBullet1 = bullet1 || defaultBullets[0];
-  const displayBullet2 = bullet2 || defaultBullets[1];
-  const displayBullet3 = bullet3 || defaultBullets[2];
+  // Sjekk om kortet er skjult (tittel er tom streng)
+  const isHidden = title?.trim() === '';
+
+  // Vis default verdier eller redigert innhold
+  const displayTitle = title?.trim() || defaultTitle;
+  const displaySubtitle = subtitle?.trim() || defaultSubtitle;
+  const displayBullet1 = bullet1?.trim() || defaultBullets[0];
+  const displayBullet2 = bullet2?.trim() || defaultBullets[1];
+  const displayBullet3 = bullet3?.trim() || defaultBullets[2];
+
+  // Skjul kortet når tittelen er tom og ikke i edit mode
+  if (isHidden && (!isAdmin || !editMode)) {
+    return null;
+  }
 
   return (
     <>
       <div 
         className={`relative bg-card rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 border ${
           popular ? 'border-success border-2' : 'border-border'
-        }`}
+        } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''}`}
       >
         {isAdmin && editMode && (
           <button
@@ -57,7 +66,14 @@ export const EditableServiceCard = ({
           </button>
         )}
 
-        {popular && !editMode && (
+        {isHidden && isAdmin && editMode && (
+          <div className="absolute top-4 left-4 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded z-10">
+            <EyeOff className="h-3 w-3" />
+            <span>Skjult</span>
+          </div>
+        )}
+
+        {popular && !editMode && !isHidden && (
           <div className="absolute top-4 right-4 bg-success text-success-foreground text-xs font-semibold px-3 py-1 rounded-full">
             Populær
           </div>
@@ -74,18 +90,24 @@ export const EditableServiceCard = ({
         </p>
         
         <ul className="space-y-2 mb-6">
-          <li className="flex items-start text-sm">
-            <span className="text-success mr-2 mt-0.5">✓</span>
-            <span className="text-muted-foreground">{displayBullet1}</span>
-          </li>
-          <li className="flex items-start text-sm">
-            <span className="text-success mr-2 mt-0.5">✓</span>
-            <span className="text-muted-foreground">{displayBullet2}</span>
-          </li>
-          <li className="flex items-start text-sm">
-            <span className="text-success mr-2 mt-0.5">✓</span>
-            <span className="text-muted-foreground">{displayBullet3}</span>
-          </li>
+          {displayBullet1 && (
+            <li className="flex items-start text-sm">
+              <span className="text-success mr-2 mt-0.5">✓</span>
+              <span className="text-muted-foreground">{displayBullet1}</span>
+            </li>
+          )}
+          {displayBullet2 && (
+            <li className="flex items-start text-sm">
+              <span className="text-success mr-2 mt-0.5">✓</span>
+              <span className="text-muted-foreground">{displayBullet2}</span>
+            </li>
+          )}
+          {displayBullet3 && (
+            <li className="flex items-start text-sm">
+              <span className="text-success mr-2 mt-0.5">✓</span>
+              <span className="text-muted-foreground">{displayBullet3}</span>
+            </li>
+          )}
         </ul>
         
         <Link to={`/tjenester/${id}`}>

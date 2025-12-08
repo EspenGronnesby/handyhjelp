@@ -1,5 +1,5 @@
 import { useState, CSSProperties } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, Eye, EyeOff } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { EditTextModal } from './EditTextModal';
@@ -14,6 +14,7 @@ interface EditableWrapperProps {
   label?: string;
   maxLength?: number;
   multiline?: boolean;
+  hideWhenEmpty?: boolean;
 }
 
 export const EditableWrapper = ({
@@ -24,7 +25,8 @@ export const EditableWrapper = ({
   className = '',
   label,
   maxLength,
-  multiline = false
+  multiline = false,
+  hideWhenEmpty = false
 }: EditableWrapperProps) => {
   const { editMode, isAdmin } = useEditMode();
   const [isHovered, setIsHovered] = useState(false);
@@ -39,14 +41,23 @@ export const EditableWrapper = ({
     return await updateContent(newValue);
   };
 
-  // Hvis ikke admin eller edit mode av: Vis bare children
+  // Sjekk om innholdet er tomt (trimmet)
+  const isEmpty = !content || content.trim() === '';
+
+  // Hvis ikke admin eller edit mode av: Sjekk om skal skjules
   if (!isAdmin || !editMode) {
+    if (hideWhenEmpty && isEmpty) {
+      return null;
+    }
     return <>{children}</>;
   }
 
+  // I edit mode: Vis alltid, men marker om den er skjult
+
   const wrapperStyle: CSSProperties = {
     position: 'relative',
-    display: 'inline-block'
+    display: 'inline-block',
+    opacity: hideWhenEmpty && isEmpty ? 0.5 : 1,
   };
 
   const buttonStyle: CSSProperties = {
@@ -69,11 +80,17 @@ export const EditableWrapper = ({
   return (
     <>
       <div
-        className={`editable-wrapper ${className}`}
+        className={`editable-wrapper ${className} ${hideWhenEmpty && isEmpty ? 'border-2 border-dashed border-muted-foreground/50 rounded-lg' : ''}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         style={wrapperStyle}
       >
+        {hideWhenEmpty && isEmpty && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2 text-xs text-muted-foreground pointer-events-none">
+            <EyeOff className="h-4 w-4" />
+            <span>Skjult</span>
+          </div>
+        )}
         {children}
         
         {isHovered && (

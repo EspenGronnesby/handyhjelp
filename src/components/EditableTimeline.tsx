@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, EyeOff } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { TimelineEditModal } from './TimelineEditModal';
@@ -23,20 +23,28 @@ export const EditableTimeline = () => {
   const { content: event6 } = useEditableContent('about-timeline', 'event_6');
 
   const timeline = [
-    { year: year1 || '2004', event: event1 || 'HandyHjelp ble grunnlagt i Kristiansand' },
-    { year: year2 || '2008', event: event2 || 'Utvidet til å tilby blikkenslagertjenester' },
-    { year: year3 || '2012', event: event3 || 'Nådde milepælen med 100 fornøyde bedriftskunder' },
-    { year: year4 || '2016', event: event4 || 'Fikk sertifisering som godkjent entreprenør' },
-    { year: year5 || '2020', event: event5 || 'Lanserte faste vedlikeholdsavtaler for bedrifter' },
-    { year: year6 || '2025', event: event6 || 'Over 200 faste kunder og 20+ års erfaring' },
+    { year: year1, event: event1, defaultYear: '2004', defaultEvent: 'HandyHjelp ble grunnlagt i Kristiansand' },
+    { year: year2, event: event2, defaultYear: '2008', defaultEvent: 'Utvidet til å tilby blikkenslagertjenester' },
+    { year: year3, event: event3, defaultYear: '2012', defaultEvent: 'Nådde milepælen med 100 fornøyde bedriftskunder' },
+    { year: year4, event: event4, defaultYear: '2016', defaultEvent: 'Fikk sertifisering som godkjent entreprenør' },
+    { year: year5, event: event5, defaultYear: '2020', defaultEvent: 'Lanserte faste vedlikeholdsavtaler for bedrifter' },
+    { year: year6, event: event6, defaultYear: '2025', defaultEvent: 'Over 200 faste kunder og 20+ års erfaring' },
   ];
 
-  // Filter out empty timeline items
-  const filteredTimeline = timeline.filter(item => {
-    const hasYear = item.year && item.year.trim() !== '';
-    const hasEvent = item.event && item.event.trim() !== '';
-    return hasYear || hasEvent;
-  });
+  // Sjekk om et item er skjult (både år og event er tomme strenger)
+  const isItemHidden = (item: typeof timeline[0]) => {
+    return item.year?.trim() === '' && item.event?.trim() === '';
+  };
+
+  // Filtrer ut skjulte items når ikke i edit mode
+  const visibleTimeline = isAdmin && editMode 
+    ? timeline 
+    : timeline.filter(item => !isItemHidden(item));
+
+  // Hvis alle items er skjult og ikke i edit mode, skjul hele seksjonen
+  if (visibleTimeline.length === 0 && (!isAdmin || !editMode)) {
+    return null;
+  }
 
   return (
     <>
@@ -53,19 +61,42 @@ export const EditableTimeline = () => {
         <h2 className="text-3xl font-bold text-center mb-12">{heading || 'Vår reise'}</h2>
         <div className="max-w-4xl mx-auto">
           <div className="space-y-8">
-            {filteredTimeline.map((item, index) => (
-              <div key={index} className="flex gap-6 items-start">
-                <div className="flex-shrink-0 w-20 text-right">
-                  <span className="text-2xl font-bold text-primary">{item.year}</span>
+            {timeline.map((item, index) => {
+              const isHidden = isItemHidden(item);
+              
+              // I edit mode: vis alle, men marker skjulte
+              if (!isAdmin || !editMode) {
+                if (isHidden) return null;
+              }
+
+              const displayYear = item.year?.trim() || item.defaultYear;
+              const displayEvent = item.event?.trim() || item.defaultEvent;
+
+              return (
+                <div 
+                  key={index} 
+                  className={`flex gap-6 items-start relative ${
+                    isHidden && isAdmin && editMode ? 'opacity-50' : ''
+                  }`}
+                >
+                  {isHidden && isAdmin && editMode && (
+                    <div className="absolute -top-2 left-0 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded z-10">
+                      <EyeOff className="h-3 w-3" />
+                      <span>Skjult</span>
+                    </div>
+                  )}
+                  <div className="flex-shrink-0 w-20 text-right">
+                    <span className="text-2xl font-bold text-primary">{displayYear}</span>
+                  </div>
+                  <div className="flex-shrink-0 mt-2">
+                    <div className="w-4 h-4 rounded-full bg-primary"></div>
+                  </div>
+                  <div className="flex-1 pb-8 border-l-2 border-border pl-6 -ml-2">
+                    <p className="text-lg">{displayEvent}</p>
+                  </div>
                 </div>
-                <div className="flex-shrink-0 mt-2">
-                  <div className="w-4 h-4 rounded-full bg-primary"></div>
-                </div>
-                <div className="flex-1 pb-8 border-l-2 border-border pl-6 -ml-2">
-                  <p className="text-lg">{item.event}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -74,7 +105,10 @@ export const EditableTimeline = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         section="about-timeline"
-        currentData={{ heading: heading || 'Vår reise', timeline }}
+        currentData={{ heading: heading || 'Vår reise', timeline: timeline.map(t => ({
+          year: t.year || t.defaultYear,
+          event: t.event || t.defaultEvent
+        })) }}
       />
     </>
   );
