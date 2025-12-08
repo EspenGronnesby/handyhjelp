@@ -69,6 +69,10 @@
     --shadow-elevated: 0 10px 15px -3px hsl(222 47% 11% / 0.1), 0 4px 6px -2px hsl(222 47% 11% / 0.05);
     --shadow-hero: 0 25px 50px -12px hsl(222 47% 11% / 0.25);
 
+    /* Popover (same as card in light mode) */
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 19% 27%;
+
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
@@ -89,53 +93,62 @@
   }
 
   .dark {
-    /* Dark Mode - Enhanced Professional */
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    /* Dark Mode - Enhanced Professional with Better Contrast */
+    --background: 222 47% 8%;
+    --foreground: 210 20% 95%;
 
-    --hero-bg: 222 47% 8%;
-    --hero-bg-secondary: 215 50% 12%;
-    --hero-text: 210 40% 98%;
-    --hero-text-muted: 215 25% 75%;
+    --hero-bg: 222 47% 6%;
+    --hero-bg-secondary: 215 50% 10%;
+    --hero-text: 210 20% 98%;
+    --hero-text-muted: 215 20% 80%;
 
-    --card: 215 50% 15%;
-    --card-foreground: 210 40% 98%;
-    --card-elevated: 215 50% 18%;
+    --card: 222 47% 12%;
+    --card-foreground: 210 20% 95%;
+    --card-elevated: 222 47% 15%;
 
-    --primary: 210 40% 98%;
-    --primary-hover: 210 40% 85%;
-    --primary-foreground: 222 47% 11%;
+    /* Primary stays turquoise for visibility */
+    --primary: 188 94% 45%;
+    --primary-hover: 188 94% 55%;
+    --primary-foreground: 222 47% 8%;
 
-    --success: 142 76% 40%;
-    --success-hover: 142 76% 45%;
-    --success-foreground: 210 40% 98%;
+    --success: 142 76% 45%;
+    --success-hover: 142 76% 55%;
+    --success-foreground: 222 47% 8%;
 
-    --secondary: 215 50% 20%;
-    --secondary-hover: 215 50% 25%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 222 47% 18%;
+    --secondary-hover: 222 47% 22%;
+    --secondary-foreground: 210 20% 95%;
 
-    --muted: 215 50% 20%;
-    --muted-hover: 215 50% 25%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 222 47% 15%;
+    --muted-hover: 222 47% 20%;
+    --muted-foreground: 215 15% 70%;
 
-    --accent: 215 50% 20%;
-    --accent-foreground: 210 40% 98%;
+    /* Keep orange accent for hover states */
+    --accent: 24 95% 53%;
+    --accent-hover: 24 95% 60%;
+    --accent-foreground: 222 47% 8%;
 
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 215 50% 25%;
-    --border-input: 215 50% 30%;
-    --input: 215 50% 18%;
-    --ring: 210 40% 98%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 222 47% 22%;
+    --border-input: 222 47% 28%;
+    --input: 222 47% 15%;
+    --input-foreground: 210 20% 95%;
+    --ring: 188 94% 45%;
+
+    /* Popover in dark mode */
+    --popover: 222 47% 12%;
+    --popover-foreground: 210 20% 95%;
+    
+    --sidebar-background: 222 47% 10%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 188 94% 45%;
+    --sidebar-primary-foreground: 222 47% 8%;
+    --sidebar-accent: 222 47% 18%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 222 47% 20%;
+    --sidebar-ring: 188 94% 45%;
   }
 }
 
@@ -279,9 +292,9 @@
   }
 }
 
-/* Blog Content Styling */
+/* Blog Content Styling - Theme-aware */
 .blog-content {
-  color: #1a1a1a;
+  color: hsl(var(--foreground));
   font-size: 18px;
   line-height: 1.75;
   max-width: 800px;
@@ -291,7 +304,7 @@
 .blog-content h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #000;
+  color: hsl(var(--foreground));
   line-height: 1.2;
   margin-bottom: 0.5em;
   margin-top: 1.5em;
@@ -300,7 +313,7 @@
 .blog-content h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: hsl(var(--foreground));
   margin-top: 2em;
   margin-bottom: 0.75em;
 }
@@ -308,20 +321,20 @@
 .blog-content h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: hsl(var(--foreground));
   margin-top: 1.5em;
   margin-bottom: 0.5em;
 }
 
 .blog-content p {
   margin-bottom: 1.25em;
-  color: #1a1a1a;
+  color: hsl(var(--foreground));
 }
 
 .blog-content strong,
 .blog-content b {
   font-weight: 700;
-  color: #000;
+  color: hsl(var(--foreground));
 }
 
 .blog-content em,
@@ -333,7 +346,7 @@
 .blog-content ol {
   padding-left: 1.5em;
   margin: 1em 0;
-  color: #1a1a1a;
+  color: hsl(var(--foreground));
 }
 
 .blog-content li {
@@ -341,12 +354,12 @@
 }
 
 .blog-content blockquote {
-  background: #f5f5f5;
+  background: hsl(var(--muted));
   border-left: 4px solid hsl(var(--primary));
   padding: 1em 1.5em;
   margin: 1.5em 0;
   font-style: italic;
-  color: #333;
+  color: hsl(var(--muted-foreground));
 }
 
 .blog-content a {
