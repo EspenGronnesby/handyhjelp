@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Shield, LogOut, Home, Building2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface Profile {
   full_name: string;
@@ -231,6 +232,18 @@ const DashboardProfile = () => {
             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Lagre endringer
           </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Utseende</CardTitle>
+          <CardDescription>
+            Velg mellom lys og mørk modus
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ThemeToggle />
         </CardContent>
       </Card>
 

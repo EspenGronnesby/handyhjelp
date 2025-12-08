@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { EditModeProvider } from "./contexts/EditModeContext";
@@ -39,54 +40,55 @@ const queryClient = new QueryClient();
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <EditModeProvider>
-          <Toaster />
-          <Sonner position="top-center" duration={2000} />
-          <BrowserRouter>
-            <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/tilbud" element={<QuotePage />} />
-            <Route path="/fast-avtale" element={<ServiceAgreement />} />
-            <Route path="/takk-avtale" element={<ThankYouAgreement />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/prosjekter" element={<Projects />} />
-            <Route path="/prosjekter/:id" element={<ProjectDetail />} />
-            <Route path="/om-oss" element={<About />} />
-            <Route path="/kontakt" element={<Contact />} />
-            <Route path="/tjenester" element={<Services />} />
-            <Route path="/tjenester/vaktmester" element={<ServiceVaktmester />} />
-            <Route path="/tjenester/takrennerens" element={<ServiceTakrennerens />} />
-            <Route path="/tjenester/tomrer" element={<ServiceTomrer />} />
-            <Route path="/tjenester/blikk" element={<ServiceBlikk />} />
-            <Route path="/raad" element={<Blog />} />
-            <Route path="/raad/:slug" element={<BlogDetail />} />
-            <Route path="/takk" element={<ThankYou />} />
-            <Route path="/dashboard" element={
-              <ErrorBoundary>
-                <Dashboard />
-              </ErrorBoundary>
-            }>
-              <Route index element={<DashboardHome />} />
-              <Route path="quotes" element={<DashboardQuotes />} />
-              <Route path="jobs" element={<DashboardJobs />} />
-              {/* <Route path="loyalty" element={<DashboardLoyalty />} /> */} {/* Hidden temporarily */}
-              <Route path="profile" element={<DashboardProfile />} />
-              <Route path="notifications" element={<DashboardNotifications />} />
-              <Route path="admin" element={
-                <ErrorBoundary>
-                  <AdminDashboard />
-                </ErrorBoundary>
-              } />
-            </Route>
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-        </EditModeProvider>
-      </TooltipProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <TooltipProvider>
+          <EditModeProvider>
+            <Toaster />
+            <Sonner position="top-center" duration={2000} />
+            <BrowserRouter>
+              <ScrollToTop />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/tilbud" element={<QuotePage />} />
+                <Route path="/fast-avtale" element={<ServiceAgreement />} />
+                <Route path="/takk-avtale" element={<ThankYouAgreement />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/prosjekter" element={<Projects />} />
+                <Route path="/prosjekter/:id" element={<ProjectDetail />} />
+                <Route path="/om-oss" element={<About />} />
+                <Route path="/kontakt" element={<Contact />} />
+                <Route path="/tjenester" element={<Services />} />
+                <Route path="/tjenester/vaktmester" element={<ServiceVaktmester />} />
+                <Route path="/tjenester/takrennerens" element={<ServiceTakrennerens />} />
+                <Route path="/tjenester/tomrer" element={<ServiceTomrer />} />
+                <Route path="/tjenester/blikk" element={<ServiceBlikk />} />
+                <Route path="/raad" element={<Blog />} />
+                <Route path="/raad/:slug" element={<BlogDetail />} />
+                <Route path="/takk" element={<ThankYou />} />
+                <Route path="/dashboard" element={
+                  <ErrorBoundary>
+                    <Dashboard />
+                  </ErrorBoundary>
+                }>
+                  <Route index element={<DashboardHome />} />
+                  <Route path="quotes" element={<DashboardQuotes />} />
+                  <Route path="jobs" element={<DashboardJobs />} />
+                  {/* <Route path="loyalty" element={<DashboardLoyalty />} /> */}
+                  <Route path="profile" element={<DashboardProfile />} />
+                  <Route path="notifications" element={<DashboardNotifications />} />
+                  <Route path="admin" element={
+                    <ErrorBoundary>
+                      <AdminDashboard />
+                    </ErrorBoundary>
+                  } />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </EditModeProvider>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );
