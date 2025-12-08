@@ -1,14 +1,22 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, Clock, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 import handyhjelpLogoFooter from '@/assets/handyhjelp-logo-footer.png';
+
 export const Footer = () => {
+  const { resolvedTheme } = useTheme();
+  
   return <footer className="bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
           {/* Kolonne 1: HandyHjelp Info */}
           <div>
-            <img alt="HandyHjelp - Levert med kvalitet" className="h-20 w-auto object-contain mb-4" src="/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png" />
+            <img 
+              alt="HandyHjelp - Levert med kvalitet" 
+              className="h-20 w-auto object-contain mb-4" 
+              src={resolvedTheme === 'dark' ? handyhjelpLogoFooter : handyhjelpLogo} 
+            />
             <p className="text-sm mb-4 opacity-90">
               Din pålitelige partner for vaktmester-, tømrer- og blikkenslagertjenester. 
               Med over 20 års erfaring leverer vi kvalitet og trygghet til kunder i Kristiansand og omegn.
