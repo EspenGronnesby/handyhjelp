@@ -2,6 +2,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { QuoteForm } from "@/components/QuoteForm";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CalendarCheck, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const QuotePage = () => {
   return (
@@ -21,6 +25,29 @@ const QuotePage = () => {
               </p>
             </div>
             <QuoteForm />
+
+            {/* Fast avtale promo section */}
+            <Card className="mt-12 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+              <CardContent className="p-6 text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 rounded-full bg-primary/10">
+                    <CalendarCheck className="h-8 w-8 text-primary" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-heading font-semibold mb-2">
+                  Trenger du regelmessig hjelp?
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  Spar tid og penger med en fast serviceavtale tilpasset dine behov.
+                </p>
+                <Button asChild variant="outline" className="group">
+                  <Link to="/fast-avtale">
+                    Forespør fast avtale
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>

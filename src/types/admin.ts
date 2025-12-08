@@ -68,6 +68,7 @@ export interface ServiceAgreement {
   status: string;
   created_at: string;
   updated_at: string;
+  user_id?: string | null;
 }
 
 export const STATUS_COLORS: Record<string, string> = {

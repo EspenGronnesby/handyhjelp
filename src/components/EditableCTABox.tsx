@@ -46,8 +46,8 @@ export const EditableCTABox = () => {
             <Button variant="cta" size="lg" onClick={() => window.location.href = '/tilbud'} className="text-lg px-8">
               {defaultData.button1}
             </Button>
-            <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'} className="text-lg px-8 hover:bg-warning hover:text-warning-foreground hover:border-warning transition-colors">
-              {defaultData.button2}
+            <Button variant="outline" size="lg" onClick={() => window.location.href = '/fast-avtale'} className="text-lg px-8 hover:bg-primary/10 hover:border-primary transition-colors">
+              Faste oppdrag?
             </Button>
           </div>
         </CardContent>

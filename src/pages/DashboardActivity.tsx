@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeleton-loaders';
 
 interface Quote {
@@ -37,7 +37,18 @@ interface Job {
   };
 }
 
-// Forespørsel skal ikke vise "Fullført" - det er kun for jobber
+interface ServiceAgreement {
+  id: string;
+  customer_type: string;
+  address: string;
+  services: string[];
+  frequency: string;
+  contract_duration: string;
+  status: string;
+  created_at: string;
+  contact_person: string;
+}
+
 const quoteStatusColors: Record<string, string> = {
   pending: 'bg-yellow-500',
   under_review: 'bg-blue-500',
@@ -72,9 +83,42 @@ const jobStatusLabels: Record<string, string> = {
   cancelled: 'Kansellert'
 };
 
+const agreementStatusColors: Record<string, string> = {
+  new: 'bg-yellow-500',
+  under_review: 'bg-blue-500',
+  offer_sent: 'bg-purple-500',
+  contract_signed: 'bg-green-500',
+  rejected: 'bg-red-500'
+};
+
+const agreementStatusLabels: Record<string, string> = {
+  new: 'Ny',
+  under_review: 'Under vurdering',
+  offer_sent: 'Tilbud sendt',
+  contract_signed: 'Avtale inngått',
+  rejected: 'Avslått'
+};
+
+const serviceLabels: Record<string, string> = {
+  maintenance: 'Vedlikehold',
+  cleaning: 'Renhold',
+  winter: 'Vintervedlikehold',
+  summer: 'Sommervedlikehold',
+  inspection: 'Tilsyn',
+  other: 'Annet'
+};
+
+const frequencyLabels: Record<string, string> = {
+  daily: 'Daglig',
+  weekly: 'Ukentlig',
+  monthly: 'Månedlig',
+  on_demand: 'Ved behov'
+};
+
 const DashboardActivity = () => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [agreements, setAgreements] = useState<ServiceAgreement[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -107,8 +151,16 @@ const DashboardActivity = () => {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
+    // Fetch service agreements
+    const { data: agreementsData } = await supabase
+      .from('service_agreements')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
     if (quotesData) setQuotes(quotesData);
     if (jobsData) setJobs(jobsData);
+    if (agreementsData) setAgreements(agreementsData as ServiceAgreement[]);
     setLoading(false);
   }, []);
 
@@ -116,7 +168,7 @@ const DashboardActivity = () => {
     fetchData();
   }, [fetchData]);
 
-  // Realtime subscription for quotes and jobs
+  // Realtime subscription for quotes, jobs and agreements
   useEffect(() => {
     if (!userId) return;
 
@@ -142,9 +194,21 @@ const DashboardActivity = () => {
       )
       .subscribe();
 
+    const agreementsChannel = supabase
+      .channel('agreements-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'service_agreements' },
+        () => {
+          fetchData();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(quotesChannel);
       supabase.removeChannel(jobsChannel);
+      supabase.removeChannel(agreementsChannel);
     };
   }, [userId, fetchData]);
 
@@ -159,8 +223,10 @@ const DashboardActivity = () => {
 
   // Filtrer jobber: kun vis fullførte i Jobber-fanen
   const completedJobs = jobs.filter(job => job.status === 'completed');
+  // Filtrer aktive avtaler (ikke avslått)
+  const activeAgreements = agreements.filter(a => a.status !== 'rejected');
   
-  const isEmpty = quotes.length === 0 && completedJobs.length === 0;
+  const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
 
   if (isEmpty) {
     return (
@@ -168,7 +234,7 @@ const DashboardActivity = () => {
         <div>
           <h1 className="text-3xl font-bold mb-2">Mine forespørsler</h1>
           <p className="text-muted-foreground">
-            Oversikt over dine forespørsler og fullførte oppdrag
+            Oversikt over dine forespørsler, avtaler og fullførte oppdrag
           </p>
         </div>
         <Card className="p-8 text-center">
@@ -188,19 +254,23 @@ const DashboardActivity = () => {
       <div>
         <h1 className="text-3xl font-bold mb-2">Mine forespørsler</h1>
         <p className="text-muted-foreground">
-          Oversikt over dine forespørsler og fullførte oppdrag
+          Oversikt over dine forespørsler, avtaler og fullførte oppdrag
         </p>
       </div>
 
       <Tabs defaultValue="quotes" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="quotes" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
-            Forespørsel ({quotes.length})
+            <span className="hidden sm:inline">Forespørsel</span> ({quotes.length})
+          </TabsTrigger>
+          <TabsTrigger value="agreements" className="flex items-center gap-2">
+            <CalendarCheck className="h-4 w-4" />
+            <span className="hidden sm:inline">Avtaler</span> ({activeAgreements.length})
           </TabsTrigger>
           <TabsTrigger value="jobs" className="flex items-center gap-2">
             <Briefcase className="h-4 w-4" />
-            Fullført ({completedJobs.length})
+            <span className="hidden sm:inline">Fullført</span> ({completedJobs.length})
           </TabsTrigger>
         </TabsList>
 
@@ -258,6 +328,75 @@ const DashboardActivity = () => {
                     </div>
                     <div>
                       <span className="font-medium">Telefon:</span> {quote.phone}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="agreements" className="space-y-4">
+          {activeAgreements.length === 0 ? (
+            <Card className="p-6 text-center">
+              <CalendarCheck className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+              <p className="text-muted-foreground">
+                Ingen aktive avtaler ennå.
+                <a href="/fast-avtale" className="text-primary hover:underline ml-1">Forespør en fast avtale</a>
+              </p>
+            </Card>
+          ) : (
+            activeAgreements.map((agreement) => (
+              <Card key={agreement.id} className="border-l-4 border-l-primary">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/10">
+                        <CalendarCheck className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-primary border-primary/30 bg-primary/5">
+                            Fast avtale
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-lg mt-1">
+                          {agreement.contact_person}
+                        </CardTitle>
+                        <CardDescription>
+                          Sendt inn {formatDistanceToNow(new Date(agreement.created_at), { 
+                            addSuffix: true,
+                            locale: nb 
+                          })}
+                        </CardDescription>
+                      </div>
+                    </div>
+                    <Badge className={agreementStatusColors[agreement.status]}>
+                      {agreementStatusLabels[agreement.status] || agreement.status}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium">Adresse:</p>
+                    <p className="text-sm text-muted-foreground">{agreement.address}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Tjenester:</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {agreement.services.map((service: string) => (
+                        <Badge key={service} variant="secondary" className="text-xs">
+                          {serviceLabels[service] || service}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-medium">Frekvens:</span> {frequencyLabels[agreement.frequency] || agreement.frequency}
+                    </div>
+                    <div>
+                      <span className="font-medium">Varighet:</span> {agreement.contract_duration}
                     </div>
                   </div>
                 </CardContent>
