@@ -61,15 +61,6 @@ export const Header = () => {
             />
           </Link>
 
-          {/* Mobile Profile Button - Only visible on mobile */}
-          <Link 
-            to={user ? "/dashboard" : "/auth"} 
-            className="md:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-accent text-accent-foreground hover:bg-accent-hover transition-colors touch-manipulation"
-            aria-label={user ? "Gå til profil" : "Logg inn"}
-          >
-            <User className="h-5 w-5" />
-          </Link>
-
           <div className="flex items-center space-x-4 relative z-10">
             {/* Navigation Links */}
             <nav className="hidden md:flex items-center space-x-6">
@@ -129,7 +120,7 @@ export const Header = () => {
               )}
             </div>
 
-            {/* Mobile Menu Button - Improved touch target */}
+            {/* Mobile Menu Button - Left side */}
             <Button
               variant="ghost"
               size="icon"
@@ -140,6 +131,15 @@ export const Header = () => {
             >
               <Menu className="h-6 w-6" />
             </Button>
+
+            {/* Mobile Profile Button - Right side, only visible on mobile */}
+            <Link 
+              to={user ? "/dashboard" : "/auth"} 
+              className="md:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation"
+              aria-label={user ? "Gå til profil" : "Logg inn"}
+            >
+              <User className="h-5 w-5" />
+            </Link>
           </div>
         </div>
 
