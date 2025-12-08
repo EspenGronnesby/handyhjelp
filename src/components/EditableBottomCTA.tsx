@@ -45,7 +45,7 @@ export const EditableBottomCTA = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/tilbud">
-              <Button variant="outline" size="lg" className="text-primary text-lg px-10 bg-success border-success">
+              <Button variant="outline" size="lg" className="text-lg px-10 bg-success border-success text-success-foreground">
                 {defaultData.button1}
               </Button>
             </Link>
