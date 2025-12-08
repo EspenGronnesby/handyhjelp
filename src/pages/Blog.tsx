@@ -102,15 +102,15 @@ const Blog = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-12">
+      <section className="py-8 md:py-12">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-4 gap-8">
-            {/* Sidebar */}
-            <aside className="lg:col-span-1 space-y-6">
+          <div className="flex flex-col lg:grid lg:grid-cols-4 gap-6 lg:gap-8">
+            {/* Sidebar - Shows first on mobile for better UX */}
+            <aside className="order-first lg:order-none lg:col-span-1 space-y-4 lg:space-y-6">
               {/* Search */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Søk</CardTitle>
+                <CardHeader className="pb-2 lg:pb-4">
+                  <CardTitle className="text-base lg:text-lg">Søk</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="relative">
@@ -119,36 +119,38 @@ const Blog = () => {
                       placeholder="Søk i artikler..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9"
+                      className="pl-9 h-12 text-base"
                     />
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Categories */}
+              {/* Categories - Horizontal scroll on mobile */}
               <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Kategorier</CardTitle>
+                <CardHeader className="pb-2 lg:pb-4">
+                  <CardTitle className="text-base lg:text-lg">Kategorier</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => setSelectedCategory(category.id)}
-                      className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
-                        selectedCategory === category.id
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted"
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">{category.name}</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {category.count}
-                        </Badge>
-                      </div>
-                    </button>
-                  ))}
+                <CardContent>
+                  <div className="flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0">
+                    {categories.map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => setSelectedCategory(category.id)}
+                        className={`flex-shrink-0 lg:w-full text-left px-4 py-3 min-h-[44px] rounded-md transition-colors whitespace-nowrap ${
+                          selectedCategory === category.id
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted/50 hover:bg-muted active:bg-muted"
+                        }`}
+                      >
+                        <div className="flex justify-between items-center gap-2">
+                          <span className="text-sm font-medium">{category.name}</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {category.count}
+                          </Badge>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
 

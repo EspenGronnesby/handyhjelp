@@ -396,3 +396,36 @@
     font-size: 1.25rem;
   }
 }
+
+/* Mobile optimization - Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in-left,
+  .animate-fade-in-right,
+  .animate-scale-in {
+    animation: none !important;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Mobile tap highlight removal for cleaner touch experience */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Ensure touch targets are at least 44px */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

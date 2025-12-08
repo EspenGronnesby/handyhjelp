@@ -34,7 +34,7 @@ const ServiceTakrennerens = () => {
       
       {/* Hero Section with Background */}
       <div 
-        className="relative bg-cover bg-center bg-no-repeat"
+        className="relative h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
         <div 
