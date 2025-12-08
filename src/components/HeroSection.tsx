@@ -9,45 +9,45 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { Pencil } from "lucide-react";
 import { HeroSectionEditModal } from "./HeroSectionEditModal";
 import heroDefaultImage from "@/assets/hero-building-maintenance.jpg";
-
 export const HeroSection = () => {
-  const { heroImage, opacity, refetch } = useHeroImage('home', heroDefaultImage);
-  const { editMode, isAdmin } = useEditMode();
+  const {
+    heroImage,
+    opacity,
+    refetch
+  } = useHeroImage('home', heroDefaultImage);
+  const {
+    editMode,
+    isAdmin
+  } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const { content: title } = useEditableContent('hero-home', 'title');
-  const { content: subtitle } = useEditableContent('hero-home', 'subtitle');
-  const { content: ctaText } = useEditableContent('hero-home', 'cta-button');
-  
+  const {
+    content: title
+  } = useEditableContent('hero-home', 'title');
+  const {
+    content: subtitle
+  } = useEditableContent('hero-home', 'subtitle');
+  const {
+    content: ctaText
+  } = useEditableContent('hero-home', 'cta-button');
   const displayTitle = title || 'Vi tar vare på dine bygg';
   const displaySubtitle = subtitle || 'Vaktmester • Tømrer • Blikk';
   const displayCtaText = ctaText || 'Få tilbud';
-
-  return (
-    <>
+  return <>
       <section className="min-h-screen relative flex items-center pt-32 md:pt-20">
         {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroImage})` }}
-        >
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-secondary to-secondary"
-            style={{ opacity }}
-          ></div>
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{
+        backgroundImage: `url(${heroImage})`
+      }}>
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary to-secondary" style={{
+          opacity
+        }}></div>
         </div>
         
         <HeroImageEditor page="home" currentImageUrl={heroImage} onImageUpdate={refetch} />
         
-        {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-32 right-8 z-20 bg-background rounded-full p-3 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-            aria-label="Rediger hero-seksjon"
-          >
+        {isAdmin && editMode && <button onClick={() => setIsModalOpen(true)} className="absolute top-32 right-8 z-20 bg-background rounded-full p-3 shadow-lg border-2 border-primary hover:scale-110 transition-transform" aria-label="Rediger hero-seksjon">
             <Pencil className="h-6 w-6 text-primary" />
-          </button>
-        )}
+          </button>}
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-8rem)] py-12 md:py-20">
@@ -65,31 +65,22 @@ export const HeroSection = () => {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-left mb-12">
-                <Button 
-                  size="lg" 
-                  variant="cta"
-                  className="text-lg px-8 py-6"
-                  onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({ behavior: 'smooth' })}
-                >
+                <Button size="lg" variant="cta" className="text-lg px-8 py-6" onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({
+                behavior: 'smooth'
+              })}>
                   {displayCtaText}
                 </Button>
-                <Button 
-                  variant="cta-outline" 
-                  size="lg" 
-                  className="text-lg px-6 py-6 bg-white/10 text-white border-white/30 hover:bg-white/20"
-                  onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-                >
+                <Button variant="cta-outline" size="lg" className="text-lg px-6 py-6 bg-white/10 text-white border-white/30 hover:bg-white/20" onClick={() => document.getElementById('services')?.scrollIntoView({
+                behavior: 'smooth'
+              })}>
                   Se tjenester
                 </Button>
               </div>
 
               {/* 24/7 Contact - Prominent */}
-              <div className="bg-primary/90 backdrop-blur-sm rounded-lg p-6 inline-block animate-fade-in-left">
+              <div className="backdrop-blur-sm rounded-lg p-6 inline-block animate-fade-in-left bg-secondary-hover">
                 <p className="text-white/80 text-sm mb-2">24/7 Service</p>
-                <a 
-                  href="tel:+4741250553"
-                  className="text-white text-2xl md:text-3xl font-bold flex items-center gap-3 hover:text-white/90 transition-colors"
-                >
+                <a href="tel:+4741250553" className="text-white text-2xl md:text-3xl font-bold flex items-center gap-3 hover:text-white/90 transition-colors">
                   <Phone className="h-7 w-7" />
                   <span>+47 41250553</span>
                 </a>
@@ -104,15 +95,10 @@ export const HeroSection = () => {
         </div>
       </section>
 
-      <HeroSectionEditModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        currentData={{
-          title: displayTitle,
-          subtitle: displaySubtitle,
-          ctaButton: displayCtaText
-        }}
-      />
-    </>
-  );
+      <HeroSectionEditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} currentData={{
+      title: displayTitle,
+      subtitle: displaySubtitle,
+      ctaButton: displayCtaText
+    }} />
+    </>;
 };
