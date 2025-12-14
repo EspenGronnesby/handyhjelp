@@ -20,3 +20,12 @@ verify_jwt = false
 
 [functions.send-invoice-ready-email]
 verify_jwt = false
+
+[functions.send-invoice-due-reminder]
+verify_jwt = false
+
+[functions.send-agreement-confirmation]
+verify_jwt = false
+
+[functions.send-agreement-status-email]
+verify_jwt = false

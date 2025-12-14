@@ -4,9 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle } from 'lucide-react';
-import { Job, STATUS_COLORS, STATUS_LABELS, Invoice, InvoiceRequest } from '@/types/admin';
+import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard } from 'lucide-react';
+import { Job, STATUS_COLORS, STATUS_LABELS, Invoice, InvoiceRequest, INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface JobCardProps {
   job: Job;
@@ -20,6 +21,7 @@ interface JobCardProps {
 export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onAddInvoice }: JobCardProps) => {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [invoiceRequest, setInvoiceRequest] = useState<InvoiceRequest | null>(null);
+  const [markingPaid, setMarkingPaid] = useState(false);
 
   useEffect(() => {
     if (variant === 'completed') {
@@ -47,11 +49,52 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
     if (requestData) setInvoiceRequest(requestData as InvoiceRequest);
   };
 
+  const handleMarkAsPaid = async () => {
+    if (!invoice) return;
+    
+    setMarkingPaid(true);
+    try {
+      const { error } = await supabase
+        .from('invoices')
+        .update({ status: 'paid' })
+        .eq('id', invoice.id);
+
+      if (error) throw error;
+
+      setInvoice({ ...invoice, status: 'paid' });
+      toast({
+        title: 'Faktura markert som betalt',
+        description: `Faktura ${invoice.invoice_number} er nå registrert som betalt.`
+      });
+    } catch (error) {
+      console.error('Error marking invoice as paid:', error);
+      toast({
+        title: 'Feil',
+        description: 'Kunne ikke oppdatere fakturastatus.',
+        variant: 'destructive'
+      });
+    } finally {
+      setMarkingPaid(false);
+    }
+  };
+
   const dateLabel = variant === 'active' 
     ? `Startet ${job.started_at && formatDistanceToNow(new Date(job.started_at), { addSuffix: true, locale: nb })}`
     : `Fullført ${job.completed_date && formatDistanceToNow(new Date(job.completed_date), { addSuffix: true, locale: nb })}`;
 
   const hasInvoiceRequest = invoiceRequest && invoiceRequest.status === 'pending';
+
+  const getInvoiceStatusBadge = () => {
+    if (!invoice) return null;
+    const statusClass = INVOICE_STATUS_COLORS[invoice.status] || 'bg-gray-500';
+    const statusLabel = INVOICE_STATUS_LABELS[invoice.status] || invoice.status;
+    return (
+      <Badge className={`${statusClass} flex items-center gap-1`}>
+        <Receipt className="h-3 w-3" />
+        {statusLabel}
+      </Badge>
+    );
+  };
 
   return (
     <Card className={hasInvoiceRequest ? 'ring-2 ring-orange-400' : ''}>
@@ -76,12 +119,7 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
                 Faktura forespurt
               </Badge>
             )}
-            {invoice && (
-              <Badge className="bg-green-500 flex items-center gap-1">
-                <Receipt className="h-3 w-3" />
-                Faktura sendt
-              </Badge>
-            )}
+            {getInvoiceStatusBadge()}
           </div>
         </div>
       </CardHeader>
@@ -112,7 +150,7 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
 
         {/* Invoice details if exists */}
         {invoice && (
-          <div className="bg-muted/50 p-3 rounded-lg space-y-1">
+          <div className="bg-muted/50 p-3 rounded-lg space-y-3">
             <p className="text-sm font-medium flex items-center gap-2">
               <Receipt className="h-4 w-4" />
               Fakturadetaljer
@@ -128,9 +166,29 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
                 <span className="text-muted-foreground">Forfallsdato:</span> {new Date(invoice.due_date).toLocaleDateString('nb-NO')}
               </div>
               <div>
-                <span className="text-muted-foreground">Status:</span> {invoice.status === 'pending' ? 'Ubetalt' : invoice.status === 'paid' ? 'Betalt' : 'Forfalt'}
+                <span className="text-muted-foreground">Status:</span>{' '}
+                <span className={invoice.status === 'paid' ? 'text-green-600 font-medium' : invoice.status === 'overdue' ? 'text-red-600 font-medium' : 'text-yellow-600'}>
+                  {INVOICE_STATUS_LABELS[invoice.status]}
+                </span>
               </div>
             </div>
+            
+            {/* Mark as paid button */}
+            {invoice.status !== 'paid' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleMarkAsPaid}
+                disabled={markingPaid}
+                className="w-full mt-2 border-green-500 text-green-600 hover:bg-green-50"
+              >
+                {markingPaid ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Oppdaterer...</>
+                ) : (
+                  <><CreditCard className="mr-2 h-4 w-4" /> Marker som betalt</>
+                )}
+              </Button>
+            )}
           </div>
         )}
         
