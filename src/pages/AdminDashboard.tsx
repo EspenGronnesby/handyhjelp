@@ -19,6 +19,7 @@ import { ProjectManagement } from '@/components/admin/ProjectManagement';
 import { BlogManagement } from '@/components/admin/BlogManagement';
 import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 import { InvoiceUploadModal } from '@/components/admin/InvoiceUploadModal';
+import { InvoiceManagement } from '@/components/admin/InvoiceManagement';
 
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
@@ -105,6 +106,9 @@ const AdminDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="completed" className="text-sm whitespace-nowrap">
             Ferdig ({completedJobs.length})
+          </TabsTrigger>
+          <TabsTrigger value="invoices" className="text-sm whitespace-nowrap">
+            Fakturaer
           </TabsTrigger>
           <TabsTrigger value="customers" className="text-sm whitespace-nowrap">
             Kunder ({profiles.length})
@@ -200,6 +204,11 @@ const AdminDashboard = () => {
               />
             ))
           )}
+        </TabsContent>
+
+        {/* Fakturaer */}
+        <TabsContent value="invoices">
+          <InvoiceManagement />
         </TabsContent>
 
         {/* Kunder */}
