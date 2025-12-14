@@ -1,0 +1,322 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Star, Quote, ChevronLeft, ChevronRight, Building2, User } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+
+interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  profiles?: {
+    full_name: string;
+    customer_type: string | null;
+    company_name: string | null;
+  };
+  jobs?: {
+    quotes?: {
+      type: string;
+      name: string;
+      company_name: string | null;
+    };
+  };
+}
+
+const TestimonialsSection = () => {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('reviews')
+          .select(`
+            id,
+            rating,
+            comment,
+            created_at,
+            profiles!reviews_user_id_fkey(full_name, customer_type, company_name),
+            jobs!reviews_job_id_fkey(
+              quotes(type, name, company_name)
+            )
+          `)
+          .eq('status', 'approved')
+          .gte('rating', 4)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+        setReviews(data || []);
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  const scrollToIndex = useCallback((index: number) => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const cardWidth = container.scrollWidth / reviews.length;
+    container.scrollTo({
+      left: cardWidth * index,
+      behavior: 'smooth'
+    });
+    setCurrentIndex(index);
+  }, [reviews.length]);
+
+  const nextSlide = useCallback(() => {
+    const nextIndex = (currentIndex + 1) % reviews.length;
+    scrollToIndex(nextIndex);
+  }, [currentIndex, reviews.length, scrollToIndex]);
+
+  const prevSlide = useCallback(() => {
+    const prevIndex = (currentIndex - 1 + reviews.length) % reviews.length;
+    scrollToIndex(prevIndex);
+  }, [currentIndex, reviews.length, scrollToIndex]);
+
+  // Auto-play functionality
+  useEffect(() => {
+    if (isAutoPlaying && reviews.length > 1) {
+      autoPlayRef.current = setInterval(() => {
+        nextSlide();
+      }, 5000);
+    }
+
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+      }
+    };
+  }, [isAutoPlaying, nextSlide, reviews.length]);
+
+  // Pause auto-play on hover
+  const handleMouseEnter = () => setIsAutoPlaying(false);
+  const handleMouseLeave = () => setIsAutoPlaying(true);
+
+  // Handle scroll to update current index
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const cardWidth = container.scrollWidth / reviews.length;
+    const newIndex = Math.round(container.scrollLeft / cardWidth);
+    if (newIndex !== currentIndex) {
+      setCurrentIndex(newIndex);
+    }
+  };
+
+  const getServiceTypeName = (type: string) => {
+    switch (type) {
+      case 'vaktmester': return 'Vaktmestertjenester';
+      case 'tomrer': return 'Tømrertjenester';
+      case 'blikk': return 'Blikkenslagertjenester';
+      case 'takrennerens': return 'Takrennerens';
+      default: return 'Tjenester';
+    }
+  };
+
+  const getCustomerDisplay = (review: Review) => {
+    const profile = review.profiles;
+    const quote = review.jobs?.quotes;
+    
+    // Check if business customer
+    const isBusiness = profile?.customer_type === 'business' || quote?.company_name;
+    
+    if (isBusiness) {
+      const companyName = profile?.company_name || quote?.company_name;
+      return {
+        name: companyName || profile?.full_name?.split(' ')[0] || quote?.name?.split(' ')[0] || 'Kunde',
+        isBusiness: true
+      };
+    }
+    
+    // Private customer - only first name
+    const fullName = profile?.full_name || quote?.name || 'Kunde';
+    return {
+      name: fullName.split(' ')[0],
+      isBusiness: false
+    };
+  };
+
+  if (loading || reviews.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden">
+      <div className="container mx-auto px-4">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+            <Star className="h-4 w-4 fill-primary" />
+            <span>Kundeanmeldelser</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Hva kundene sier om oss
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Les hva våre fornøyde kunder mener om arbeidet vårt
+          </p>
+        </div>
+
+        {/* Testimonials Carousel */}
+        <div 
+          className="relative"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Navigation Buttons - Desktop */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={prevSlide}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 hidden md:flex bg-background shadow-lg border-border hover:bg-muted"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={nextSlide}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 hidden md:flex bg-background shadow-lg border-border hover:bg-muted"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+
+          {/* Scrollable Container */}
+          <div
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 px-4 md:px-12"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {reviews.map((review, index) => {
+              const customerDisplay = getCustomerDisplay(review);
+              const serviceType = review.jobs?.quotes?.type;
+              
+              return (
+                <div
+                  key={review.id}
+                  className={cn(
+                    "flex-shrink-0 w-[85vw] md:w-[450px] snap-center",
+                    "group"
+                  )}
+                >
+                  <div className={cn(
+                    "relative h-full bg-card rounded-2xl p-8 shadow-lg border border-border/50",
+                    "transition-all duration-500 ease-out",
+                    "hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1",
+                    index === currentIndex && "ring-2 ring-primary/20"
+                  )}>
+                    {/* Quote Icon */}
+                    <div className="absolute -top-4 left-8">
+                      <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                        <Quote className="h-5 w-5 text-primary-foreground" />
+                      </div>
+                    </div>
+
+                    {/* Rating */}
+                    <div className="flex gap-1 mb-4 pt-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={cn(
+                            "h-5 w-5 transition-all duration-300",
+                            star <= review.rating
+                              ? "text-yellow-400 fill-yellow-400"
+                              : "text-muted-foreground/30"
+                          )}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Comment */}
+                    <blockquote className="text-foreground text-lg leading-relaxed mb-6 min-h-[80px]">
+                      "{review.comment || 'Veldig fornøyd med arbeidet!'}"
+                    </blockquote>
+
+                    {/* Customer Info */}
+                    <div className="flex items-center gap-4 pt-4 border-t border-border/50">
+                      <div className={cn(
+                        "w-12 h-12 rounded-full flex items-center justify-center",
+                        customerDisplay.isBusiness 
+                          ? "bg-blue-100 dark:bg-blue-900/30" 
+                          : "bg-primary/10"
+                      )}>
+                        {customerDisplay.isBusiness ? (
+                          <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                        ) : (
+                          <User className="h-6 w-6 text-primary" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">
+                          {customerDisplay.name}
+                        </p>
+                        {serviceType && (
+                          <p className="text-sm text-muted-foreground">
+                            {getServiceTypeName(serviceType)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Decorative gradient */}
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Dots Indicator */}
+          <div className="flex justify-center gap-2 mt-8">
+            {reviews.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => scrollToIndex(index)}
+                className={cn(
+                  "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                  index === currentIndex
+                    ? "bg-primary w-8"
+                    : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                )}
+                aria-label={`Gå til anmeldelse ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Mobile Navigation Hint */}
+          <p className="text-center text-sm text-muted-foreground mt-4 md:hidden">
+            Sveip for å se flere anmeldelser
+          </p>
+        </div>
+
+        {/* Trust Badge */}
+        <div className="mt-12 text-center">
+          <div className="inline-flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-6 py-3 rounded-full">
+            <div className="flex -space-x-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star key={star} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+              ))}
+            </div>
+            <span className="font-medium">
+              {reviews.length}+ fornøyde kunder har gitt oss toppkarakter
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default TestimonialsSection;

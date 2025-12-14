@@ -17,6 +17,7 @@ import { Pencil } from "lucide-react";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
 import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
+import TestimonialsSection from "@/components/TestimonialsSection";
 
 // Component for Services Section Heading
 const ServicesHeading = () => {
@@ -89,6 +90,9 @@ const Index = () => {
 
         {/* Projects Section */}
         <ProjectsSection />
+
+        {/* Testimonials Section */}
+        <TestimonialsSection />
 
         {/* Services Section - Compact Overview */}
         <section className="py-16 bg-background" id="services">
