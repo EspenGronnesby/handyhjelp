@@ -2,11 +2,13 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2 } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeleton-loaders';
+import { toast } from '@/hooks/use-toast';
 
 interface Quote {
   id: string;
@@ -23,6 +25,7 @@ interface Quote {
 
 interface Job {
   id: string;
+  user_id: string;
   status: string;
   scheduled_date?: string;
   completed_date?: string;
@@ -49,6 +52,22 @@ interface ServiceAgreement {
   contact_person: string;
 }
 
+interface Invoice {
+  id: string;
+  job_id: string;
+  amount: number;
+  due_date: string;
+  file_url: string | null;
+  status: string;
+  invoice_number: string;
+}
+
+interface InvoiceRequest {
+  id: string;
+  job_id: string;
+  status: string;
+}
+
 const quoteStatusColors: Record<string, string> = {
   pending: 'bg-yellow-500',
   under_review: 'bg-blue-500',
@@ -65,22 +84,6 @@ const quoteStatusLabels: Record<string, string> = {
   accepted: 'Akseptert',
   rejected: 'Avvist',
   in_progress: 'Under arbeid'
-};
-
-const jobStatusColors: Record<string, string> = {
-  confirmed: 'bg-blue-500',
-  started: 'bg-yellow-500',
-  in_progress: 'bg-orange-500',
-  completed: 'bg-green-500',
-  cancelled: 'bg-red-500'
-};
-
-const jobStatusLabels: Record<string, string> = {
-  confirmed: 'Bekreftet',
-  started: 'Startet',
-  in_progress: 'Under arbeid',
-  completed: 'Fullført',
-  cancelled: 'Kansellert'
 };
 
 const agreementStatusColors: Record<string, string> = {
@@ -119,7 +122,10 @@ const DashboardActivity = () => {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [agreements, setAgreements] = useState<ServiceAgreement[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoiceRequests, setInvoiceRequests] = useState<InvoiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [requestingInvoice, setRequestingInvoice] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
@@ -158,9 +164,23 @@ const DashboardActivity = () => {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
+    // Fetch invoices
+    const { data: invoicesData } = await supabase
+      .from('invoices')
+      .select('*')
+      .eq('user_id', user.id);
+
+    // Fetch invoice requests
+    const { data: requestsData } = await supabase
+      .from('invoice_requests')
+      .select('*')
+      .eq('user_id', user.id);
+
     if (quotesData) setQuotes(quotesData);
     if (jobsData) setJobs(jobsData);
     if (agreementsData) setAgreements(agreementsData as ServiceAgreement[]);
+    if (invoicesData) setInvoices(invoicesData as Invoice[]);
+    if (requestsData) setInvoiceRequests(requestsData as InvoiceRequest[]);
     setLoading(false);
   }, []);
 
@@ -168,7 +188,7 @@ const DashboardActivity = () => {
     fetchData();
   }, [fetchData]);
 
-  // Realtime subscription for quotes, jobs and agreements
+  // Realtime subscription for quotes, jobs, agreements, and invoice_requests
   useEffect(() => {
     if (!userId) return;
 
@@ -177,9 +197,7 @@ const DashboardActivity = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'quotes' },
-        () => {
-          fetchData();
-        }
+        () => fetchData()
       )
       .subscribe();
 
@@ -188,9 +206,7 @@ const DashboardActivity = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'jobs' },
-        () => {
-          fetchData();
-        }
+        () => fetchData()
       )
       .subscribe();
 
@@ -199,9 +215,25 @@ const DashboardActivity = () => {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'service_agreements' },
-        () => {
-          fetchData();
-        }
+        () => fetchData()
+      )
+      .subscribe();
+
+    const invoicesChannel = supabase
+      .channel('invoices-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'invoices' },
+        () => fetchData()
+      )
+      .subscribe();
+
+    const requestsChannel = supabase
+      .channel('invoice-requests-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'invoice_requests' },
+        () => fetchData()
       )
       .subscribe();
 
@@ -209,8 +241,93 @@ const DashboardActivity = () => {
       supabase.removeChannel(quotesChannel);
       supabase.removeChannel(jobsChannel);
       supabase.removeChannel(agreementsChannel);
+      supabase.removeChannel(invoicesChannel);
+      supabase.removeChannel(requestsChannel);
     };
   }, [userId, fetchData]);
+
+  const handleRequestInvoice = async (job: Job) => {
+    if (!userId) return;
+    
+    setRequestingInvoice(job.id);
+    try {
+      // Create invoice request
+      const { error: requestError } = await supabase
+        .from('invoice_requests')
+        .insert({
+          job_id: job.id,
+          user_id: userId,
+          status: 'pending'
+        });
+
+      if (requestError) throw requestError;
+
+      // Send notification to admin
+      await supabase.functions.invoke('send-invoice-request-notification', {
+        body: {
+          jobId: job.id,
+          userId: userId,
+          customerName: job.quotes.name,
+          customerEmail: '', // Will be fetched from profile
+          jobDescription: job.quotes.description
+        }
+      });
+
+      toast({
+        title: 'Forespørsel sendt',
+        description: 'Vi sender deg fakturaen så snart den er klar.'
+      });
+
+      fetchData();
+    } catch (error: any) {
+      console.error('Error requesting invoice:', error);
+      toast({
+        title: 'Feil',
+        description: 'Kunne ikke sende forespørsel. Prøv igjen.',
+        variant: 'destructive'
+      });
+    } finally {
+      setRequestingInvoice(null);
+    }
+  };
+
+  const getInvoiceForJob = (jobId: string) => {
+    return invoices.find(inv => inv.job_id === jobId);
+  };
+
+  const getInvoiceRequestForJob = (jobId: string) => {
+    return invoiceRequests.find(req => req.job_id === jobId);
+  };
+
+  const handleDownloadInvoice = async (invoice: Invoice) => {
+    if (!invoice.file_url) {
+      toast({
+        title: 'Ingen fil',
+        description: 'Det er ingen PDF-fil tilgjengelig for denne fakturaen.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Get signed URL for private bucket
+    const filePath = invoice.file_url.split('/invoices/')[1];
+    if (filePath) {
+      const { data, error } = await supabase.storage
+        .from('invoices')
+        .createSignedUrl(filePath, 3600); // 1 hour expiry
+
+      if (data) {
+        window.open(data.signedUrl, '_blank');
+      } else {
+        console.error('Error getting signed URL:', error);
+        toast({
+          title: 'Feil',
+          description: 'Kunne ikke laste ned faktura.',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -414,79 +531,118 @@ const DashboardActivity = () => {
               </p>
             </Card>
           ) : (
-            completedJobs.map((job) => (
-              <Card key={job.id} className="border-l-4 border-l-green-500">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-green-500/10">
-                        <Briefcase className="h-5 w-5 text-green-600" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50">
-                            Fullført
-                          </Badge>
+            completedJobs.map((job) => {
+              const invoice = getInvoiceForJob(job.id);
+              const invoiceRequest = getInvoiceRequestForJob(job.id);
+              const hasRequestedInvoice = invoiceRequest && invoiceRequest.status === 'pending';
+
+              return (
+                <Card key={job.id} className="border-l-4 border-l-green-500">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-green-500/10">
+                          <Briefcase className="h-5 w-5 text-green-600" />
                         </div>
-                        <CardTitle className="text-lg mt-1">
-                          {job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name}
-                        </CardTitle>
-                        <CardDescription>
-                          Fullført {job.completed_date ? formatDistanceToNow(new Date(job.completed_date), { 
-                            addSuffix: true,
-                            locale: nb 
-                          }) : formatDistanceToNow(new Date(job.created_at), { 
-                            addSuffix: true,
-                            locale: nb 
-                          })}
-                        </CardDescription>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-green-600 border-green-300 bg-green-50">
+                              Fullført
+                            </Badge>
+                          </div>
+                          <CardTitle className="text-lg mt-1">
+                            {job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name}
+                          </CardTitle>
+                          <CardDescription>
+                            Fullført {job.completed_date ? formatDistanceToNow(new Date(job.completed_date), { 
+                              addSuffix: true,
+                              locale: nb 
+                            }) : formatDistanceToNow(new Date(job.created_at), { 
+                              addSuffix: true,
+                              locale: nb 
+                            })}
+                          </CardDescription>
+                        </div>
                       </div>
+                      <Badge className="bg-green-500">
+                        Fullført
+                      </Badge>
                     </div>
-                    <Badge className="bg-green-500">
-                      Fullført
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <p className="text-sm font-medium">Beskrivelse:</p>
-                    <p className="text-sm text-muted-foreground">{job.quotes.description}</p>
-                  </div>
-                  {job.scheduled_date && (
+                  </CardHeader>
+                  <CardContent className="space-y-3">
                     <div>
-                      <p className="text-sm font-medium">Planlagt dato:</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(job.scheduled_date).toLocaleDateString('nb-NO', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
+                      <p className="text-sm font-medium">Beskrivelse:</p>
+                      <p className="text-sm text-muted-foreground">{job.quotes.description}</p>
                     </div>
-                  )}
-                  {job.estimated_completion && (
-                    <div>
-                      <p className="text-sm font-medium">Estimert ferdigstillelse:</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(job.estimated_completion).toLocaleDateString('nb-NO', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </p>
-                    </div>
-                  )}
-                  {job.notes && (
-                    <div>
-                      <p className="text-sm font-medium">Notater:</p>
-                      <p className="text-sm text-muted-foreground">{job.notes}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))
+
+                    {/* Invoice section */}
+                    {invoice ? (
+                      <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Receipt className="h-5 w-5 text-primary" />
+                          <span className="font-medium">Faktura {invoice.invoice_number}</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">Beløp:</span>{' '}
+                            <span className="font-medium">
+                              {new Intl.NumberFormat('nb-NO', { style: 'currency', currency: 'NOK' }).format(invoice.amount)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Forfallsdato:</span>{' '}
+                            <span className="font-medium">
+                              {new Date(invoice.due_date).toLocaleDateString('nb-NO')}
+                            </span>
+                          </div>
+                        </div>
+                        {invoice.file_url && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownloadInvoice(invoice)}
+                            className="w-full sm:w-auto"
+                          >
+                            <Download className="mr-2 h-4 w-4" />
+                            Last ned faktura
+                          </Button>
+                        )}
+                      </div>
+                    ) : hasRequestedInvoice ? (
+                      <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                        <div className="flex items-center gap-2 text-amber-700">
+                          <Receipt className="h-5 w-5" />
+                          <span className="font-medium">Fakturaforespørsel sendt</span>
+                        </div>
+                        <p className="text-sm text-amber-600 mt-1">
+                          Vi sender deg fakturaen så snart den er klar.
+                        </p>
+                      </div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        onClick={() => handleRequestInvoice(job)}
+                        disabled={requestingInvoice === job.id}
+                        className="w-full sm:w-auto"
+                      >
+                        {requestingInvoice === job.id ? (
+                          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sender...</>
+                        ) : (
+                          <><Receipt className="mr-2 h-4 w-4" /> Be om faktura</>
+                        )}
+                      </Button>
+                    )}
+
+                    {job.notes && (
+                      <div>
+                        <p className="text-sm font-medium">Notater:</p>
+                        <p className="text-sm text-muted-foreground">{job.notes}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })
           )}
         </TabsContent>
       </Tabs>

@@ -71,6 +71,27 @@ export interface ServiceAgreement {
   user_id?: string | null;
 }
 
+export interface Invoice {
+  id: string;
+  job_id: string;
+  user_id: string;
+  amount: number;
+  due_date: string;
+  file_url: string | null;
+  status: string;
+  invoice_number: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InvoiceRequest {
+  id: string;
+  job_id: string;
+  user_id: string;
+  status: string;
+  created_at: string;
+}
+
 export const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-500',
   in_progress: 'bg-blue-500',
@@ -106,4 +127,16 @@ export const AGREEMENT_STATUS_COLORS: Record<string, string> = {
   offer_sent: 'bg-purple-500',
   contract_signed: 'bg-green-500',
   rejected: 'bg-red-500'
+};
+
+export const INVOICE_STATUS_LABELS: Record<string, string> = {
+  pending: 'Ubetalt',
+  paid: 'Betalt',
+  overdue: 'Forfalt'
+};
+
+export const INVOICE_STATUS_COLORS: Record<string, string> = {
+  pending: 'bg-yellow-500',
+  paid: 'bg-green-500',
+  overdue: 'bg-red-500'
 };
