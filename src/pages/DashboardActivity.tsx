@@ -309,23 +309,34 @@ const DashboardActivity = () => {
       return;
     }
 
-    // Get signed URL for private bucket
-    const filePath = invoice.file_url.split('/invoices/')[1];
-    if (filePath) {
+    try {
+      // Extract path from URL
+      const filePath = invoice.file_url.split('/invoices/')[1];
+      if (!filePath) throw new Error('Invalid file path');
+
+      // Download the file directly
       const { data, error } = await supabase.storage
         .from('invoices')
-        .createSignedUrl(filePath, 3600); // 1 hour expiry
+        .download(filePath);
 
-      if (data) {
-        window.open(data.signedUrl, '_blank');
-      } else {
-        console.error('Error getting signed URL:', error);
-        toast({
-          title: 'Feil',
-          description: 'Kunne ikke laste ned faktura.',
-          variant: 'destructive'
-        });
-      }
+      if (error) throw error;
+
+      // Create download link
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Faktura-${invoice.invoice_number}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error: any) {
+      console.error('Error downloading invoice:', error);
+      toast({
+        title: 'Feil',
+        description: 'Kunne ikke laste ned faktura. Prøv igjen.',
+        variant: 'destructive'
+      });
     }
   };
 
