@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle } from 'lucide-react';
-import { CardGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeleton-loaders';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, Bell } from 'lucide-react';
+import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 interface Quote {
   id: string;
@@ -340,10 +342,40 @@ const DashboardActivity = () => {
     }
   };
 
-  if (loading) {
+  const { stats, isLoading: statsLoading } = useDashboardStats();
+
+  const statCards = [
+    {
+      title: 'Totalt forespørsler',
+      value: stats.totalQuotes,
+      icon: FileText,
+      description: 'Alle dine forespørsler'
+    },
+    {
+      title: 'Aktive jobber',
+      value: stats.activeJobs,
+      icon: Briefcase,
+      description: 'Jobber under arbeid'
+    },
+    {
+      title: 'Fullførte jobber',
+      value: stats.completedJobs,
+      icon: CheckCircle,
+      description: 'Ferdigstilte prosjekter'
+    },
+    {
+      title: 'Uleste varsler',
+      value: stats.unreadNotifications,
+      icon: Bell,
+      description: 'Nye oppdateringer'
+    }
+  ];
+
+  if (loading || statsLoading) {
     return (
       <div className="space-y-6">
         <PageHeaderSkeleton />
+        <StatsSkeleton />
         <CardGridSkeleton count={3} />
       </div>
     );
@@ -356,35 +388,62 @@ const DashboardActivity = () => {
   
   const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
 
-  if (isEmpty) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Mine forespørsler</h1>
-          <p className="text-muted-foreground">
-            Oversikt over dine forespørsler, avtaler og fullførte oppdrag
-          </p>
-        </div>
-        <Card className="p-8 text-center">
-          <ClipboardList className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <CardTitle className="mb-2">Ingen forespørsler ennå</CardTitle>
-          <CardDescription>
-            Du har ikke sendt inn noen forespørsler ennå.
-            <a href="/tilbud" className="text-primary hover:underline ml-1">Send din første forespørsel</a>
-          </CardDescription>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Mine forespørsler</h1>
+        <h1 className="text-3xl font-bold mb-2">Velkommen til din profil</h1>
         <p className="text-muted-foreground">
-          Oversikt over dine forespørsler, avtaler og fullførte oppdrag
+          Her kan du holde oversikt over alle dine tilbud, jobber og varslinger
         </p>
       </div>
+
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {statCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <Card key={card.title}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                <Icon className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{card.value}</div>
+                <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Kom i gang */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Kom i gang</CardTitle>
+          <CardDescription>
+            Her er noen ting du kan gjøre
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Link to="/tilbud">
+            <Button variant="outline" className="w-full justify-start">
+              Send inn en ny tilbudsforespørsel
+            </Button>
+          </Link>
+          <Link to="/dashboard/profile">
+            <Button variant="outline" className="w-full justify-start">
+              Oppdater din profil
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+
+      {/* Mine forespørsler */}
+      {!isEmpty && (
+        <>
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Mine forespørsler</h2>
+          </div>
 
       <Tabs defaultValue="quotes" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6">
@@ -679,6 +738,8 @@ const DashboardActivity = () => {
           )}
         </TabsContent>
       </Tabs>
+        </>
+      )}
     </div>
   );
 };
