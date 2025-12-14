@@ -33,6 +33,7 @@ import ThankYou from "./pages/ThankYou";
 import QuotePage from "./pages/QuotePage";
 import ServiceAgreement from "./pages/ServiceAgreement";
 import ThankYouAgreement from "./pages/ThankYouAgreement";
+import ReviewSubmit from "./pages/ReviewSubmit";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const App = () => (
                 <Route path="/raad" element={<Blog />} />
                 <Route path="/raad/:slug" element={<BlogDetail />} />
                 <Route path="/takk" element={<ThankYou />} />
+                <Route path="/anmeldelse/:jobId" element={<ReviewSubmit />} />
                 <Route path="/dashboard" element={
                   <ErrorBoundary>
                     <Dashboard />

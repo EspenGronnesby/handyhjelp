@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.send-agreement-status-email]
 verify_jwt = false
+
+[functions.send-feedback-request]
+verify_jwt = false

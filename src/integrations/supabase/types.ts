@@ -236,6 +236,7 @@ export type Database = {
           completed_date: string | null
           created_at: string
           estimated_completion: string | null
+          feedback_sent_at: string | null
           id: string
           notes: string | null
           quote_id: string
@@ -250,6 +251,7 @@ export type Database = {
           completed_date?: string | null
           created_at?: string
           estimated_completion?: string | null
+          feedback_sent_at?: string | null
           id?: string
           notes?: string | null
           quote_id: string
@@ -264,6 +266,7 @@ export type Database = {
           completed_date?: string | null
           created_at?: string
           estimated_completion?: string | null
+          feedback_sent_at?: string | null
           id?: string
           notes?: string | null
           quote_id?: string
@@ -623,33 +626,49 @@ export type Database = {
       }
       reviews: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           comment: string | null
           created_at: string
           id: string
           job_id: string
           rating: number
+          status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           comment?: string | null
           created_at?: string
           id?: string
           job_id: string
           rating: number
+          status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           comment?: string | null
           created_at?: string
           id?: string
           job_id?: string
           rating?: number
+          status?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reviews_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reviews_job_id_fkey"
             columns: ["job_id"]

@@ -20,6 +20,7 @@ import { BlogManagement } from '@/components/admin/BlogManagement';
 import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 import { InvoiceUploadModal } from '@/components/admin/InvoiceUploadModal';
 import { InvoiceManagement } from '@/components/admin/InvoiceManagement';
+import ReviewManagement from '@/components/admin/ReviewManagement';
 
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
@@ -118,6 +119,9 @@ const AdminDashboard = () => {
           </TabsTrigger>
           <TabsTrigger value="blog" className="text-sm whitespace-nowrap">
             Blogg
+          </TabsTrigger>
+          <TabsTrigger value="reviews" className="text-sm whitespace-nowrap">
+            Anmeldelser
           </TabsTrigger>
           <TabsTrigger value="site-editing" className="text-sm whitespace-nowrap">
             Redigering
@@ -230,6 +234,11 @@ const AdminDashboard = () => {
         {/* Blog Tab */}
         <TabsContent value="blog">
           <BlogManagement />
+        </TabsContent>
+
+        {/* Reviews Tab */}
+        <TabsContent value="reviews">
+          <ReviewManagement />
         </TabsContent>
 
         {/* Site Editing Tab */}
