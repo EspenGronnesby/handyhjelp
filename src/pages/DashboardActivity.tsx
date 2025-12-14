@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2 } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 
@@ -588,10 +588,26 @@ const DashboardActivity = () => {
 
                     {/* Invoice section */}
                     {invoice ? (
-                      <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg space-y-3">
-                        <div className="flex items-center gap-2">
-                          <Receipt className="h-5 w-5 text-primary" />
-                          <span className="font-medium">Faktura {invoice.invoice_number}</span>
+                      <div className={`p-4 rounded-lg space-y-3 ${
+                        invoice.status === 'paid' 
+                          ? 'bg-green-50 border border-green-200 dark:bg-green-950/20 dark:border-green-800' 
+                          : 'bg-primary/5 border border-primary/20'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Receipt className={`h-5 w-5 ${invoice.status === 'paid' ? 'text-green-600' : 'text-primary'}`} />
+                            <span className="font-medium">Faktura {invoice.invoice_number}</span>
+                          </div>
+                          {invoice.status === 'paid' ? (
+                            <Badge className="bg-green-500 flex items-center gap-1">
+                              <CheckCircle className="h-3 w-3" />
+                              Betalt
+                            </Badge>
+                          ) : invoice.status === 'overdue' ? (
+                            <Badge className="bg-red-500">Forfalt</Badge>
+                          ) : (
+                            <Badge className="bg-yellow-500">Ubetalt</Badge>
+                          )}
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div>
@@ -607,6 +623,12 @@ const DashboardActivity = () => {
                             </span>
                           </div>
                         </div>
+                        {invoice.status === 'paid' && (
+                          <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                            <CheckCircle className="h-4 w-4" />
+                            Takk for betalingen!
+                          </p>
+                        )}
                         {invoice.file_url && (
                           <Button
                             variant="outline"
