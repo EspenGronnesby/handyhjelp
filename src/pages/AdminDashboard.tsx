@@ -18,6 +18,7 @@ import { AdminConfirmDialog } from '@/components/admin/AdminConfirmDialog';
 import { ProjectManagement } from '@/components/admin/ProjectManagement';
 import { BlogManagement } from '@/components/admin/BlogManagement';
 import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
+import { InvoiceUploadModal } from '@/components/admin/InvoiceUploadModal';
 
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
@@ -28,6 +29,7 @@ const AdminDashboard = () => {
     item: Quote | Job | null;
   }>({ open: false, type: null, item: null });
   const [selectedCustomer, setSelectedCustomer] = useState<Profile | null>(null);
+  const [invoiceJob, setInvoiceJob] = useState<Job | null>(null);
 
   const {
     profiles,
@@ -194,6 +196,7 @@ const AdminDashboard = () => {
                 variant="completed"
                 actionLoading={actionLoading}
                 onDelete={(j) => setConfirmDialog({ open: true, type: 'delete', item: j })}
+                onAddInvoice={(j) => setInvoiceJob(j)}
               />
             ))
           )}
@@ -238,6 +241,13 @@ const AdminDashboard = () => {
         profile={selectedCustomer}
         open={!!selectedCustomer}
         onClose={() => setSelectedCustomer(null)}
+      />
+
+      <InvoiceUploadModal
+        job={invoiceJob}
+        open={!!invoiceJob}
+        onOpenChange={(open) => !open && setInvoiceJob(null)}
+        onSuccess={() => setInvoiceJob(null)}
       />
     </div>
   );

@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.send-job-status-email]
 verify_jwt = false
+
+[functions.send-invoice-request-notification]
+verify_jwt = false
+
+[functions.send-invoice-ready-email]
+verify_jwt = false
