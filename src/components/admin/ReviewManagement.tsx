@@ -5,7 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Star, CheckCircle, XCircle, Clock, Search, Loader2, MessageSquare, User, Briefcase } from 'lucide-react';
+import { Star, CheckCircle, XCircle, Clock, Search, Loader2, MessageSquare, User, Briefcase, EyeOff, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from '@/hooks/use-toast';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -38,6 +48,7 @@ const ReviewManagement = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; reviewId: string | null }>({ open: false, reviewId: null });
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -112,6 +123,67 @@ const ReviewManagement = () => {
       });
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleHideReview = async (reviewId: string) => {
+    setActionLoading(reviewId);
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .update({ status: 'rejected' })
+        .eq('id', reviewId);
+
+      if (error) throw error;
+
+      setReviews(prev => 
+        prev.map(review => 
+          review.id === reviewId 
+            ? { ...review, status: 'rejected' }
+            : review
+        )
+      );
+
+      toast({
+        title: 'Anmeldelse skjult',
+        description: 'Anmeldelsen er nå skjult fra nettsiden',
+      });
+    } catch (error) {
+      console.error('Error hiding review:', error);
+      toast({
+        title: 'Feil ved skjuling',
+        variant: 'destructive',
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    setActionLoading(reviewId);
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', reviewId);
+
+      if (error) throw error;
+
+      setReviews(prev => prev.filter(review => review.id !== reviewId));
+
+      toast({
+        title: 'Anmeldelse slettet',
+        description: 'Anmeldelsen er permanent slettet',
+      });
+    } catch (error) {
+      console.error('Error deleting review:', error);
+      toast({
+        title: 'Feil ved sletting',
+        variant: 'destructive',
+      });
+    } finally {
+      setActionLoading(null);
+      setDeleteDialog({ open: false, reviewId: null });
     }
   };
 
@@ -214,35 +286,98 @@ const ReviewManagement = () => {
             </div>
 
             {/* Right side - Actions */}
-            {review.status === 'pending' && (
-              <div className="flex gap-2 md:flex-col">
-                <Button
-                  size="sm"
-                  onClick={() => handleUpdateStatus(review.id, 'approved')}
-                  disabled={actionLoading === review.id}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  {actionLoading === review.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      <CheckCircle className="h-4 w-4 mr-1" />
-                      Godkjenn
-                    </>
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleUpdateStatus(review.id, 'rejected')}
-                  disabled={actionLoading === review.id}
-                  className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950"
-                >
-                  <XCircle className="h-4 w-4 mr-1" />
-                  Avvis
-                </Button>
-              </div>
-            )}
+            <div className="flex gap-2 md:flex-col">
+              {review.status === 'pending' && (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={() => handleUpdateStatus(review.id, 'approved')}
+                    disabled={actionLoading === review.id}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {actionLoading === review.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Godkjenn
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleUpdateStatus(review.id, 'rejected')}
+                    disabled={actionLoading === review.id}
+                    className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950"
+                  >
+                    <XCircle className="h-4 w-4 mr-1" />
+                    Avvis
+                  </Button>
+                </>
+              )}
+              
+              {review.status === 'approved' && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleHideReview(review.id)}
+                    disabled={actionLoading === review.id}
+                    className="text-orange-600 border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-950"
+                  >
+                    {actionLoading === review.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <EyeOff className="h-4 w-4 mr-1" />
+                        Skjul
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setDeleteDialog({ open: true, reviewId: review.id })}
+                    disabled={actionLoading === review.id}
+                    className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Slett
+                  </Button>
+                </>
+              )}
+              
+              {review.status === 'rejected' && (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={() => handleUpdateStatus(review.id, 'approved')}
+                    disabled={actionLoading === review.id}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {actionLoading === review.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Godkjenn
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setDeleteDialog({ open: true, reviewId: review.id })}
+                    disabled={actionLoading === review.id}
+                    className="text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Slett
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -395,6 +530,31 @@ const ReviewManagement = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open, reviewId: open ? deleteDialog.reviewId : null })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Slette anmeldelse?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Er du sikker på at du vil slette denne anmeldelsen permanent? Denne handlingen kan ikke angres.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Avbryt</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteDialog.reviewId && handleDeleteReview(deleteDialog.reviewId)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {actionLoading === deleteDialog.reviewId ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Slett permanent'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
