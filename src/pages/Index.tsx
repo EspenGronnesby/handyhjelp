@@ -3,11 +3,9 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
 import { ProcessSection } from "@/components/ProcessSection";
-import { QuoteForm } from "@/components/QuoteForm";
 import { ProjectsSection } from "@/components/ProjectsSection";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { EditableServiceCard } from "@/components/EditableServiceCard";
@@ -18,6 +16,7 @@ import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
 import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import { Helmet } from "react-helmet";
 
 // Component for Services Section Heading
 const ServicesHeading = () => {
@@ -71,6 +70,20 @@ const Index = () => {
   
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>HandyHjelp | Profesjonelle håndverkstjenester i Kristiansand</title>
+        <meta name="description" content="HandyHjelp tilbyr profesjonelle vaktmester-, tømrer- og blikkenslagertjenester i Kristiansand. Få gratis tilbud i dag!" />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="HandyHjelp | Profesjonelle håndverkstjenester i Kristiansand" />
+        <meta property="og:description" content="HandyHjelp tilbyr profesjonelle vaktmester-, tømrer- og blikkenslagertjenester i Kristiansand. Få gratis tilbud i dag!" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://handyhjelp.no" />
+        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
+        <meta property="og:locale" content="nb_NO" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="HandyHjelp | Profesjonelle håndverkstjenester i Kristiansand" />
+        <meta name="twitter:description" content="HandyHjelp tilbyr profesjonelle vaktmester-, tømrer- og blikkenslagertjenester i Kristiansand. Få gratis tilbud i dag!" />
+      </Helmet>
       {/* Google Analytics */}
       <GoogleAnalytics />
       
@@ -80,7 +93,7 @@ const Index = () => {
       <BreadcrumbNavigation />
       
       {/* Hero Section with Integrated Quote Form */}
-      <main>
+      <main id="main-content">
         <HeroSection />
         
         {/* How It Works Process Section */}

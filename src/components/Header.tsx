@@ -28,8 +28,12 @@ export const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 w-full bg-background/95 backdrop-blur-md border-b border-border z-50">
-      <div className="container mx-auto px-4">
+    <>
+      <a href="#main-content" className="skip-to-content">
+        Hopp til hovedinnhold
+      </a>
+      <header className="fixed top-0 left-0 w-full bg-background/95 backdrop-blur-md border-b border-border z-50">
+        <div className="container mx-auto px-4">
         {/* Top Contact Bar - Hidden on mobile */}
         <div className="hidden md:block bg-secondary text-secondary-foreground py-1.5">
           <div className="container mx-auto px-4 flex justify-end space-x-6 text-sm">
@@ -264,7 +268,8 @@ export const Header = () => {
               </nav>
             </div>
           )}
-      </div>
-    </header>
+        </div>
+      </header>
+    </>
   );
 };

@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
+import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
+import { Helmet } from "react-helmet";
 
 const ThankYou = () => {
   const navigate = useNavigate();
@@ -21,19 +24,26 @@ const ThankYou = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>Takk for din forespørsel | HandyHjelp</title>
+        <meta name="description" content="Takk for din forespørsel. Vi kontakter deg innen 1-3 virkedager." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <GoogleAnalytics />
       <Header />
+      <BreadcrumbNavigation />
       
-      <main className="flex-1 bg-gradient-to-b from-gray-50 to-white py-16 px-4">
+      <main id="main-content" className="flex-1 bg-gradient-to-b from-muted/30 to-background py-16 px-4">
         <div className="container max-w-3xl mx-auto">
           {/* Success Icon */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-6">
-              <CheckCircle className="w-12 h-12 text-green-600" />
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-6">
+              <CheckCircle className="w-12 h-12 text-success" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl font-bold text-foreground mb-4">
               Takk for din forespørsel!
             </h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-muted-foreground">
               Vi har mottatt din {type === "business" ? "bedrifts" : "private"} forespørsel
             </p>
           </div>
@@ -41,27 +51,27 @@ const ThankYou = () => {
           {/* Confirmation Card */}
           <Card className="p-8 mb-8 shadow-lg">
             <div className="space-y-6">
-              <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg">
-                <Mail className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+              <div className="flex items-start gap-4 p-4 bg-primary/10 rounded-lg">
+                <Mail className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Bekreftelse sendt</h3>
-                  <p className="text-gray-700">
+                  <h3 className="font-semibold text-foreground mb-1">Bekreftelse sendt</h3>
+                  <p className="text-foreground">
                     En bekreftelse er sendt til <strong>{email}</strong>
                   </p>
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className="text-sm text-muted-foreground mt-2">
                     Sjekk også spam-mappen hvis du ikke finner e-posten i innboksen.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-4 bg-green-50 rounded-lg">
-                <Clock className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <div className="flex items-start gap-4 p-4 bg-success/10 rounded-lg">
+                <Clock className="w-6 h-6 text-success flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Forventet responstid</h3>
-                  <p className="text-gray-700">
+                  <h3 className="font-semibold text-foreground mb-1">Forventet responstid</h3>
+                  <p className="text-foreground">
                     Vi kontakter deg <strong>innen 1-3 virkedager</strong> i våre åpningstider (man-fre 09:00-17:00)
                   </p>
-                  <p className="text-sm text-gray-600 mt-2">
+                  <p className="text-sm text-muted-foreground mt-2">
                     Du vil motta et uforpliktende tilbud tilpasset dine behov.
                   </p>
                 </div>
@@ -71,51 +81,51 @@ const ThankYou = () => {
 
           {/* Next Steps */}
           <Card className="p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Hva skjer nå?</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Hva skjer nå?</h2>
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
                   1
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Vi gjennomgår din forespørsel</h3>
-                  <p className="text-gray-600">
+                  <h3 className="font-semibold text-foreground mb-1">Vi gjennomgår din forespørsel</h3>
+                  <p className="text-muted-foreground">
                     Vårt team vurderer dine behov og forbereder et skreddersydd tilbud.
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
                   2
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Du mottar tilbud</h3>
-                  <p className="text-gray-600">
+                  <h3 className="font-semibold text-foreground mb-1">Du mottar tilbud</h3>
+                  <p className="text-muted-foreground">
                     Vi kontakter deg per e-post eller telefon med et detaljert prisforslag.
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
                   3
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Avtale tidspunkt</h3>
-                  <p className="text-gray-600">
+                  <h3 className="font-semibold text-foreground mb-1">Avtale tidspunkt</h3>
+                  <p className="text-muted-foreground">
                     Godkjenner du tilbudet, avtaler vi et passende tidspunkt for jobben.
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
                   4
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Profesjonell utførelse</h3>
-                  <p className="text-gray-600">
+                  <h3 className="font-semibold text-foreground mb-1">Profesjonell utførelse</h3>
+                  <p className="text-muted-foreground">
                     Våre erfarne fagfolk utfører jobben med høy kvalitet og rydder opp etterpå.
                   </p>
                 </div>
@@ -124,14 +134,14 @@ const ThankYou = () => {
           </Card>
 
           {/* Contact Info */}
-          <Card className="p-8 mb-8 bg-gradient-to-br from-gray-50 to-gray-100">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Har du spørsmål i mellomtiden?</h2>
+          <Card className="p-8 mb-8 bg-gradient-to-br from-muted/50 to-muted/30">
+            <h2 className="text-xl font-bold text-foreground mb-4">Har du spørsmål i mellomtiden?</h2>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="text-sm text-gray-600">Ring oss på</p>
-                  <a href="tel:+4741250553" className="text-lg font-semibold text-gray-900 hover:text-primary">
+                  <p className="text-sm text-muted-foreground">Ring oss på</p>
+                  <a href="tel:+4741250553" className="text-lg font-semibold text-foreground hover:text-primary">
                     +47 412 50 553
                   </a>
                 </div>
@@ -139,8 +149,8 @@ const ThankYou = () => {
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary" />
                 <div>
-                  <p className="text-sm text-gray-600">Send e-post til</p>
-                  <a href="mailto:team@handyhjelp.no" className="text-lg font-semibold text-gray-900 hover:text-primary">
+                  <p className="text-sm text-muted-foreground">Send e-post til</p>
+                  <a href="mailto:team@handyhjelp.no" className="text-lg font-semibold text-foreground hover:text-primary">
                     team@handyhjelp.no
                   </a>
                 </div>

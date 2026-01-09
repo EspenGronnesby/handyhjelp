@@ -12,7 +12,6 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import DashboardActivity from "./pages/DashboardActivity";
-import DashboardLoyalty from "./pages/DashboardLoyalty";
 import DashboardProfile from "./pages/DashboardProfile";
 import DashboardNotifications from "./pages/DashboardNotifications";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -33,6 +32,9 @@ import QuotePage from "./pages/QuotePage";
 import ServiceAgreement from "./pages/ServiceAgreement";
 import ThankYouAgreement from "./pages/ThankYouAgreement";
 import ReviewSubmit from "./pages/ReviewSubmit";
+import Personvern from "./pages/Personvern";
+import Cookies from "./pages/Cookies";
+import Vilkaar from "./pages/Vilkaar";
 
 const queryClient = new QueryClient();
 
@@ -66,13 +68,15 @@ const App = () => (
                 <Route path="/raad/:slug" element={<BlogDetail />} />
                 <Route path="/takk" element={<ThankYou />} />
                 <Route path="/anmeldelse/:jobId" element={<ReviewSubmit />} />
+                <Route path="/personvern" element={<Personvern />} />
+                <Route path="/cookies" element={<Cookies />} />
+                <Route path="/vilkaar" element={<Vilkaar />} />
                 <Route path="/dashboard" element={
                   <ErrorBoundary>
                     <Dashboard />
                   </ErrorBoundary>
                 }>
                   <Route index element={<DashboardActivity />} />
-                  {/* <Route path="loyalty" element={<DashboardLoyalty />} /> */}
                   <Route path="profile" element={<DashboardProfile />} />
                   <Route path="notifications" element={<DashboardNotifications />} />
                   <Route path="admin" element={

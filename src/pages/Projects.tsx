@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin } from "lucide-react";
 import { EditableHero } from "@/components/EditableHero";
+import { Helmet } from "react-helmet";
 
 interface Project {
   id: string;
@@ -44,7 +45,6 @@ const Projects = () => {
           table: "projects",
         },
         () => {
-          console.log("🔄 Projects changed, refetching...");
           fetchProjects();
         }
       )
@@ -56,7 +56,6 @@ const Projects = () => {
   }, []);
 
   const fetchProjects = async () => {
-    console.log("🔍 [Projects Page] Fetching projects...");
     setIsLoading(true);
     
     const { data, error } = await supabase
@@ -67,15 +66,8 @@ const Projects = () => {
       .order("completed_date", { ascending: false });
 
     if (error) {
-      console.error("❌ [Projects Page] Error fetching projects:", error);
-      console.error("❌ [Projects Page] Error details:", {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-      });
+      console.error("Error fetching projects:", error);
     } else {
-      console.log("✅ [Projects Page] Projects loaded:", data?.length || 0);
-      console.log("📊 [Projects Page] Projects data:", data);
       setProjects(data || []);
       setFilteredProjects(data || []);
     }
@@ -84,19 +76,13 @@ const Projects = () => {
   };
 
   const handleCategoryFilter = (category: string | null) => {
-    console.log("🔍 [Projects Page] Filtering by category:", category);
     setActiveCategory(category);
     if (category === null) {
       setFilteredProjects(projects);
     } else {
       const filtered = projects.filter((p) => p.category === category);
-      console.log(`📊 [Projects Page] Filtered ${filtered.length} projects for category ${category}`);
       setFilteredProjects(filtered);
     }
-  };
-
-  const handleTouch = (projectId: string) => {
-    setTouchedProject(touchedProject === projectId ? null : projectId);
   };
 
   const isShowingAfter = (projectId: string) => {
@@ -105,11 +91,25 @@ const Projects = () => {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Våre prosjekter | HandyHjelp</title>
+        <meta name="description" content="Se før- og etterbilder fra våre prosjekter. Kvalitetsarbeid innen vaktmester, tømrer og blikkenslagerarbeid." />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Våre prosjekter | HandyHjelp" />
+        <meta property="og:description" content="Se før- og etterbilder fra våre prosjekter. Kvalitetsarbeid innen vaktmester, tømrer og blikkenslagerarbeid." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://handyhjelp.no/prosjekter" />
+        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
+        <meta property="og:locale" content="nb_NO" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Våre prosjekter | HandyHjelp" />
+        <meta name="twitter:description" content="Se før- og etterbilder fra våre prosjekter. Kvalitetsarbeid innen vaktmester, tømrer og blikkenslagerarbeid." />
+      </Helmet>
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />
       
-      <main className="pt-32 pb-16">
+      <main id="main-content" className="pt-32 pb-16">
         <div className="container mx-auto px-4">
           {/* Header Section */}
           <EditableHero
@@ -125,6 +125,7 @@ const Projects = () => {
               <Button
                 variant={activeCategory === null ? "default" : "outline"}
                 onClick={() => handleCategoryFilter(null)}
+                aria-label="Filtrer etter alle kategorier"
                 className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
                 Alle ({projects.length})
@@ -132,6 +133,7 @@ const Projects = () => {
               <Button
                 variant={activeCategory === "vaktmester" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("vaktmester")}
+                aria-label="Filtrer etter vaktmester"
                 className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
                 🔧 Vaktmester ({projects.filter(p => p.category === "vaktmester").length})
@@ -139,6 +141,7 @@ const Projects = () => {
               <Button
                 variant={activeCategory === "tomrer" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("tomrer")}
+                aria-label="Filtrer etter tømrer"
                 className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
                 🔨 Tømrer ({projects.filter(p => p.category === "tomrer").length})
@@ -146,6 +149,7 @@ const Projects = () => {
               <Button
                 variant={activeCategory === "blikk" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("blikk")}
+                aria-label="Filtrer etter blikk"
                 className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
                 💧 Blikk ({projects.filter(p => p.category === "blikk").length})
