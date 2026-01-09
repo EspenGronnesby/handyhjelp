@@ -227,36 +227,35 @@ const handler = async (req: Request): Promise<Response> => {
           
           feedbackSection = `
             <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); padding: 25px; border-radius: 12px; margin: 25px 0; text-align: center;">
-              <h3 style="margin: 0 0 10px 0; color: #0891B2; font-size: 18px;">Hvordan var opplevelsen?</h3>
-              <p style="margin: 0 0 20px 0; color: #64748b; font-size: 14px;">Trykk på et fjes for å gi oss en rask tilbakemelding</p>
+              <h3 style="margin: 0 0 20px 0; color: #0891B2; font-size: 18px;">Hvordan var opplevelsen?</h3>
               
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto; max-width: 100%;">
                 <tr>
-                  <td style="padding: 0 15px;">
-                    <a href="${feedbackBaseUrl}?token=${feedbackToken}&rating=happy" 
-                       style="display: block; text-decoration: none; text-align: center;">
-                      <div style="font-size: 48px; line-height: 1;">😊</div>
-                      <div style="color: #10B981; font-size: 12px; font-weight: 600; margin-top: 5px;">Fornøyd</div>
-                    </a>
-                  </td>
-                  <td style="padding: 0 15px;">
-                    <a href="${feedbackBaseUrl}?token=${feedbackToken}&rating=neutral" 
-                       style="display: block; text-decoration: none; text-align: center;">
-                      <div style="font-size: 48px; line-height: 1;">😐</div>
-                      <div style="color: #F59E0B; font-size: 12px; font-weight: 600; margin-top: 5px;">Nøytral</div>
-                    </a>
-                  </td>
-                  <td style="padding: 0 15px;">
+                  <td style="padding: 0 10px;">
                     <a href="${feedbackBaseUrl}?token=${feedbackToken}&rating=sad" 
                        style="display: block; text-decoration: none; text-align: center;">
-                      <div style="font-size: 48px; line-height: 1;">😟</div>
-                      <div style="color: #EF4444; font-size: 12px; font-weight: 600; margin-top: 5px;">Misfornøyd</div>
+                      <div style="font-size: 40px; line-height: 1;">😟</div>
+                      <div style="color: #EF4444; font-size: 11px; font-weight: 600; margin-top: 5px;">Misfornøyd</div>
+                    </a>
+                  </td>
+                  <td style="padding: 0 10px;">
+                    <a href="${feedbackBaseUrl}?token=${feedbackToken}&rating=neutral" 
+                       style="display: block; text-decoration: none; text-align: center;">
+                      <div style="font-size: 40px; line-height: 1;">😐</div>
+                      <div style="color: #F59E0B; font-size: 11px; font-weight: 600; margin-top: 5px;">Nøytral</div>
+                    </a>
+                  </td>
+                  <td style="padding: 0 10px;">
+                    <a href="${feedbackBaseUrl}?token=${feedbackToken}&rating=happy" 
+                       style="display: block; text-decoration: none; text-align: center;">
+                      <div style="font-size: 40px; line-height: 1;">😊</div>
+                      <div style="color: #10B981; font-size: 11px; font-weight: 600; margin-top: 5px;">Fornøyd</div>
                     </a>
                   </td>
                 </tr>
               </table>
               
-              <p style="margin: 15px 0 0 0; color: #94a3b8; font-size: 12px;">Du kan bare trykke én gang</p>
+              <p style="margin: 15px 0 0 0; color: #94a3b8; font-size: 12px;">Trykk på et av fjesene</p>
             </div>
           `;
         }
