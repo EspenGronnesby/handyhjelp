@@ -112,37 +112,71 @@ const handler = async (req: Request): Promise<Response> => {
     const { data, error } = await resend.emails.send({
       from: "HandyHjelp <team@handyhjelp.no>",
       to: [email],
-      subject: "Takk for din avtaleforespørsel – HandyHjelp | Levert med kvalitet",
+      subject: "Takk for din avtaleforespørsel – HandyHjelp",
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2C3E50;">Hei ${contactPerson},</h2>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Takk for at dere vurderer HandyHjelp som deres faste servicepartner! 🏠
-          </p>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Vi har mottatt forespørselen deres og vil gjennomgå den grundig. Dere kan forvente å bli kontaktet <strong>innen 1-3 virkedager</strong> for en uforpliktende samtale om deres behov.
-          </p>
-          
-          <div style="margin: 30px 0; padding: 20px; background-color: #F8FAFC; border-radius: 8px;">
-            <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Har dere spørsmål i mellomtiden?</p>
-            <p style="margin: 5px 0;">📞 Ring oss: <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
-            <p style="margin: 5px 0;">📧 E-post: <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .header { background: linear-gradient(135deg, #0891B2, #06B6D4); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+            .header h1 { color: white; margin: 0; font-size: 28px; }
+            .content { background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
+            .contact-info { background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; }
+            .contact-info h3 { margin-top: 0; color: #0891B2; }
+            .contact-item { margin: 8px 0; }
+            .contact-label { font-weight: bold; color: #374151; }
+            .footer { background-color: #f8fafc; padding: 20px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">HandyHjelp</div>
+              <h1>Takk for din avtaleforespørsel!</h1>
+            </div>
+            
+            <div class="content">
+              <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${contactPerson}</strong>,</p>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Takk for at dere vurderer HandyHjelp som deres faste servicepartner!
+              </p>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Vi har mottatt forespørselen deres og vil gjennomgå den grundig. Dere kan forvente å bli kontaktet <strong>innen 1-3 virkedager</strong> for en uforpliktende samtale om deres behov.
+              </p>
+              
+              <div class="contact-info">
+                <h3>Har dere spørsmål i mellomtiden?</h3>
+                <div class="contact-item">
+                  <span class="contact-label">Telefon:</span> <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a>
+                </div>
+                <div class="contact-item">
+                  <span class="contact-label">E-post:</span> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a>
+                </div>
+                <div class="contact-item">
+                  <span class="contact-label">Åpningstid:</span> Man-Fre 09:00-17:00
+                </div>
+              </div>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Med vennlig hilsen,<br>
+                <strong>HandyHjelp-teamet</strong>
+              </p>
+            </div>
+            
+            <div class="footer">
+              <strong>Levert med kvalitet</strong><br>
+              <a href="https://handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
+            </div>
           </div>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Med vennlig hilsen,<br>
-            <strong>HandyHjelp-teamet</strong>
-          </p>
-          
-          <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 30px 0;">
-          
-          <p style="font-size: 14px; color: #6B7280; text-align: center;">
-            HandyHjelp – Levert med kvalitet<br>
-            <a href="https://www.handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
-          </p>
-        </div>
+        </body>
+        </html>
       `,
     });
 

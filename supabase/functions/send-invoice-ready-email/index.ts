@@ -44,33 +44,75 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email to customer
     const emailResponse = await resend.emails.send({
-      from: "HandyHjelp <onboarding@resend.dev>",
+      from: "HandyHjelp <team@handyhjelp.no>",
       to: [customerEmail],
       subject: `Faktura ${invoiceNumber} er klar`,
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #0891B2;">Faktura tilgjengelig</h1>
-          <p>Hei ${customerName},</p>
-          <p>Din faktura for utført arbeid er nå klar.</p>
-          
-          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">Fakturadetaljer</h3>
-            <p><strong>Fakturanummer:</strong> ${invoiceNumber}</p>
-            <p><strong>Beløp:</strong> ${formattedAmount}</p>
-            <p><strong>Forfallsdato:</strong> ${formattedDate}</p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .header { background: linear-gradient(135deg, #0891B2, #06B6D4); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+            .header h1 { color: white; margin: 0; font-size: 24px; }
+            .content { background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
+            .invoice-details { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .contact-info { background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; }
+            .cta-button { display: inline-block; background-color: #0891B2; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; }
+            .footer { background-color: #f8fafc; padding: 20px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">HandyHjelp</div>
+              <h1>Faktura tilgjengelig</h1>
+            </div>
+            
+            <div class="content">
+              <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+              
+              <p style="font-size: 16px; line-height: 1.6;">Din faktura for utført arbeid er nå klar.</p>
+              
+              <div class="invoice-details">
+                <h3 style="margin-top: 0; color: #0891B2;">Fakturadetaljer</h3>
+                <p style="margin: 8px 0;"><strong>Fakturanummer:</strong> ${invoiceNumber}</p>
+                <p style="margin: 8px 0;"><strong>Beløp:</strong> ${formattedAmount}</p>
+                <p style="margin: 8px 0;"><strong>Forfallsdato:</strong> ${formattedDate}</p>
+              </div>
+              
+              <p style="font-size: 16px; line-height: 1.6;">Du kan laste ned fakturaen fra din kundeside på handyhjelp.no</p>
+              
+              <div style="text-align: center; margin: 25px 0;">
+                <a href="https://handyhjelp.no/dashboard/aktivitet" class="cta-button">
+                  Se faktura
+                </a>
+              </div>
+              
+              <div class="contact-info">
+                <h3 style="margin-top: 0; color: #0891B2;">Har du spørsmål?</h3>
+                <p style="margin: 8px 0;"><strong>Telefon:</strong> <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
+                <p style="margin: 8px 0;"><strong>E-post:</strong> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
+                <p style="margin: 8px 0;"><strong>Åpningstid:</strong> Man-Fre 09:00-17:00</p>
+              </div>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Med vennlig hilsen,<br>
+                <strong>HandyHjelp-teamet</strong>
+              </p>
+            </div>
+            
+            <div class="footer">
+              <strong>Levert med kvalitet</strong><br>
+              <a href="https://handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
+            </div>
           </div>
-          
-          <p>Du kan laste ned fakturaen fra din kundeside på handyhjelp.no</p>
-          
-          <a href="https://handyhjelp.no/dashboard/aktivitet" 
-             style="display: inline-block; background-color: #0891B2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 10px;">
-            Se faktura
-          </a>
-          
-          <p style="color: #666; font-size: 12px; margin-top: 30px;">
-            Ved spørsmål, kontakt oss på handyhjelp@gmail.com eller +47 41250553.
-          </p>
-        </div>
+        </body>
+        </html>
       `,
     });
 

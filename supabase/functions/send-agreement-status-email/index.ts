@@ -88,7 +88,7 @@ const STATUS_CONFIG = {
   },
   contract_signed: {
     subject: "Velkommen som avtalekunde – HandyHjelp",
-    title: "Avtalen er bekreftet! 🎉",
+    title: "Avtalen er bekreftet!",
     message: "Gratulerer! Du er nå avtalekunde hos HandyHjelp. Vi ser frem til et godt samarbeid og vil ta kontakt for å avtale oppstart.",
     color: "#10B981"
   },
@@ -161,13 +161,13 @@ const handler = async (req: Request): Promise<Response> => {
     if (status === 'offer_sent' && offerAmount) {
       offerSection = `
         <div style="background-color: #EDE9FE; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #8B5CF6;">
-          <h3 style="margin: 0 0 10px 0; color: #5B21B6;">💰 Tilbudsdetaljer</h3>
+          <h3 style="margin: 0 0 10px 0; color: #5B21B6;">Tilbudsdetaljer</h3>
           <p style="font-size: 24px; font-weight: bold; color: #5B21B6; margin: 0;">
             kr ${offerAmount.toLocaleString('nb-NO')}/mnd
           </p>
           ${offerDocumentUrl ? `
             <a href="${offerDocumentUrl}" style="display: inline-block; margin-top: 15px; background-color: #8B5CF6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
-              📄 Last ned tilbudsdokument
+              Last ned tilbudsdokument
             </a>
           ` : ''}
         </div>
@@ -179,10 +179,10 @@ const handler = async (req: Request): Promise<Response> => {
     if (status === 'contract_signed' && contractDocumentUrl) {
       contractSection = `
         <div style="background-color: #D1FAE5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #10B981;">
-          <h3 style="margin: 0 0 10px 0; color: #047857;">📋 Din kontrakt</h3>
+          <h3 style="margin: 0 0 10px 0; color: #047857;">Din kontrakt</h3>
           <p style="color: #047857; margin: 0 0 15px 0;">Kontrakten din er nå klar for nedlasting.</p>
           <a href="${contractDocumentUrl}" style="display: inline-block; background-color: #10B981; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
-            📄 Last ned kontrakt
+            Last ned kontrakt
           </a>
         </div>
       `;
@@ -193,54 +193,65 @@ const handler = async (req: Request): Promise<Response> => {
     if (status === 'rejected' && rejectionReason) {
       rejectionSection = `
         <div style="background-color: #FEE2E2; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #EF4444;">
-          <h3 style="margin: 0 0 10px 0; color: #991B1B;">📋 Årsak</h3>
+          <h3 style="margin: 0 0 10px 0; color: #991B1B;">Årsak</h3>
           <p style="color: #991B1B; margin: 0; font-style: italic;">"${rejectionReason}"</p>
         </div>
       `;
     }
 
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background-color: ${config.color}; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">${config.title}</h1>
-        </div>
-        
-        <div style="padding: 30px; background-color: #ffffff; border: 1px solid #E5E7EB; border-top: none;">
-          <h2 style="color: #2C3E50; margin-top: 0;">Hei ${contactPerson},</h2>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc;">
+        <div style="max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, ${config.color}, ${config.color}cc); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <div style="color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px;">HandyHjelp</div>
+            <h1 style="color: white; margin: 0; font-size: 24px;">${config.title}</h1>
+          </div>
           
-          <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">
-            ${config.message}
-          </p>
+          <div style="padding: 30px; background-color: #ffffff; border: 1px solid #E5E7EB; border-top: none;">
+            <h2 style="color: #2C3E50; margin-top: 0;">Hei ${contactPerson},</h2>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">
+              ${config.message}
+            </p>
 
-          ${offerSection}
-          ${contractSection}
-          ${rejectionSection}
-          
-          <div style="background-color: #F1F5F9; padding: 20px; border-radius: 8px; margin: 25px 0;">
-            <h3 style="margin: 0 0 15px 0; color: #2C3E50;">Detaljer om forespørselen:</h3>
-            <p style="margin: 8px 0; color: #4A5568;"><strong>Adresse:</strong> ${address || 'Ikke oppgitt'}</p>
-            <p style="margin: 8px 0; color: #4A5568;"><strong>Tjenester:</strong> ${servicesList}</p>
+            ${offerSection}
+            ${contractSection}
+            ${rejectionSection}
+            
+            <div style="background-color: #F1F5F9; padding: 20px; border-radius: 8px; margin: 25px 0;">
+              <h3 style="margin: 0 0 15px 0; color: #2C3E50;">Detaljer om forespørselen:</h3>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>Adresse:</strong> ${address || 'Ikke oppgitt'}</p>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>Tjenester:</strong> ${servicesList}</p>
+            </div>
+            
+            <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0;">
+              <h3 style="margin-top: 0; color: #0891B2;">Har du spørsmål?</h3>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>Telefon:</strong> <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>E-post:</strong> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>Åpningstid:</strong> Man-Fre 09:00-17:00</p>
+            </div>
+            
+            <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">
+              Med vennlig hilsen,<br>
+              <strong>HandyHjelp-teamet</strong>
+            </p>
           </div>
           
-          <div style="margin: 30px 0; padding: 20px; background-color: #F8FAFC; border-radius: 8px; border-left: 4px solid ${config.color};">
-            <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #2C3E50;">Har du spørsmål?</p>
-            <p style="margin: 5px 0; color: #4A5568;">📞 Ring oss: <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
-            <p style="margin: 5px 0; color: #4A5568;">📧 E-post: <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
+          <div style="padding: 20px; background-color: #F8FAFC; border-radius: 0 0 8px 8px; text-align: center; border: 1px solid #E5E7EB; border-top: none;">
+            <p style="font-size: 14px; color: #6B7280; margin: 0;">
+              <strong>Levert med kvalitet</strong><br>
+              <a href="https://handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
+            </p>
           </div>
-          
-          <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">
-            Med vennlig hilsen,<br>
-            <strong>HandyHjelp-teamet</strong>
-          </p>
         </div>
-        
-        <div style="padding: 20px; background-color: #F8FAFC; border-radius: 0 0 8px 8px; text-align: center; border: 1px solid #E5E7EB; border-top: none;">
-          <p style="font-size: 14px; color: #6B7280; margin: 0;">
-            HandyHjelp – Levert med kvalitet<br>
-            <a href="https://www.handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
-          </p>
-        </div>
-      </div>
+      </body>
+      </html>
     `;
 
     const { data, error } = await resend.emails.send({

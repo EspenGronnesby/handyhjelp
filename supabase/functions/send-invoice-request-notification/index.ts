@@ -32,8 +32,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email to admin
     const emailResponse = await resend.emails.send({
-      from: "HandyHjelp <onboarding@resend.dev>",
-      to: ["handyhjelp@gmail.com"],
+      from: "HandyHjelp System <team@handyhjelp.no>",
+      to: ["team@handyhjelp.no"],
       subject: `Ny fakturaforespørsel fra ${customerName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
