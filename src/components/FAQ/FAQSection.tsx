@@ -26,9 +26,7 @@ export const FAQSection = () => {
               <Phone className="mr-2 h-4 w-4" />
               41250553
             </Button>
-            <Button size="lg" className="bg-success hover:bg-success-hover text-success-foreground" onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({
-            behavior: 'smooth'
-          })}>
+            <Button size="lg" className="bg-success hover:bg-success-hover text-success-foreground" onClick={() => window.location.href = '/tilbud'}>
               Send forespørsel
             </Button>
           </div>
