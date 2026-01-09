@@ -34,7 +34,8 @@ interface FormData {
   description: string;
 }
 
-// Hardkodet Web3Forms access key - IKKE BRUK ENVIRONMENT VARIABLE
+// Web3Forms access key - dette er en PUBLISHABLE key (som Stripe publishable key)
+// og er ment å være synlig i frontend-kode. Se: https://web3forms.com/
 const WEB3FORMS_ACCESS_KEY = "e73de942-c444-45b1-ba7a-1556f5862bfd";
 
 export const QuoteForm = () => {
@@ -150,7 +151,7 @@ export const QuoteForm = () => {
         user_id: user?.id || null,
       };
 
-      console.log('Saving quote to database:', quoteData);
+      
       
       const { data: savedQuote, error: dbError } = await supabase
         .from('quotes')
@@ -162,7 +163,7 @@ export const QuoteForm = () => {
         console.error('Database save failed:', dbError);
         // Fortsett likevel - Web3Forms er backup
       } else {
-        console.log('Quote saved to database successfully');
+        
         
         // Opprett notifikasjon for innlogget bruker
         if (user?.id) {
@@ -191,7 +192,7 @@ export const QuoteForm = () => {
         description: formData.description,
       };
 
-      console.log('Sending to Web3Forms:', web3FormData);
+      
 
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -199,9 +200,7 @@ export const QuoteForm = () => {
         body: JSON.stringify(web3FormData)
       });
 
-      console.log('Response status:', response.status);
       const responseData = await response.json();
-      console.log('Response data:', responseData);
 
       if (!response.ok || !responseData.success) {
         throw new Error(responseData.message || 'Kunne ikke sende forespørsel');
@@ -209,7 +208,7 @@ export const QuoteForm = () => {
 
       // 3. Send bekreftelsesmail til kunden (non-blocking)
       try {
-        console.log('Sending confirmation email to:', formData.email);
+        
         const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
           body: {
             name: formData.name,
@@ -222,7 +221,7 @@ export const QuoteForm = () => {
         if (emailError) {
           console.error('Confirmation email failed:', emailError);
         } else {
-          console.log('Confirmation email sent successfully');
+          
         }
       } catch (emailErr) {
         console.error('Failed to send confirmation email:', emailErr);
@@ -297,7 +296,7 @@ export const QuoteForm = () => {
 
       {step === 1 && (
         <div className="space-y-4 animate-fade-in-up">
-          <Label className="text-base font-medium">Privat eller bedrift?</Label>
+          <Label className="text-base font-medium" required>Privat eller bedrift?</Label>
           
           {user && profile && (
             <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-md text-sm text-success-foreground">
@@ -335,7 +334,7 @@ export const QuoteForm = () => {
 
       {step === 2 && (
         <div className="space-y-4 animate-fade-in-up">
-          <Label className="text-base font-medium">Dine kontaktopplysninger</Label>
+          <Label className="text-base font-medium" required>Dine kontaktopplysninger</Label>
           <div className="space-y-4">
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -443,13 +442,13 @@ export const QuoteForm = () => {
         <div className="space-y-4 animate-fade-in-up">
           {user && profile?.customer_type ? (
             <div>
-              <Label className="text-base font-medium">Beskriv oppdraget</Label>
+              <Label className="text-base font-medium" required>Beskriv oppdraget</Label>
               <p className="text-sm text-muted-foreground mt-1 mb-3">
                 Vi har allerede dine kontaktopplysninger. Fortell oss hva du ønsker hjelp til.
               </p>
             </div>
           ) : (
-            <Label className="text-base font-medium">Beskriv oppdraget</Label>
+            <Label className="text-base font-medium" required>Beskriv oppdraget</Label>
           )}
           <Textarea
             placeholder="Fortell oss om jobben som skal gjøres..."
@@ -466,6 +465,9 @@ export const QuoteForm = () => {
           )}
           <p className="text-sm text-muted-foreground">
             {formData.description.length}/2000 tegn
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            <span className="text-destructive">*</span> Obligatoriske felt
           </p>
         </div>
       )}
