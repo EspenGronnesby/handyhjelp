@@ -24,6 +24,7 @@ import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 import { InvoiceUploadModal } from '@/components/admin/InvoiceUploadModal';
 import { InvoiceManagement } from '@/components/admin/InvoiceManagement';
 import ReviewManagement from '@/components/admin/ReviewManagement';
+import { QuickFeedbackStats } from '@/components/admin/QuickFeedbackStats';
 import { OfferModal } from '@/components/admin/OfferModal';
 import { ContractModal } from '@/components/admin/ContractModal';
 import { RejectAgreementModal } from '@/components/admin/RejectAgreementModal';
@@ -92,6 +93,7 @@ const AdminDashboard = () => {
       tabs: [
         { key: 'projects', label: 'Prosjekter', count: null },
         { key: 'blog', label: 'Blogg', count: null },
+        { key: 'feedback', label: 'Tilbakemeldinger', count: null },
         { key: 'reviews', label: 'Anmeldelser', count: null },
       ],
       totalBadge: null,
@@ -378,6 +380,11 @@ const AdminDashboard = () => {
         {/* Blog Tab */}
         <TabsContent value="blog">
           <BlogManagement />
+        </TabsContent>
+
+        {/* Quick Feedback Stats Tab */}
+        <TabsContent value="feedback">
+          <QuickFeedbackStats />
         </TabsContent>
 
         {/* Reviews Tab */}
