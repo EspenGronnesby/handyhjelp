@@ -4,6 +4,43 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const FUNCTION_NAME = "send-job-status-email";
 
+// Rate limiting - IP-based with in-memory store
+const rateLimits = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX_REQUESTS = 10;
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimits.get(ip);
+
+  if (rateLimits.size > 10000) {
+    for (const [key, value] of rateLimits.entries()) {
+      if (now > value.resetAt) {
+        rateLimits.delete(key);
+      }
+    }
+  }
+
+  if (!record || now > record.resetAt) {
+    rateLimits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown";
+}
+
 // Structured logging utility
 const log = {
   info: (message: string, data?: Record<string, unknown>) => {
@@ -81,12 +118,34 @@ const generateToken = (): string => {
 
 const handler = async (req: Request): Promise<Response> => {
   const requestId = crypto.randomUUID();
+  const clientIP = getClientIP(req);
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  log.info("Request received", { requestId, method: req.method });
+  log.info("Request received", { requestId, method: req.method, clientIP });
+
+  // Rate limiting check
+  if (!checkRateLimit(clientIP)) {
+    log.warn("Rate limit exceeded", { requestId, clientIP });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Too many requests. Please try again later.",
+        requestId,
+        timestamp: new Date().toISOString()
+      }),
+      {
+        status: 429,
+        headers: { 
+          "Content-Type": "application/json", 
+          "Retry-After": "60",
+          ...corsHeaders 
+        }
+      }
+    );
+  }
 
   if (req.method !== "POST") {
     log.warn("Invalid request method", { requestId, method: req.method });
