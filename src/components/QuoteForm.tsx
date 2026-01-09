@@ -153,11 +153,11 @@ export const QuoteForm = () => {
 
       
       
-      const { data: savedQuote, error: dbError } = await supabase
+      // Merk: Vi bruker IKKE .select() etter insert fordi anonyme brukere
+      // ikke har lesetilgang til quotes-tabellen (kun admin kan lese)
+      const { error: dbError } = await supabase
         .from('quotes')
-        .insert(quoteData)
-        .select()
-        .single();
+        .insert(quoteData);
 
       if (dbError) {
         console.error('Database save failed:', dbError);
