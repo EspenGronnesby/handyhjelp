@@ -4,10 +4,16 @@ import { QuoteForm } from "@/components/QuoteForm";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, ArrowRight } from "lucide-react";
+import { CalendarCheck, ArrowRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const QuotePage = () => {
+  const scrollToAgreement = () => {
+    document.getElementById('fast-avtale-section')?.scrollIntoView({
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <div className="min-h-screen">
       <GoogleAnalytics />
@@ -20,14 +26,21 @@ const QuotePage = () => {
               <h1 className="text-4xl md:text-5xl font-heading font-bold mb-4">
                 Få gratis tilbud
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-muted-foreground mb-4">
                 Send inn din forespørsel og få kontakt med lokale fagfolk. Vi svarer innen 1-3 virkedager.
               </p>
+              <button 
+                onClick={scrollToAgreement}
+                className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+              >
+                <span>Trenger du regelmessig hjelp?</span>
+                <ChevronDown className="h-4 w-4 animate-bounce" />
+              </button>
             </div>
             <QuoteForm />
 
             {/* Fast avtale promo section */}
-            <Card className="mt-12 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <Card id="fast-avtale-section" className="mt-12 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent scroll-mt-32">
               <CardContent className="p-6 text-center">
                 <div className="flex justify-center mb-4">
                   <div className="p-3 rounded-full bg-primary/10">
