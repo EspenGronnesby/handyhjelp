@@ -152,7 +152,7 @@ export const ServiceAgreementForm = () => {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Adresse (gateadresse, postnummer og sted) *</FormLabel>
+                  <FormLabel>Adresse (gateadresse, postnummer og sted) <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Input placeholder="F.eks. Storgata 1, 4612 Kristiansand" {...field} />
                   </FormControl>
@@ -232,7 +232,7 @@ export const ServiceAgreementForm = () => {
               name="frequency"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hvor ofte trenger dere tilsyn? *</FormLabel>
+                  <FormLabel>Hvor ofte trenger dere tilsyn? <span className="text-destructive">*</span></FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
@@ -283,7 +283,7 @@ export const ServiceAgreementForm = () => {
               name="contractDuration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ønsket avtalevarighet *</FormLabel>
+                  <FormLabel>Ønsket avtalevarighet <span className="text-destructive">*</span></FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
@@ -385,7 +385,7 @@ export const ServiceAgreementForm = () => {
               name="contactPerson"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kontaktperson *</FormLabel>
+                  <FormLabel>Kontaktperson <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Input placeholder="Fullt navn" {...field} />
                   </FormControl>
@@ -399,7 +399,7 @@ export const ServiceAgreementForm = () => {
               name="contactRole"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Din rolle *</FormLabel>
+                  <FormLabel>Din rolle <span className="text-destructive">*</span></FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
@@ -424,7 +424,7 @@ export const ServiceAgreementForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-post *</FormLabel>
+                  <FormLabel>E-post <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="din@epost.no" {...field} />
                   </FormControl>
@@ -438,7 +438,7 @@ export const ServiceAgreementForm = () => {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Telefon *</FormLabel>
+                  <FormLabel>Telefon <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Input 
                       type="tel" 
@@ -479,9 +479,13 @@ export const ServiceAgreementForm = () => {
                     />
                   </FormControl>
                   <FormMessage />
-                </FormItem>
-              )}
-            />
+              </FormItem>
+            )}
+          />
+            
+            <p className="text-sm text-muted-foreground mt-4">
+              <span className="text-destructive">*</span> Obligatoriske felt
+            </p>
           </div>
         );
 
