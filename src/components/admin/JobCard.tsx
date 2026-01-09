@@ -4,10 +4,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard } from 'lucide-react';
+import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard, Smile, Meh, Frown } from 'lucide-react';
 import { Job, STATUS_COLORS, STATUS_LABELS, Invoice, InvoiceRequest, INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+
+interface QuickFeedback {
+  id: string;
+  job_id: string;
+  rating: 'happy' | 'neutral' | 'sad' | null;
+  token_used_at: string | null;
+  created_at: string;
+}
 
 interface JobCardProps {
   job: Job;
@@ -18,14 +26,22 @@ interface JobCardProps {
   onAddInvoice?: (job: Job) => void;
 }
 
+const RATING_CONFIG = {
+  happy: { icon: Smile, label: 'Fornøyd', color: 'text-green-500', bg: 'bg-green-50' },
+  neutral: { icon: Meh, label: 'Nøytral', color: 'text-yellow-500', bg: 'bg-yellow-50' },
+  sad: { icon: Frown, label: 'Misfornøyd', color: 'text-red-500', bg: 'bg-red-50' }
+};
+
 export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onAddInvoice }: JobCardProps) => {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [invoiceRequest, setInvoiceRequest] = useState<InvoiceRequest | null>(null);
   const [markingPaid, setMarkingPaid] = useState(false);
+  const [quickFeedback, setQuickFeedback] = useState<QuickFeedback | null>(null);
 
   useEffect(() => {
     if (variant === 'completed') {
       fetchInvoiceData();
+      fetchQuickFeedback();
     }
   }, [job.id, variant]);
 
@@ -47,6 +63,16 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
       .maybeSingle();
     
     if (requestData) setInvoiceRequest(requestData as InvoiceRequest);
+  };
+
+  const fetchQuickFeedback = async () => {
+    const { data } = await supabase
+      .from('quick_feedback')
+      .select('*')
+      .eq('job_id', job.id)
+      .maybeSingle();
+    
+    if (data) setQuickFeedback(data as QuickFeedback);
   };
 
   const handleMarkAsPaid = async () => {
@@ -96,6 +122,27 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
     );
   };
 
+  const getFeedbackBadge = () => {
+    if (!quickFeedback) return null;
+    
+    if (!quickFeedback.rating || !quickFeedback.token_used_at) {
+      return (
+        <Badge variant="outline" className="flex items-center gap-1 text-muted-foreground">
+          Venter på tilbakemelding
+        </Badge>
+      );
+    }
+
+    const config = RATING_CONFIG[quickFeedback.rating];
+    const Icon = config.icon;
+    return (
+      <Badge className={`${config.bg} ${config.color} border-0 flex items-center gap-1`}>
+        <Icon className="h-3 w-3" />
+        {config.label}
+      </Badge>
+    );
+  };
+
   return (
     <Card className={hasInvoiceRequest ? 'ring-2 ring-orange-400' : ''}>
       <CardHeader>
@@ -120,6 +167,7 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
               </Badge>
             )}
             {getInvoiceStatusBadge()}
+            {variant === 'completed' && getFeedbackBadge()}
           </div>
         </div>
       </CardHeader>

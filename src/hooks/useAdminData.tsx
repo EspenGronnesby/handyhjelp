@@ -137,6 +137,7 @@ export const useAdminData = (isAdmin: boolean) => {
           customerEmail: job.quotes.email,
           jobDescription: job.quotes.description,
           status: 'completed',
+          jobId: job.id,
         },
       }).catch(console.error);
 
