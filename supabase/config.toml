@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.send-feedback-request]
 verify_jwt = false
+
+[functions.submit-quick-feedback]
+verify_jwt = false

@@ -579,6 +579,44 @@ export type Database = {
         }
         Relationships: []
       }
+      quick_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string | null
+          job_id: string
+          rating: string | null
+          token: string
+          token_used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          job_id: string
+          rating?: string | null
+          token: string
+          token_used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          job_id?: string
+          rating?: string | null
+          token?: string
+          token_used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quick_feedback_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quotes: {
         Row: {
           address: string | null

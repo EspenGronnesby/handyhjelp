@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const FUNCTION_NAME = "send-job-status-email";
 
@@ -68,7 +69,15 @@ interface JobStatusEmailRequest {
   customerEmail: string;
   jobDescription: string;
   status: "started" | "completed";
+  jobId?: string;
 }
+
+// Generate a secure random token
+const generateToken = (): string => {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+};
 
 const handler = async (req: Request): Promise<Response> => {
   const requestId = crypto.randomUUID();
@@ -93,7 +102,7 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Invalid JSON in request body", 400, requestId);
   }
 
-  const { customerName, customerEmail, jobDescription, status } = requestData;
+  const { customerName, customerEmail, jobDescription, status, jobId } = requestData;
 
   // Validate required fields
   if (!customerName || !customerEmail || !jobDescription || !status) {
@@ -121,6 +130,11 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   log.info("Sending job status email", { requestId, customerEmail, status });
+
+  // Initialize Supabase client for feedback token
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   try {
     let subject: string;
@@ -192,6 +206,62 @@ const handler = async (req: Request): Promise<Response> => {
         </html>
       `;
     } else {
+      // Generate feedback token for completed jobs
+      let feedbackSection = '';
+      
+      if (jobId) {
+        const feedbackToken = generateToken();
+        
+        // Insert feedback record
+        const { error: feedbackError } = await supabase
+          .from('quick_feedback')
+          .insert({
+            job_id: jobId,
+            token: feedbackToken
+          });
+
+        if (feedbackError) {
+          log.warn("Failed to create feedback token", { requestId, error: feedbackError.message });
+        } else {
+          const feedbackBaseUrl = `${supabaseUrl}/functions/v1/submit-quick-feedback`;
+          
+          feedbackSection = `
+            <div style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); padding: 25px; border-radius: 12px; margin: 25px 0; text-align: center;">
+              <h3 style="margin: 0 0 10px 0; color: #0891B2; font-size: 18px;">Hvordan var opplevelsen?</h3>
+              <p style="margin: 0 0 20px 0; color: #64748b; font-size: 14px;">Trykk på et fjes for å gi oss en rask tilbakemelding</p>
+              
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                <tr>
+                  <td style="padding: 0 15px;">
+                    <a href="${feedbackBaseUrl}?token=${feedbackToken}&rating=happy" 
+                       style="display: block; text-decoration: none; text-align: center;">
+                      <div style="font-size: 48px; line-height: 1;">😊</div>
+                      <div style="color: #10B981; font-size: 12px; font-weight: 600; margin-top: 5px;">Fornøyd</div>
+                    </a>
+                  </td>
+                  <td style="padding: 0 15px;">
+                    <a href="${feedbackBaseUrl}?token=${feedbackToken}&rating=neutral" 
+                       style="display: block; text-decoration: none; text-align: center;">
+                      <div style="font-size: 48px; line-height: 1;">😐</div>
+                      <div style="color: #F59E0B; font-size: 12px; font-weight: 600; margin-top: 5px;">Nøytral</div>
+                    </a>
+                  </td>
+                  <td style="padding: 0 15px;">
+                    <a href="${feedbackBaseUrl}?token=${feedbackToken}&rating=sad" 
+                       style="display: block; text-decoration: none; text-align: center;">
+                      <div style="font-size: 48px; line-height: 1;">😟</div>
+                      <div style="color: #EF4444; font-size: 12px; font-weight: 600; margin-top: 5px;">Misfornøyd</div>
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 15px 0 0 0; color: #94a3b8; font-size: 12px;">Du kan bare trykke én gang</p>
+            </div>
+          `;
+        }
+      }
+
       subject = "Oppdraget er fullført – Takk for tilliten!";
       html = `
         <!DOCTYPE html>
@@ -234,6 +304,8 @@ const handler = async (req: Request): Promise<Response> => {
               <p style="font-size: 16px; line-height: 1.6;">
                 Takk for at du valgte HandyHjelp! Vi håper du er fornøyd med arbeidet.
               </p>
+              
+              ${feedbackSection}
               
               <div class="contact-info">
                 <h3 style="margin-top: 0; color: #0891B2;">Har du tilbakemeldinger eller nye oppdrag?</h3>
@@ -294,7 +366,7 @@ const handler = async (req: Request): Promise<Response> => {
       await resend.emails.send({
         from: "HandyHjelp System <team@handyhjelp.no>",
         to: ["team@handyhjelp.no"],
-        subject: "⚠️ Feil ved sending av jobbstatus-epost",
+        subject: "Feil ved sending av jobbstatus-epost",
         html: `
           <h2>Feil ved sending av jobbstatus-epost</h2>
           <p><strong>Request ID:</strong> ${requestId}</p>
@@ -302,7 +374,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p><strong>Status:</strong> ${status}</p>
           <p><strong>Jobbeskrivelse:</strong> ${jobDescription}</p>
           <p><strong>Feilmelding:</strong> ${error instanceof Error ? error.message : 'Ukjent feil'}</p>
-          <p><strong>⚠️ Vennligst informer kunden manuelt.</strong></p>
+          <p><strong>Vennligst informer kunden manuelt.</strong></p>
         `,
       });
       log.info("Error notification sent to team", { requestId });
