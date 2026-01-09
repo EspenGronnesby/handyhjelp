@@ -3,6 +3,7 @@ import { FAQSchema, defaultFAQItems } from "@/components/SEO/FAQSchema";
 import { Button } from "@/components/ui/button";
 import { Phone } from "lucide-react";
 import { EditableFAQItem } from "@/components/EditableFAQItem";
+import { Link } from "react-router-dom";
 export const FAQSection = () => {
   return <section className="py-16 bg-background" id="faq">
       <FAQSchema faqItems={defaultFAQItems} />
@@ -26,8 +27,8 @@ export const FAQSection = () => {
               <Phone className="mr-2 h-4 w-4" />
               41250553
             </Button>
-            <Button size="lg" className="bg-success hover:bg-success-hover text-success-foreground" onClick={() => window.location.href = '/tilbud'}>
-              Send forespørsel
+            <Button size="lg" className="bg-success hover:bg-success-hover text-success-foreground" asChild>
+              <Link to="/tilbud">Send forespørsel</Link>
             </Button>
           </div>
         </div>
