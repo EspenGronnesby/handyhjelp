@@ -1,16 +1,64 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatDistanceToNow } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
+import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { ServiceAgreement, SERVICE_LABELS, AGREEMENT_STATUS_LABELS, AGREEMENT_STATUS_COLORS } from '@/types/admin';
+import { FileText, Save, Loader2, ExternalLink, Send, FileCheck } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ServiceAgreementCardProps {
   agreement: ServiceAgreement;
   onUpdateStatus: (id: string, status: string) => void;
+  onSendOffer: (agreement: ServiceAgreement) => void;
+  onUploadContract: (agreement: ServiceAgreement) => void;
 }
 
-export const ServiceAgreementCard = ({ agreement, onUpdateStatus }: ServiceAgreementCardProps) => {
+export const ServiceAgreementCard = ({ 
+  agreement, 
+  onUpdateStatus, 
+  onSendOffer,
+  onUploadContract 
+}: ServiceAgreementCardProps) => {
+  const { toast } = useToast();
+  const [notes, setNotes] = useState(agreement.admin_notes || '');
+  const [savingNotes, setSavingNotes] = useState(false);
+  const [notesChanged, setNotesChanged] = useState(false);
+
+  const handleNotesChange = (value: string) => {
+    setNotes(value);
+    setNotesChanged(value !== (agreement.admin_notes || ''));
+  };
+
+  const handleSaveNotes = async () => {
+    setSavingNotes(true);
+    try {
+      const { error } = await supabase
+        .from('service_agreements')
+        .update({ admin_notes: notes })
+        .eq('id', agreement.id);
+
+      if (error) throw error;
+
+      setNotesChanged(false);
+      toast({
+        title: "Lagret",
+        description: "Notater er oppdatert.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Feil",
+        description: `Kunne ikke lagre notater: ${error?.message || 'Ukjent feil'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setSavingNotes(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -40,7 +88,6 @@ export const ServiceAgreementCard = ({ agreement, onUpdateStatus }: ServiceAgree
           <p className="text-sm font-medium">Adresse:</p>
           <p className="text-sm text-muted-foreground">{agreement.address}</p>
         </div>
-        
 
         <div>
           <p className="text-sm font-medium mb-2">Tjenester:</p>
@@ -94,7 +141,80 @@ export const ServiceAgreementCard = ({ agreement, onUpdateStatus }: ServiceAgree
           </div>
         )}
 
-        <div className="flex gap-2 pt-4 flex-wrap">
+        {/* Tilbud og kontrakt info */}
+        {(agreement.offer_amount || agreement.offer_document_url || agreement.contract_document_url) && (
+          <div className="border-t pt-4 space-y-2">
+            {agreement.offer_amount && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-medium">Tilbudsbeløp:</span>
+                <span className="text-primary font-semibold">
+                  kr {agreement.offer_amount.toLocaleString('nb-NO')}/mnd
+                </span>
+                {agreement.offer_sent_at && (
+                  <span className="text-muted-foreground">
+                    (sendt {format(new Date(agreement.offer_sent_at), 'dd.MM.yyyy', { locale: nb })})
+                  </span>
+                )}
+              </div>
+            )}
+            {agreement.customer_approved_at && (
+              <div className="flex items-center gap-2 text-sm text-green-600">
+                <FileCheck className="h-4 w-4" />
+                <span>Kunde godkjente {format(new Date(agreement.customer_approved_at), 'dd.MM.yyyy', { locale: nb })}</span>
+              </div>
+            )}
+            <div className="flex gap-2 flex-wrap">
+              {agreement.offer_document_url && (
+                <Button size="sm" variant="outline" asChild>
+                  <a href={agreement.offer_document_url} target="_blank" rel="noopener noreferrer">
+                    <FileText className="h-4 w-4 mr-1" />
+                    Tilbudsdokument
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </a>
+                </Button>
+              )}
+              {agreement.contract_document_url && (
+                <Button size="sm" variant="outline" asChild>
+                  <a href={agreement.contract_document_url} target="_blank" rel="noopener noreferrer">
+                    <FileText className="h-4 w-4 mr-1" />
+                    Kontrakt
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </a>
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Admin notater */}
+        <div className="border-t pt-4">
+          <p className="text-sm font-medium mb-2">Interne notater:</p>
+          <Textarea
+            placeholder="Legg til interne notater her..."
+            value={notes}
+            onChange={(e) => handleNotesChange(e.target.value)}
+            rows={3}
+            className="text-sm"
+          />
+          {notesChanged && (
+            <Button 
+              size="sm" 
+              onClick={handleSaveNotes} 
+              disabled={savingNotes}
+              className="mt-2"
+            >
+              {savingNotes ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-1" />
+              )}
+              Lagre notater
+            </Button>
+          )}
+        </div>
+
+        {/* Handlingsknapper */}
+        <div className="flex gap-2 pt-4 flex-wrap border-t">
           <Button
             size="sm"
             variant="outline"
@@ -106,23 +226,26 @@ export const ServiceAgreementCard = ({ agreement, onUpdateStatus }: ServiceAgree
           <Button
             size="sm"
             variant="outline"
-            onClick={() => onUpdateStatus(agreement.id, 'offer_sent')}
-            disabled={agreement.status === 'new'}
+            onClick={() => onSendOffer(agreement)}
+            disabled={agreement.status === 'new' || agreement.status === 'contract_signed' || agreement.status === 'rejected'}
           >
-            Tilbud sendt
+            <Send className="h-4 w-4 mr-1" />
+            Send tilbud
           </Button>
           <Button
             size="sm"
             variant="default"
-            onClick={() => onUpdateStatus(agreement.id, 'contract_signed')}
-            disabled={agreement.status === 'new'}
+            onClick={() => onUploadContract(agreement)}
+            disabled={agreement.status === 'new' || agreement.status === 'rejected'}
           >
-            Avtale inngått
+            <FileCheck className="h-4 w-4 mr-1" />
+            Last opp kontrakt
           </Button>
           <Button
             size="sm"
             variant="destructive"
             onClick={() => onUpdateStatus(agreement.id, 'rejected')}
+            disabled={agreement.status === 'contract_signed'}
           >
             Avslå
           </Button>

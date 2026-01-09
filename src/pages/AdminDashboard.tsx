@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
-import { Quote, Job, Profile } from '@/types/admin';
+import { Quote, Job, Profile, ServiceAgreement } from '@/types/admin';
 
 // Admin components
 import { AdminSummaryCards } from '@/components/admin/AdminSummaryCards';
@@ -21,6 +21,8 @@ import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 import { InvoiceUploadModal } from '@/components/admin/InvoiceUploadModal';
 import { InvoiceManagement } from '@/components/admin/InvoiceManagement';
 import ReviewManagement from '@/components/admin/ReviewManagement';
+import { OfferModal } from '@/components/admin/OfferModal';
+import { ContractModal } from '@/components/admin/ContractModal';
 
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
@@ -32,6 +34,8 @@ const AdminDashboard = () => {
   }>({ open: false, type: null, item: null });
   const [selectedCustomer, setSelectedCustomer] = useState<Profile | null>(null);
   const [invoiceJob, setInvoiceJob] = useState<Job | null>(null);
+  const [offerAgreement, setOfferAgreement] = useState<ServiceAgreement | null>(null);
+  const [contractAgreement, setContractAgreement] = useState<ServiceAgreement | null>(null);
 
   const {
     profiles,
@@ -46,6 +50,7 @@ const AdminDashboard = () => {
     handleCompleteJob,
     handleDeleteJob,
     handleUpdateAgreementStatus,
+    refreshData,
   } = useAdminData(isAdmin);
 
   useEffect(() => {
@@ -162,6 +167,8 @@ const AdminDashboard = () => {
                 key={agreement.id}
                 agreement={agreement}
                 onUpdateStatus={handleUpdateAgreementStatus}
+                onSendOffer={(a) => setOfferAgreement(a)}
+                onUploadContract={(a) => setContractAgreement(a)}
               />
             ))
           )}
@@ -266,6 +273,20 @@ const AdminDashboard = () => {
         open={!!invoiceJob}
         onOpenChange={(open) => !open && setInvoiceJob(null)}
         onSuccess={() => setInvoiceJob(null)}
+      />
+
+      <OfferModal
+        agreement={offerAgreement}
+        open={!!offerAgreement}
+        onClose={() => setOfferAgreement(null)}
+        onSuccess={() => refreshData()}
+      />
+
+      <ContractModal
+        agreement={contractAgreement}
+        open={!!contractAgreement}
+        onClose={() => setContractAgreement(null)}
+        onSuccess={() => refreshData()}
       />
     </div>
   );

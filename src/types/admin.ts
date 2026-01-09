@@ -69,6 +69,23 @@ export interface ServiceAgreement {
   created_at: string;
   updated_at: string;
   user_id?: string | null;
+  // Nye kolonner for tilbud og kontrakt
+  offer_amount?: number | null;
+  offer_document_url?: string | null;
+  contract_document_url?: string | null;
+  admin_notes?: string | null;
+  offer_sent_at?: string | null;
+  contract_signed_at?: string | null;
+  customer_approved_at?: string | null;
+}
+
+export interface AgreementActivity {
+  id: string;
+  agreement_id: string;
+  action: string;
+  description: string;
+  created_by: string | null;
+  created_at: string;
 }
 
 export interface Invoice {

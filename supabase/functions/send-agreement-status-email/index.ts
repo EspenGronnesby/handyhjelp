@@ -67,6 +67,9 @@ interface AgreementStatusEmailRequest {
   address: string;
   services: string[];
   status: "under_review" | "offer_sent" | "contract_signed" | "rejected";
+  offerAmount?: number;
+  offerDocumentUrl?: string;
+  contractDocumentUrl?: string;
 }
 
 const STATUS_CONFIG = {
@@ -119,7 +122,7 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Invalid JSON in request body", 400, requestId);
   }
 
-  const { contactPerson, email, address, services, status } = requestData;
+  const { contactPerson, email, address, services, status, offerAmount, offerDocumentUrl, contractDocumentUrl } = requestData;
 
   if (!contactPerson || !email || !status) {
     log.warn("Missing required fields", { requestId, contactPerson: !!contactPerson, email: !!email, status: !!status });
@@ -152,6 +155,38 @@ const handler = async (req: Request): Promise<Response> => {
   const servicesList = services?.map(s => serviceLabels[s] || s).join(", ") || "Ikke spesifisert";
 
   try {
+    // Bygg tilbudsdetaljer hvis relevant
+    let offerSection = '';
+    if (status === 'offer_sent' && offerAmount) {
+      offerSection = `
+        <div style="background-color: #EDE9FE; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #8B5CF6;">
+          <h3 style="margin: 0 0 10px 0; color: #5B21B6;">💰 Tilbudsdetaljer</h3>
+          <p style="font-size: 24px; font-weight: bold; color: #5B21B6; margin: 0;">
+            kr ${offerAmount.toLocaleString('nb-NO')}/mnd
+          </p>
+          ${offerDocumentUrl ? `
+            <a href="${offerDocumentUrl}" style="display: inline-block; margin-top: 15px; background-color: #8B5CF6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+              📄 Last ned tilbudsdokument
+            </a>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    // Bygg kontraktdetaljer hvis relevant
+    let contractSection = '';
+    if (status === 'contract_signed' && contractDocumentUrl) {
+      contractSection = `
+        <div style="background-color: #D1FAE5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #10B981;">
+          <h3 style="margin: 0 0 10px 0; color: #047857;">📋 Din kontrakt</h3>
+          <p style="color: #047857; margin: 0 0 15px 0;">Kontrakten din er nå klar for nedlasting.</p>
+          <a href="${contractDocumentUrl}" style="display: inline-block; background-color: #10B981; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+            📄 Last ned kontrakt
+          </a>
+        </div>
+      `;
+    }
+
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background-color: ${config.color}; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
@@ -164,6 +199,9 @@ const handler = async (req: Request): Promise<Response> => {
           <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">
             ${config.message}
           </p>
+
+          ${offerSection}
+          ${contractSection}
           
           <div style="background-color: #F1F5F9; padding: 20px; border-radius: 8px; margin: 25px 0;">
             <h3 style="margin: 0 0 15px 0; color: #2C3E50;">Detaljer om forespørselen:</h3>
