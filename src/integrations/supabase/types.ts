@@ -743,6 +743,7 @@ export type Database = {
           offer_sent_at: string | null
           other_services: string | null
           phone: string
+          rejection_reason: string | null
           services: Json
           start_date: string | null
           status: string
@@ -773,6 +774,7 @@ export type Database = {
           offer_sent_at?: string | null
           other_services?: string | null
           phone: string
+          rejection_reason?: string | null
           services?: Json
           start_date?: string | null
           status?: string
@@ -803,6 +805,7 @@ export type Database = {
           offer_sent_at?: string | null
           other_services?: string | null
           phone?: string
+          rejection_reason?: string | null
           services?: Json
           start_date?: string | null
           status?: string

@@ -5,7 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
-import { Quote, Job, Profile, ServiceAgreement } from '@/types/admin';
+import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter } from '@/types/admin';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 // Admin components
 import { AdminSummaryCards } from '@/components/admin/AdminSummaryCards';
@@ -23,6 +25,7 @@ import { InvoiceManagement } from '@/components/admin/InvoiceManagement';
 import ReviewManagement from '@/components/admin/ReviewManagement';
 import { OfferModal } from '@/components/admin/OfferModal';
 import { ContractModal } from '@/components/admin/ContractModal';
+import { RejectAgreementModal } from '@/components/admin/RejectAgreementModal';
 
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
@@ -36,6 +39,8 @@ const AdminDashboard = () => {
   const [invoiceJob, setInvoiceJob] = useState<Job | null>(null);
   const [offerAgreement, setOfferAgreement] = useState<ServiceAgreement | null>(null);
   const [contractAgreement, setContractAgreement] = useState<ServiceAgreement | null>(null);
+  const [rejectAgreement, setRejectAgreement] = useState<ServiceAgreement | null>(null);
+  const [agreementStatusFilter, setAgreementStatusFilter] = useState<AgreementStatusFilter>('all');
 
   const {
     profiles,
@@ -50,6 +55,7 @@ const AdminDashboard = () => {
     handleCompleteJob,
     handleDeleteJob,
     handleUpdateAgreementStatus,
+    handleRejectAgreement,
     refreshData,
   } = useAdminData(isAdmin);
 
@@ -86,6 +92,25 @@ const AdminDashboard = () => {
     setConfirmDialog({ open: false, type: null, item: null });
   };
 
+  const handleConfirmedRejectAgreement = async (agreementId: string, reason: string) => {
+    await handleRejectAgreement(agreementId, reason);
+  };
+
+  // Filter agreements by status
+  const filteredAgreements = agreementStatusFilter === 'all' 
+    ? agreements 
+    : agreements.filter(a => a.status === agreementStatusFilter);
+
+  // Count agreements by status
+  const agreementStatusCounts = {
+    all: agreements.length,
+    new: agreements.filter(a => a.status === 'new').length,
+    under_review: agreements.filter(a => a.status === 'under_review').length,
+    offer_sent: agreements.filter(a => a.status === 'offer_sent').length,
+    contract_signed: agreements.filter(a => a.status === 'contract_signed').length,
+    rejected: agreements.filter(a => a.status === 'rejected').length,
+  };
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
@@ -105,7 +130,7 @@ const AdminDashboard = () => {
             Forespørsler ({pendingQuotes.length})
           </TabsTrigger>
           <TabsTrigger value="agreements" className="text-sm whitespace-nowrap">
-            Avtaler ({newAgreements.length})
+            Avtaler ({agreements.length})
           </TabsTrigger>
           <TabsTrigger value="active" className="text-sm whitespace-nowrap">
             Aktive ({activeJobs.length})
@@ -155,20 +180,67 @@ const AdminDashboard = () => {
 
         {/* Avtaleforespørsler */}
         <TabsContent value="agreements" className="space-y-4">
-          {agreements.length === 0 ? (
+          {/* Status filter buttons */}
+          <div className="flex flex-wrap gap-2 pb-2">
+            <Button 
+              size="sm" 
+              variant={agreementStatusFilter === 'all' ? 'default' : 'outline'}
+              onClick={() => setAgreementStatusFilter('all')}
+            >
+              Alle ({agreementStatusCounts.all})
+            </Button>
+            <Button 
+              size="sm" 
+              variant={agreementStatusFilter === 'new' ? 'default' : 'outline'}
+              onClick={() => setAgreementStatusFilter('new')}
+            >
+              Nye ({agreementStatusCounts.new})
+            </Button>
+            <Button 
+              size="sm" 
+              variant={agreementStatusFilter === 'under_review' ? 'default' : 'outline'}
+              onClick={() => setAgreementStatusFilter('under_review')}
+            >
+              Under vurdering ({agreementStatusCounts.under_review})
+            </Button>
+            <Button 
+              size="sm" 
+              variant={agreementStatusFilter === 'offer_sent' ? 'default' : 'outline'}
+              onClick={() => setAgreementStatusFilter('offer_sent')}
+            >
+              Tilbud sendt ({agreementStatusCounts.offer_sent})
+            </Button>
+            <Button 
+              size="sm" 
+              variant={agreementStatusFilter === 'contract_signed' ? 'default' : 'outline'}
+              onClick={() => setAgreementStatusFilter('contract_signed')}
+            >
+              Avtale inngått ({agreementStatusCounts.contract_signed})
+            </Button>
+            <Button 
+              size="sm" 
+              variant={agreementStatusFilter === 'rejected' ? 'destructive' : 'outline'}
+              onClick={() => setAgreementStatusFilter('rejected')}
+            >
+              Avslått ({agreementStatusCounts.rejected})
+            </Button>
+          </div>
+
+          {filteredAgreements.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                Ingen avtaleforespørsler
+                {agreementStatusFilter === 'all' ? 'Ingen avtaleforespørsler' : 'Ingen avtaler med denne statusen'}
               </CardContent>
             </Card>
           ) : (
-            agreements.map((agreement) => (
+            filteredAgreements.map((agreement) => (
               <ServiceAgreementCard
                 key={agreement.id}
                 agreement={agreement}
                 onUpdateStatus={handleUpdateAgreementStatus}
                 onSendOffer={(a) => setOfferAgreement(a)}
                 onUploadContract={(a) => setContractAgreement(a)}
+                onReject={(a) => setRejectAgreement(a)}
               />
             ))
           )}
@@ -287,6 +359,13 @@ const AdminDashboard = () => {
         open={!!contractAgreement}
         onClose={() => setContractAgreement(null)}
         onSuccess={() => refreshData()}
+      />
+
+      <RejectAgreementModal
+        agreement={rejectAgreement}
+        open={!!rejectAgreement}
+        onClose={() => setRejectAgreement(null)}
+        onConfirm={handleConfirmedRejectAgreement}
       />
     </div>
   );
