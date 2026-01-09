@@ -196,14 +196,14 @@ const handler = async (req: Request): Promise<Response> => {
           </head>
           <body>
             <div class="header">
-              <div class="logo">🏠 HandyHjelp</div>
+              <div class="logo">HandyHjelp</div>
               <h1 style="margin: 0; font-size: 28px;">Takk for din forespørsel!</h1>
             </div>
             
             <div class="content">
               <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${name}</strong>,</p>
               
-              <p>Takk for at du kontaktet HandyHjelp! 🏠</p>
+              <p>Takk for at du kontaktet HandyHjelp!</p>
               
               <p>Vi har mottatt din forespørsel og vil gjennomgå den så snart som mulig. Du kan forvente å høre fra oss <strong>innen 1-3 virkedager</strong> i vår åpningstid.</p>
               
@@ -226,13 +226,13 @@ const handler = async (req: Request): Promise<Response> => {
               <div class="contact-info">
                 <h3 style="margin-top: 0; color: #0891B2;">Har du spørsmål i mellomtiden?</h3>
                 <div class="contact-item">
-                  <span class="contact-label">📞 Telefon:</span> <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a>
+                  <span class="contact-label">Telefon:</span> <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a>
                 </div>
                 <div class="contact-item">
-                  <span class="contact-label">✉️ E-post:</span> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a>
+                  <span class="contact-label">E-post:</span> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a>
                 </div>
                 <div class="contact-item">
-                  <span class="contact-label">⏰ Åpningstid:</span> Man-Fre 09:00-17:00
+                  <span class="contact-label">Åpningstid:</span> Man-Fre 09:00-17:00
                 </div>
               </div>
               
@@ -240,7 +240,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="footer">
-              <strong>HandyHjelp – Din lokale altmuligmann</strong><br>
+              <strong>Levert med kvalitet</strong><br>
               <a href="https://handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
             </div>
           </body>
