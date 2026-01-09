@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { ServiceAgreement, SERVICE_LABELS, AGREEMENT_STATUS_LABELS, AGREEMENT_STATUS_COLORS } from '@/types/admin';
+import { AlertTriangle } from 'lucide-react';
 import { FileText, Save, Loader2, ExternalLink, Send, FileCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -15,13 +16,15 @@ interface ServiceAgreementCardProps {
   onUpdateStatus: (id: string, status: string) => void;
   onSendOffer: (agreement: ServiceAgreement) => void;
   onUploadContract: (agreement: ServiceAgreement) => void;
+  onReject: (agreement: ServiceAgreement) => void;
 }
 
 export const ServiceAgreementCard = ({ 
   agreement, 
   onUpdateStatus, 
   onSendOffer,
-  onUploadContract 
+  onUploadContract,
+  onReject
 }: ServiceAgreementCardProps) => {
   const { toast } = useToast();
   const [notes, setNotes] = useState(agreement.admin_notes || '');
@@ -141,6 +144,19 @@ export const ServiceAgreementCard = ({
           </div>
         )}
 
+        {/* Avslåingsårsak */}
+        {agreement.status === 'rejected' && agreement.rejection_reason && (
+          <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-destructive">Årsak til avslag:</p>
+                <p className="text-sm text-destructive/80">{agreement.rejection_reason}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Tilbud og kontrakt info */}
         {(agreement.offer_amount || agreement.offer_document_url || agreement.contract_document_url) && (
           <div className="border-t pt-4 space-y-2">
@@ -244,8 +260,8 @@ export const ServiceAgreementCard = ({
           <Button
             size="sm"
             variant="destructive"
-            onClick={() => onUpdateStatus(agreement.id, 'rejected')}
-            disabled={agreement.status === 'contract_signed'}
+            onClick={() => onReject(agreement)}
+            disabled={agreement.status === 'contract_signed' || agreement.status === 'rejected'}
           >
             Avslå
           </Button>

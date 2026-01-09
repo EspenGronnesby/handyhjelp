@@ -1,3 +1,6 @@
+// Agreement status filter type
+export type AgreementStatusFilter = 'all' | 'new' | 'under_review' | 'offer_sent' | 'contract_signed' | 'rejected';
+
 export interface Quote {
   id: string;
   type: string;
@@ -77,6 +80,7 @@ export interface ServiceAgreement {
   offer_sent_at?: string | null;
   contract_signed_at?: string | null;
   customer_approved_at?: string | null;
+  rejection_reason?: string | null;
 }
 
 export interface AgreementActivity {

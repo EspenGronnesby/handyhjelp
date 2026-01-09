@@ -70,6 +70,7 @@ interface AgreementStatusEmailRequest {
   offerAmount?: number;
   offerDocumentUrl?: string;
   contractDocumentUrl?: string;
+  rejectionReason?: string;
 }
 
 const STATUS_CONFIG = {
@@ -122,7 +123,7 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Invalid JSON in request body", 400, requestId);
   }
 
-  const { contactPerson, email, address, services, status, offerAmount, offerDocumentUrl, contractDocumentUrl } = requestData;
+  const { contactPerson, email, address, services, status, offerAmount, offerDocumentUrl, contractDocumentUrl, rejectionReason } = requestData;
 
   if (!contactPerson || !email || !status) {
     log.warn("Missing required fields", { requestId, contactPerson: !!contactPerson, email: !!email, status: !!status });
@@ -187,6 +188,17 @@ const handler = async (req: Request): Promise<Response> => {
       `;
     }
 
+    // Bygg avslåingsårsak hvis relevant
+    let rejectionSection = '';
+    if (status === 'rejected' && rejectionReason) {
+      rejectionSection = `
+        <div style="background-color: #FEE2E2; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #EF4444;">
+          <h3 style="margin: 0 0 10px 0; color: #991B1B;">📋 Årsak</h3>
+          <p style="color: #991B1B; margin: 0; font-style: italic;">"${rejectionReason}"</p>
+        </div>
+      `;
+    }
+
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="background-color: ${config.color}; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
@@ -202,6 +214,7 @@ const handler = async (req: Request): Promise<Response> => {
 
           ${offerSection}
           ${contractSection}
+          ${rejectionSection}
           
           <div style="background-color: #F1F5F9; padding: 20px; border-radius: 8px; margin: 25px 0;">
             <h3 style="margin: 0 0 15px 0; color: #2C3E50;">Detaljer om forespørselen:</h3>

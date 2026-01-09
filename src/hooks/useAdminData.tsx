@@ -251,6 +251,73 @@ export const useAdminData = (isAdmin: boolean) => {
     }
   };
 
+  const handleRejectAgreement = async (agreementId: string, rejectionReason: string) => {
+    setActionLoading(agreementId);
+    
+    try {
+      const agreement = agreements.find(a => a.id === agreementId);
+      if (!agreement) throw new Error('Avtale ikke funnet');
+
+      const { error } = await supabase
+        .from('service_agreements')
+        .update({ 
+          status: 'rejected',
+          rejection_reason: rejectionReason 
+        })
+        .eq('id', agreementId);
+
+      if (error) throw error;
+
+      setAgreements(prev => prev.map(a => 
+        a.id === agreementId ? { ...a, status: 'rejected', rejection_reason: rejectionReason } : a
+      ));
+
+      // Log activity
+      await supabase.from('agreement_activities').insert({
+        agreement_id: agreementId,
+        action: 'rejected',
+        description: `Forespørsel avslått: ${rejectionReason}`
+      });
+
+      // Send notification to user if they have a user_id
+      if (agreement.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: agreement.user_id,
+          type: 'agreement_update',
+          title: 'Forespørsel behandlet',
+          message: 'Vi har behandlet din forespørsel. Se e-post for detaljer.',
+          read: false
+        });
+      }
+
+      // Send email to customer with rejection reason
+      supabase.functions.invoke('send-agreement-status-email', {
+        body: {
+          contactPerson: agreement.contact_person,
+          email: agreement.email,
+          address: agreement.address,
+          services: agreement.services,
+          status: 'rejected',
+          rejectionReason: rejectionReason,
+        },
+      }).catch(console.error);
+
+      toast({
+        title: "Avslått",
+        description: "Forespørselen er avslått og kunden er informert.",
+      });
+    } catch (error: any) {
+      console.error('Error rejecting agreement:', error);
+      toast({
+        title: "Feil",
+        description: `Kunne ikke avslå forespørselen: ${error?.message || 'Ukjent feil'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const pendingQuotes = quotes.filter(q => q.status === 'pending');
   const activeJobs = jobs.filter(j => j.status === 'in_progress');
   const completedJobs = jobs.filter(j => j.status === 'completed');
@@ -275,6 +342,7 @@ export const useAdminData = (isAdmin: boolean) => {
     handleCompleteJob,
     handleDeleteJob,
     handleUpdateAgreementStatus,
+    handleRejectAgreement,
     refreshData,
   };
 };
