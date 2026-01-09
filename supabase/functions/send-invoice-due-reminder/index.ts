@@ -75,7 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       try {
         const emailResponse = await resend.emails.send({
-          from: "HandyHjelp <noreply@resend.dev>",
+          from: "HandyHjelp <team@handyhjelp.no>",
           to: [customerEmail],
           subject: `Vennlig påminnelse: Faktura ${invoice.invoice_number} forfaller i dag`,
           html: `
@@ -83,45 +83,56 @@ const handler = async (req: Request): Promise<Response> => {
             <html>
             <head>
               <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #0891B2, #06B6D4); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-                .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
-                .highlight { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0891B2; }
+                body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc; }
+                .container { max-width: 600px; margin: 0 auto; }
+                .header { background: linear-gradient(135deg, #0891B2, #06B6D4); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+                .header h1 { color: white; margin: 0; font-size: 24px; }
+                .content { background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
+                .highlight { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0891B2; }
                 .amount { font-size: 24px; color: #0891B2; font-weight: bold; }
-                .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
-                .emoji { font-size: 48px; margin-bottom: 10px; }
+                .contact-info { background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; }
+                .footer { background-color: #f8fafc; padding: 20px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; }
               </style>
             </head>
             <body>
-              <div class="header">
-                <div class="emoji">☀️</div>
-                <h1 style="margin: 0;">Vennlig påminnelse</h1>
-              </div>
-              <div class="content">
-                <p>Hei ${customerName}! 👋</p>
-                
-                <p>Vi håper du har det fint! Dette er bare en vennlig påminnelse om at fakturaen din forfaller <strong>i dag</strong>.</p>
-                
-                <div class="highlight">
-                  <p style="margin: 0 0 10px 0;"><strong>Fakturanummer:</strong> ${invoice.invoice_number}</p>
-                  <p style="margin: 0;"><strong>Beløp:</strong> <span class="amount">${formattedAmount}</span></p>
+              <div class="container">
+                <div class="header">
+                  <div class="logo">HandyHjelp</div>
+                  <h1>Vennlig påminnelse</h1>
                 </div>
-                
-                <p>Hvis du allerede har betalt, kan du se bort fra denne meldingen – tusen takk! 🙏</p>
-                
-                <p>Har du spørsmål om fakturaen eller trenger litt mer tid? Bare ta kontakt med oss, så finner vi en løsning sammen. Vi er her for å hjelpe! 💪</p>
-                
-                <p>Ha en fantastisk dag videre! ☀️</p>
-                
-                <p style="margin-top: 30px;">
-                  Med vennlig hilsen,<br>
-                  <strong>Teamet hos HandyHjelp</strong> 🏠
-                </p>
-              </div>
-              <div class="footer">
-                <p>📞 +47 41250553 | ✉️ handyhjelp@gmail.com</p>
-                <p>Ægirsvei 3, Kristiansand</p>
+                <div class="content">
+                  <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+                  
+                  <p style="font-size: 16px; line-height: 1.6;">Vi håper du har det fint! Dette er bare en vennlig påminnelse om at fakturaen din forfaller <strong>i dag</strong>.</p>
+                  
+                  <div class="highlight">
+                    <p style="margin: 0 0 10px 0;"><strong>Fakturanummer:</strong> ${invoice.invoice_number}</p>
+                    <p style="margin: 0;"><strong>Beløp:</strong> <span class="amount">${formattedAmount}</span></p>
+                  </div>
+                  
+                  <p style="font-size: 16px; line-height: 1.6;">Hvis du allerede har betalt, kan du se bort fra denne meldingen – tusen takk!</p>
+                  
+                  <p style="font-size: 16px; line-height: 1.6;">Har du spørsmål om fakturaen eller trenger litt mer tid? Bare ta kontakt med oss, så finner vi en løsning sammen.</p>
+                  
+                  <div class="contact-info">
+                    <h3 style="margin-top: 0; color: #0891B2;">Kontakt oss</h3>
+                    <p style="margin: 8px 0;"><strong>Telefon:</strong> <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
+                    <p style="margin: 8px 0;"><strong>E-post:</strong> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
+                    <p style="margin: 8px 0;"><strong>Åpningstid:</strong> Man-Fre 09:00-17:00</p>
+                  </div>
+                  
+                  <p style="font-size: 16px; line-height: 1.6;">
+                    Med vennlig hilsen,<br>
+                    <strong>HandyHjelp-teamet</strong>
+                  </p>
+                </div>
+                <div class="footer">
+                  <strong>Levert med kvalitet</strong><br>
+                  <a href="https://handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
+                </div>
               </div>
             </body>
             </html>

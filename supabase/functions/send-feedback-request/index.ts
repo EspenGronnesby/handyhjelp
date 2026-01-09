@@ -87,54 +87,60 @@ serve(async (req) => {
 
       try {
         const emailResponse = await resend.emails.send({
-          from: 'HandyHjelp <post@handyhjelp.no>',
+          from: 'HandyHjelp <team@handyhjelp.no>',
           to: [quote.email],
-          subject: 'Hvordan gikk jobben? Vi setter pris på din tilbakemelding 🙏',
+          subject: 'Hvordan gikk jobben? Vi setter pris på din tilbakemelding',
           html: `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc; }
+    .container { max-width: 600px; margin: 0 auto; }
+    .header { background: linear-gradient(135deg, #0891B2, #06B6D4); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+    .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+    .header h1 { color: white; margin: 0; font-size: 24px; }
+    .content { background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
+    .stars { text-align: center; margin: 25px 0; font-size: 40px; }
+    .cta-button { display: inline-block; background: linear-gradient(135deg, #0891b2, #06b6d4); color: white; font-size: 16px; font-weight: 600; text-decoration: none; padding: 16px 40px; border-radius: 8px; }
+    .benefits { background: #f0f9ff; border-radius: 8px; padding: 20px; margin: 25px 0; }
+    .contact-info { background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; }
+    .footer { background-color: #f8fafc; padding: 20px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; }
+  </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc;">
-  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-    <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">HandyHjelp</div>
+      <h1>Hvordan gikk jobben?</h1>
+    </div>
+    
+    <div class="content">
+      <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${quote.name}</strong>,</p>
       
-      <!-- Logo -->
-      <div style="text-align: center; margin-bottom: 32px;">
-        <img src="https://bwwodqzhkehirerzlzpu.supabase.co/storage/v1/object/public/site-images/handyhjelp-logo.png" alt="HandyHjelp" style="height: 50px; width: auto;">
-      </div>
-      
-      <!-- Heading -->
-      <h1 style="color: #1a2332; font-size: 24px; font-weight: 700; text-align: center; margin: 0 0 16px 0;">
-        Hei ${quote.name}! 👋
-      </h1>
-      
-      <p style="color: #4a5568; font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 24px 0;">
+      <p style="font-size: 16px; line-height: 1.6; color: #4a5568;">
         For et par dager siden fullførte vi <strong>${serviceType}</strong> for deg. 
         Vi håper du er fornøyd med arbeidet!
       </p>
       
-      <!-- Stars illustration -->
-      <div style="text-align: center; margin: 32px 0;">
-        <span style="font-size: 40px;">⭐️⭐️⭐️⭐️⭐️</span>
+      <div class="stars">
+        <span style="color: #fbbf24;">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
       </div>
       
-      <p style="color: #4a5568; font-size: 16px; line-height: 1.6; text-align: center; margin: 0 0 32px 0;">
+      <p style="font-size: 16px; line-height: 1.6; color: #4a5568; text-align: center;">
         Din tilbakemelding betyr mye for oss og hjelper andre kunder å ta gode valg. 
         Det tar bare 1 minutt å dele din opplevelse.
       </p>
       
-      <!-- CTA Button -->
-      <div style="text-align: center; margin: 32px 0;">
-        <a href="${reviewUrl}" style="display: inline-block; background: linear-gradient(135deg, #0891b2, #06b6d4); color: white; font-size: 16px; font-weight: 600; text-decoration: none; padding: 16px 40px; border-radius: 8px; box-shadow: 0 4px 14px rgba(8, 145, 178, 0.4);">
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${reviewUrl}" class="cta-button">
           Gi din tilbakemelding
         </a>
       </div>
       
-      <!-- Benefits -->
-      <div style="background: #f0fdfa; border-radius: 12px; padding: 24px; margin: 32px 0;">
+      <div class="benefits">
         <p style="color: #0d9488; font-size: 14px; font-weight: 600; margin: 0 0 12px 0; text-align: center;">
           Hvorfor dele din mening?
         </p>
@@ -145,18 +151,22 @@ serve(async (req) => {
         </ul>
       </div>
       
-      <!-- Footer -->
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 32px;">
-        <p style="color: #94a3b8; font-size: 13px; text-align: center; margin: 0;">
-          Tusen takk for at du valgte HandyHjelp! 💚
-        </p>
-        <p style="color: #94a3b8; font-size: 12px; text-align: center; margin: 16px 0 0 0;">
-          HandyHjelp AS | Ægirsvei 3, 4632 Kristiansand<br>
-          <a href="tel:+4741250553" style="color: #0891b2; text-decoration: none;">+47 412 50 553</a> | 
-          <a href="mailto:handyhjelp@gmail.com" style="color: #0891b2; text-decoration: none;">handyhjelp@gmail.com</a>
-        </p>
+      <div class="contact-info">
+        <h3 style="margin-top: 0; color: #0891B2;">Har du spørsmål?</h3>
+        <p style="margin: 8px 0;"><strong>Telefon:</strong> <a href="tel:+4741250553" style="color: #0891b2; text-decoration: none;">+47 412 50 553</a></p>
+        <p style="margin: 8px 0;"><strong>E-post:</strong> <a href="mailto:team@handyhjelp.no" style="color: #0891b2; text-decoration: none;">team@handyhjelp.no</a></p>
+        <p style="margin: 8px 0;"><strong>Åpningstid:</strong> Man-Fre 09:00-17:00</p>
       </div>
       
+      <p style="font-size: 16px; line-height: 1.6;">
+        Med vennlig hilsen,<br>
+        <strong>HandyHjelp-teamet</strong>
+      </p>
+    </div>
+    
+    <div class="footer">
+      <strong>Levert med kvalitet</strong><br>
+      <a href="https://handyhjelp.no" style="color: #0891b2; text-decoration: none;">www.handyhjelp.no</a>
     </div>
   </div>
 </body>

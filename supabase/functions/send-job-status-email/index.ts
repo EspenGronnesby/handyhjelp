@@ -127,83 +127,135 @@ const handler = async (req: Request): Promise<Response> => {
     let html: string;
 
     if (status === "started") {
-      subject = "Ditt oppdrag er i gang – HandyHjelp | Levert med kvalitet";
+      subject = "Ditt oppdrag er i gang – HandyHjelp";
       html = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2C3E50;">Hei ${customerName},</h2>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Gode nyheter! Vi har startet arbeidet med ditt oppdrag:
-          </p>
-          
-          <div style="background-color: #F1F5F9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="font-size: 16px; font-weight: bold; margin: 0;">
-              "${jobDescription}"
-            </p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .header { background: linear-gradient(135deg, #0891B2, #06B6D4); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+            .header h1 { color: white; margin: 0; font-size: 24px; }
+            .content { background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
+            .job-description { background: #F1F5F9; padding: 15px; border-radius: 8px; margin: 20px 0; }
+            .contact-info { background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; }
+            .footer { background-color: #f8fafc; padding: 20px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">HandyHjelp</div>
+              <h1>Ditt oppdrag er i gang!</h1>
+            </div>
+            
+            <div class="content">
+              <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Gode nyheter! Vi har startet arbeidet med ditt oppdrag:
+              </p>
+              
+              <div class="job-description">
+                <p style="font-size: 16px; font-weight: bold; margin: 0;">
+                  "${jobDescription}"
+                </p>
+              </div>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Takk for tålmodigheten – vi jobber for å levere med kvalitet. Du vil motta en ny bekreftelse når oppdraget er fullført.
+              </p>
+              
+              <div class="contact-info">
+                <h3 style="margin-top: 0; color: #0891B2;">Har du spørsmål underveis?</h3>
+                <p style="margin: 8px 0;"><strong>Telefon:</strong> <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
+                <p style="margin: 8px 0;"><strong>E-post:</strong> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
+                <p style="margin: 8px 0;"><strong>Åpningstid:</strong> Man-Fre 09:00-17:00</p>
+              </div>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Med vennlig hilsen,<br>
+                <strong>HandyHjelp-teamet</strong>
+              </p>
+            </div>
+            
+            <div class="footer">
+              <strong>Levert med kvalitet</strong><br>
+              <a href="https://handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
+            </div>
           </div>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Takk for tålmodigheten – vi jobber for å levere med kvalitet. Du vil motta en ny bekreftelse når oppdraget er fullført.
-          </p>
-          
-          <div style="margin: 30px 0; padding: 20px; background-color: #F8FAFC; border-radius: 8px;">
-            <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Har du spørsmål underveis?</p>
-            <p style="margin: 5px 0;">📞 Ring oss: <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
-            <p style="margin: 5px 0;">📧 E-post: <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
-          </div>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Med vennlig hilsen,<br>
-            <strong>HandyHjelp-teamet</strong>
-          </p>
-          
-          <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 30px 0;">
-          
-          <p style="font-size: 14px; color: #6B7280; text-align: center;">
-            HandyHjelp – Levert med kvalitet<br>
-            <a href="https://www.handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
-          </p>
-        </div>
+        </body>
+        </html>
       `;
     } else {
-      subject = "Oppdraget er fullført – Takk for tilliten! | Levert med kvalitet ✓";
+      subject = "Oppdraget er fullført – Takk for tilliten!";
       html = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #2C3E50;">Hei ${customerName},</h2>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Oppdraget ditt er nå fullført:
-          </p>
-          
-          <div style="background-color: #F1F5F9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="font-size: 16px; font-weight: bold; margin: 0;">
-              "${jobDescription}"
-            </p>
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8fafc; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .header { background: linear-gradient(135deg, #10B981, #34D399); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }
+            .logo { color: white; font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+            .header h1 { color: white; margin: 0; font-size: 24px; }
+            .content { background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }
+            .job-description { background: #F1F5F9; padding: 15px; border-radius: 8px; margin: 20px 0; }
+            .contact-info { background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0; }
+            .footer { background-color: #f8fafc; padding: 20px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">HandyHjelp</div>
+              <h1>Oppdraget er fullført!</h1>
+            </div>
+            
+            <div class="content">
+              <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Oppdraget ditt er nå fullført:
+              </p>
+              
+              <div class="job-description">
+                <p style="font-size: 16px; font-weight: bold; margin: 0;">
+                  "${jobDescription}"
+                </p>
+              </div>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Takk for at du valgte HandyHjelp! Vi håper du er fornøyd med arbeidet.
+              </p>
+              
+              <div class="contact-info">
+                <h3 style="margin-top: 0; color: #0891B2;">Har du tilbakemeldinger eller nye oppdrag?</h3>
+                <p style="font-size: 16px; margin-bottom: 10px;">Vi er alltid klare til å hjelpe.</p>
+                <p style="margin: 8px 0;"><strong>Telefon:</strong> <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
+                <p style="margin: 8px 0;"><strong>E-post:</strong> <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
+                <p style="margin: 8px 0;"><strong>Åpningstid:</strong> Man-Fre 09:00-17:00</p>
+              </div>
+              
+              <p style="font-size: 16px; line-height: 1.6;">
+                Med vennlig hilsen,<br>
+                <strong>HandyHjelp-teamet</strong>
+              </p>
+            </div>
+            
+            <div class="footer">
+              <strong>Levert med kvalitet</strong><br>
+              <a href="https://handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
+            </div>
           </div>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Takk for at du valgte HandyHjelp! Vi håper du er fornøyd med arbeidet.
-          </p>
-          
-          <div style="margin: 30px 0; padding: 20px; background-color: #F8FAFC; border-radius: 8px;">
-            <p style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">Har du tilbakemeldinger eller nye oppdrag?</p>
-            <p style="font-size: 16px; margin-bottom: 10px;">Vi er alltid klare til å hjelpe.</p>
-            <p style="margin: 5px 0;">📞 Ring oss: <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a></p>
-            <p style="margin: 5px 0;">📧 E-post: <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a></p>
-          </div>
-          
-          <p style="font-size: 16px; line-height: 1.6;">
-            Med vennlig hilsen,<br>
-            <strong>HandyHjelp-teamet</strong>
-          </p>
-          
-          <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 30px 0;">
-          
-          <p style="font-size: 14px; color: #6B7280; text-align: center;">
-            HandyHjelp – Levert med kvalitet<br>
-            <a href="https://www.handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
-          </p>
-        </div>
+        </body>
+        </html>
       `;
     }
 
