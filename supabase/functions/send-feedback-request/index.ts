@@ -1,15 +1,54 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { Resend } from "https://esm.sh/resend@4.0.0";
+
+const FUNCTION_NAME = "send-feedback-request";
+
+// Rate limiting - IP-based with in-memory store
+const rateLimits = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX_REQUESTS = 5;
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimits.get(ip);
+
+  if (rateLimits.size > 10000) {
+    for (const [key, value] of rateLimits.entries()) {
+      if (now > value.resetAt) {
+        rateLimits.delete(key);
+      }
+    }
+  }
+
+  if (!record || now > record.resetAt) {
+    rateLimits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown";
+}
 
 // Structured logging
 const log = {
   info: (message: string, data?: Record<string, unknown>) => 
-    console.log(JSON.stringify({ level: 'INFO', message, ...data, timestamp: new Date().toISOString() })),
+    console.log(JSON.stringify({ level: 'INFO', function: FUNCTION_NAME, message, ...data, timestamp: new Date().toISOString() })),
   error: (message: string, data?: Record<string, unknown>) => 
-    console.error(JSON.stringify({ level: 'ERROR', message, ...data, timestamp: new Date().toISOString() })),
+    console.error(JSON.stringify({ level: 'ERROR', function: FUNCTION_NAME, message, ...data, timestamp: new Date().toISOString() })),
   warn: (message: string, data?: Record<string, unknown>) => 
-    console.warn(JSON.stringify({ level: 'WARN', message, ...data, timestamp: new Date().toISOString() })),
+    console.warn(JSON.stringify({ level: 'WARN', function: FUNCTION_NAME, message, ...data, timestamp: new Date().toISOString() })),
 };
 
 const corsHeaders = {
@@ -20,12 +59,37 @@ const corsHeaders = {
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 serve(async (req) => {
+  const requestId = crypto.randomUUID();
+  const clientIP = getClientIP(req);
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  log.info('Request received', { requestId, clientIP });
+
+  // Rate limiting check
+  if (!checkRateLimit(clientIP)) {
+    log.warn('Rate limit exceeded', { requestId, clientIP });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Too many requests. Please try again later.',
+        timestamp: new Date().toISOString()
+      }),
+      {
+        status: 429,
+        headers: { 
+          'Content-Type': 'application/json', 
+          'Retry-After': '60',
+          ...corsHeaders 
+        }
+      }
+    );
+  }
+
   try {
-    log.info('Starting feedback request job');
+    log.info('Starting feedback request job', { requestId });
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -58,15 +122,15 @@ serve(async (req) => {
       .gte('completed_date', threeDaysAgo.toISOString());
 
     if (jobsError) {
-      log.error('Error fetching jobs', { error: jobsError.message });
+      log.error('Error fetching jobs', { requestId, error: jobsError.message });
       throw jobsError;
     }
 
-    log.info('Found jobs needing feedback emails', { count: jobs?.length || 0 });
+    log.info('Found jobs needing feedback emails', { requestId, count: jobs?.length || 0 });
 
     if (!jobs || jobs.length === 0) {
       return new Response(
-        JSON.stringify({ success: true, message: 'No jobs need feedback emails', sent: 0 }),
+        JSON.stringify({ success: true, message: 'No jobs need feedback emails', sent: 0, requestId }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -77,6 +141,13 @@ serve(async (req) => {
     for (const job of jobs) {
       const quote = (job.quotes as unknown as { id: string; name: string; email: string; type: string });
       if (!quote) continue;
+
+      // Validate email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(quote.email)) {
+        log.warn('Invalid email, skipping', { requestId, jobId: job.id });
+        continue;
+      }
       
       const reviewUrl = `${siteUrl}/anmeldelse/${job.id}`;
       
@@ -174,7 +245,7 @@ serve(async (req) => {
           `,
         });
 
-        log.info('Feedback email sent', { jobId: job.id, email: quote.email, response: emailResponse });
+        log.info('Feedback email sent', { requestId, jobId: job.id, email: quote.email, messageId: emailResponse.data?.id });
 
         // Mark job as feedback email sent
         const { error: updateError } = await supabase
@@ -183,27 +254,27 @@ serve(async (req) => {
           .eq('id', job.id);
 
         if (updateError) {
-          log.error('Error updating job feedback_sent_at', { jobId: job.id, error: updateError.message });
+          log.error('Error updating job feedback_sent_at', { requestId, jobId: job.id, error: updateError.message });
         } else {
           sentCount++;
         }
 
       } catch (emailError) {
-        log.error('Error sending feedback email', { jobId: job.id, error: String(emailError) });
+        log.error('Error sending feedback email', { requestId, jobId: job.id, error: String(emailError) });
       }
     }
 
-    log.info('Feedback request job completed', { sent: sentCount, total: jobs.length });
+    log.info('Feedback request job completed', { requestId, sent: sentCount, total: jobs.length });
 
     return new Response(
-      JSON.stringify({ success: true, sent: sentCount, total: jobs.length }),
+      JSON.stringify({ success: true, sent: sentCount, total: jobs.length, requestId }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    log.error('Fatal error in feedback request function', { error: String(error) });
+    log.error('Fatal error in feedback request function', { requestId, error: String(error) });
     return new Response(
-      JSON.stringify({ error: String(error) }),
+      JSON.stringify({ success: false, error: String(error), requestId }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

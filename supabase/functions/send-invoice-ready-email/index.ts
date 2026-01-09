@@ -1,6 +1,77 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const FUNCTION_NAME = "send-invoice-ready-email";
+
+// Rate limiting - IP-based with in-memory store
+const rateLimits = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX_REQUESTS = 10;
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimits.get(ip);
+
+  if (rateLimits.size > 10000) {
+    for (const [key, value] of rateLimits.entries()) {
+      if (now > value.resetAt) {
+        rateLimits.delete(key);
+      }
+    }
+  }
+
+  if (!record || now > record.resetAt) {
+    rateLimits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown";
+}
+
+// Structured logging
+const log = {
+  info: (message: string, data?: Record<string, unknown>) => {
+    console.log(JSON.stringify({
+      level: "INFO",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  },
+  error: (message: string, error?: unknown, data?: Record<string, unknown>) => {
+    console.error(JSON.stringify({
+      level: "ERROR",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      error: error instanceof Error ? error.message : error,
+      ...data
+    }));
+  },
+  warn: (message: string, data?: Record<string, unknown>) => {
+    console.warn(JSON.stringify({
+      level: "WARN",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  }
+};
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -19,17 +90,59 @@ interface InvoiceReadyPayload {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  console.log("send-invoice-ready-email function called");
+  const requestId = crypto.randomUUID();
+  const clientIP = getClientIP(req);
 
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  log.info("Request received", { requestId, clientIP });
+
+  // Rate limiting check
+  if (!checkRateLimit(clientIP)) {
+    log.warn("Rate limit exceeded", { requestId, clientIP });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Too many requests. Please try again later.",
+        timestamp: new Date().toISOString()
+      }),
+      {
+        status: 429,
+        headers: { 
+          "Content-Type": "application/json", 
+          "Retry-After": "60",
+          ...corsHeaders 
+        }
+      }
+    );
+  }
+
   try {
     const payload: InvoiceReadyPayload = await req.json();
-    console.log("Received payload:", payload);
+    log.info("Processing payload", { requestId, invoiceNumber: payload.invoiceNumber });
 
     const { userId, customerName, customerEmail, amount, dueDate, invoiceNumber } = payload;
+
+    // Validate required fields
+    if (!userId || !customerName || !customerEmail || !amount || !dueDate || !invoiceNumber) {
+      log.warn("Missing required fields", { requestId });
+      return new Response(
+        JSON.stringify({ success: false, error: "Missing required fields" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerEmail)) {
+      log.warn("Invalid email format", { requestId, customerEmail });
+      return new Response(
+        JSON.stringify({ success: false, error: "Invalid email format" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     const formattedAmount = new Intl.NumberFormat("nb-NO", {
       style: "currency",
@@ -116,7 +229,7 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    log.info("Email sent successfully", { requestId, messageId: emailResponse.data?.id });
 
     // Create notification for customer
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -131,16 +244,16 @@ const handler = async (req: Request): Promise<Response> => {
       read: false,
     });
 
-    console.log("Customer notification created");
+    log.info("Customer notification created", { requestId, userId });
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ success: true, requestId }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
-  } catch (error: any) {
-    console.error("Error in send-invoice-ready-email:", error);
+  } catch (error) {
+    log.error("Error processing request", error, { requestId });
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

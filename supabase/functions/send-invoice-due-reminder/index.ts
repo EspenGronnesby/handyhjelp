@@ -1,6 +1,77 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const FUNCTION_NAME = "send-invoice-due-reminder";
+
+// Rate limiting - IP-based with in-memory store
+const rateLimits = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_MAX_REQUESTS = 5;
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimits.get(ip);
+
+  if (rateLimits.size > 10000) {
+    for (const [key, value] of rateLimits.entries()) {
+      if (now > value.resetAt) {
+        rateLimits.delete(key);
+      }
+    }
+  }
+
+  if (!record || now > record.resetAt) {
+    rateLimits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+
+  record.count++;
+  return true;
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown";
+}
+
+// Structured logging
+const log = {
+  info: (message: string, data?: Record<string, unknown>) => {
+    console.log(JSON.stringify({
+      level: "INFO",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  },
+  error: (message: string, error?: unknown, data?: Record<string, unknown>) => {
+    console.error(JSON.stringify({
+      level: "ERROR",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      error: error instanceof Error ? error.message : error,
+      ...data
+    }));
+  },
+  warn: (message: string, data?: Record<string, unknown>) => {
+    console.warn(JSON.stringify({
+      level: "WARN",
+      function: FUNCTION_NAME,
+      timestamp: new Date().toISOString(),
+      message,
+      ...data
+    }));
+  }
+};
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -10,13 +81,37 @@ const corsHeaders = {
 };
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS
+  const requestId = crypto.randomUUID();
+  const clientIP = getClientIP(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  log.info("Request received", { requestId, clientIP });
+
+  // Rate limiting check
+  if (!checkRateLimit(clientIP)) {
+    log.warn("Rate limit exceeded", { requestId, clientIP });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Too many requests. Please try again later.",
+        timestamp: new Date().toISOString()
+      }),
+      {
+        status: 429,
+        headers: { 
+          "Content-Type": "application/json", 
+          "Retry-After": "60",
+          ...corsHeaders 
+        }
+      }
+    );
+  }
+
   try {
-    console.log("Starting invoice due date reminder check...");
+    log.info("Starting invoice due date reminder check", { requestId });
 
     // Create Supabase client with service role
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -25,7 +120,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
-    console.log(`Checking for invoices due on: ${today}`);
+    log.info("Checking for invoices", { requestId, dueDate: today });
 
     // Find all unpaid invoices due today
     const { data: invoices, error: fetchError } = await supabase
@@ -45,15 +140,15 @@ const handler = async (req: Request): Promise<Response> => {
       .eq('status', 'pending');
 
     if (fetchError) {
-      console.error("Error fetching invoices:", fetchError);
+      log.error("Error fetching invoices", fetchError, { requestId });
       throw fetchError;
     }
 
-    console.log(`Found ${invoices?.length || 0} invoices due today`);
+    log.info("Found invoices due today", { requestId, count: invoices?.length || 0 });
 
     if (!invoices || invoices.length === 0) {
       return new Response(
-        JSON.stringify({ message: "No invoices due today", count: 0 }),
+        JSON.stringify({ success: true, message: "No invoices due today", count: 0, requestId }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -66,12 +161,20 @@ const handler = async (req: Request): Promise<Response> => {
         ? invoice.jobs.quotes.company_name 
         : invoice.jobs.quotes.name;
       const customerEmail = invoice.jobs.quotes.email;
+
+      // Validate email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(customerEmail)) {
+        log.warn("Invalid email, skipping", { requestId, invoiceNumber: invoice.invoice_number });
+        continue;
+      }
+
       const formattedAmount = new Intl.NumberFormat('nb-NO', { 
         style: 'currency', 
         currency: 'NOK' 
       }).format(invoice.amount);
 
-      console.log(`Sending reminder to ${customerEmail} for invoice ${invoice.invoice_number}`);
+      log.info("Sending reminder", { requestId, invoiceNumber: invoice.invoice_number, email: customerEmail });
 
       try {
         const emailResponse = await resend.emails.send({
@@ -139,7 +242,7 @@ const handler = async (req: Request): Promise<Response> => {
           `,
         });
 
-        console.log(`Email sent successfully to ${customerEmail}:`, emailResponse);
+        log.info("Email sent", { requestId, invoiceNumber: invoice.invoice_number, messageId: emailResponse.data?.id });
         sentCount++;
 
         // Create notification for the user
@@ -151,28 +254,30 @@ const handler = async (req: Request): Promise<Response> => {
           read: false
         });
 
-      } catch (emailError: any) {
-        console.error(`Error sending email to ${customerEmail}:`, emailError);
-        errors.push(`${customerEmail}: ${emailError.message}`);
+      } catch (emailError) {
+        log.error("Error sending email", emailError, { requestId, invoiceNumber: invoice.invoice_number });
+        errors.push(`${customerEmail}: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`);
       }
     }
 
-    console.log(`Reminder process complete. Sent: ${sentCount}, Errors: ${errors.length}`);
+    log.info("Reminder process complete", { requestId, sent: sentCount, errors: errors.length });
 
     return new Response(
       JSON.stringify({ 
+        success: true,
         message: "Invoice reminders processed",
         sent: sentCount,
         total: invoices.length,
-        errors: errors.length > 0 ? errors : undefined
+        errors: errors.length > 0 ? errors : undefined,
+        requestId
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
-  } catch (error: any) {
-    console.error("Error in send-invoice-due-reminder:", error);
+  } catch (error) {
+    log.error("Fatal error", error, { requestId });
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : "Unknown error", requestId }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
