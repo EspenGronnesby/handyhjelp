@@ -3,11 +3,12 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Briefcase, CreditCard, FileText, Settings } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter } from '@/types/admin';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 // Admin components
 import { AdminSummaryCards } from '@/components/admin/AdminSummaryCards';
@@ -27,9 +28,13 @@ import { OfferModal } from '@/components/admin/OfferModal';
 import { ContractModal } from '@/components/admin/ContractModal';
 import { RejectAgreementModal } from '@/components/admin/RejectAgreementModal';
 
+type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'innstillinger';
+
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>('oppdrag');
+  const [activeTab, setActiveTab] = useState('requests');
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     type: 'start' | 'complete' | 'delete' | null;
@@ -58,6 +63,54 @@ const AdminDashboard = () => {
     handleRejectAgreement,
     refreshData,
   } = useAdminData(isAdmin);
+
+  // Category configuration
+  const categories = {
+    oppdrag: {
+      label: 'Oppdrag',
+      icon: Briefcase,
+      tabs: [
+        { key: 'requests', label: 'Forespørsler', count: pendingQuotes.length },
+        { key: 'agreements', label: 'Avtaler', count: agreements.length },
+        { key: 'active', label: 'Aktive', count: activeJobs.length },
+        { key: 'completed', label: 'Ferdig', count: completedJobs.length },
+      ],
+      totalBadge: pendingQuotes.length + newAgreements.length + activeJobs.length,
+    },
+    okonomi: {
+      label: 'Økonomi',
+      icon: CreditCard,
+      tabs: [
+        { key: 'invoices', label: 'Fakturaer', count: null },
+        { key: 'customers', label: 'Kunder', count: profiles.length },
+      ],
+      totalBadge: null,
+    },
+    innhold: {
+      label: 'Innhold',
+      icon: FileText,
+      tabs: [
+        { key: 'projects', label: 'Prosjekter', count: null },
+        { key: 'blog', label: 'Blogg', count: null },
+        { key: 'reviews', label: 'Anmeldelser', count: null },
+      ],
+      totalBadge: null,
+    },
+    innstillinger: {
+      label: 'Innstillinger',
+      icon: Settings,
+      tabs: [
+        { key: 'site-editing', label: 'Redigering', count: null },
+      ],
+      totalBadge: null,
+    },
+  };
+
+  // Set default tab when category changes
+  const handleCategoryChange = (category: CategoryKey) => {
+    setActiveCategory(category);
+    setActiveTab(categories[category].tabs[0].key);
+  };
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -111,6 +164,8 @@ const AdminDashboard = () => {
     rejected: agreements.filter(a => a.status === 'rejected').length,
   };
 
+  const currentCategory = categories[activeCategory];
+
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
@@ -124,38 +179,48 @@ const AdminDashboard = () => {
         activeJobs={activeJobs.length}
       />
 
-      <Tabs defaultValue="requests" className="space-y-4">
+      {/* Main Category Navigation */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        {(Object.keys(categories) as CategoryKey[]).map((key) => {
+          const category = categories[key];
+          const Icon = category.icon;
+          const isActive = activeCategory === key;
+          
+          return (
+            <button
+              key={key}
+              onClick={() => handleCategoryChange(key)}
+              className={cn(
+                "flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
+                isActive 
+                  ? "border-primary bg-primary/10 text-primary" 
+                  : "border-border bg-card hover:border-primary/50 hover:bg-muted/50"
+              )}
+            >
+              <Icon className="h-6 w-6" />
+              <span className="font-medium text-sm">{category.label}</span>
+              {category.totalBadge !== null && category.totalBadge > 0 && (
+                <Badge variant={isActive ? "default" : "secondary"} className="text-xs">
+                  {category.totalBadge}
+                </Badge>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Sub-category Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="h-auto flex-wrap gap-2 p-2 bg-muted/50">
-          <TabsTrigger value="requests" className="text-sm whitespace-nowrap">
-            Forespørsler ({pendingQuotes.length})
-          </TabsTrigger>
-          <TabsTrigger value="agreements" className="text-sm whitespace-nowrap">
-            Avtaler ({agreements.length})
-          </TabsTrigger>
-          <TabsTrigger value="active" className="text-sm whitespace-nowrap">
-            Aktive ({activeJobs.length})
-          </TabsTrigger>
-          <TabsTrigger value="completed" className="text-sm whitespace-nowrap">
-            Ferdig ({completedJobs.length})
-          </TabsTrigger>
-          <TabsTrigger value="invoices" className="text-sm whitespace-nowrap">
-            Fakturaer
-          </TabsTrigger>
-          <TabsTrigger value="customers" className="text-sm whitespace-nowrap">
-            Kunder ({profiles.length})
-          </TabsTrigger>
-          <TabsTrigger value="projects" className="text-sm whitespace-nowrap">
-            Prosjekter
-          </TabsTrigger>
-          <TabsTrigger value="blog" className="text-sm whitespace-nowrap">
-            Blogg
-          </TabsTrigger>
-          <TabsTrigger value="reviews" className="text-sm whitespace-nowrap">
-            Anmeldelser
-          </TabsTrigger>
-          <TabsTrigger value="site-editing" className="text-sm whitespace-nowrap">
-            Redigering
-          </TabsTrigger>
+          {currentCategory.tabs.map((tab) => (
+            <TabsTrigger 
+              key={tab.key} 
+              value={tab.key} 
+              className="text-sm whitespace-nowrap"
+            >
+              {tab.label} {tab.count !== null && `(${tab.count})`}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         {/* Nye forespørsler */}
