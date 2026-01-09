@@ -256,6 +256,10 @@ export const useAdminData = (isAdmin: boolean) => {
   const completedJobs = jobs.filter(j => j.status === 'completed');
   const newAgreements = agreements.filter(a => a.status === 'new');
 
+  const refreshData = () => {
+    fetchData();
+  };
+
   return {
     quotes,
     jobs,
@@ -271,5 +275,6 @@ export const useAdminData = (isAdmin: boolean) => {
     handleCompleteJob,
     handleDeleteJob,
     handleUpdateAgreementStatus,
+    refreshData,
   };
 };

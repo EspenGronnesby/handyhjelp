@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      agreement_activities: {
+        Row: {
+          action: string
+          agreement_id: string
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+        }
+        Insert: {
+          action: string
+          agreement_id: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          agreement_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreement_activities_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "service_agreements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       blog_posts: {
         Row: {
           category: string
@@ -689,16 +724,23 @@ export type Database = {
         Row: {
           additional_info: string | null
           address: string
+          admin_notes: string | null
           contact_person: string
           contact_role: string
+          contract_document_url: string | null
           contract_duration: string
+          contract_signed_at: string | null
           created_at: string
           current_situation: string
+          customer_approved_at: string | null
           customer_type: string
           email: string
           fixed_contact_person: boolean
           frequency: string
           id: string
+          offer_amount: number | null
+          offer_document_url: string | null
+          offer_sent_at: string | null
           other_services: string | null
           phone: string
           services: Json
@@ -712,16 +754,23 @@ export type Database = {
         Insert: {
           additional_info?: string | null
           address: string
+          admin_notes?: string | null
           contact_person: string
           contact_role: string
+          contract_document_url?: string | null
           contract_duration: string
+          contract_signed_at?: string | null
           created_at?: string
           current_situation: string
+          customer_approved_at?: string | null
           customer_type: string
           email: string
           fixed_contact_person?: boolean
           frequency: string
           id?: string
+          offer_amount?: number | null
+          offer_document_url?: string | null
+          offer_sent_at?: string | null
           other_services?: string | null
           phone: string
           services?: Json
@@ -735,16 +784,23 @@ export type Database = {
         Update: {
           additional_info?: string | null
           address?: string
+          admin_notes?: string | null
           contact_person?: string
           contact_role?: string
+          contract_document_url?: string | null
           contract_duration?: string
+          contract_signed_at?: string | null
           created_at?: string
           current_situation?: string
+          customer_approved_at?: string | null
           customer_type?: string
           email?: string
           fixed_contact_person?: boolean
           frequency?: string
           id?: string
+          offer_amount?: number | null
+          offer_document_url?: string | null
+          offer_sent_at?: string | null
           other_services?: string | null
           phone?: string
           services?: Json
