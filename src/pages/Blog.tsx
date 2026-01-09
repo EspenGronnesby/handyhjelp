@@ -4,14 +4,14 @@ import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, Search, Mail } from "lucide-react";
+import { Calendar, Clock, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditableHero } from "@/components/EditableHero";
+import { Helmet } from "react-helmet";
 
 interface BlogPost {
   id: string;
@@ -35,7 +35,6 @@ const categoryLabels: Record<string, string> = {
 const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("alle");
-  const [email, setEmail] = useState("");
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -72,12 +71,6 @@ const Blog = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Newsletter signup:", email);
-    setEmail("");
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -85,6 +78,20 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Råd og tips | HandyHjelp</title>
+        <meta name="description" content="Gode råd og tips for eiendomsvedlikehold fra våre erfarne fagfolk." />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Råd og tips | HandyHjelp" />
+        <meta property="og:description" content="Gode råd og tips for eiendomsvedlikehold fra våre erfarne fagfolk." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://handyhjelp.no/raad" />
+        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
+        <meta property="og:locale" content="nb_NO" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Råd og tips | HandyHjelp" />
+        <meta name="twitter:description" content="Gode råd og tips for eiendomsvedlikehold fra våre erfarne fagfolk." />
+      </Helmet>
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />
@@ -102,7 +109,7 @@ const Blog = () => {
       </section>
 
       {/* Main Content */}
-      <section className="py-8 md:py-12">
+      <main id="main-content" className="py-8 md:py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:grid lg:grid-cols-4 gap-6 lg:gap-8">
             {/* Sidebar - Shows first on mobile for better UX */}
@@ -120,6 +127,7 @@ const Blog = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-9 h-12 text-base"
+                      aria-label="Søk i bloggartikler"
                     />
                   </div>
                 </CardContent>
@@ -136,6 +144,7 @@ const Blog = () => {
                       <button
                         key={category.id}
                         onClick={() => setSelectedCategory(category.id)}
+                        aria-label={`Vis artikler i kategorien ${category.name}`}
                         className={`flex-shrink-0 lg:w-full text-left px-4 py-3 min-h-[44px] rounded-md transition-colors whitespace-nowrap ${
                           selectedCategory === category.id
                             ? "bg-primary text-primary-foreground"
@@ -151,33 +160,6 @@ const Blog = () => {
                       </button>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Newsletter Signup */}
-              <Card className="bg-primary/5 border-primary/20">
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-lg">Nyhetsbrev</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Få de nyeste rådene og tipsene direkte i innboksen din
-                  </p>
-                  <form onSubmit={handleNewsletterSubmit} className="space-y-3">
-                    <Input
-                      type="email"
-                      placeholder="Din e-post"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                    <Button type="submit" variant="cta" className="w-full">
-                      Meld deg på
-                    </Button>
-                  </form>
                 </CardContent>
               </Card>
             </aside>
@@ -260,7 +242,7 @@ const Blog = () => {
             </div>
           </div>
         </div>
-      </section>
+      </main>
 
       {/* CTA Section */}
       <section className="py-16 bg-muted/30">
@@ -277,14 +259,14 @@ const Blog = () => {
             <CardContent>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link to="/tilbud">
-                  <Button variant="cta" size="lg">
+                  <button className="bg-success hover:bg-success-hover text-success-foreground px-6 py-3 rounded-lg font-medium transition-colors">
                     Få gratis tilbud
-                  </Button>
+                  </button>
                 </Link>
                 <Link to="/kontakt">
-                  <Button variant="cta-outline" size="lg">
+                  <button className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors">
                     Kontakt oss
-                  </Button>
+                  </button>
                 </Link>
               </div>
             </CardContent>

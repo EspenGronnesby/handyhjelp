@@ -2,11 +2,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
@@ -18,6 +13,7 @@ import EditableServiceCardGrid from "@/components/service-edit/EditableServiceCa
 import EditableWhyChooseSection from "@/components/service-edit/EditableWhyChooseSection";
 import EditablePricingDetails from "@/components/service-edit/EditablePricingDetails";
 import EditableComparisonSection from "@/components/service-edit/EditableComparisonSection";
+import { Helmet } from "react-helmet";
 
 const Services = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('services', servicesBackground);
@@ -38,6 +34,20 @@ const Services = () => {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Våre tjenester | HandyHjelp</title>
+        <meta name="description" content="Se våre tjenester: vaktmester, tømrer, blikkenslager og takrennerens. Kvalitetsarbeid til konkurransedyktige priser." />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Våre tjenester | HandyHjelp" />
+        <meta property="og:description" content="Se våre tjenester: vaktmester, tømrer, blikkenslager og takrennerens. Kvalitetsarbeid til konkurransedyktige priser." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://handyhjelp.no/tjenester" />
+        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
+        <meta property="og:locale" content="nb_NO" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Våre tjenester | HandyHjelp" />
+        <meta name="twitter:description" content="Se våre tjenester: vaktmester, tømrer, blikkenslager og takrennerens. Kvalitetsarbeid til konkurransedyktige priser." />
+      </Helmet>
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />
@@ -56,7 +66,7 @@ const Services = () => {
         <HeroImageEditor page="services" currentImageUrl={heroImage} onImageUpdate={refetchHero} />
         
         {/* Content over background */}
-        <div className="relative z-10 w-full py-20">
+        <main id="main-content" className="relative z-10 w-full py-20">
           <div className="container mx-auto px-4">
             <EditableHero
               section="hero-tjenester"
@@ -68,7 +78,7 @@ const Services = () => {
             {/* Editable CTA Box */}
             <EditableCTABox />
           </div>
-        </div>
+        </main>
       </div>
 
       <EditableServiceCardGrid />

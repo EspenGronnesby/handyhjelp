@@ -1,17 +1,25 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
+import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
+import { Helmet } from "react-helmet";
 
 const ThankYouAgreement = () => {
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Takk for din avtaleforespørsel | HandyHjelp</title>
+        <meta name="description" content="Takk for din bestilling av fast avtale. Vi kontakter deg innen 1-2 virkedager." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <GoogleAnalytics />
       <Header />
+      <BreadcrumbNavigation />
       
-      <main className="pt-32 pb-16">
+      <main id="main-content" className="pt-32 pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <div className="mb-8 flex justify-center">

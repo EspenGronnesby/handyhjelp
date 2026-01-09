@@ -1,11 +1,13 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { QuoteForm } from "@/components/QuoteForm";
+import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
+import { QuoteForm } from "@/components/QuoteForm";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarCheck, ArrowRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
 
 const QuotePage = () => {
   const scrollToAgreement = () => {
@@ -16,10 +18,25 @@ const QuotePage = () => {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Få gratis tilbud | HandyHjelp</title>
+        <meta name="description" content="Få gratis og uforpliktende tilbud på håndverkstjenester. Vi svarer innen 1-3 virkedager." />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Få gratis tilbud | HandyHjelp" />
+        <meta property="og:description" content="Få gratis og uforpliktende tilbud på håndverkstjenester. Vi svarer innen 1-3 virkedager." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://handyhjelp.no/tilbud" />
+        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
+        <meta property="og:locale" content="nb_NO" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Få gratis tilbud | HandyHjelp" />
+        <meta name="twitter:description" content="Få gratis og uforpliktende tilbud på håndverkstjenester. Vi svarer innen 1-3 virkedager." />
+      </Helmet>
       <GoogleAnalytics />
       <Header />
+      <BreadcrumbNavigation />
       
-      <main className="pt-32 pb-16 bg-muted/30">
+      <main id="main-content" className="pt-32 pb-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
@@ -32,6 +49,7 @@ const QuotePage = () => {
               <button 
                 onClick={scrollToAgreement}
                 className="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors"
+                aria-label="Hopp til fast avtale-seksjonen"
               >
                 <span>Trenger du regelmessig hjelp?</span>
                 <ChevronDown className="h-4 w-4 animate-bounce" />

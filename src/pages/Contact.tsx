@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
+import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +16,7 @@ import { EditableFAQItem } from "@/components/EditableFAQItem";
 import { Accordion } from "@/components/ui/accordion";
 import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { useWeb3Forms } from "@/hooks/useWeb3Forms";
+import { Helmet } from "react-helmet";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -63,9 +66,25 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>Kontakt oss | HandyHjelp</title>
+        <meta name="description" content="Kontakt HandyHjelp for eiendomsvedlikehold. Ring oss eller send melding - vi svarer innen 1-3 virkedager." />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Kontakt oss | HandyHjelp" />
+        <meta property="og:description" content="Kontakt HandyHjelp for eiendomsvedlikehold. Ring oss eller send melding - vi svarer innen 1-3 virkedager." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://handyhjelp.no/kontakt" />
+        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
+        <meta property="og:locale" content="nb_NO" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Kontakt oss | HandyHjelp" />
+        <meta name="twitter:description" content="Kontakt HandyHjelp for eiendomsvedlikehold. Ring oss eller send melding - vi svarer innen 1-3 virkedager." />
+      </Helmet>
+      <GoogleAnalytics />
       <Header />
+      <BreadcrumbNavigation />
       
-      <main className="pt-32 pb-16">
+      <main id="main-content" className="pt-32 pb-16">
         {/* Hero Section */}
         <section className="container mx-auto px-4 mb-16">
           <EditableHero
@@ -88,7 +107,7 @@ const Contact = () => {
                   <h2 className="text-2xl font-bold mb-6">Send oss en melding</h2>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <Label htmlFor="name">Navn</Label>
+                      <Label htmlFor="name" required>Navn</Label>
                       <Input
                         id="name"
                         value={formData.name}
@@ -98,7 +117,7 @@ const Contact = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="email">E-post</Label>
+                      <Label htmlFor="email" required>E-post</Label>
                       <Input
                         id="email"
                         type="email"
@@ -109,7 +128,7 @@ const Contact = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="phone">Telefon</Label>
+                      <Label htmlFor="phone" required>Telefon</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -127,7 +146,7 @@ const Contact = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="message">Melding</Label>
+                      <Label htmlFor="message" required>Melding</Label>
                       <Textarea
                         id="message"
                         value={formData.message}
@@ -137,6 +156,9 @@ const Contact = () => {
                         rows={5}
                       />
                     </div>
+                    <p className="text-sm text-muted-foreground">
+                      <span className="text-destructive">*</span> Obligatoriske felt
+                    </p>
                     <Button type="submit" className="w-full" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <>

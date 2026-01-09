@@ -114,7 +114,7 @@ export const Footer = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/#quote-form" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
+                  <Link to="/fast-avtale" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
                     Faste avtaler
                   </Link>
                 </li>
