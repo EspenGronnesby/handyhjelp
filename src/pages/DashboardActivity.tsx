@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,11 +6,21 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, Bell } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, Bell, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+
+const JOBS_PER_PAGE = 10;
 interface Quote {
   id: string;
   type: string;
@@ -117,6 +127,7 @@ const DashboardActivity = () => {
   const [loading, setLoading] = useState(true);
   const [requestingInvoice, setRequestingInvoice] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [completedJobsPage, setCompletedJobsPage] = useState(1);
   const fetchData = useCallback(async () => {
     const {
       data: {
@@ -331,7 +342,21 @@ const DashboardActivity = () => {
   }
 
   // Filtrer jobber: kun vis fullførte i Jobber-fanen
-  const completedJobs = jobs.filter(job => job.status === 'completed');
+  const completedJobs = useMemo(() => 
+    jobs.filter(job => job.status === 'completed'), 
+    [jobs]
+  );
+  
+  // Pagination for completed jobs
+  const totalCompletedPages = Math.ceil(completedJobs.length / JOBS_PER_PAGE);
+  const paginatedCompletedJobs = useMemo(() => 
+    completedJobs.slice(
+      (completedJobsPage - 1) * JOBS_PER_PAGE,
+      completedJobsPage * JOBS_PER_PAGE
+    ),
+    [completedJobs, completedJobsPage]
+  );
+  
   // Filtrer aktive avtaler (ikke avslått)
   const activeAgreements = agreements.filter(a => a.status !== 'rejected');
   const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
@@ -525,11 +550,12 @@ const DashboardActivity = () => {
               <p className="text-muted-foreground">
                 Ingen fullførte oppdrag ennå. Når jobbene dine er ferdige, vises de her.
               </p>
-            </Card> : completedJobs.map(job => {
-            const invoice = getInvoiceForJob(job.id);
-            const invoiceRequest = getInvoiceRequestForJob(job.id);
-            const hasRequestedInvoice = invoiceRequest && invoiceRequest.status === 'pending';
-            return <Card key={job.id} className="border-l-4 border-l-green-500">
+            </Card> : <>
+              {paginatedCompletedJobs.map(job => {
+                const invoice = getInvoiceForJob(job.id);
+                const invoiceRequest = getInvoiceRequestForJob(job.id);
+                const hasRequestedInvoice = invoiceRequest && invoiceRequest.status === 'pending';
+                return <Card key={job.id} className="border-l-4 border-l-green-500">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -547,12 +573,12 @@ const DashboardActivity = () => {
                           </CardTitle>
                           <CardDescription>
                             Fullført {job.completed_date ? formatDistanceToNow(new Date(job.completed_date), {
-                          addSuffix: true,
-                          locale: nb
-                        }) : formatDistanceToNow(new Date(job.created_at), {
-                          addSuffix: true,
-                          locale: nb
-                        })}
+                              addSuffix: true,
+                              locale: nb
+                            }) : formatDistanceToNow(new Date(job.created_at), {
+                              addSuffix: true,
+                              locale: nb
+                            })}
                           </CardDescription>
                         </div>
                       </div>
@@ -584,9 +610,9 @@ const DashboardActivity = () => {
                             <span className="text-muted-foreground">Beløp:</span>{' '}
                             <span className="font-medium">
                               {new Intl.NumberFormat('nb-NO', {
-                          style: 'currency',
-                          currency: 'NOK'
-                        }).format(invoice.amount)}
+                                style: 'currency',
+                                currency: 'NOK'
+                              }).format(invoice.amount)}
                             </span>
                           </div>
                           <div>
@@ -622,7 +648,39 @@ const DashboardActivity = () => {
                       </div>}
                   </CardContent>
                 </Card>;
-          })}
+              })}
+              
+              {/* Pagination */}
+              {totalCompletedPages > 1 && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCompletedJobsPage(p => Math.max(1, p - 1))}
+                        className={completedJobsPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: totalCompletedPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCompletedJobsPage(page)}
+                          isActive={completedJobsPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCompletedJobsPage(p => Math.min(totalCompletedPages, p + 1))}
+                        className={completedJobsPage === totalCompletedPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </>}
         </TabsContent>
       </Tabs>
         </>}

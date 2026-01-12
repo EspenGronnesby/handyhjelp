@@ -3,12 +3,20 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Briefcase, CreditCard, FileText, Settings } from 'lucide-react';
+import { Loader2, Briefcase, CreditCard, FileText, Settings, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter } from '@/types/admin';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 // Admin components
 import { AdminSummaryCards } from '@/components/admin/AdminSummaryCards';
@@ -56,6 +64,14 @@ const AdminDashboard = () => {
     pendingQuotes,
     activeJobs,
     completedJobs,
+    paginatedCompletedJobs,
+    recentCompletedJobsCount,
+    oldCompletedJobsCount,
+    showOldCompletedJobs,
+    setShowOldCompletedJobs,
+    completedJobsPage,
+    setCompletedJobsPage,
+    totalCompletedPages,
     newAgreements,
     handleStartJob,
     handleCompleteJob,
@@ -74,7 +90,7 @@ const AdminDashboard = () => {
         { key: 'requests', label: 'Forespørsler', count: pendingQuotes.length },
         { key: 'agreements', label: 'Avtaler', count: agreements.length },
         { key: 'active', label: 'Aktive', count: activeJobs.length },
-        { key: 'completed', label: 'Ferdig', count: completedJobs.length },
+        { key: 'completed', label: 'Ferdig', count: recentCompletedJobsCount },
       ],
       totalBadge: pendingQuotes.length + newAgreements.length + activeJobs.length,
     },
@@ -336,23 +352,87 @@ const AdminDashboard = () => {
 
         {/* Ferdig */}
         <TabsContent value="completed" className="space-y-4">
-          {completedJobs.length === 0 ? (
+          {paginatedCompletedJobs.length === 0 && !showOldCompletedJobs ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                Ingen fullførte jobber
+                Ingen fullførte jobber den siste måneden
+                {oldCompletedJobsCount > 0 && (
+                  <Button
+                    variant="link"
+                    onClick={() => setShowOldCompletedJobs(true)}
+                    className="ml-2"
+                  >
+                    Vis {oldCompletedJobsCount} eldre oppdrag
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ) : (
-            completedJobs.map((job) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                variant="completed"
-                actionLoading={actionLoading}
-                onDelete={(j) => setConfirmDialog({ open: true, type: 'delete', item: j })}
-                onAddInvoice={(j) => setInvoiceJob(j)}
-              />
-            ))
+            <>
+              {paginatedCompletedJobs.map((job) => (
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  variant="completed"
+                  actionLoading={actionLoading}
+                  onDelete={(j) => setConfirmDialog({ open: true, type: 'delete', item: j })}
+                  onAddInvoice={(j) => setInvoiceJob(j)}
+                />
+              ))}
+
+              {/* Show/hide old jobs toggle */}
+              {!showOldCompletedJobs && oldCompletedJobsCount > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowOldCompletedJobs(true)}
+                  className="w-full"
+                >
+                  <Package className="mr-2 h-4 w-4" />
+                  Vis {oldCompletedJobsCount} eldre ferdige oppdrag
+                </Button>
+              )}
+
+              {showOldCompletedJobs && oldCompletedJobsCount > 0 && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowOldCompletedJobs(false)}
+                  className="w-full"
+                >
+                  Skjul eldre oppdrag
+                </Button>
+              )}
+
+              {/* Pagination */}
+              {totalCompletedPages > 1 && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCompletedJobsPage(p => Math.max(1, p - 1))}
+                        className={completedJobsPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: totalCompletedPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCompletedJobsPage(page)}
+                          isActive={completedJobsPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCompletedJobsPage(p => Math.min(totalCompletedPages, p + 1))}
+                        className={completedJobsPage === totalCompletedPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </>
           )}
         </TabsContent>
 

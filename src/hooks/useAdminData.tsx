@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Quote, Job, Profile, ServiceAgreement } from '@/types/admin';
+
+const JOBS_PER_PAGE = 10;
 
 export const useAdminData = (isAdmin: boolean) => {
   const { toast } = useToast();
@@ -11,6 +13,10 @@ export const useAdminData = (isAdmin: boolean) => {
   const [agreements, setAgreements] = useState<ServiceAgreement[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  
+  // State for completed jobs filtering and pagination
+  const [showOldCompletedJobs, setShowOldCompletedJobs] = useState(false);
+  const [completedJobsPage, setCompletedJobsPage] = useState(1);
 
   const fetchData = async () => {
     const [quotesResponse, jobsResponse, profilesResponse, agreementsResponse] = await Promise.all([
@@ -263,7 +269,8 @@ export const useAdminData = (isAdmin: boolean) => {
         .from('service_agreements')
         .update({ 
           status: 'rejected',
-          rejection_reason: rejectionReason 
+          rejection_reason: rejectionReason,
+          rejected_at: new Date().toISOString()
         })
         .eq('id', agreementId);
 
@@ -321,8 +328,40 @@ export const useAdminData = (isAdmin: boolean) => {
 
   const pendingQuotes = quotes.filter(q => q.status === 'pending');
   const activeJobs = jobs.filter(j => j.status === 'in_progress');
-  const completedJobs = jobs.filter(j => j.status === 'completed');
+  const allCompletedJobs = jobs.filter(j => j.status === 'completed');
   const newAgreements = agreements.filter(a => a.status === 'new');
+
+  // Filter completed jobs: recent (last month) vs old
+  const { recentCompletedJobs, oldCompletedJobs } = useMemo(() => {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    
+    const recent = allCompletedJobs.filter(j => 
+      new Date(j.completed_date || j.created_at) > oneMonthAgo
+    );
+    const old = allCompletedJobs.filter(j => 
+      new Date(j.completed_date || j.created_at) <= oneMonthAgo
+    );
+    
+    return { recentCompletedJobs: recent, oldCompletedJobs: old };
+  }, [allCompletedJobs]);
+
+  // Displayed completed jobs based on toggle
+  const displayedCompletedJobs = showOldCompletedJobs 
+    ? allCompletedJobs
+    : recentCompletedJobs;
+
+  // Pagination for completed jobs
+  const totalCompletedPages = Math.ceil(displayedCompletedJobs.length / JOBS_PER_PAGE);
+  const paginatedCompletedJobs = displayedCompletedJobs.slice(
+    (completedJobsPage - 1) * JOBS_PER_PAGE,
+    completedJobsPage * JOBS_PER_PAGE
+  );
+
+  // Reset page when toggling
+  useEffect(() => {
+    setCompletedJobsPage(1);
+  }, [showOldCompletedJobs]);
 
   const refreshData = () => {
     fetchData();
@@ -337,7 +376,15 @@ export const useAdminData = (isAdmin: boolean) => {
     actionLoading,
     pendingQuotes,
     activeJobs,
-    completedJobs,
+    completedJobs: displayedCompletedJobs,
+    paginatedCompletedJobs,
+    recentCompletedJobsCount: recentCompletedJobs.length,
+    oldCompletedJobsCount: oldCompletedJobs.length,
+    showOldCompletedJobs,
+    setShowOldCompletedJobs,
+    completedJobsPage,
+    setCompletedJobsPage,
+    totalCompletedPages,
     newAgreements,
     handleStartJob,
     handleCompleteJob,
