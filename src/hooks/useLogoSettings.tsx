@@ -9,6 +9,7 @@ export interface LogoSettings {
   mobilePadding: number;
   tabletPadding: number;
   desktopPadding: number;
+  desktopMarginLeft: number;
 }
 
 const defaultSettings: LogoSettings = {
@@ -18,6 +19,7 @@ const defaultSettings: LogoSettings = {
   mobilePadding: 12,
   tabletPadding: 16,
   desktopPadding: 16,
+  desktopMarginLeft: 0,
 };
 
 export const useLogoSettings = () => {
