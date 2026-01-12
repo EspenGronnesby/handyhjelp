@@ -114,7 +114,7 @@ const AdminDashboard = () => {
       totalBadge: null,
     },
     innhold: {
-      label: 'Innhold',
+      label: 'Innhold / Anmeldelser',
       icon: FileText,
       tabs: [
         { key: 'projects', label: 'Prosjekter', count: null },
