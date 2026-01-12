@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Briefcase, CreditCard, FileText, Settings, Package, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
-import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter } from '@/types/admin';
+import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter, SingleJobStatusFilter, SINGLE_JOB_STATUS_LABELS } from '@/types/admin';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -43,7 +43,7 @@ const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('oppdrag');
-  const [activeTab, setActiveTab] = useState('requests');
+  const [activeTab, setActiveTab] = useState('single-jobs');
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     type: 'start' | 'complete' | 'delete' | null;
@@ -55,6 +55,7 @@ const AdminDashboard = () => {
   const [contractAgreement, setContractAgreement] = useState<ServiceAgreement | null>(null);
   const [rejectAgreement, setRejectAgreement] = useState<ServiceAgreement | null>(null);
   const [agreementStatusFilter, setAgreementStatusFilter] = useState<AgreementStatusFilter>('all');
+  const [singleJobStatusFilter, setSingleJobStatusFilter] = useState<SingleJobStatusFilter>('all');
 
   const {
     profiles,
@@ -81,16 +82,25 @@ const AdminDashboard = () => {
     refreshData,
   } = useAdminData(isAdmin);
 
+  // Calculate total single jobs count
+  const totalSingleJobs = pendingQuotes.length + activeJobs.length + completedJobs.length;
+  
+  // Count single jobs by status
+  const singleJobStatusCounts = {
+    all: totalSingleJobs,
+    pending: pendingQuotes.length,
+    in_progress: activeJobs.length,
+    completed: completedJobs.length,
+  };
+
   // Category configuration
   const categories = {
     oppdrag: {
       label: 'Oppdrag',
       icon: Briefcase,
       tabs: [
-        { key: 'requests', label: 'Forespørsler', count: pendingQuotes.length },
-        { key: 'agreements', label: 'Avtaler', count: agreements.length },
-        { key: 'active', label: 'Aktive', count: activeJobs.length },
-        { key: 'completed', label: 'Ferdig', count: recentCompletedJobsCount },
+        { key: 'single-jobs', label: 'Enkelt-jobber', count: totalSingleJobs },
+        { key: 'agreements', label: 'Faste avtaler', count: agreements.length },
       ],
       totalBadge: pendingQuotes.length + newAgreements.length + activeJobs.length,
     },
@@ -241,27 +251,173 @@ const AdminDashboard = () => {
           ))}
         </TabsList>
 
-        {/* Nye forespørsler */}
-        <TabsContent value="requests" className="space-y-4">
-          {pendingQuotes.length === 0 ? (
+        {/* Enkelt-jobber */}
+        <TabsContent value="single-jobs" className="space-y-4">
+          {/* Status filter buttons */}
+          <div className="flex flex-wrap gap-2 pb-2">
+            {(Object.keys(SINGLE_JOB_STATUS_LABELS) as SingleJobStatusFilter[]).map((status) => (
+              <Button 
+                key={status}
+                size="sm" 
+                variant={singleJobStatusFilter === status ? 'default' : 'outline'}
+                onClick={() => setSingleJobStatusFilter(status)}
+              >
+                {SINGLE_JOB_STATUS_LABELS[status]} ({singleJobStatusCounts[status]})
+              </Button>
+            ))}
+          </div>
+
+          {/* Nye forespørsler (pending) */}
+          {(singleJobStatusFilter === 'all' || singleJobStatusFilter === 'pending') && (
+            <>
+              {singleJobStatusFilter === 'all' && pendingQuotes.length > 0 && (
+                <h3 className="text-lg font-semibold mt-4">Nye forespørsler</h3>
+              )}
+              {pendingQuotes.map((quote) => (
+                <QuoteCard
+                  key={quote.id}
+                  quote={quote}
+                  actionLoading={actionLoading}
+                  onStartJob={(q) => setConfirmDialog({ open: true, type: 'start', item: q })}
+                />
+              ))}
+            </>
+          )}
+
+          {/* Aktive jobber (in_progress) */}
+          {(singleJobStatusFilter === 'all' || singleJobStatusFilter === 'in_progress') && (
+            <>
+              {singleJobStatusFilter === 'all' && activeJobs.length > 0 && (
+                <h3 className="text-lg font-semibold mt-4">Aktive jobber</h3>
+              )}
+              {activeJobs.map((job) => (
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  variant="active"
+                  actionLoading={actionLoading}
+                  onComplete={(j) => setConfirmDialog({ open: true, type: 'complete', item: j })}
+                />
+              ))}
+            </>
+          )}
+
+          {/* Ferdige jobber (completed) */}
+          {(singleJobStatusFilter === 'all' || singleJobStatusFilter === 'completed') && (
+            <>
+              {singleJobStatusFilter === 'all' && paginatedCompletedJobs.length > 0 && (
+                <h3 className="text-lg font-semibold mt-4">Ferdige jobber</h3>
+              )}
+              {paginatedCompletedJobs.map((job) => (
+                <JobCard
+                  key={job.id}
+                  job={job}
+                  variant="completed"
+                  actionLoading={actionLoading}
+                  onDelete={(j) => setConfirmDialog({ open: true, type: 'delete', item: j })}
+                  onAddInvoice={(j) => setInvoiceJob(j)}
+                />
+              ))}
+
+              {/* Show/hide old jobs toggle */}
+              {!showOldCompletedJobs && oldCompletedJobsCount > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowOldCompletedJobs(true)}
+                  className="w-full"
+                >
+                  <Package className="mr-2 h-4 w-4" />
+                  Vis {oldCompletedJobsCount} eldre ferdige oppdrag
+                </Button>
+              )}
+
+              {showOldCompletedJobs && oldCompletedJobsCount > 0 && (
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowOldCompletedJobs(false)}
+                  className="w-full"
+                >
+                  Skjul eldre oppdrag
+                </Button>
+              )}
+
+              {/* Pagination */}
+              {totalCompletedPages > 1 && singleJobStatusFilter === 'completed' && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCompletedJobsPage(p => Math.max(1, p - 1))}
+                        className={completedJobsPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: totalCompletedPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCompletedJobsPage(page)}
+                          isActive={completedJobsPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCompletedJobsPage(p => Math.min(totalCompletedPages, p + 1))}
+                        className={completedJobsPage === totalCompletedPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </>
+          )}
+
+          {/* Tom tilstand */}
+          {totalSingleJobs === 0 && (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Ingen enkelt-jobber
+              </CardContent>
+            </Card>
+          )}
+
+          {singleJobStatusFilter === 'pending' && pendingQuotes.length === 0 && (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
                 Ingen nye forespørsler
               </CardContent>
             </Card>
-          ) : (
-            pendingQuotes.map((quote) => (
-              <QuoteCard
-                key={quote.id}
-                quote={quote}
-                actionLoading={actionLoading}
-                onStartJob={(q) => setConfirmDialog({ open: true, type: 'start', item: q })}
-              />
-            ))
+          )}
+
+          {singleJobStatusFilter === 'in_progress' && activeJobs.length === 0 && (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Ingen aktive jobber
+              </CardContent>
+            </Card>
+          )}
+
+          {singleJobStatusFilter === 'completed' && paginatedCompletedJobs.length === 0 && !showOldCompletedJobs && (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                Ingen fullførte jobber den siste måneden
+                {oldCompletedJobsCount > 0 && (
+                  <Button
+                    variant="link"
+                    onClick={() => setShowOldCompletedJobs(true)}
+                    className="ml-2"
+                  >
+                    Vis {oldCompletedJobsCount} eldre oppdrag
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
 
-        {/* Avtaleforespørsler */}
+        {/* Faste avtaler */}
         <TabsContent value="agreements" className="space-y-4">
           {/* Status filter buttons */}
           <div className="flex flex-wrap gap-2 pb-2">
@@ -312,7 +468,7 @@ const AdminDashboard = () => {
           {filteredAgreements.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                {agreementStatusFilter === 'all' ? 'Ingen avtaleforespørsler' : 'Ingen avtaler med denne statusen'}
+                {agreementStatusFilter === 'all' ? 'Ingen faste avtaler' : 'Ingen avtaler med denne statusen'}
               </CardContent>
             </Card>
           ) : (
@@ -328,115 +484,6 @@ const AdminDashboard = () => {
             ))
           )}
         </TabsContent>
-
-        {/* Aktive jobber */}
-        <TabsContent value="active" className="space-y-4">
-          {activeJobs.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Ingen aktive jobber
-              </CardContent>
-            </Card>
-          ) : (
-            activeJobs.map((job) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                variant="active"
-                actionLoading={actionLoading}
-                onComplete={(j) => setConfirmDialog({ open: true, type: 'complete', item: j })}
-              />
-            ))
-          )}
-        </TabsContent>
-
-        {/* Ferdig */}
-        <TabsContent value="completed" className="space-y-4">
-          {paginatedCompletedJobs.length === 0 && !showOldCompletedJobs ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                Ingen fullførte jobber den siste måneden
-                {oldCompletedJobsCount > 0 && (
-                  <Button
-                    variant="link"
-                    onClick={() => setShowOldCompletedJobs(true)}
-                    className="ml-2"
-                  >
-                    Vis {oldCompletedJobsCount} eldre oppdrag
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              {paginatedCompletedJobs.map((job) => (
-                <JobCard
-                  key={job.id}
-                  job={job}
-                  variant="completed"
-                  actionLoading={actionLoading}
-                  onDelete={(j) => setConfirmDialog({ open: true, type: 'delete', item: j })}
-                  onAddInvoice={(j) => setInvoiceJob(j)}
-                />
-              ))}
-
-              {/* Show/hide old jobs toggle */}
-              {!showOldCompletedJobs && oldCompletedJobsCount > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={() => setShowOldCompletedJobs(true)}
-                  className="w-full"
-                >
-                  <Package className="mr-2 h-4 w-4" />
-                  Vis {oldCompletedJobsCount} eldre ferdige oppdrag
-                </Button>
-              )}
-
-              {showOldCompletedJobs && oldCompletedJobsCount > 0 && (
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowOldCompletedJobs(false)}
-                  className="w-full"
-                >
-                  Skjul eldre oppdrag
-                </Button>
-              )}
-
-              {/* Pagination */}
-              {totalCompletedPages > 1 && (
-                <Pagination className="mt-4">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => setCompletedJobsPage(p => Math.max(1, p - 1))}
-                        className={completedJobsPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      />
-                    </PaginationItem>
-                    {Array.from({ length: totalCompletedPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => setCompletedJobsPage(page)}
-                          isActive={completedJobsPage === page}
-                          className="cursor-pointer"
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => setCompletedJobsPage(p => Math.min(totalCompletedPages, p + 1))}
-                        className={completedJobsPage === totalCompletedPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              )}
-            </>
-          )}
-        </TabsContent>
-
-        {/* Fakturaer */}
         <TabsContent value="invoices">
           <InvoiceManagement />
         </TabsContent>

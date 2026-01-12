@@ -1,6 +1,16 @@
 // Agreement status filter type
 export type AgreementStatusFilter = 'all' | 'new' | 'under_review' | 'offer_sent' | 'contract_signed' | 'rejected';
 
+// Single job status filter type
+export type SingleJobStatusFilter = 'all' | 'pending' | 'in_progress' | 'completed';
+
+export const SINGLE_JOB_STATUS_LABELS: Record<SingleJobStatusFilter, string> = {
+  all: 'Alle',
+  pending: 'Nye',
+  in_progress: 'Aktive',
+  completed: 'Ferdig'
+};
+
 export interface Quote {
   id: string;
   type: string;
