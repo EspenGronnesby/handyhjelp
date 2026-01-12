@@ -55,28 +55,41 @@ export const Header = () => {
         </div>
 
         {/* Main Navigation */}
-        <div className="flex items-center justify-between md:justify-between py-3 md:py-4">
+        <div className="flex items-center justify-between py-3 md:py-4">
+          {/* Mobile Menu Button - Left side */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden min-h-[44px] min-w-[44px] touch-manipulation"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? "Lukk meny" : "Åpne meny"}
+            aria-expanded={isMenuOpen}
+          >
+            <Menu className="h-6 w-6" />
+          </Button>
+
           {/* Logo - Centered on mobile, left-aligned on desktop */}
-          <Link to="/" className="flex items-center absolute left-1/2 transform -translate-x-1/2 md:static md:transform-none z-20">
+          <Link to="/" className="flex items-center md:order-first">
             <img 
               src={resolvedTheme === 'dark' ? handyhjelpLogoWhite : handyhjelpLogo} 
               alt="HandyHjelp - Levert med kvalitet" 
-              className="h-14 md:h-16 w-auto object-contain"
+              className="h-10 sm:h-12 md:h-16 w-auto object-contain"
             />
           </Link>
 
           {/* Mobile Profile Button - Right side, only visible on mobile */}
           <Link 
             to={user ? "/dashboard" : "/auth"} 
-            className="md:hidden absolute right-4 flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation z-10"
+            className="md:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation"
             aria-label={user ? "Gå til profil" : "Logg inn"}
           >
             <User className="h-5 w-5" />
           </Link>
 
-          <div className="flex items-center space-x-4 relative z-10">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-4">
             {/* Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-6">
+            <nav className="flex items-center space-x-6">
               <Link to="/" className={`transition-colors text-sm ${isActive('/') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
                 Hjem
               </Link>
@@ -101,7 +114,7 @@ export const Header = () => {
             </nav>
 
             {/* Auth Buttons */}
-            <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-2">
               {user ? (
                 <>
                   <Link to="/dashboard">
@@ -132,18 +145,6 @@ export const Header = () => {
                 </>
               )}
             </div>
-
-            {/* Mobile Menu Button - Left side */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden min-h-[44px] min-w-[44px] touch-manipulation"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label={isMenuOpen ? "Lukk meny" : "Åpne meny"}
-              aria-expanded={isMenuOpen}
-            >
-              <Menu className="h-6 w-6" />
-            </Button>
           </div>
         </div>
 
