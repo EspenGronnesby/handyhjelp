@@ -104,6 +104,7 @@ interface AgreementStatusEmailRequest {
   address: string;
   services: string[];
   status: "under_review" | "offer_sent" | "contract_signed" | "rejected";
+  agreementId?: string;
   offerAmount?: number;
   offerDocumentUrl?: string;
   contractDocumentUrl?: string;
@@ -182,7 +183,14 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Invalid JSON in request body", 400, requestId);
   }
 
-  const { contactPerson, email, address, services, status, offerAmount, offerDocumentUrl, contractDocumentUrl, rejectionReason } = requestData;
+  const { contactPerson, email, address, services, status, agreementId, offerAmount, offerDocumentUrl, contractDocumentUrl, rejectionReason } = requestData;
+
+  // Bygg nedlastings-URL for dokumenter (bruker edge function for sikker nedlasting)
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const buildDownloadUrl = (type: "offer" | "contract") => {
+    if (!agreementId || !supabaseUrl) return null;
+    return `${supabaseUrl}/functions/v1/download-agreement-document?id=${agreementId}&type=${type}`;
+  };
 
   if (!contactPerson || !email || !status) {
     log.warn("Missing required fields", { requestId, contactPerson: !!contactPerson, email: !!email, status: !!status });
@@ -218,14 +226,15 @@ const handler = async (req: Request): Promise<Response> => {
     // Bygg tilbudsdetaljer hvis relevant
     let offerSection = '';
     if (status === 'offer_sent' && offerAmount) {
+      const offerDownloadUrl = buildDownloadUrl('offer');
       offerSection = `
         <div style="background-color: #EDE9FE; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #8B5CF6;">
           <h3 style="margin: 0 0 10px 0; color: #5B21B6;">Tilbudsdetaljer</h3>
           <p style="font-size: 24px; font-weight: bold; color: #5B21B6; margin: 0;">
             kr ${offerAmount.toLocaleString('nb-NO')}/mnd
           </p>
-          ${offerDocumentUrl ? `
-            <a href="${offerDocumentUrl}" style="display: inline-block; margin-top: 15px; background-color: #8B5CF6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+          ${offerDownloadUrl && offerDocumentUrl ? `
+            <a href="${offerDownloadUrl}" style="display: inline-block; margin-top: 15px; background-color: #8B5CF6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
               Last ned tilbudsdokument
             </a>
           ` : ''}
@@ -235,16 +244,19 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Bygg kontraktdetaljer hvis relevant
     let contractSection = '';
-    if (status === 'contract_signed' && contractDocumentUrl) {
-      contractSection = `
-        <div style="background-color: #D1FAE5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #10B981;">
-          <h3 style="margin: 0 0 10px 0; color: #047857;">Din kontrakt</h3>
-          <p style="color: #047857; margin: 0 0 15px 0;">Kontrakten din er nå klar for nedlasting.</p>
-          <a href="${contractDocumentUrl}" style="display: inline-block; background-color: #10B981; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
-            Last ned kontrakt
-          </a>
-        </div>
-      `;
+    if (status === 'contract_signed') {
+      const contractDownloadUrl = buildDownloadUrl('contract');
+      if (contractDownloadUrl && contractDocumentUrl) {
+        contractSection = `
+          <div style="background-color: #D1FAE5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #10B981;">
+            <h3 style="margin: 0 0 10px 0; color: #047857;">Din kontrakt</h3>
+            <p style="color: #047857; margin: 0 0 15px 0;">Kontrakten din er nå klar for nedlasting.</p>
+            <a href="${contractDownloadUrl}" style="display: inline-block; background-color: #10B981; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+              Last ned kontrakt
+            </a>
+          </div>
+        `;
+      }
     }
 
     // Bygg avslåingsårsak hvis relevant
