@@ -62,12 +62,12 @@ export const Header = () => {
         </div>
 
         {/* Main Navigation */}
-        <div className="flex items-center justify-between py-3 lg:py-4">
+        <div className="flex items-center justify-between py-3 lg:py-4 relative">
           {/* Mobile/Tablet Menu Button - Left side */}
           <Button
             variant="ghost"
             size="icon"
-            className="lg:hidden min-h-[44px] min-w-[44px] touch-manipulation"
+            className="lg:hidden min-h-[44px] min-w-[44px] touch-manipulation z-10"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={isMenuOpen ? "Lukk meny" : "Åpne meny"}
             aria-expanded={isMenuOpen}
@@ -75,9 +75,11 @@ export const Header = () => {
             <Menu className="h-6 w-6" />
           </Button>
 
-          {/* Logo - Centered on mobile/tablet, left-aligned on desktop */}
-          <div className="relative flex items-center lg:order-first group" style={{ marginLeft: `${logoSettings.desktopMarginLeft ?? 0}px` }}>
-            <Link 
+          {/* Logo - Absolutely centered on mobile/tablet, left-aligned on desktop */}
+          <div 
+            className="logo-container absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:left-auto flex items-center group"
+          >
+            <Link
               to="/" 
               className="flex items-center"
             >
@@ -104,6 +106,11 @@ export const Header = () => {
                     padding: ${logoSettings.desktopPadding}px ${logoSettings.desktopHorizontalPadding ?? 0}px;
                   }
                 }
+                @media (min-width: 1024px) {
+                  .logo-container {
+                    margin-left: ${logoSettings.desktopMarginLeft ?? 0}px;
+                  }
+                }
               `}</style>
             </Link>
             
@@ -122,7 +129,7 @@ export const Header = () => {
           {/* Mobile/Tablet Profile Button - Right side */}
           <Link 
             to={user ? "/dashboard" : "/auth"} 
-            className="lg:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation"
+            className="lg:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation z-10"
             aria-label={user ? "Gå til profil" : "Logg inn"}
           >
             <User className="h-5 w-5" />
