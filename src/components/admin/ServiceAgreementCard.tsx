@@ -30,6 +30,46 @@ export const ServiceAgreementCard = ({
   const [notes, setNotes] = useState(agreement.admin_notes || '');
   const [savingNotes, setSavingNotes] = useState(false);
   const [notesChanged, setNotesChanged] = useState(false);
+  const [downloadingOffer, setDownloadingOffer] = useState(false);
+  const [downloadingContract, setDownloadingContract] = useState(false);
+
+  // Ekstraherer filsti fra URL eller returnerer stien direkte
+  const extractFilePath = (urlOrPath: string): string => {
+    // Hvis det er en full URL, ekstraher filstien
+    if (urlOrPath.includes('supabase.co') || urlOrPath.includes('/storage/v1/object/public/')) {
+      const match = urlOrPath.match(/agreement-documents\/(.+)$/);
+      return match ? match[1] : urlOrPath;
+    }
+    return urlOrPath;
+  };
+
+  const handleDownloadDocument = async (urlOrPath: string, type: 'offer' | 'contract') => {
+    const setLoading = type === 'offer' ? setDownloadingOffer : setDownloadingContract;
+    setLoading(true);
+    
+    try {
+      const filePath = extractFilePath(urlOrPath);
+      
+      const { data, error } = await supabase.storage
+        .from('agreement-documents')
+        .createSignedUrl(filePath, 3600); // 60 minutter gyldig
+
+      if (error) throw error;
+
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+      }
+    } catch (error: any) {
+      console.error('Error downloading document:', error);
+      toast({
+        title: "Feil ved nedlasting",
+        description: error?.message || "Kunne ikke laste ned dokumentet",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleNotesChange = (value: string) => {
     setNotes(value);
@@ -181,21 +221,35 @@ export const ServiceAgreementCard = ({
             )}
             <div className="flex gap-2 flex-wrap">
               {agreement.offer_document_url && (
-                <Button size="sm" variant="outline" asChild>
-                  <a href={agreement.offer_document_url} target="_blank" rel="noopener noreferrer">
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => handleDownloadDocument(agreement.offer_document_url!, 'offer')}
+                  disabled={downloadingOffer}
+                >
+                  {downloadingOffer ? (
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                  ) : (
                     <FileText className="h-4 w-4 mr-1" />
-                    Tilbudsdokument
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </a>
+                  )}
+                  Tilbudsdokument
+                  <ExternalLink className="h-3 w-3 ml-1" />
                 </Button>
               )}
               {agreement.contract_document_url && (
-                <Button size="sm" variant="outline" asChild>
-                  <a href={agreement.contract_document_url} target="_blank" rel="noopener noreferrer">
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={() => handleDownloadDocument(agreement.contract_document_url!, 'contract')}
+                  disabled={downloadingContract}
+                >
+                  {downloadingContract ? (
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                  ) : (
                     <FileText className="h-4 w-4 mr-1" />
-                    Kontrakt
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </a>
+                  )}
+                  Kontrakt
+                  <ExternalLink className="h-3 w-3 ml-1" />
                 </Button>
               )}
             </div>
