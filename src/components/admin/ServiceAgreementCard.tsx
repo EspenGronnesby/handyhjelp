@@ -7,7 +7,7 @@ import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { ServiceAgreement, SERVICE_LABELS, AGREEMENT_STATUS_LABELS, AGREEMENT_STATUS_COLORS } from '@/types/admin';
 import { AlertTriangle } from 'lucide-react';
-import { FileText, Save, Loader2, ExternalLink, Send, FileCheck } from 'lucide-react';
+import { FileText, Save, Loader2, Download, Send, FileCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -50,14 +50,28 @@ export const ServiceAgreementCard = ({
     try {
       const filePath = extractFilePath(urlOrPath);
       
+      // Last ned filen som blob direkte
       const { data, error } = await supabase.storage
         .from('agreement-documents')
-        .createSignedUrl(filePath, 3600); // 60 minutter gyldig
+        .download(filePath);
 
       if (error) throw error;
 
-      if (data?.signedUrl) {
-        window.open(data.signedUrl, '_blank');
+      if (data) {
+        // Lag en lokal URL og trigger nedlasting
+        const url = URL.createObjectURL(data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filePath.split('/').pop() || `${type}-document.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        toast({
+          title: "Nedlastet",
+          description: "Dokumentet er lastet ned.",
+        });
       }
     } catch (error: any) {
       console.error('Error downloading document:', error);
@@ -233,7 +247,7 @@ export const ServiceAgreementCard = ({
                     <FileText className="h-4 w-4 mr-1" />
                   )}
                   Tilbudsdokument
-                  <ExternalLink className="h-3 w-3 ml-1" />
+                  <Download className="h-3 w-3 ml-1" />
                 </Button>
               )}
               {agreement.contract_document_url && (
@@ -249,7 +263,7 @@ export const ServiceAgreementCard = ({
                     <FileText className="h-4 w-4 mr-1" />
                   )}
                   Kontrakt
-                  <ExternalLink className="h-3 w-3 ml-1" />
+                  <Download className="h-3 w-3 ml-1" />
                 </Button>
               )}
             </div>
