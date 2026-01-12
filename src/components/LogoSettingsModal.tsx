@@ -158,6 +158,20 @@ export const LogoSettingsModal = ({
                 step={2}
               />
             </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label className="text-xs text-muted-foreground">Horisontal posisjon</Label>
+                <span className="text-xs font-mono">{localSettings.desktopMarginLeft ?? 0}px</span>
+              </div>
+              <Slider
+                value={[localSettings.desktopMarginLeft ?? 0]}
+                onValueChange={([value]) => updateSetting('desktopMarginLeft', value)}
+                min={-50}
+                max={100}
+                step={2}
+              />
+            </div>
           </div>
         </div>
 
