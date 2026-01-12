@@ -96,6 +96,7 @@ export const ContractModal = ({ agreement, open, onClose, onSuccess }: ContractM
           address: agreement.address,
           services: agreement.services,
           status: 'contract_signed',
+          agreementId: agreement.id,
           contractDocumentUrl: contractDocumentUrl,
         },
       });

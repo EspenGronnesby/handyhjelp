@@ -107,6 +107,7 @@ export const OfferModal = ({ agreement, open, onClose, onSuccess }: OfferModalPr
           address: agreement.address,
           services: agreement.services,
           status: 'offer_sent',
+          agreementId: agreement.id,
           offerAmount: amount,
           offerDocumentUrl: offerDocumentUrl,
         },
