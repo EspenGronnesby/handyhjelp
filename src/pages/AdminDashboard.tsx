@@ -95,7 +95,7 @@ const AdminDashboard = () => {
       totalBadge: pendingQuotes.length + newAgreements.length + activeJobs.length,
     },
     okonomi: {
-      label: 'Økonomi',
+      label: 'Økonomi / Kunder',
       icon: CreditCard,
       tabs: [
         { key: 'invoices', label: 'Fakturaer', count: null },
