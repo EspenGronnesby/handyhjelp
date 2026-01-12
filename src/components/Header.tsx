@@ -1,20 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Menu, Phone, Mail, User, LogOut } from "lucide-react";
+import { Menu, Phone, Mail, User, LogOut, Settings } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { useLogoSettings } from "@/hooks/useLogoSettings";
+import { LogoSettingsModal } from "@/components/LogoSettingsModal";
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
+  const { editMode, isAdmin } = useEditMode();
+  const { settings: logoSettings, updateSettings: updateLogoSettings } = useLogoSettings();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -26,6 +32,7 @@ export const Header = () => {
     });
     navigate('/');
   };
+
 
   return (
     <>
@@ -69,13 +76,48 @@ export const Header = () => {
           </Button>
 
           {/* Logo - Centered on mobile, left-aligned on desktop */}
-          <Link to="/" className="flex items-center md:order-first">
-            <img 
-              src={resolvedTheme === 'dark' ? handyhjelpLogoWhite : handyhjelpLogo} 
-              alt="HandyHjelp - Levert med kvalitet" 
-              className="h-10 sm:h-12 md:h-16 w-auto object-contain"
-            />
-          </Link>
+          <div className="relative flex items-center md:order-first group">
+            <Link 
+              to="/" 
+              className="flex items-center"
+            >
+              <img 
+                src={resolvedTheme === 'dark' ? handyhjelpLogoWhite : handyhjelpLogo} 
+                alt="HandyHjelp - Levert med kvalitet" 
+                className="w-auto object-contain transition-all duration-200"
+                id="header-logo"
+              />
+              <style>{`
+                #header-logo {
+                  height: ${logoSettings.mobileHeight}px;
+                  padding: ${logoSettings.mobilePadding}px;
+                }
+                @media (min-width: 640px) {
+                  #header-logo {
+                    height: ${logoSettings.tabletHeight}px;
+                    padding: ${logoSettings.tabletPadding}px;
+                  }
+                }
+                @media (min-width: 768px) {
+                  #header-logo {
+                    height: ${logoSettings.desktopHeight}px;
+                    padding: ${logoSettings.desktopPadding}px;
+                  }
+                }
+              `}</style>
+            </Link>
+            
+            {/* Edit button for logo */}
+            {isAdmin && editMode && (
+              <button
+                onClick={() => setIsLogoModalOpen(true)}
+                className="absolute -top-1 -right-1 p-1.5 bg-primary text-primary-foreground rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-30"
+                aria-label="Rediger logo-innstillinger"
+              >
+                <Settings className="h-3 w-3" />
+              </button>
+            )}
+          </div>
 
           {/* Mobile Profile Button - Right side, only visible on mobile */}
           <Link 
@@ -271,6 +313,14 @@ export const Header = () => {
           )}
         </div>
       </header>
+      
+      {/* Logo Settings Modal */}
+      <LogoSettingsModal
+        isOpen={isLogoModalOpen}
+        onClose={() => setIsLogoModalOpen(false)}
+        settings={logoSettings}
+        onSave={updateLogoSettings}
+      />
     </>
   );
 };
