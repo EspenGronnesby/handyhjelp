@@ -47,19 +47,16 @@ export const ContractModal = ({ agreement, open, onClose, onSuccess }: ContractM
     setLoading(true);
 
     try {
-      // Last opp kontrakt
-      const fileName = `${agreement.user_id || 'anonymous'}/${agreement.id}/contract-${Date.now()}.pdf`;
+      // Last opp kontrakt - lagre kun filstien, ikke full URL
+      const filePath = `${agreement.user_id || 'anonymous'}/${agreement.id}/contract-${Date.now()}.pdf`;
       const { error: uploadError } = await supabase.storage
         .from('agreement-documents')
-        .upload(fileName, file);
+        .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
-        .from('agreement-documents')
-        .getPublicUrl(fileName);
-
-      const contractDocumentUrl = urlData.publicUrl;
+      // Lagre kun filstien i databasen, ikke full URL
+      const contractDocumentUrl = filePath;
 
       // Oppdater avtalen
       const { error: updateError } = await supabase

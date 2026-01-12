@@ -55,20 +55,17 @@ export const OfferModal = ({ agreement, open, onClose, onSuccess }: OfferModalPr
     try {
       let offerDocumentUrl: string | null = null;
 
-      // Last opp dokument hvis valgt
+      // Last opp dokument hvis valgt - lagre kun filstien, ikke full URL
       if (file) {
-        const fileName = `${agreement.user_id || 'anonymous'}/${agreement.id}/offer-${Date.now()}.pdf`;
-        const { error: uploadError, data } = await supabase.storage
+        const filePath = `${agreement.user_id || 'anonymous'}/${agreement.id}/offer-${Date.now()}.pdf`;
+        const { error: uploadError } = await supabase.storage
           .from('agreement-documents')
-          .upload(fileName, file);
+          .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
-        const { data: urlData } = supabase.storage
-          .from('agreement-documents')
-          .getPublicUrl(fileName);
-
-        offerDocumentUrl = urlData.publicUrl;
+        // Lagre kun filstien i databasen, ikke full URL
+        offerDocumentUrl = filePath;
       }
 
       // Oppdater avtalen
