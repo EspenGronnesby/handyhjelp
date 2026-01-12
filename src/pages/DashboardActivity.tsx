@@ -312,6 +312,29 @@ const DashboardActivity = () => {
     stats,
     isLoading: statsLoading
   } = useDashboardStats();
+
+  // Flytt alle useMemo hooks FØR loading-return for å unngå React hooks-feil
+  const completedJobs = useMemo(() => 
+    jobs.filter(job => job.status === 'completed'), 
+    [jobs]
+  );
+  
+  // Pagination for completed jobs
+  const totalCompletedPages = Math.ceil(completedJobs.length / JOBS_PER_PAGE);
+  const paginatedCompletedJobs = useMemo(() => 
+    completedJobs.slice(
+      (completedJobsPage - 1) * JOBS_PER_PAGE,
+      completedJobsPage * JOBS_PER_PAGE
+    ),
+    [completedJobs, completedJobsPage]
+  );
+  
+  // Filtrer aktive avtaler (ikke avslått)
+  const activeAgreements = useMemo(() => 
+    agreements.filter(a => a.status !== 'rejected'),
+    [agreements]
+  );
+
   const statCards = [{
     title: 'Totalt forespørsler',
     value: stats.totalQuotes,
@@ -333,6 +356,7 @@ const DashboardActivity = () => {
     icon: Bell,
     description: 'Nye oppdateringer'
   }];
+
   if (loading || statsLoading) {
     return <div className="space-y-6">
         <PageHeaderSkeleton />
@@ -341,24 +365,6 @@ const DashboardActivity = () => {
       </div>;
   }
 
-  // Filtrer jobber: kun vis fullførte i Jobber-fanen
-  const completedJobs = useMemo(() => 
-    jobs.filter(job => job.status === 'completed'), 
-    [jobs]
-  );
-  
-  // Pagination for completed jobs
-  const totalCompletedPages = Math.ceil(completedJobs.length / JOBS_PER_PAGE);
-  const paginatedCompletedJobs = useMemo(() => 
-    completedJobs.slice(
-      (completedJobsPage - 1) * JOBS_PER_PAGE,
-      completedJobsPage * JOBS_PER_PAGE
-    ),
-    [completedJobs, completedJobsPage]
-  );
-  
-  // Filtrer aktive avtaler (ikke avslått)
-  const activeAgreements = agreements.filter(a => a.status !== 'rejected');
   const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
   return <div className="space-y-6">
       <div>
