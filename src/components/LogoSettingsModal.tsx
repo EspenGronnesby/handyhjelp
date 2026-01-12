@@ -46,7 +46,7 @@ export const LogoSettingsModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Logo-innstillinger</DialogTitle>
         </DialogHeader>
@@ -75,7 +75,7 @@ export const LogoSettingsModal = ({
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <Label className="text-xs text-muted-foreground">Padding</Label>
+                <Label className="text-xs text-muted-foreground">Vertikal padding</Label>
                 <span className="text-xs font-mono">{localSettings.mobilePadding}px</span>
               </div>
               <Slider
@@ -83,6 +83,20 @@ export const LogoSettingsModal = ({
                 onValueChange={([value]) => updateSetting('mobilePadding', value)}
                 min={0}
                 max={32}
+                step={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label className="text-xs text-muted-foreground">Horisontal padding</Label>
+                <span className="text-xs font-mono">{localSettings.mobileHorizontalPadding ?? 0}px</span>
+              </div>
+              <Slider
+                value={[localSettings.mobileHorizontalPadding ?? 0]}
+                onValueChange={([value]) => updateSetting('mobileHorizontalPadding', value)}
+                min={0}
+                max={40}
                 step={2}
               />
             </div>
@@ -111,7 +125,7 @@ export const LogoSettingsModal = ({
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <Label className="text-xs text-muted-foreground">Padding</Label>
+                <Label className="text-xs text-muted-foreground">Vertikal padding</Label>
                 <span className="text-xs font-mono">{localSettings.tabletPadding}px</span>
               </div>
               <Slider
@@ -119,6 +133,20 @@ export const LogoSettingsModal = ({
                 onValueChange={([value]) => updateSetting('tabletPadding', value)}
                 min={0}
                 max={40}
+                step={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label className="text-xs text-muted-foreground">Horisontal padding</Label>
+                <span className="text-xs font-mono">{localSettings.tabletHorizontalPadding ?? 0}px</span>
+              </div>
+              <Slider
+                value={[localSettings.tabletHorizontalPadding ?? 0]}
+                onValueChange={([value]) => updateSetting('tabletHorizontalPadding', value)}
+                min={0}
+                max={50}
                 step={2}
               />
             </div>
@@ -147,7 +175,7 @@ export const LogoSettingsModal = ({
 
             <div className="space-y-2">
               <div className="flex justify-between">
-                <Label className="text-xs text-muted-foreground">Padding</Label>
+                <Label className="text-xs text-muted-foreground">Vertikal padding</Label>
                 <span className="text-xs font-mono">{localSettings.desktopPadding}px</span>
               </div>
               <Slider
@@ -155,6 +183,20 @@ export const LogoSettingsModal = ({
                 onValueChange={([value]) => updateSetting('desktopPadding', value)}
                 min={0}
                 max={48}
+                step={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label className="text-xs text-muted-foreground">Horisontal padding</Label>
+                <span className="text-xs font-mono">{localSettings.desktopHorizontalPadding ?? 0}px</span>
+              </div>
+              <Slider
+                value={[localSettings.desktopHorizontalPadding ?? 0]}
+                onValueChange={([value]) => updateSetting('desktopHorizontalPadding', value)}
+                min={0}
+                max={60}
                 step={2}
               />
             </div>
