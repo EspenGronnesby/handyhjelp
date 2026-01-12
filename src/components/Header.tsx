@@ -90,18 +90,18 @@ export const Header = () => {
               <style>{`
                 #header-logo {
                   height: ${logoSettings.mobileHeight}px;
-                  padding: ${logoSettings.mobilePadding}px;
+                  padding: ${logoSettings.mobilePadding}px ${logoSettings.mobileHorizontalPadding ?? 0}px;
                 }
                 @media (min-width: 640px) {
                   #header-logo {
                     height: ${logoSettings.tabletHeight}px;
-                    padding: ${logoSettings.tabletPadding}px;
+                    padding: ${logoSettings.tabletPadding}px ${logoSettings.tabletHorizontalPadding ?? 0}px;
                   }
                 }
                 @media (min-width: 1024px) {
                   #header-logo {
                     height: ${logoSettings.desktopHeight}px;
-                    padding: ${logoSettings.desktopPadding}px;
+                    padding: ${logoSettings.desktopPadding}px ${logoSettings.desktopHorizontalPadding ?? 0}px;
                   }
                 }
               `}</style>
