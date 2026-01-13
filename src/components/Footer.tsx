@@ -8,6 +8,20 @@ import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { FooterEditModal } from './FooterEditModal';
 
+// TikTok icon component (not available in lucide-react)
+const TikTok = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+  </svg>
+);
+
+// Helper function to check if a social URL is valid
+const isValidSocialUrl = (url: string | undefined): boolean => {
+  if (!url) return false;
+  const trimmed = url.trim();
+  return trimmed !== '' && trimmed !== '#';
+};
+
 export const Footer = () => {
   const { resolvedTheme } = useTheme();
   const { editMode, isAdmin } = useEditMode();
@@ -22,18 +36,20 @@ export const Footer = () => {
   const { content: facebookUrl } = useEditableContent('footer', 'facebook_url');
   const { content: instagramUrl } = useEditableContent('footer', 'instagram_url');
   const { content: linkedinUrl } = useEditableContent('footer', 'linkedin_url');
+  const { content: tiktokUrl } = useEditableContent('footer', 'tiktok_url');
   const { content: copyright } = useEditableContent('footer', 'copyright');
 
-  // Default values
+  // Default values - empty for social URLs means they won't show
   const footerData = {
     description: description || 'Din pålitelige partner for vaktmester-, tømrer- og blikkenslagertjenester. Med over 20 års erfaring leverer vi kvalitet og trygghet til kunder i Kristiansand og omegn.',
     address: address || 'Kristiansand, Norge',
     phone: phone || '+47 41250553',
     email: email || 'Team@handyhjelp.no',
     hours: hours || 'Man-Fre 09:00-17:00',
-    facebookUrl: facebookUrl || '#',
-    instagramUrl: instagramUrl || '#',
-    linkedinUrl: linkedinUrl || '#',
+    facebookUrl: facebookUrl || '',
+    instagramUrl: instagramUrl || '',
+    linkedinUrl: linkedinUrl || '',
+    tiktokUrl: tiktokUrl || '',
     copyright: copyright || '© 2025 HandyHjelp. Alle rettigheter reservert.'
   };
 
@@ -64,33 +80,50 @@ export const Footer = () => {
                 {footerData.description}
               </p>
               <div className="flex gap-2">
-                <a 
-                  href={footerData.facebookUrl}
-                  target={footerData.facebookUrl !== '#' ? '_blank' : undefined}
-                  rel={footerData.facebookUrl !== '#' ? 'noopener noreferrer' : undefined}
-                  className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
-                  aria-label="Facebook"
-                >
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a 
-                  href={footerData.instagramUrl}
-                  target={footerData.instagramUrl !== '#' ? '_blank' : undefined}
-                  rel={footerData.instagramUrl !== '#' ? 'noopener noreferrer' : undefined}
-                  className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
-                  aria-label="Instagram"
-                >
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a 
-                  href={footerData.linkedinUrl}
-                  target={footerData.linkedinUrl !== '#' ? '_blank' : undefined}
-                  rel={footerData.linkedinUrl !== '#' ? 'noopener noreferrer' : undefined}
-                  className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
+                {isValidSocialUrl(footerData.facebookUrl) && (
+                  <a 
+                    href={footerData.facebookUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
+                    aria-label="Facebook"
+                  >
+                    <Facebook className="h-5 w-5" />
+                  </a>
+                )}
+                {isValidSocialUrl(footerData.instagramUrl) && (
+                  <a 
+                    href={footerData.instagramUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
+                    aria-label="Instagram"
+                  >
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                )}
+                {isValidSocialUrl(footerData.linkedinUrl) && (
+                  <a 
+                    href={footerData.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
+                    aria-label="LinkedIn"
+                  >
+                    <Linkedin className="h-5 w-5" />
+                  </a>
+                )}
+                {isValidSocialUrl(footerData.tiktokUrl) && (
+                  <a 
+                    href={footerData.tiktokUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
+                    aria-label="TikTok"
+                  >
+                    <TikTok className="h-5 w-5" />
+                  </a>
+                )}
               </div>
             </div>
 

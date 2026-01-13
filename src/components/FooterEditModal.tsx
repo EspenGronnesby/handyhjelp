@@ -21,6 +21,7 @@ interface FooterEditModalProps {
     facebookUrl: string;
     instagramUrl: string;
     linkedinUrl: string;
+    tiktokUrl: string;
     copyright: string;
   };
 }
@@ -60,6 +61,7 @@ export const FooterEditModal = ({
         { section: 'footer', content_key: 'facebook_url', content_value: formData.facebookUrl, content_type: 'text', updated_by: user.id },
         { section: 'footer', content_key: 'instagram_url', content_value: formData.instagramUrl, content_type: 'text', updated_by: user.id },
         { section: 'footer', content_key: 'linkedin_url', content_value: formData.linkedinUrl, content_type: 'text', updated_by: user.id },
+        { section: 'footer', content_key: 'tiktok_url', content_value: formData.tiktokUrl, content_type: 'text', updated_by: user.id },
         { section: 'footer', content_key: 'copyright', content_value: formData.copyright, content_type: 'text', updated_by: user.id }
       ];
 
@@ -162,6 +164,7 @@ export const FooterEditModal = ({
 
           <div className="border-t pt-4">
             <h4 className="font-medium mb-3">Sosiale medier (lenker)</h4>
+            <p className="text-sm text-muted-foreground mb-3">La feltet stå tomt for å skjule ikonet</p>
             <div className="space-y-3">
               <div className="space-y-2">
                 <Label htmlFor="facebookUrl">Facebook</Label>
@@ -193,6 +196,17 @@ export const FooterEditModal = ({
                   onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
                   maxLength={200}
                   placeholder="https://linkedin.com/company/..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tiktokUrl">TikTok</Label>
+                <Input
+                  id="tiktokUrl"
+                  value={formData.tiktokUrl}
+                  onChange={(e) => setFormData({ ...formData, tiktokUrl: e.target.value })}
+                  maxLength={200}
+                  placeholder="https://tiktok.com/@..."
                 />
               </div>
             </div>
