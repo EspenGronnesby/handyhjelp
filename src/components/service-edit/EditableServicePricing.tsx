@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface EditableServicePricingProps {
@@ -126,15 +127,23 @@ export const EditableServicePricing = ({
                   ))}
                 </div>
               )}
+              <div className="mt-6 text-center">
+                <Button asChild variant="cta" size="lg">
+                  <Link to="/tilbud">Få tilbud</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
           <Card>
             <CardContent className="pt-6 text-center">
               <p className="text-lg mb-4">{displayData.description}</p>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground mb-6">
                 Priser varierer basert på størrelse, kompleksitet og materialvalg. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett.
               </p>
+              <Button asChild variant="cta" size="lg">
+                <Link to="/tilbud">Få tilbud</Link>
+              </Button>
             </CardContent>
           </Card>
         )}
