@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, Award, Shield } from 'lucide-react';
+import { Pencil, Award, Shield, AlertCircle } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { CertificationsEditModal } from './CertificationsEditModal';
@@ -21,24 +21,46 @@ export const EditableCertifications = () => {
   const { content: card2Item3 } = useEditableContent('about-certifications', 'card2_item3');
   const { content: card2Item4 } = useEditableContent('about-certifications', 'card2_item4');
 
+  // Filter out empty items
+  const card1Items = [card1Item1, card1Item2, card1Item3, card1Item4]
+    .filter(item => item && item.trim() !== '');
+  const card2Items = [card2Item1, card2Item2, card2Item3, card2Item4]
+    .filter(item => item && item.trim() !== '');
+
+  // Check if cards have content
+  const card1HasContent = (card1Title && card1Title.trim() !== '') || card1Items.length > 0;
+  const card2HasContent = (card2Title && card2Title.trim() !== '') || card2Items.length > 0;
+
+  // Check if entire section should be hidden
+  const sectionHasContent = card1HasContent || card2HasContent;
+  const isEditModeActive = isAdmin && editMode;
+
+  // Hide entire section if no content and not in edit mode
+  if (!sectionHasContent && !isEditModeActive) {
+    return null;
+  }
+
+  const displayHeading = heading || 'Sertifiseringer & Kvalifikasjoner';
+
+  // For the modal, we need to pass the current data structure
   const defaultData = {
-    heading: heading || 'Sertifiseringer & Kvalifikasjoner',
+    heading: displayHeading,
     card1: {
-      title: card1Title || 'Offisielle godkjenninger',
+      title: card1Title || '',
       items: [
-        card1Item1 || 'Godkjent av Direktoratet for byggkvalitet (DiBK)',
-        card1Item2 || 'Sertifisert elektriker med autorisasjon',
-        card1Item3 || 'VVS-autorisasjon for sanitær og varme',
-        card1Item4 || 'Miljøsertifisert for håndtering av avfall'
+        card1Item1 || '',
+        card1Item2 || '',
+        card1Item3 || '',
+        card1Item4 || ''
       ]
     },
     card2: {
-      title: card2Title || 'Forsikring & Garantier',
+      title: card2Title || '',
       items: [
-        card2Item1 || 'Fullverdig yrkesskadeforsikring',
-        card2Item2 || 'Ansvarsforsikring opp til 10 mill. kr',
-        card2Item3 || '5 års garanti på håndverksarbeid',
-        card2Item4 || '2 års garanti på materialer og utstyr'
+        card2Item1 || '',
+        card2Item2 || '',
+        card2Item3 || '',
+        card2Item4 || ''
       ]
     }
   };
@@ -46,7 +68,7 @@ export const EditableCertifications = () => {
   return (
     <>
       <div className="mb-20 relative">
-        {isAdmin && editMode && (
+        {isEditModeActive && (
           <button
             onClick={() => setIsModalOpen(true)}
             className="absolute top-0 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
@@ -55,30 +77,62 @@ export const EditableCertifications = () => {
           </button>
         )}
 
-        <h2 className="text-3xl font-bold text-center mb-12">{defaultData.heading}</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">{displayHeading}</h2>
+        
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <Card>
-            <CardContent className="pt-6">
-              <Award className="h-10 w-10 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-3">{defaultData.card1.title}</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                {defaultData.card1.items.map((item, index) => (
-                  <li key={index}>✓ {item}</li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <Shield className="h-10 w-10 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-3">{defaultData.card2.title}</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                {defaultData.card2.items.map((item, index) => (
-                  <li key={index}>✓ {item}</li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+          {/* Card 1 - Show if has content OR in edit mode */}
+          {(card1HasContent || isEditModeActive) && (
+            <Card className={!card1HasContent ? 'opacity-50 border-dashed border-2' : ''}>
+              <CardContent className="pt-6">
+                {!card1HasContent && isEditModeActive && (
+                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <span className="text-sm">Tom - skjult for besøkende</span>
+                  </div>
+                )}
+                <Award className="h-10 w-10 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-3">
+                  {card1Title || (isEditModeActive ? 'Legg til tittel...' : '')}
+                </h3>
+                {card1Items.length > 0 ? (
+                  <ul className="space-y-2 text-muted-foreground">
+                    {card1Items.map((item, index) => (
+                      <li key={index}>✓ {item}</li>
+                    ))}
+                  </ul>
+                ) : isEditModeActive ? (
+                  <p className="text-muted-foreground text-sm italic">Ingen punkter lagt til</p>
+                ) : null}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Card 2 - Show if has content OR in edit mode */}
+          {(card2HasContent || isEditModeActive) && (
+            <Card className={!card2HasContent ? 'opacity-50 border-dashed border-2' : ''}>
+              <CardContent className="pt-6">
+                {!card2HasContent && isEditModeActive && (
+                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <span className="text-sm">Tom - skjult for besøkende</span>
+                  </div>
+                )}
+                <Shield className="h-10 w-10 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-3">
+                  {card2Title || (isEditModeActive ? 'Legg til tittel...' : '')}
+                </h3>
+                {card2Items.length > 0 ? (
+                  <ul className="space-y-2 text-muted-foreground">
+                    {card2Items.map((item, index) => (
+                      <li key={index}>✓ {item}</li>
+                    ))}
+                  </ul>
+                ) : isEditModeActive ? (
+                  <p className="text-muted-foreground text-sm italic">Ingen punkter lagt til</p>
+                ) : null}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
