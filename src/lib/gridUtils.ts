@@ -57,3 +57,16 @@ export const isItemEmpty = (title?: string, description?: string): boolean => {
 export const isStringEmpty = (value?: string): boolean => {
   return !value || value.trim() === '';
 };
+
+/**
+ * Returnerer riktig visningsverdi basert på om feltet har blitt redigert
+ * Hvis feltet er redigert i DB, bruk DB-verdien (selv om tom)
+ * Hvis ikke redigert, bruk default-verdien
+ */
+export const getDisplayValue = (
+  dbValue: string,
+  hasBeenEdited: boolean,
+  defaultValue: string
+): string => {
+  return hasBeenEdited ? dbValue : defaultValue;
+};

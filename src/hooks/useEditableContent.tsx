@@ -6,7 +6,7 @@ export const useEditableContent = (section: string, contentKey: string) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: content = '', isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['site-content', section, contentKey],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -20,10 +20,17 @@ export const useEditableContent = (section: string, contentKey: string) => {
         throw error;
       }
       
-      return data?.content_value || '';
+      // Return both the value and whether the row exists in DB
+      return {
+        value: data?.content_value ?? '',
+        hasBeenEdited: data !== null
+      };
     },
     staleTime: 1000 * 60 * 5, // Cache i 5 minutter
   });
+
+  const content = data?.value ?? '';
+  const hasBeenEdited = data?.hasBeenEdited ?? false;
 
   const updateContent = async (newValue: string) => {
     // Optimistic update
@@ -80,5 +87,5 @@ export const useEditableContent = (section: string, contentKey: string) => {
     }
   };
 
-  return { content, updateContent, isLoading };
+  return { content, hasBeenEdited, updateContent, isLoading };
 };

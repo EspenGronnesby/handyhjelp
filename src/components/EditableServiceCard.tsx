@@ -5,6 +5,7 @@ import { useEditableContent } from '@/hooks/useEditableContent';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ServiceCardEditModal } from './ServiceCardEditModal';
+import { getDisplayValue } from '@/lib/gridUtils';
 
 interface EditableServiceCardProps {
   section: string;
@@ -28,21 +29,21 @@ export const EditableServiceCard = ({
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  const { content: title } = useEditableContent(section, 'title');
-  const { content: subtitle } = useEditableContent(section, 'subtitle');
-  const { content: bullet1 } = useEditableContent(section, 'bullet_1');
-  const { content: bullet2 } = useEditableContent(section, 'bullet_2');
-  const { content: bullet3 } = useEditableContent(section, 'bullet_3');
+  const { content: title, hasBeenEdited: titleEdited } = useEditableContent(section, 'title');
+  const { content: subtitle, hasBeenEdited: subtitleEdited } = useEditableContent(section, 'subtitle');
+  const { content: bullet1, hasBeenEdited: bullet1Edited } = useEditableContent(section, 'bullet_1');
+  const { content: bullet2, hasBeenEdited: bullet2Edited } = useEditableContent(section, 'bullet_2');
+  const { content: bullet3, hasBeenEdited: bullet3Edited } = useEditableContent(section, 'bullet_3');
 
-  // Sjekk om kortet er skjult (tittel er tom streng)
-  const isHidden = title?.trim() === '';
+  // Use DB value if edited (even if empty), otherwise use default
+  const displayTitle = getDisplayValue(title, titleEdited, defaultTitle);
+  const displaySubtitle = getDisplayValue(subtitle, subtitleEdited, defaultSubtitle);
+  const displayBullet1 = getDisplayValue(bullet1, bullet1Edited, defaultBullets[0] || '');
+  const displayBullet2 = getDisplayValue(bullet2, bullet2Edited, defaultBullets[1] || '');
+  const displayBullet3 = getDisplayValue(bullet3, bullet3Edited, defaultBullets[2] || '');
 
-  // Vis default verdier eller redigert innhold
-  const displayTitle = title?.trim() || defaultTitle;
-  const displaySubtitle = subtitle?.trim() || defaultSubtitle;
-  const displayBullet1 = bullet1?.trim() || defaultBullets[0];
-  const displayBullet2 = bullet2?.trim() || defaultBullets[1];
-  const displayBullet3 = bullet3?.trim() || defaultBullets[2];
+  // Sjekk om kortet er skjult (tittel er tom streng og har blitt redigert)
+  const isHidden = titleEdited && title.trim() === '';
 
   // Skjul kortet når tittelen er tom og ikke i edit mode
   if (isHidden && (!isAdmin || !editMode)) {

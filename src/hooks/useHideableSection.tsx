@@ -7,9 +7,10 @@ import { useEditableContent } from '@/hooks/useEditableContent';
  */
 export const useHideableSection = (section: string, contentKey: string) => {
   const { editMode, isAdmin } = useEditMode();
-  const { content } = useEditableContent(section, contentKey);
+  const { content, hasBeenEdited } = useEditableContent(section, contentKey);
 
-  const isEmpty = !content || content.trim() === '';
+  // Empty = content is empty string AND has been edited (saved as empty)
+  const isEmpty = hasBeenEdited && (!content || content.trim() === '');
   
   // I edit mode: vis alltid (slik at admin kan redigere)
   // Utenfor edit mode: skjul hvis tom
@@ -21,6 +22,7 @@ export const useHideableSection = (section: string, contentKey: string) => {
     shouldHide,
     showEmptyIndicator,
     content,
+    hasBeenEdited,
     isEditMode: isAdmin && editMode
   };
 };

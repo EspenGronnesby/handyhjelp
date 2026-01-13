@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
-import { isStringEmpty } from '@/lib/gridUtils';
+import { isStringEmpty, getDisplayValue } from '@/lib/gridUtils';
 
 interface EditableServiceBenefitsProps {
   section: string;
@@ -26,16 +26,17 @@ export const EditableServiceBenefits = ({
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
 
-  const { content: benefit1 } = useEditableContent(section, 'benefit_1');
-  const { content: benefit2 } = useEditableContent(section, 'benefit_2');
-  const { content: benefit3 } = useEditableContent(section, 'benefit_3');
-  const { content: benefit4 } = useEditableContent(section, 'benefit_4');
+  const { content: benefit1, hasBeenEdited: benefit1Edited } = useEditableContent(section, 'benefit_1');
+  const { content: benefit2, hasBeenEdited: benefit2Edited } = useEditableContent(section, 'benefit_2');
+  const { content: benefit3, hasBeenEdited: benefit3Edited } = useEditableContent(section, 'benefit_3');
+  const { content: benefit4, hasBeenEdited: benefit4Edited } = useEditableContent(section, 'benefit_4');
 
+  // Use DB value if edited (even if empty), otherwise use default
   const allBenefits = [
-    benefit1 || defaultBenefits[0] || '',
-    benefit2 || defaultBenefits[1] || '',
-    benefit3 || defaultBenefits[2] || '',
-    benefit4 || defaultBenefits[3] || '',
+    getDisplayValue(benefit1, benefit1Edited, defaultBenefits[0] || ''),
+    getDisplayValue(benefit2, benefit2Edited, defaultBenefits[1] || ''),
+    getDisplayValue(benefit3, benefit3Edited, defaultBenefits[2] || ''),
+    getDisplayValue(benefit4, benefit4Edited, defaultBenefits[3] || ''),
   ];
 
   // Filter visible benefits (non-empty)
