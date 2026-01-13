@@ -57,6 +57,7 @@ export const ServiceAgreementForm = () => {
   const selectedServices = form.watch("services");
   const customerType = form.watch("customerType");
   const contractDuration = form.watch("contractDuration");
+  const contactRole = form.watch("contactRole");
 
   const onSubmit = async (data: ServiceAgreementFormData) => {
     await submit(async () => {
@@ -454,6 +455,22 @@ export const ServiceAgreementForm = () => {
                 </FormItem>
               )}
             />
+
+            {contactRole === "other" && (
+              <FormField
+                control={form.control}
+                name="customContactRole"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Beskriv din rolle</FormLabel>
+                    <FormControl>
+                      <Input placeholder="F.eks. Vaktmester, Prosjektleder, etc." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
