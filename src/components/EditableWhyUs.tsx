@@ -51,6 +51,14 @@ export const EditableWhyUs = () => {
     return null;
   }
 
+  // Dynamic grid class based on number of visible cards
+  const getCardWidthClass = () => {
+    const count = visibleItems.filter(item => !isItemHidden(item) || (isAdmin && editMode)).length;
+    if (count === 1) return 'w-full max-w-sm';
+    if (count === 2) return 'w-full md:w-[calc(50%-1rem)] max-w-sm';
+    return 'w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm';
+  };
+
   return (
     <>
       <div className="mb-20 relative">
@@ -64,7 +72,7 @@ export const EditableWhyUs = () => {
         )}
 
         <h2 className="text-3xl font-bold text-center mb-12">{heading || 'Hvorfor velge oss?'}</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           {items.map((item, index) => {
             const IconComponent = iconMap[item.icon as keyof typeof iconMap];
             const isHidden = isItemHidden(item);
@@ -80,7 +88,7 @@ export const EditableWhyUs = () => {
             return (
               <Card 
                 key={index} 
-                className={`border-2 hover:border-primary transition-colors relative ${
+                className={`border-2 hover:border-primary transition-colors relative ${getCardWidthClass()} ${
                   isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''
                 }`}
               >
