@@ -54,8 +54,8 @@ const AdminDashboard = () => {
   const [offerAgreement, setOfferAgreement] = useState<ServiceAgreement | null>(null);
   const [contractAgreement, setContractAgreement] = useState<ServiceAgreement | null>(null);
   const [rejectAgreement, setRejectAgreement] = useState<ServiceAgreement | null>(null);
-  const [agreementStatusFilter, setAgreementStatusFilter] = useState<AgreementStatusFilter>('all');
-  const [singleJobStatusFilter, setSingleJobStatusFilter] = useState<SingleJobStatusFilter>('all');
+  const [agreementStatusFilter, setAgreementStatusFilter] = useState<AgreementStatusFilter>('new');
+  const [singleJobStatusFilter, setSingleJobStatusFilter] = useState<SingleJobStatusFilter>('pending');
 
   const {
     profiles,
@@ -87,7 +87,6 @@ const AdminDashboard = () => {
   
   // Count single jobs by status
   const singleJobStatusCounts = {
-    all: totalSingleJobs,
     pending: pendingQuotes.length,
     in_progress: activeJobs.length,
     completed: completedJobs.length,
@@ -114,7 +113,7 @@ const AdminDashboard = () => {
       totalBadge: null,
     },
     innhold: {
-      label: 'Innhold',
+      label: 'Innhold og anmeldelser',
       icon: FileText,
       tabs: [
         { key: 'projects', label: 'Prosjekter', count: null },
@@ -125,7 +124,7 @@ const AdminDashboard = () => {
       totalBadge: null,
     },
     innstillinger: {
-      label: 'Innstillinger',
+      label: 'Innstillinger og redigering',
       icon: Settings,
       tabs: [
         { key: 'site-editing', label: 'Redigering', count: null },
@@ -268,11 +267,8 @@ const AdminDashboard = () => {
           </div>
 
           {/* Nye forespørsler (pending) */}
-          {(singleJobStatusFilter === 'all' || singleJobStatusFilter === 'pending') && (
+          {singleJobStatusFilter === 'pending' && (
             <>
-              {singleJobStatusFilter === 'all' && pendingQuotes.length > 0 && (
-                <h3 className="text-lg font-semibold mt-4">Nye forespørsler</h3>
-              )}
               {pendingQuotes.map((quote) => (
                 <QuoteCard
                   key={quote.id}
@@ -285,11 +281,8 @@ const AdminDashboard = () => {
           )}
 
           {/* Aktive jobber (in_progress) */}
-          {(singleJobStatusFilter === 'all' || singleJobStatusFilter === 'in_progress') && (
+          {singleJobStatusFilter === 'in_progress' && (
             <>
-              {singleJobStatusFilter === 'all' && activeJobs.length > 0 && (
-                <h3 className="text-lg font-semibold mt-4">Aktive jobber</h3>
-              )}
               {activeJobs.map((job) => (
                 <JobCard
                   key={job.id}
@@ -303,11 +296,8 @@ const AdminDashboard = () => {
           )}
 
           {/* Ferdige jobber (completed) */}
-          {(singleJobStatusFilter === 'all' || singleJobStatusFilter === 'completed') && (
+          {singleJobStatusFilter === 'completed' && (
             <>
-              {singleJobStatusFilter === 'all' && paginatedCompletedJobs.length > 0 && (
-                <h3 className="text-lg font-semibold mt-4">Ferdige jobber</h3>
-              )}
               {paginatedCompletedJobs.map((job) => (
                 <JobCard
                   key={job.id}
@@ -423,13 +413,6 @@ const AdminDashboard = () => {
           <div className="flex flex-wrap gap-2 pb-2">
             <Button 
               size="sm" 
-              variant={agreementStatusFilter === 'all' ? 'default' : 'outline'}
-              onClick={() => setAgreementStatusFilter('all')}
-            >
-              Alle ({agreementStatusCounts.all})
-            </Button>
-            <Button 
-              size="sm" 
               variant={agreementStatusFilter === 'new' ? 'default' : 'outline'}
               onClick={() => setAgreementStatusFilter('new')}
             >
@@ -468,7 +451,7 @@ const AdminDashboard = () => {
           {filteredAgreements.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground">
-                {agreementStatusFilter === 'all' ? 'Ingen faste avtaler' : 'Ingen avtaler med denne statusen'}
+                Ingen avtaler med denne statusen
               </CardContent>
             </Card>
           ) : (
