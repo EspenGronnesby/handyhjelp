@@ -78,6 +78,12 @@ export const serviceAgreementSchema = z.object({
     .string()
     .min(1, "Rolle er påkrevd"),
 
+  customContactRole: z
+    .string()
+    .max(100, "Kan ikke være mer enn 100 tegn")
+    .optional()
+    .transform((val) => val ? sanitizeString(val) : undefined),
+
   email: z
     .string()
     .min(1, "E-post er påkrevd")
