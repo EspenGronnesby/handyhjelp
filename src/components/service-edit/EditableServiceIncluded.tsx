@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, CheckCircle2 } from 'lucide-react';
+import { Pencil, CheckCircle2, EyeOff } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { isStringEmpty } from '@/lib/gridUtils';
 
 interface EditableServiceIncludedProps {
   section: string;
@@ -34,7 +35,7 @@ export const EditableServiceIncluded = ({
   const { content: item7 } = useEditableContent(section, 'included_7');
   const { content: item8 } = useEditableContent(section, 'included_8');
 
-  const displayItems = [
+  const allItems = [
     item1 || defaultItems[0] || '',
     item2 || defaultItems[1] || '',
     item3 || defaultItems[2] || '',
@@ -43,11 +44,24 @@ export const EditableServiceIncluded = ({
     item6 || defaultItems[5] || '',
     item7 || defaultItems[6] || '',
     item8 || defaultItems[7] || '',
-  ].filter(item => item.trim() !== '');
+  ];
+
+  // For display - filter truly visible (non-empty) items for non-admin
+  const displayItems = isAdmin && editMode 
+    ? allItems 
+    : allItems.filter(item => !isStringEmpty(item));
 
   const [formData, setFormData] = useState({
-    items: displayItems.length > 0 ? displayItems : defaultItems
+    items: allItems.some(i => i.trim() !== '') ? allItems : defaultItems
   });
+
+  // Dynamic grid class based on visible count
+  const getGridClass = () => {
+    const count = displayItems.filter(i => !isStringEmpty(i)).length;
+    if (count <= 2) return 'flex flex-wrap justify-center gap-4';
+    if (count <= 4) return 'grid md:grid-cols-2 gap-4';
+    return 'grid md:grid-cols-2 gap-4';
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -87,6 +101,12 @@ export const EditableServiceIncluded = ({
     }
   };
 
+  // Don't render section if no visible items
+  const visibleCount = displayItems.filter(i => !isStringEmpty(i)).length;
+  if (visibleCount === 0 && !(isAdmin && editMode)) {
+    return null;
+  }
+
   return (
     <>
       <div className="mb-12 relative">
@@ -102,13 +122,36 @@ export const EditableServiceIncluded = ({
         <h2 className="text-3xl font-heading font-bold mb-6">Hva er inkludert?</h2>
         <Card>
           <CardContent className="pt-6">
-            <div className="grid md:grid-cols-2 gap-4">
-              {displayItems.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </div>
-              ))}
+            <div className={getGridClass()}>
+              {displayItems.map((item, idx) => {
+                const isHidden = isStringEmpty(item);
+                
+                // Skip rendering empty items for non-admin
+                if (isHidden && !(isAdmin && editMode)) {
+                  return null;
+                }
+                
+                return (
+                  <div 
+                    key={idx} 
+                    className={`flex items-start gap-3 ${
+                      isHidden && isAdmin && editMode ? 'opacity-50' : ''
+                    }`}
+                  >
+                    {isHidden && isAdmin && editMode ? (
+                      <>
+                        <EyeOff className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground italic">Tom (skjult)</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -132,6 +175,7 @@ export const EditableServiceIncluded = ({
                     setFormData({ items: newItems });
                   }}
                   maxLength={200}
+                  placeholder="La stå tom for å skjule"
                 />
               </div>
             ))}

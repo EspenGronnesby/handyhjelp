@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Pencil } from "lucide-react";
+import { CheckCircle2, Pencil, EyeOff } from "lucide-react";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { isItemEmpty } from "@/lib/gridUtils";
 
 interface WhyChooseItem {
   title: string;
@@ -14,7 +15,7 @@ interface WhyChooseItem {
 }
 
 const EditableWhyChooseSection = () => {
-  const { editMode } = useEditMode();
+  const { editMode, isAdmin } = useEditMode();
   const [isEditing, setIsEditing] = useState(false);
   const { content, updateContent } = useEditableContent("why-choose-section", "data");
 
@@ -37,6 +38,27 @@ const EditableWhyChooseSection = () => {
   const [editedItems, setEditedItems] = useState<WhyChooseItem[]>(items);
   const [heading, setHeading] = useState("Hvorfor velge HandyHjelp?");
 
+  // Filter visible items (non-empty title and description)
+  const visibleItems = items.filter(item => 
+    isAdmin && editMode ? true : !isItemEmpty(item.title, item.description)
+  );
+
+  // Dynamic grid class based on visible count
+  const getGridClass = () => {
+    const count = visibleItems.length;
+    if (count === 1) return 'flex justify-center';
+    if (count === 2) return 'flex flex-wrap justify-center gap-8';
+    return 'flex flex-wrap justify-center gap-8';
+  };
+
+  // Dynamic card width class
+  const getCardWidthClass = () => {
+    const count = visibleItems.length;
+    if (count === 1) return 'w-full max-w-sm';
+    if (count === 2) return 'w-full md:w-[calc(50%-1rem)] max-w-sm';
+    return 'w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm';
+  };
+
   const handleSave = async () => {
     await updateContent(JSON.stringify(editedItems));
     setIsEditing(false);
@@ -48,11 +70,16 @@ const EditableWhyChooseSection = () => {
     setEditedItems(updated);
   };
 
+  // Don't render section if no visible items
+  if (visibleItems.length === 0 && !(isAdmin && editMode)) {
+    return null;
+  }
+
   return (
     <>
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 relative">
-          {editMode && (
+          {isAdmin && editMode && (
             <button
               onClick={() => setIsEditing(true)}
               className="absolute top-2 right-2 z-10 p-2 bg-primary/10 hover:bg-primary/20 rounded-full border-2 border-primary transition-all hover:scale-110"
@@ -66,18 +93,35 @@ const EditableWhyChooseSection = () => {
             {heading}
           </h2>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {items.map((item, index) => (
-              <div key={index} className="text-center p-6 rounded-lg hover:bg-background transition-colors duration-300">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle2 className="h-8 w-8 text-primary" />
+          <div className={`${getGridClass()} max-w-5xl mx-auto`}>
+            {visibleItems.map((item, index) => {
+              const isHidden = isItemEmpty(item.title, item.description);
+              
+              return (
+                <div 
+                  key={index} 
+                  className={`text-center p-6 rounded-lg hover:bg-background transition-colors duration-300 ${getCardWidthClass()} ${
+                    isHidden && isAdmin && editMode ? 'opacity-50 border-2 border-dashed border-muted-foreground' : ''
+                  }`}
+                >
+                  {/* Hidden indicator for admin */}
+                  {isHidden && isAdmin && editMode && (
+                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-2">
+                      <EyeOff className="h-3 w-3" />
+                      <span>Skjult</span>
+                    </div>
+                  )}
+                  
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground">
+                    {item.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                <p className="text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
