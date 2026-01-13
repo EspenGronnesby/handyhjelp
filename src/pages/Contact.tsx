@@ -17,7 +17,6 @@ import { Accordion } from "@/components/ui/accordion";
 import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { useWeb3Forms } from "@/hooks/useWeb3Forms";
 import { Helmet } from "react-helmet";
-
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -25,18 +24,21 @@ const Contact = () => {
     phone: "",
     message: ""
   });
-
-  const { submitToWeb3Forms, sendConfirmationEmail } = useWeb3Forms();
-  const { submit, isSubmitting } = useFormSubmit({
+  const {
+    submitToWeb3Forms,
+    sendConfirmationEmail
+  } = useWeb3Forms();
+  const {
+    submit,
+    isSubmitting
+  } = useFormSubmit({
     successMessage: "Melding sendt!",
     successDescription: "Vi svarer deg innen 1-3 virkedager.",
     errorMessage: "Feil ved sending",
-    errorDescription: "Prøv igjen eller ring oss direkte.",
+    errorDescription: "Prøv igjen eller ring oss direkte."
   });
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     await submit(async () => {
       // Send to Web3Forms
       const success = await submitToWeb3Forms({
@@ -44,9 +46,8 @@ const Contact = () => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        message: formData.message,
+        message: formData.message
       });
-
       if (!success) {
         throw new Error("Kan ikke sende melding. Ring oss på +47 41250553");
       }
@@ -56,16 +57,19 @@ const Contact = () => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        customerType: "private",
+        customerType: "private"
       });
 
       // Reset form
-      setFormData({ name: "", email: "", phone: "", message: "" });
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        message: ""
+      });
     });
   };
-
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       <Helmet>
         <title>Kontakt oss | HandyHjelp</title>
         <meta name="description" content="Kontakt HandyHjelp for eiendomsvedlikehold. Ring oss eller send melding - vi svarer innen 1-3 virkedager." />
@@ -87,12 +91,7 @@ const Contact = () => {
       <main id="main-content" className="pt-32 pb-16">
         {/* Hero Section */}
         <section className="container mx-auto px-4 mb-16">
-          <EditableHero
-            section="hero-kontakt"
-            defaultHeading="Ta kontakt i dag"
-            defaultSubtext="Vi er her for å hjelpe deg med alle dine eiendomsbehov. Kontakt oss for en uforpliktende samtale."
-            className="max-w-3xl mx-auto"
-          />
+          <EditableHero section="hero-kontakt" defaultHeading="Ta kontakt i dag" defaultSubtext="Vi er her for å hjelpe deg med alle dine eiendomsbehov. Kontakt oss for en uforpliktende samtale." className="max-w-3xl mx-auto" />
           <p className="text-lg font-semibold text-primary text-center mt-4">
             ⏱️ Vi svarer innen 1-3 virkedager
           </p>
@@ -108,66 +107,43 @@ const Contact = () => {
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                       <Label htmlFor="name" required>Navn</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        required
-                        disabled={isSubmitting}
-                      />
+                      <Input id="name" value={formData.name} onChange={e => setFormData({
+                      ...formData,
+                      name: e.target.value
+                    })} required disabled={isSubmitting} />
                     </div>
                     <div>
                       <Label htmlFor="email" required>E-post</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        required
-                        disabled={isSubmitting}
-                      />
+                      <Input id="email" type="email" value={formData.email} onChange={e => setFormData({
+                      ...formData,
+                      email: e.target.value
+                    })} required disabled={isSubmitting} />
                     </div>
                     <div>
                       <Label htmlFor="phone" required>Telefon</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="8 siffer"
-                        value={formData.phone}
-                        onChange={(e) => {
-                          const value = e.target.value.replace(/[^0-9]/g, '');
-                          setFormData({ ...formData, phone: value });
-                        }}
-                        maxLength={8}
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        required
-                        disabled={isSubmitting}
-                      />
+                      <Input id="phone" type="tel" placeholder="8 siffer" value={formData.phone} onChange={e => {
+                      const value = e.target.value.replace(/[^0-9]/g, '');
+                      setFormData({
+                        ...formData,
+                        phone: value
+                      });
+                    }} maxLength={8} inputMode="numeric" pattern="[0-9]*" required disabled={isSubmitting} />
                     </div>
                     <div>
                       <Label htmlFor="message" required>Melding</Label>
-                      <Textarea
-                        id="message"
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        required
-                        disabled={isSubmitting}
-                        rows={5}
-                      />
+                      <Textarea id="message" value={formData.message} onChange={e => setFormData({
+                      ...formData,
+                      message: e.target.value
+                    })} required disabled={isSubmitting} rows={5} />
                     </div>
                     <p className="text-sm text-muted-foreground">
                       <span className="text-destructive">*</span> Obligatoriske felt
                     </p>
                     <Button type="submit" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting ? (
-                        <>
+                      {isSubmitting ? <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Sender...
-                        </>
-                      ) : (
-                        'Send melding'
-                      )}
+                        </> : 'Send melding'}
                     </Button>
                   </form>
                 </CardContent>
@@ -186,35 +162,16 @@ const Contact = () => {
             {/* Map Section with Google Maps Embed */}
             <Card>
               <CardContent className="pt-4 md:pt-6 p-0">
-                <iframe
-                  width="100%"
-                  height="300"
-                  className="md:h-[450px]"
-                  style={{ border: 0, borderRadius: '0.5rem' }}
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Ægirsvei+3,+Kristiansand&zoom=15"
-                  title="HandyHjelp lokasjon - Ægirsvei 3, Kristiansand"
-                ></iframe>
+                <iframe width="100%" height="300" className="md:h-[450px]" style={{
+                  border: 0,
+                  borderRadius: '0.5rem'
+                }} loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Ægirsvei+3,+Kristiansand&zoom=15" title="HandyHjelp lokasjon - Ægirsvei 3, Kristiansand"></iframe>
               </CardContent>
             </Card>
 
               {/* Alternative Contact */}
               <Card className="bg-accent/10 border-accent">
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-3">Andre kontaktmetoder</h3>
-                  <div className="space-y-2">
-                    <a href="sms:+4741250553" className="flex items-center gap-2 text-sm hover:text-primary transition-colors">
-                      <MessageSquare className="h-4 w-4" />
-                      Send SMS til +47 41250553
-                    </a>
-                    <a href="https://wa.me/4741250553" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-primary transition-colors">
-                      <MessageSquare className="h-4 w-4" />
-                      Kontakt oss på WhatsApp
-                    </a>
-                  </div>
-                </CardContent>
+                
               </Card>
 
               {/* How We Work */}
@@ -232,38 +189,16 @@ const Contact = () => {
               Ofte stilte spørsmål før du kontakter oss
             </h2>
             <Accordion type="single" collapsible className="space-y-4">
-              <EditableFAQItem
-                section="faq-contact"
-                defaultQuestion="Hvor raskt kan dere komme?"
-                defaultAnswer="For akutte henvendelser kan vi ofte være på stedet samme dag. Planlagte oppdrag avtales etter dine ønsker."
-                index={1}
-              />
-              <EditableFAQItem
-                section="faq-contact"
-                defaultQuestion="Tar dere oppdrag på kveldstid?"
-                defaultAnswer="Ja, vi tilbyr både kveldstjenester og helgetjenester mot et lite tillegg."
-                index={2}
-              />
-              <EditableFAQItem
-                section="faq-contact"
-                defaultQuestion="Må jeg være hjemme under arbeidet?"
-                defaultAnswer="Det er ikke nødvendig. Mange av våre kunder gir oss nøkkel eller kode til jobben."
-                index={3}
-              />
-              <EditableFAQItem
-                section="faq-contact"
-                defaultQuestion="Hvor lang er responstiden?"
-                defaultAnswer="Vi svarer på alle henvendelser innen 1-3 virkedager i åpningstiden."
-                index={4}
-              />
+              <EditableFAQItem section="faq-contact" defaultQuestion="Hvor raskt kan dere komme?" defaultAnswer="For akutte henvendelser kan vi ofte være på stedet samme dag. Planlagte oppdrag avtales etter dine ønsker." index={1} />
+              <EditableFAQItem section="faq-contact" defaultQuestion="Tar dere oppdrag på kveldstid?" defaultAnswer="Ja, vi tilbyr både kveldstjenester og helgetjenester mot et lite tillegg." index={2} />
+              <EditableFAQItem section="faq-contact" defaultQuestion="Må jeg være hjemme under arbeidet?" defaultAnswer="Det er ikke nødvendig. Mange av våre kunder gir oss nøkkel eller kode til jobben." index={3} />
+              <EditableFAQItem section="faq-contact" defaultQuestion="Hvor lang er responstiden?" defaultAnswer="Vi svarer på alle henvendelser innen 1-3 virkedager i åpningstiden." index={4} />
             </Accordion>
           </section>
         </div>
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Contact;
