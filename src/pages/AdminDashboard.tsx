@@ -113,7 +113,7 @@ const AdminDashboard = () => {
       totalBadge: null,
     },
     innhold: {
-      label: 'Innhold og anmeldelser',
+      label: 'Innhold / anmeldelser',
       icon: FileText,
       tabs: [
         { key: 'projects', label: 'Prosjekter', count: null },
@@ -124,7 +124,7 @@ const AdminDashboard = () => {
       totalBadge: null,
     },
     innstillinger: {
-      label: 'Innstillinger og redigering',
+      label: 'Innstillinger / redigering',
       icon: Settings,
       tabs: [
         { key: 'site-editing', label: 'Redigering', count: null },
