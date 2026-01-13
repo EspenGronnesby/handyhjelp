@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
-import { isStringEmpty } from '@/lib/gridUtils';
+import { isStringEmpty, getDisplayValue } from '@/lib/gridUtils';
 
 interface EditableServiceIncludedProps {
   section: string;
@@ -26,24 +26,25 @@ export const EditableServiceIncluded = ({
   const [isSaving, setIsSaving] = useState(false);
   const queryClient = useQueryClient();
 
-  const { content: item1 } = useEditableContent(section, 'included_1');
-  const { content: item2 } = useEditableContent(section, 'included_2');
-  const { content: item3 } = useEditableContent(section, 'included_3');
-  const { content: item4 } = useEditableContent(section, 'included_4');
-  const { content: item5 } = useEditableContent(section, 'included_5');
-  const { content: item6 } = useEditableContent(section, 'included_6');
-  const { content: item7 } = useEditableContent(section, 'included_7');
-  const { content: item8 } = useEditableContent(section, 'included_8');
+  const { content: item1, hasBeenEdited: item1Edited } = useEditableContent(section, 'included_1');
+  const { content: item2, hasBeenEdited: item2Edited } = useEditableContent(section, 'included_2');
+  const { content: item3, hasBeenEdited: item3Edited } = useEditableContent(section, 'included_3');
+  const { content: item4, hasBeenEdited: item4Edited } = useEditableContent(section, 'included_4');
+  const { content: item5, hasBeenEdited: item5Edited } = useEditableContent(section, 'included_5');
+  const { content: item6, hasBeenEdited: item6Edited } = useEditableContent(section, 'included_6');
+  const { content: item7, hasBeenEdited: item7Edited } = useEditableContent(section, 'included_7');
+  const { content: item8, hasBeenEdited: item8Edited } = useEditableContent(section, 'included_8');
 
+  // Use DB value if edited (even if empty), otherwise use default
   const allItems = [
-    item1 || defaultItems[0] || '',
-    item2 || defaultItems[1] || '',
-    item3 || defaultItems[2] || '',
-    item4 || defaultItems[3] || '',
-    item5 || defaultItems[4] || '',
-    item6 || defaultItems[5] || '',
-    item7 || defaultItems[6] || '',
-    item8 || defaultItems[7] || '',
+    getDisplayValue(item1, item1Edited, defaultItems[0] || ''),
+    getDisplayValue(item2, item2Edited, defaultItems[1] || ''),
+    getDisplayValue(item3, item3Edited, defaultItems[2] || ''),
+    getDisplayValue(item4, item4Edited, defaultItems[3] || ''),
+    getDisplayValue(item5, item5Edited, defaultItems[4] || ''),
+    getDisplayValue(item6, item6Edited, defaultItems[5] || ''),
+    getDisplayValue(item7, item7Edited, defaultItems[6] || ''),
+    getDisplayValue(item8, item8Edited, defaultItems[7] || ''),
   ];
 
   // For display - filter truly visible (non-empty) items for non-admin
