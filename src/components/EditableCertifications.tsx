@@ -35,6 +35,17 @@ export const EditableCertifications = () => {
   const sectionHasContent = card1HasContent || card2HasContent;
   const isEditModeActive = isAdmin && editMode;
 
+  // Count visible cards for dynamic grid
+  const visibleCardCount = [
+    card1HasContent || isEditModeActive,
+    card2HasContent || isEditModeActive
+  ].filter(Boolean).length;
+
+  // Dynamic grid class based on visible cards
+  const gridClass = visibleCardCount === 1 
+    ? 'flex justify-center' 
+    : 'grid md:grid-cols-2 gap-8';
+
   // Hide entire section if no content and not in edit mode
   if (!sectionHasContent && !isEditModeActive) {
     return null;
@@ -79,10 +90,10 @@ export const EditableCertifications = () => {
 
         <h2 className="text-3xl font-bold text-center mb-12">{displayHeading}</h2>
         
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className={`${gridClass} max-w-4xl mx-auto`}>
           {/* Card 1 - Show if has content OR in edit mode */}
           {(card1HasContent || isEditModeActive) && (
-            <Card className={!card1HasContent ? 'opacity-50 border-dashed border-2' : ''}>
+            <Card className={`${!card1HasContent ? 'opacity-50 border-dashed border-2' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
               <CardContent className="pt-6">
                 {!card1HasContent && isEditModeActive && (
                   <div className="flex items-center gap-2 text-muted-foreground mb-4">
@@ -109,7 +120,7 @@ export const EditableCertifications = () => {
 
           {/* Card 2 - Show if has content OR in edit mode */}
           {(card2HasContent || isEditModeActive) && (
-            <Card className={!card2HasContent ? 'opacity-50 border-dashed border-2' : ''}>
+            <Card className={`${!card2HasContent ? 'opacity-50 border-dashed border-2' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
               <CardContent className="pt-6">
                 {!card2HasContent && isEditModeActive && (
                   <div className="flex items-center gap-2 text-muted-foreground mb-4">
