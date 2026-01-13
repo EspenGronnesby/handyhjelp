@@ -10,7 +10,7 @@ const phoneRegex = /^[0-9]{8}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const serviceAgreementSchema = z.object({
-  customerType: z.enum(["borettslag", "bedrift", "annet"], {
+  customerType: z.enum(["borettslag", "bedrift", "privat", "annet"], {
     required_error: "Velg kundetype",
     invalid_type_error: "Ugyldig kundetype",
   }),
@@ -51,6 +51,12 @@ export const serviceAgreementSchema = z.object({
   contractDuration: z
     .string()
     .min(1, "Avtalevarighet er påkrevd"),
+
+  customContractDuration: z
+    .string()
+    .max(100, "Kan ikke være mer enn 100 tegn")
+    .optional()
+    .transform((val) => val ? sanitizeString(val) : undefined),
 
   startDate: z.date().optional(),
 

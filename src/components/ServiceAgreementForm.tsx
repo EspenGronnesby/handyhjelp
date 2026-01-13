@@ -24,8 +24,8 @@ import { FormProgress } from "@/components/ui/form-progress";
 const serviceOptions = [
   { id: "maintenance", label: "Generelt vedlikehold og småreperasjoner" },
   { id: "cleaning", label: "Utvendig renhold (søppel, fellesarealer)" },
-  { id: "winter", label: "Snømåking og strøing (vinter)" },
-  { id: "summer", label: "Gressklipping og hagearbeid (sommer)" },
+  { id: "seasonal", label: "Sesongarbeid (vinter / sommer)" },
+  { id: "transport", label: "Transport" },
   { id: "inspection", label: "Tilsyn og inspeksjoner" },
   { id: "other", label: "Annet" },
 ];
@@ -56,6 +56,7 @@ export const ServiceAgreementForm = () => {
 
   const selectedServices = form.watch("services");
   const customerType = form.watch("customerType");
+  const contractDuration = form.watch("contractDuration");
 
   const onSubmit = async (data: ServiceAgreementFormData) => {
     await submit(async () => {
@@ -129,6 +130,12 @@ export const ServiceAgreementForm = () => {
                       </Label>
                     </div>
                     <div className="flex items-center space-x-3 border border-border rounded-lg p-4 hover:border-primary transition-colors cursor-pointer">
+                      <RadioGroupItem value="privat" id="privat" />
+                      <Label htmlFor="privat" className="cursor-pointer flex-1 font-medium">
+                        Privat
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-3 border border-border rounded-lg p-4 hover:border-primary transition-colors cursor-pointer">
                       <RadioGroupItem value="annet" id="annet" />
                       <Label htmlFor="annet" className="cursor-pointer flex-1 font-medium">
                         Annet
@@ -166,7 +173,20 @@ export const ServiceAgreementForm = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <h2 className="text-xl font-heading font-semibold">Hvilke tjenester trenger dere?</h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-heading font-semibold">Hvilke tjenester trenger dere?</h2>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  const allServiceIds = serviceOptions.map(s => s.id);
+                  form.setValue("services", allServiceIds);
+                }}
+              >
+                Velg alle
+              </Button>
+            </div>
             
             <FormField
               control={form.control}
@@ -243,7 +263,7 @@ export const ServiceAgreementForm = () => {
                       <SelectItem value="daily">Daglig</SelectItem>
                       <SelectItem value="weekly">Ukentlig</SelectItem>
                       <SelectItem value="monthly">Månedlig</SelectItem>
-                      <SelectItem value="on_demand">Ved behov</SelectItem>
+                      <SelectItem value="on_demand">Ved behov (Tilkalling)</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -301,6 +321,22 @@ export const ServiceAgreementForm = () => {
                 </FormItem>
               )}
             />
+
+            {contractDuration === "other" && (
+              <FormField
+                control={form.control}
+                name="customContractDuration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Beskriv ønsket avtalevarighet</FormLabel>
+                    <FormControl>
+                      <Input placeholder="F.eks. 3 måneder, sesongbasert, etc." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
