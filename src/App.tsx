@@ -15,6 +15,9 @@ import DashboardActivity from "./pages/DashboardActivity";
 import DashboardProfile from "./pages/DashboardProfile";
 import DashboardNotifications from "./pages/DashboardNotifications";
 import AdminDashboard from "./pages/AdminDashboard";
+import PlatformDashboard from "./pages/PlatformDashboard";
+import TenantAdminDashboard from "./pages/TenantAdminDashboard";
+import WorkerDashboard from "./pages/WorkerDashboard";
 import FAQ from "./pages/FAQ";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
@@ -35,6 +38,7 @@ import ReviewSubmit from "./pages/ReviewSubmit";
 import Personvern from "./pages/Personvern";
 import Cookies from "./pages/Cookies";
 import Vilkaar from "./pages/Vilkaar";
+import DashboardLoyalty from "./pages/DashboardLoyalty";
 
 const queryClient = new QueryClient();
 
@@ -79,12 +83,16 @@ const App = () => (
                   <Route index element={<DashboardActivity />} />
                   <Route path="profile" element={<DashboardProfile />} />
                   <Route path="notifications" element={<DashboardNotifications />} />
+                  <Route path="loyalty" element={<DashboardLoyalty />} />
                   <Route path="admin" element={
                     <ErrorBoundary>
                       <AdminDashboard />
                     </ErrorBoundary>
                   } />
                 </Route>
+                <Route path="/platform" element={<PlatformDashboard />} />
+                <Route path="/tenant-admin" element={<TenantAdminDashboard />} />
+                <Route path="/worker" element={<WorkerDashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
