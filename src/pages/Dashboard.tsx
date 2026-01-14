@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
+import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import { Button } from '@/components/ui/button';
 import { Loader2, User, Bell, Briefcase, Shield, Home, Crown, Upload } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
@@ -11,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 const Dashboard = () => {
   const { user, loading } = useAuth();
   const { isOwner, isAdmin, isWorker, loading: roleLoading } = useRole();
+  const { badges } = useNavigationBadges();
   const navigate = useNavigate();
   const location = useLocation();
   const [showCustomerTypeModal, setShowCustomerTypeModal] = useState(false);
@@ -58,21 +60,21 @@ const Dashboard = () => {
   }
 
   const navItems = [
-    { path: '/dashboard', label: 'Oversikt', icon: Briefcase },
-    { path: '/dashboard/profile', label: 'Profil', icon: User },
-    { path: '/dashboard/notifications', label: 'Varsler', icon: Bell },
+    { path: '/dashboard', label: 'Oversikt', icon: Briefcase, badge: badges.overview },
+    { path: '/dashboard/profile', label: 'Profil', icon: User, badge: 0 },
+    { path: '/dashboard/notifications', label: 'Varsler', icon: Bell, badge: badges.notifications },
     // Owner: Access to both Owner panel and Admin panel
     ...(isOwner ? [
-      { path: '/owner', label: 'Eier', icon: Crown },
-      { path: '/dashboard/admin', label: 'Admin', icon: Shield },
+      { path: '/owner', label: 'Eier', icon: Crown, badge: 0 },
+      { path: '/dashboard/admin', label: 'Admin', icon: Shield, badge: badges.admin },
     ] : []),
     // Admin (not owner): Only Admin panel
     ...(isAdmin && !isOwner ? [
-      { path: '/dashboard/admin', label: 'Admin', icon: Shield },
+      { path: '/dashboard/admin', label: 'Admin', icon: Shield, badge: badges.admin },
     ] : []),
     // Worker: Submissions
     ...(isWorker ? [
-      { path: '/worker', label: 'Innleveringer', icon: Upload },
+      { path: '/worker', label: 'Innleveringer', icon: Upload, badge: badges.worker },
     ] : []),
   ];
 
@@ -118,6 +120,11 @@ const Dashboard = () => {
                   >
                     <Icon className="h-4 w-4" />
                     {item.label}
+                    {item.badge > 0 && (
+                      <span className="ml-auto bg-destructive text-destructive-foreground text-xs font-medium rounded-full px-2 py-0.5 min-w-[20px] text-center">
+                        {item.badge > 99 ? '99+' : item.badge}
+                      </span>
+                    )}
                   </Button>
                 </Link>
               );
@@ -141,13 +148,20 @@ const Dashboard = () => {
               <Link 
                 key={item.path} 
                 to={item.path}
-                className={`flex flex-col items-center justify-center min-w-[64px] min-h-[56px] px-2 py-1 rounded-lg transition-colors ${
+                className={`flex flex-col items-center justify-center min-w-[64px] min-h-[56px] px-2 py-1 rounded-lg transition-colors relative ${
                   isActive 
                     ? 'text-primary bg-primary/10' 
                     : 'text-muted-foreground hover:text-foreground active:bg-muted'
                 }`}
               >
-                <Icon className="h-5 w-5 mb-1" />
+                <div className="relative">
+                  <Icon className="h-5 w-5 mb-1" />
+                  {item.badge > 0 && (
+                    <span className="absolute -top-1.5 -right-2.5 bg-destructive text-destructive-foreground text-[10px] font-medium rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
+                  )}
+                </div>
                 <span className="text-[10px] font-medium truncate max-w-[56px]">{item.label}</span>
               </Link>
             );
