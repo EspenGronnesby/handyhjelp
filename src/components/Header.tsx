@@ -8,6 +8,7 @@ import { useTheme } from "next-themes";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useLogoSettings } from "@/hooks/useLogoSettings";
 import { LogoSettingsModal } from "@/components/LogoSettingsModal";
+import { ThemeToggleButton } from "@/components/ThemeToggle";
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 
@@ -126,14 +127,17 @@ export const Header = () => {
             )}
           </div>
 
-          {/* Mobile/Tablet Profile Button - Right side */}
-          <Link 
-            to={user ? "/dashboard" : "/auth"} 
-            className="lg:hidden flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation z-10"
-            aria-label={user ? "Gå til profil" : "Logg inn"}
-          >
-            <User className="h-5 w-5" />
-          </Link>
+          {/* Mobile/Tablet Right side - Theme toggle and Profile */}
+          <div className="lg:hidden flex items-center gap-1 z-10">
+            <ThemeToggleButton />
+            <Link 
+              to={user ? "/dashboard" : "/auth"} 
+              className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation"
+              aria-label={user ? "Gå til profil" : "Logg inn"}
+            >
+              <User className="h-5 w-5" />
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-4">
@@ -162,8 +166,9 @@ export const Header = () => {
               </Link>
             </nav>
 
-            {/* Auth Buttons */}
+            {/* Theme Toggle and Auth Buttons */}
             <div className="flex items-center gap-2">
+              <ThemeToggleButton />
               {user ? (
                 <>
                   <Link to="/dashboard">
