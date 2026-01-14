@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useTenant } from '@/hooks/useTenant';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,7 +39,6 @@ const categoryOptions = [
 
 export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
   const { user } = useAuth();
-  const { tenantId } = useTenant();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -120,7 +118,7 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
         .from('blog_posts')
         .insert([{
           title: formData.title,
-          slug: `${slug}-${Date.now()}`, // Ensure unique slug
+          slug: `${slug}-${Date.now()}`,
           summary: formData.summary,
           content: formData.content,
           category: formData.category,
@@ -129,7 +127,6 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
           status: 'pending_approval',
           submitted_by: user?.id,
           submitted_at: new Date().toISOString(),
-          tenant_id: tenantId,
         }]);
 
       if (error) throw error;

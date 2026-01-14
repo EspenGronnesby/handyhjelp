@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
-import { useTenant } from '@/hooks/useTenant';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Loader2, Camera, FileText, Home, Plus } from 'lucide-react';
@@ -13,14 +12,14 @@ import { SubmissionList } from '@/components/worker/SubmissionList';
 
 const WorkerDashboard = () => {
   const { user, loading: authLoading } = useAuth();
-  const { isWorker, isTenantAdmin, isPlatformOwner, loading: roleLoading } = useRole();
-  const { tenant, loading: tenantLoading } = useTenant();
+  const { isWorker, isAdmin, isOwner, loading: roleLoading } = useRole();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('projects');
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [showBlogForm, setShowBlogForm] = useState(false);
 
-  const canAccess = isWorker || isTenantAdmin || isPlatformOwner;
+  // Workers, admins, and owners can access worker dashboard
+  const canAccess = isWorker || isAdmin || isOwner;
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -34,7 +33,7 @@ const WorkerDashboard = () => {
     }
   }, [canAccess, roleLoading, navigate]);
 
-  if (authLoading || roleLoading || tenantLoading) {
+  if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -56,9 +55,6 @@ const WorkerDashboard = () => {
               <img src={handyhjelpLogoWhite} alt="HandyHjelp" className="h-8 md:h-10" />
             </Link>
             <div className="flex items-center gap-2">
-              {tenant && (
-                <span className="hidden md:inline text-sm text-muted-foreground">{tenant.name}</span>
-              )}
               <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')}>
                 <Home className="h-4 w-4 mr-2" />
                 Dashboard

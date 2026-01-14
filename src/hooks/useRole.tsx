@@ -1,23 +1,22 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export type AppRole = 'platform_owner' | 'tenant_admin' | 'worker' | 'admin' | 'moderator' | 'user';
+// Simplified role types for single-site application
+export type AppRole = 'platform_owner' | 'admin' | 'worker' | 'moderator' | 'user';
 
 interface RoleState {
-  isPlatformOwner: boolean;
-  isTenantAdmin: boolean;
-  isWorker: boolean;
-  isAdmin: boolean; // Legacy admin role
+  isOwner: boolean;      // platform_owner role - full system access
+  isAdmin: boolean;      // admin role OR owner (owner always has admin access)
+  isWorker: boolean;     // worker role
   roles: AppRole[];
   loading: boolean;
 }
 
 export const useRole = () => {
   const [state, setState] = useState<RoleState>({
-    isPlatformOwner: false,
-    isTenantAdmin: false,
-    isWorker: false,
+    isOwner: false,
     isAdmin: false,
+    isWorker: false,
     roles: [],
     loading: true,
   });
@@ -26,10 +25,9 @@ export const useRole = () => {
     const checkRoles = async (userId: string | undefined) => {
       if (!userId) {
         setState({
-          isPlatformOwner: false,
-          isTenantAdmin: false,
-          isWorker: false,
+          isOwner: false,
           isAdmin: false,
+          isWorker: false,
           roles: [],
           loading: false,
         });
@@ -50,11 +48,19 @@ export const useRole = () => {
 
         const roles = (data || []).map(r => r.role as AppRole);
         
+        // Owner = platform_owner role
+        const isOwner = roles.includes('platform_owner');
+        
+        // Admin = has admin role OR is owner (owner always has admin access)
+        const isAdmin = roles.includes('admin') || isOwner;
+        
+        // Worker = has worker role
+        const isWorker = roles.includes('worker');
+        
         setState({
-          isPlatformOwner: roles.includes('platform_owner'),
-          isTenantAdmin: roles.includes('tenant_admin'),
-          isWorker: roles.includes('worker'),
-          isAdmin: roles.includes('admin') || roles.includes('platform_owner'),
+          isOwner,
+          isAdmin,
+          isWorker,
           roles,
           loading: false,
         });

@@ -2,22 +2,19 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
-import { useTenant } from '@/hooks/useTenant';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Loader2, CheckCircle, Users, Briefcase, FileText, Home } from 'lucide-react';
+import { Loader2, Users, Palette, ScrollText, Home, Shield } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
-import { ContentApprovalQueue } from '@/components/admin/ContentApprovalQueue';
-import { TenantWorkerManagement } from '@/components/admin/TenantWorkerManagement';
+import { RoleManagement } from '@/components/platform/RoleManagement';
+import { AuditLogViewer } from '@/components/platform/AuditLogViewer';
+import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 
-const TenantAdminDashboard = () => {
+const OwnerDashboard = () => {
   const { user, loading: authLoading } = useAuth();
-  const { isTenantAdmin, isPlatformOwner, loading: roleLoading } = useRole();
-  const { tenant, loading: tenantLoading } = useTenant();
+  const { isOwner, loading: roleLoading } = useRole();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('approval');
-
-  const canAccess = isTenantAdmin || isPlatformOwner;
+  const [activeTab, setActiveTab] = useState('users');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -26,12 +23,12 @@ const TenantAdminDashboard = () => {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
-    if (!roleLoading && !canAccess) {
+    if (!roleLoading && !isOwner) {
       navigate('/dashboard');
     }
-  }, [canAccess, roleLoading, navigate]);
+  }, [isOwner, roleLoading, navigate]);
 
-  if (authLoading || roleLoading || tenantLoading) {
+  if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -39,7 +36,7 @@ const TenantAdminDashboard = () => {
     );
   }
 
-  if (!user || !canAccess) {
+  if (!user || !isOwner) {
     return null;
   }
 
@@ -53,9 +50,11 @@ const TenantAdminDashboard = () => {
               <img src={handyhjelpLogoWhite} alt="HandyHjelp" className="h-8 md:h-10" />
             </Link>
             <div className="flex items-center gap-2">
-              {tenant && (
-                <span className="hidden md:inline text-sm text-muted-foreground">{tenant.name}</span>
-              )}
+              <span className="hidden md:inline text-sm text-muted-foreground">Eier</span>
+              <Button variant="outline" size="sm" onClick={() => navigate('/dashboard/admin')}>
+                <Shield className="h-4 w-4 mr-2" />
+                Admin
+              </Button>
               <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')}>
                 <Home className="h-4 w-4 mr-2" />
                 Dashboard
@@ -67,45 +66,45 @@ const TenantAdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold">Tenant Administrasjon</h1>
-          <p className="text-muted-foreground">
-            Godkjenn innhold og administrer workers
-            {tenant && <span className="font-medium"> - {tenant.name}</span>}
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold">Eier-panel</h1>
+          <p className="text-muted-foreground">Administrer brukere, roller og globale innstillinger</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto gap-2 bg-transparent">
+          <TabsList className="grid w-full grid-cols-3 h-auto gap-2 bg-transparent">
             <TabsTrigger 
-              value="approval" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              <CheckCircle className="h-4 w-4" />
-              <span className="hidden sm:inline">Godkjenning</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="workers" 
+              value="users" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Workers</span>
+              <span className="hidden sm:inline">Brukere</span>
             </TabsTrigger>
             <TabsTrigger 
-              value="admin" 
+              value="editing" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              onClick={() => navigate('/dashboard/admin')}
             >
-              <Briefcase className="h-4 w-4" />
-              <span className="hidden sm:inline">Full Admin</span>
+              <Palette className="h-4 w-4" />
+              <span className="hidden sm:inline">Redigering</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="audit" 
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <ScrollText className="h-4 w-4" />
+              <span className="hidden sm:inline">Logg</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="approval">
-            <ContentApprovalQueue />
+          <TabsContent value="users">
+            <RoleManagement />
           </TabsContent>
 
-          <TabsContent value="workers">
-            <TenantWorkerManagement />
+          <TabsContent value="editing">
+            <SiteEditingPanel />
+          </TabsContent>
+
+          <TabsContent value="audit">
+            <AuditLogViewer />
           </TabsContent>
         </Tabs>
       </div>
@@ -113,4 +112,4 @@ const TenantAdminDashboard = () => {
   );
 };
 
-export default TenantAdminDashboard;
+export default OwnerDashboard;
