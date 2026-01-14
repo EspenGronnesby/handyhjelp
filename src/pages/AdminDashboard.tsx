@@ -9,6 +9,7 @@ import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter, SingleJob
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import {
   Pagination,
   PaginationContent,
@@ -42,6 +43,7 @@ type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'innstillinger';
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
+  const { badges } = useNavigationBadges();
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('oppdrag');
   const [activeTab, setActiveTab] = useState('single-jobs');
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -92,44 +94,44 @@ const AdminDashboard = () => {
     completed: completedJobs.length,
   };
 
-  // Category configuration
+  // Category configuration with realtime badge counts
   const categories = {
     oppdrag: {
       label: 'Oppdrag',
       icon: Briefcase,
       tabs: [
-        { key: 'single-jobs', label: 'Enkelt-jobber', count: totalSingleJobs },
-        { key: 'agreements', label: 'Faste avtaler', count: agreements.length },
+        { key: 'single-jobs', label: 'Enkelt-jobber', count: totalSingleJobs, badge: badges.adminDetails.pendingQuotes + badges.adminDetails.activeJobs },
+        { key: 'agreements', label: 'Faste avtaler', count: agreements.length, badge: badges.adminDetails.newAgreements },
       ],
-      totalBadge: pendingQuotes.length + newAgreements.length + activeJobs.length,
+      totalBadge: badges.adminDetails.pendingQuotes + badges.adminDetails.newAgreements + badges.adminDetails.activeJobs,
     },
     okonomi: {
       label: 'Økonomi / Kunder',
       icon: CreditCard,
       tabs: [
-        { key: 'invoices', label: 'Fakturaer', count: null },
-        { key: 'customers', label: 'Kunder', count: profiles.length },
+        { key: 'invoices', label: 'Fakturaer', count: null, badge: 0 },
+        { key: 'customers', label: 'Kunder', count: profiles.length, badge: 0 },
       ],
-      totalBadge: null,
+      totalBadge: 0,
     },
     innhold: {
       label: 'Innhold / anmeldelser',
       icon: FileText,
       tabs: [
-        { key: 'projects', label: 'Prosjekter', count: null },
-        { key: 'blog', label: 'Blogg', count: null },
-        { key: 'feedback', label: 'Tilbakemeldinger', count: null },
-        { key: 'reviews', label: 'Anmeldelser', count: null },
+        { key: 'projects', label: 'Prosjekter', count: null, badge: badges.adminDetails.pendingProjects },
+        { key: 'blog', label: 'Blogg', count: null, badge: badges.adminDetails.pendingBlogs },
+        { key: 'feedback', label: 'Tilbakemeldinger', count: null, badge: 0 },
+        { key: 'reviews', label: 'Anmeldelser', count: null, badge: badges.adminDetails.pendingReviews },
       ],
-      totalBadge: null,
+      totalBadge: badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs + badges.adminDetails.pendingReviews,
     },
     innstillinger: {
       label: 'Innstillinger / redigering',
       icon: Settings,
       tabs: [
-        { key: 'site-editing', label: 'Redigering', count: null },
+        { key: 'site-editing', label: 'Redigering', count: null, badge: 0 },
       ],
-      totalBadge: null,
+      totalBadge: 0,
     },
   };
 
@@ -226,8 +228,8 @@ const AdminDashboard = () => {
             >
               <Icon className="h-6 w-6" />
               <span className="font-medium text-sm">{category.label}</span>
-              {category.totalBadge !== null && category.totalBadge > 0 && (
-                <Badge variant={isActive ? "default" : "secondary"} className="text-xs">
+              {category.totalBadge > 0 && (
+                <Badge variant="destructive" className="text-xs">
                   {category.totalBadge}
                 </Badge>
               )}
@@ -243,9 +245,14 @@ const AdminDashboard = () => {
             <TabsTrigger 
               key={tab.key} 
               value={tab.key} 
-              className="text-sm whitespace-nowrap"
+              className="text-sm whitespace-nowrap gap-2"
             >
               {tab.label} {tab.count !== null && `(${tab.count})`}
+              {tab.badge > 0 && (
+                <Badge variant="destructive" className="text-xs ml-1">
+                  {tab.badge}
+                </Badge>
+              )}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -254,16 +261,26 @@ const AdminDashboard = () => {
         <TabsContent value="single-jobs" className="space-y-4">
           {/* Status filter buttons */}
           <div className="flex flex-wrap gap-2 pb-2">
-            {(Object.keys(SINGLE_JOB_STATUS_LABELS) as SingleJobStatusFilter[]).map((status) => (
-              <Button 
-                key={status}
-                size="sm" 
-                variant={singleJobStatusFilter === status ? 'default' : 'outline'}
-                onClick={() => setSingleJobStatusFilter(status)}
-              >
-                {SINGLE_JOB_STATUS_LABELS[status]} ({singleJobStatusCounts[status]})
-              </Button>
-            ))}
+            {(Object.keys(SINGLE_JOB_STATUS_LABELS) as SingleJobStatusFilter[]).map((status) => {
+              const statusBadge = status === 'pending' ? badges.adminDetails.pendingQuotes : 
+                                  status === 'in_progress' ? badges.adminDetails.activeJobs : 0;
+              return (
+                <Button 
+                  key={status}
+                  size="sm" 
+                  variant={singleJobStatusFilter === status ? 'default' : 'outline'}
+                  onClick={() => setSingleJobStatusFilter(status)}
+                  className="gap-2"
+                >
+                  {SINGLE_JOB_STATUS_LABELS[status]} ({singleJobStatusCounts[status]})
+                  {statusBadge > 0 && singleJobStatusFilter !== status && (
+                    <Badge variant="destructive" className="text-xs">
+                      {statusBadge}
+                    </Badge>
+                  )}
+                </Button>
+              );
+            })}
           </div>
 
           {/* Nye forespørsler (pending) */}
@@ -415,8 +432,14 @@ const AdminDashboard = () => {
               size="sm" 
               variant={agreementStatusFilter === 'new' ? 'default' : 'outline'}
               onClick={() => setAgreementStatusFilter('new')}
+              className="gap-2"
             >
               Nye ({agreementStatusCounts.new})
+              {badges.adminDetails.newAgreements > 0 && agreementStatusFilter !== 'new' && (
+                <Badge variant="destructive" className="text-xs">
+                  {badges.adminDetails.newAgreements}
+                </Badge>
+              )}
             </Button>
             <Button 
               size="sm" 
