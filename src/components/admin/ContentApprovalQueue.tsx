@@ -57,8 +57,10 @@ export const ContentApprovalQueue = () => {
   const [rejectDialog, setRejectDialog] = useState<{ 
     open: boolean; 
     type: 'project' | 'blog'; 
-    id: string | null 
-  }>({ open: false, type: 'project', id: null });
+    id: string | null;
+    title: string;
+    submittedBy: string | null;
+  }>({ open: false, type: 'project', id: null, title: '', submittedBy: null });
   const [rejectReason, setRejectReason] = useState('');
 
   const { data: pendingProjects, isLoading: loadingProjects } = useQuery({
@@ -90,7 +92,7 @@ export const ContentApprovalQueue = () => {
   });
 
   const approveProject = useMutation({
-    mutationFn: async (projectId: string) => {
+    mutationFn: async (project: PendingProject) => {
       const { error } = await supabase
         .from('projects')
         .update({ 
@@ -98,11 +100,22 @@ export const ContentApprovalQueue = () => {
           reviewed_by: user?.id,
           reviewed_at: new Date().toISOString(),
         })
-        .eq('id', projectId);
+        .eq('id', project.id);
       if (error) throw error;
+
+      // Send notification to worker
+      if (project.submitted_by) {
+        await supabase.from('notifications').insert({
+          user_id: project.submitted_by,
+          title: 'Prosjektet ditt er godkjent! 🎉',
+          message: `"${project.title}" er nå publisert på nettsiden.`,
+          type: 'content_approved',
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-projects'] });
+      queryClient.invalidateQueries({ queryKey: ['worker-projects'] });
       toast({ title: 'Godkjent', description: 'Prosjektet er publisert.' });
       setPreviewDialog({ open: false, type: 'project', item: null });
     },
@@ -112,7 +125,7 @@ export const ContentApprovalQueue = () => {
   });
 
   const approveBlog = useMutation({
-    mutationFn: async (blogId: string) => {
+    mutationFn: async (blog: PendingBlogPost) => {
       const { error } = await supabase
         .from('blog_posts')
         .update({ 
@@ -121,11 +134,22 @@ export const ContentApprovalQueue = () => {
           reviewed_by: user?.id,
           reviewed_at: new Date().toISOString(),
         })
-        .eq('id', blogId);
+        .eq('id', blog.id);
       if (error) throw error;
+
+      // Send notification to worker
+      if (blog.submitted_by) {
+        await supabase.from('notifications').insert({
+          user_id: blog.submitted_by,
+          title: 'Blogginnlegget ditt er godkjent! 🎉',
+          message: `"${blog.title}" er nå publisert på nettsiden.`,
+          type: 'content_approved',
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-blogs'] });
+      queryClient.invalidateQueries({ queryKey: ['worker-blogs'] });
       toast({ title: 'Godkjent', description: 'Blogginnlegget er publisert.' });
       setPreviewDialog({ open: false, type: 'blog', item: null });
     },
@@ -135,7 +159,7 @@ export const ContentApprovalQueue = () => {
   });
 
   const rejectContent = useMutation({
-    mutationFn: async ({ type, id, reason }: { type: 'project' | 'blog'; id: string; reason: string }) => {
+    mutationFn: async ({ type, id, reason, title, submittedBy }: { type: 'project' | 'blog'; id: string; reason: string; title: string; submittedBy: string | null }) => {
       const table = type === 'project' ? 'projects' : 'blog_posts';
       const { error } = await supabase
         .from(table)
@@ -147,12 +171,25 @@ export const ContentApprovalQueue = () => {
         })
         .eq('id', id);
       if (error) throw error;
+
+      // Send notification to worker
+      if (submittedBy) {
+        const contentType = type === 'project' ? 'Prosjektet' : 'Blogginnlegget';
+        await supabase.from('notifications').insert({
+          user_id: submittedBy,
+          title: `${contentType} ditt ble avslått`,
+          message: `"${title}" ble avslått. Grunn: ${reason}. Du kan redigere og sende inn på nytt.`,
+          type: 'content_rejected',
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pending-projects'] });
       queryClient.invalidateQueries({ queryKey: ['pending-blogs'] });
-      toast({ title: 'Avslått', description: 'Innholdet er avslått.' });
-      setRejectDialog({ open: false, type: 'project', id: null });
+      queryClient.invalidateQueries({ queryKey: ['worker-projects'] });
+      queryClient.invalidateQueries({ queryKey: ['worker-blogs'] });
+      toast({ title: 'Avslått', description: 'Innholdet er avslått og worker har fått varsel.' });
+      setRejectDialog({ open: false, type: 'project', id: null, title: '', submittedBy: null });
       setRejectReason('');
     },
     onError: (error: any) => {
@@ -259,7 +296,7 @@ export const ContentApprovalQueue = () => {
                           variant="cta" 
                           size="sm" 
                           className="flex-1"
-                          onClick={() => approveProject.mutate(project.id)}
+                          onClick={() => approveProject.mutate(project)}
                           disabled={approveProject.isPending}
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
@@ -315,7 +352,7 @@ export const ContentApprovalQueue = () => {
                           variant="cta" 
                           size="sm" 
                           className="flex-1"
-                          onClick={() => approveBlog.mutate(blog.id)}
+                          onClick={() => approveBlog.mutate(blog)}
                           disabled={approveBlog.isPending}
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
@@ -392,8 +429,15 @@ export const ContentApprovalQueue = () => {
             <Button 
               variant="destructive" 
               onClick={() => {
+                const item = previewDialog.item;
                 setPreviewDialog({ ...previewDialog, open: false });
-                setRejectDialog({ open: true, type: previewDialog.type, id: previewDialog.item?.id || null });
+                setRejectDialog({ 
+                  open: true, 
+                  type: previewDialog.type, 
+                  id: item?.id || null,
+                  title: item?.title || '',
+                  submittedBy: item?.submitted_by || null,
+                });
               }}
             >
               <XCircle className="h-4 w-4 mr-2" />
@@ -403,9 +447,9 @@ export const ContentApprovalQueue = () => {
               variant="cta"
               onClick={() => {
                 if (previewDialog.type === 'project' && previewDialog.item) {
-                  approveProject.mutate(previewDialog.item.id);
+                  approveProject.mutate(previewDialog.item as PendingProject);
                 } else if (previewDialog.type === 'blog' && previewDialog.item) {
-                  approveBlog.mutate(previewDialog.item.id);
+                  approveBlog.mutate(previewDialog.item as PendingBlogPost);
                 }
               }}
               disabled={approveProject.isPending || approveBlog.isPending}
@@ -437,7 +481,7 @@ export const ContentApprovalQueue = () => {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectDialog({ open: false, type: 'project', id: null })}>
+            <Button variant="outline" onClick={() => setRejectDialog({ open: false, type: 'project', id: null, title: '', submittedBy: null })}>
               Avbryt
             </Button>
             <Button 
@@ -447,7 +491,9 @@ export const ContentApprovalQueue = () => {
                   rejectContent.mutate({ 
                     type: rejectDialog.type, 
                     id: rejectDialog.id, 
-                    reason: rejectReason 
+                    reason: rejectReason,
+                    title: rejectDialog.title,
+                    submittedBy: rejectDialog.submittedBy,
                   });
                 }
               }}

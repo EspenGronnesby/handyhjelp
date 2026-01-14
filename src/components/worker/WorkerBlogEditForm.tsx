@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,7 +24,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface WorkerBlogFormProps {
+interface BlogPost {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  category: string;
+  cover_image_url: string;
+}
+
+interface WorkerBlogEditFormProps {
+  blog: BlogPost | null;
   open: boolean;
   onClose: () => void;
 }
@@ -37,7 +47,7 @@ const categoryOptions = [
   { value: 'generelt', label: 'Generelt' },
 ];
 
-export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
+export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -51,6 +61,19 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState('');
   const [uploading, setUploading] = useState(false);
+
+  // Pre-fill form when blog changes
+  useEffect(() => {
+    if (blog) {
+      setFormData({
+        title: blog.title,
+        summary: blog.summary,
+        content: blog.content,
+        category: blog.category,
+      });
+      setCoverPreview(blog.cover_image_url);
+    }
+  }, [blog]);
 
   const handleImageChange = (file: File | null) => {
     if (!file) return;
@@ -86,50 +109,42 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
     return data.publicUrl;
   };
 
-  const generateSlug = (title: string): string => {
-    return title
-      .toLowerCase()
-      .replace(/æ/g, 'ae')
-      .replace(/ø/g, 'o')
-      .replace(/å/g, 'a')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
   const calculateReadingTime = (content: string): number => {
     const wordsPerMinute = 200;
     const wordCount = content.split(/\s+/).length;
     return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
   };
 
-  const submitBlog = useMutation({
+  const updateBlog = useMutation({
     mutationFn: async () => {
-      if (!coverImage) {
-        throw new Error('Forsidebilde må lastes opp');
-      }
+      if (!blog) throw new Error('No blog to update');
 
       setUploading(true);
       
-      const coverUrl = await uploadImage(coverImage);
-      const slug = generateSlug(formData.title);
+      // Only upload new image if it was changed
+      let coverUrl = blog.cover_image_url;
+      if (coverImage) {
+        coverUrl = await uploadImage(coverImage);
+      }
+
       const readingTime = calculateReadingTime(formData.content);
 
-      const { data: blog, error } = await supabase
+      const { error } = await supabase
         .from('blog_posts')
-        .insert([{
+        .update({
           title: formData.title,
-          slug: `${slug}-${Date.now()}`,
           summary: formData.summary,
           content: formData.content,
           category: formData.category,
           cover_image_url: coverUrl,
           reading_time: readingTime,
           status: 'pending_approval',
-          submitted_by: user?.id,
           submitted_at: new Date().toISOString(),
-        }])
-        .select()
-        .single();
+          rejection_reason: null,
+          reviewed_at: null,
+          reviewed_by: null,
+        })
+        .eq('id', blog.id);
 
       if (error) throw error;
 
@@ -142,20 +157,18 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
       if (adminUsers && adminUsers.length > 0) {
         const notifications = adminUsers.map((admin) => ({
           user_id: admin.user_id,
-          title: 'Nytt blogginnlegg til godkjenning',
-          message: `${user?.email || 'En worker'} har sendt inn blogginnlegget "${formData.title}"`,
+          title: 'Redigert blogginnlegg til godkjenning',
+          message: `${user?.email || 'En worker'} har sendt inn blogginnlegget "${formData.title}" på nytt`,
           type: 'content_submission',
         }));
 
         await supabase.from('notifications').insert(notifications);
       }
-
-      return blog;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['worker-blogs'] });
       queryClient.invalidateQueries({ queryKey: ['pending-blogs'] });
-      toast({ title: 'Innsendt', description: 'Blogginnlegget er sendt til godkjenning.' });
+      toast({ title: 'Innsendt', description: 'Blogginnlegget er sendt til godkjenning på nytt.' });
       handleClose();
     },
     onError: (error: any) => {
@@ -180,16 +193,16 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    submitBlog.mutate();
+    updateBlog.mutate();
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nytt blogginnlegg</DialogTitle>
+          <DialogTitle>Rediger blogginnlegg</DialogTitle>
           <DialogDescription>
-            Skriv et blogginnlegg som vil bli sendt til godkjenning
+            Gjør endringer og send inn på nytt til godkjenning
           </DialogDescription>
         </DialogHeader>
         
@@ -299,10 +312,10 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
             <Button 
               type="submit" 
               variant="cta"
-              disabled={uploading || !coverImage || submitBlog.isPending}
+              disabled={uploading || !coverPreview || updateBlog.isPending}
             >
-              {(uploading || submitBlog.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Send til godkjenning
+              {(uploading || updateBlog.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Send inn på nytt
             </Button>
           </DialogFooter>
         </form>

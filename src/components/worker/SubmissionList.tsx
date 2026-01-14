@@ -2,29 +2,36 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Camera, FileText, Clock, CheckCircle, XCircle, FileEdit } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Camera, FileText, Clock, CheckCircle, XCircle, FileEdit, Edit } from 'lucide-react';
 
 interface SubmissionListProps {
   type: 'projects' | 'blog';
   userId: string;
+  onEditProject?: (project: Project) => void;
+  onEditBlog?: (blog: BlogPost) => void;
 }
 
-interface Project {
+export interface Project {
   id: string;
   title: string;
   description: string;
-  after_image_url: string;
   category: string;
+  location: string;
+  completed_date: string;
+  before_image_url: string;
+  after_image_url: string;
   status: string;
   submitted_at: string | null;
   rejection_reason: string | null;
   reviewed_at: string | null;
 }
 
-interface BlogPost {
+export interface BlogPost {
   id: string;
   title: string;
   summary: string;
+  content: string;
   cover_image_url: string;
   category: string;
   status: string;
@@ -41,7 +48,7 @@ const statusConfig: Record<string, { label: string; icon: React.ElementType; col
   rejected: { label: 'Avslått', icon: XCircle, color: 'bg-red-500' },
 };
 
-export const SubmissionList = ({ type, userId }: SubmissionListProps) => {
+export const SubmissionList = ({ type, userId, onEditProject, onEditBlog }: SubmissionListProps) => {
   const { data: submissions, isLoading } = useQuery({
     queryKey: [type === 'projects' ? 'worker-projects' : 'worker-blogs', userId],
     queryFn: async () => {
@@ -133,6 +140,24 @@ export const SubmissionList = ({ type, userId }: SubmissionListProps) => {
                   <p className="text-xs text-destructive font-medium">Avslåingsgrunn:</p>
                   <p className="text-xs text-destructive">{item.rejection_reason}</p>
                 </div>
+              )}
+
+              {item.status === 'rejected' && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-2"
+                  onClick={() => {
+                    if (type === 'projects' && onEditProject) {
+                      onEditProject(item as Project);
+                    } else if (type === 'blog' && onEditBlog) {
+                      onEditBlog(item as BlogPost);
+                    }
+                  }}
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Rediger og send på nytt
+                </Button>
               )}
             </CardContent>
           </Card>
