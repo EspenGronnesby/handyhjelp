@@ -85,8 +85,8 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
   const handleImageChange = (type: 'before' | 'after', file: File | null) => {
     if (!file) return;
     
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'Feil', description: 'Bildet kan ikke være større enn 5 MB', variant: 'destructive' });
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: 'Feil', description: 'Bildet kan ikke være større enn 10 MB', variant: 'destructive' });
       return;
     }
 

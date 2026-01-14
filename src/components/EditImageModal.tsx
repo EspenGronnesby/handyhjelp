@@ -49,12 +49,12 @@ export const EditImageModal = ({
       return;
     }
 
-    // Valider størrelse (max 5 MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Valider størrelse (max 10 MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
     if (selectedFile.size > maxSize) {
       toast({
         title: "Filen er for stor",
-        description: "Maksimal størrelse er 5 MB",
+        description: "Maksimal størrelse er 10 MB",
         variant: "destructive"
       });
       return;
@@ -180,7 +180,7 @@ export const EditImageModal = ({
                   Klikk eller dra og slipp
                 </span>
                 <span className="text-xs text-muted-foreground mt-1">
-                  JPG, PNG eller WebP (maks 5 MB)
+                  JPG, PNG eller WebP (maks 10 MB)
                 </span>
                 <input
                   id="file-upload"

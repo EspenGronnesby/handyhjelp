@@ -104,10 +104,10 @@ export const BlogManagement = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 10 * 1024 * 1024) {
         toast({
           title: "Feil",
-          description: "Bildet kan ikke være større enn 5 MB",
+          description: "Bildet kan ikke være større enn 10 MB",
           variant: "destructive",
         });
         return;
@@ -428,7 +428,7 @@ export const BlogManagement = () => {
                       <img src={coverImagePreview} alt="Preview" className="w-full h-full object-cover object-center" />
                     </div>
                   )}
-                  <p className="text-xs text-muted-foreground">Maks 5 MB. JPG, PNG eller WebP</p>
+                  <p className="text-xs text-muted-foreground">Maks 10 MB. JPG, PNG eller WebP</p>
                 </div>
               </div>
             </div>

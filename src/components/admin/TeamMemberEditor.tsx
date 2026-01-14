@@ -52,8 +52,8 @@ export const TeamMemberEditor = ({ member, onUpdate, isNewMember = false }: Team
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Filen er for stor. Maks 2MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Filen er for stor. Maks 10MB.');
       return;
     }
 

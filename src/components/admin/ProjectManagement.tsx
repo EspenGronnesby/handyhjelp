@@ -101,11 +101,11 @@ export const ProjectManagement = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
       toast({
         title: "Feil",
-        description: "Bildet kan ikke være større enn 5 MB",
+        description: "Bildet kan ikke være større enn 10 MB",
         variant: "destructive",
       });
       return;
