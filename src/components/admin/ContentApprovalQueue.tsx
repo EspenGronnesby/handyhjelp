@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, CheckCircle, XCircle, Eye, Camera, FileText, Clock } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Eye, Camera, FileText, Clock, User } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+interface SubmitterProfile {
+  full_name: string;
+  email: string;
+}
 
 interface PendingProject {
   id: string;
@@ -30,6 +35,7 @@ interface PendingProject {
   submitted_at: string;
   submitted_by: string;
   status: string;
+  submitter?: SubmitterProfile | null;
 }
 
 interface PendingBlogPost {
@@ -42,6 +48,7 @@ interface PendingBlogPost {
   submitted_at: string;
   submitted_by: string;
   status: string;
+  submitter?: SubmitterProfile | null;
 }
 
 export const ContentApprovalQueue = () => {
@@ -73,7 +80,23 @@ export const ContentApprovalQueue = () => {
         .order('submitted_at', { ascending: false });
 
       if (error) throw error;
-      return data as PendingProject[];
+
+      // Fetch submitter profiles separately
+      const projectsWithSubmitters = await Promise.all(
+        (data || []).map(async (project) => {
+          if (project.submitted_by) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name, email')
+              .eq('id', project.submitted_by)
+              .single();
+            return { ...project, submitter: profile };
+          }
+          return { ...project, submitter: null };
+        })
+      );
+
+      return projectsWithSubmitters as PendingProject[];
     },
   });
 
@@ -87,7 +110,23 @@ export const ContentApprovalQueue = () => {
         .order('submitted_at', { ascending: false });
 
       if (error) throw error;
-      return data as PendingBlogPost[];
+
+      // Fetch submitter profiles separately
+      const blogsWithSubmitters = await Promise.all(
+        (data || []).map(async (blog) => {
+          if (blog.submitted_by) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name, email')
+              .eq('id', blog.submitted_by)
+              .single();
+            return { ...blog, submitter: profile };
+          }
+          return { ...blog, submitter: null };
+        })
+      );
+
+      return blogsWithSubmitters as PendingBlogPost[];
     },
   });
 
@@ -279,18 +318,36 @@ export const ContentApprovalQueue = () => {
                     <CardContent className="p-4 space-y-3">
                       <h3 className="font-semibold line-clamp-1">{project.title}</h3>
                       <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Innsendt: {formatDate(project.submitted_at)}
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          Sendt inn av: {project.submitter?.full_name || 'Ukjent'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Innsendt: {formatDate(project.submitted_at)}
+                        </p>
+                      </div>
                       <div className="flex gap-2">
                         <Button 
                           variant="outline" 
-                          size="sm" 
-                          className="flex-1"
+                          size="sm"
                           onClick={() => setPreviewDialog({ open: true, type: 'project', item: project })}
                         >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Se
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => setRejectDialog({ 
+                            open: true, 
+                            type: 'project', 
+                            id: project.id,
+                            title: project.title,
+                            submittedBy: project.submitted_by,
+                          })}
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Avslå
                         </Button>
                         <Button 
                           variant="cta" 
@@ -300,7 +357,7 @@ export const ContentApprovalQueue = () => {
                           disabled={approveProject.isPending}
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
-                          Godkjenn
+                          Publiser
                         </Button>
                       </div>
                     </CardContent>
@@ -335,18 +392,36 @@ export const ContentApprovalQueue = () => {
                     <CardContent className="p-4 space-y-3">
                       <h3 className="font-semibold line-clamp-1">{blog.title}</h3>
                       <p className="text-sm text-muted-foreground line-clamp-2">{blog.summary}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Innsendt: {formatDate(blog.submitted_at)}
-                      </p>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          Sendt inn av: {blog.submitter?.full_name || 'Ukjent'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Innsendt: {formatDate(blog.submitted_at)}
+                        </p>
+                      </div>
                       <div className="flex gap-2">
                         <Button 
                           variant="outline" 
-                          size="sm" 
-                          className="flex-1"
+                          size="sm"
                           onClick={() => setPreviewDialog({ open: true, type: 'blog', item: blog })}
                         >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Se
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => setRejectDialog({ 
+                            open: true, 
+                            type: 'blog', 
+                            id: blog.id,
+                            title: blog.title,
+                            submittedBy: blog.submitted_by,
+                          })}
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Avslå
                         </Button>
                         <Button 
                           variant="cta" 
@@ -356,7 +431,7 @@ export const ContentApprovalQueue = () => {
                           disabled={approveBlog.isPending}
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
-                          Godkjenn
+                          Publiser
                         </Button>
                       </div>
                     </CardContent>
