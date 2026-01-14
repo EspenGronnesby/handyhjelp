@@ -78,8 +78,8 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
   const handleImageChange = (file: File | null) => {
     if (!file) return;
     
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: 'Feil', description: 'Bildet kan ikke være større enn 5 MB', variant: 'destructive' });
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: 'Feil', description: 'Bildet kan ikke være større enn 10 MB', variant: 'destructive' });
       return;
     }
 
@@ -276,7 +276,7 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
                 <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
                   <Upload className="h-8 w-8 text-muted-foreground mb-2" />
                   <span className="text-sm text-muted-foreground">Last opp forsidebilde</span>
-                  <span className="text-xs text-muted-foreground mt-1">Maks 5 MB</span>
+                  <span className="text-xs text-muted-foreground mt-1">Maks 10 MB</span>
                   <input
                     type="file"
                     accept="image/*"
