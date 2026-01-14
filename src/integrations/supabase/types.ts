@@ -49,6 +49,47 @@ export type Database = {
           },
         ]
       }
+      agreement_download_tokens: {
+        Row: {
+          agreement_id: string
+          created_at: string
+          document_type: string
+          expires_at: string
+          id: string
+          ip_address: string | null
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          agreement_id: string
+          created_at?: string
+          document_type: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          agreement_id?: string
+          created_at?: string
+          document_type?: string
+          expires_at?: string
+          id?: string
+          ip_address?: string | null
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agreement_download_tokens_agreement_id_fkey"
+            columns: ["agreement_id"]
+            isOneToOne: false
+            referencedRelation: "service_agreements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -1264,6 +1305,10 @@ export type Database = {
         Returns: boolean
       }
       expire_old_points: { Args: never; Returns: number }
+      generate_download_token: {
+        Args: { p_agreement_id: string; p_document_type: string }
+        Returns: string
+      }
       get_active_campaign_multiplier: { Args: never; Returns: number }
       get_user_tenant_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
@@ -1287,6 +1332,17 @@ export type Database = {
           p_tenant_id: string
         }
         Returns: string
+      }
+      validate_download_token: {
+        Args: { p_ip_address?: string; p_token: string }
+        Returns: {
+          agreement_id: string
+          contact_person: string
+          contract_document_url: string
+          document_type: string
+          is_valid: boolean
+          offer_document_url: string
+        }[]
       }
     }
     Enums: {
