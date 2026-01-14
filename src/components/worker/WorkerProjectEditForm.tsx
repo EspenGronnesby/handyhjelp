@@ -204,8 +204,20 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
     onClose();
   };
 
+  const isTitleValid = formData.title.length >= 5 && formData.title.length <= 100;
+  const isDescriptionValid = formData.description.length >= 10 && formData.description.length <= 200;
+  const isFormValid = isTitleValid && isDescriptionValid && beforePreview;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isTitleValid) {
+      toast({ title: 'Feil', description: 'Tittel må være mellom 5 og 100 tegn', variant: 'destructive' });
+      return;
+    }
+    if (!isDescriptionValid) {
+      toast({ title: 'Feil', description: 'Beskrivelse må være mellom 10 og 200 tegn', variant: 'destructive' });
+      return;
+    }
     updateProject.mutate();
   };
 
@@ -227,8 +239,12 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
-              placeholder="F.eks. Fasaderenovering i Oslo"
+              placeholder="Tittel (5-100 tegn)"
+              maxLength={100}
             />
+            <p className={`text-xs mt-1 ${isTitleValid ? 'text-muted-foreground' : 'text-destructive'}`}>
+              {formData.title.length}/100 tegn (minimum 5)
+            </p>
           </div>
 
           <div>
@@ -239,8 +255,12 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
               rows={4}
-              placeholder="Beskriv arbeidet som ble utført..."
+              placeholder="Beskriv arbeidet som ble utført (10-200 tegn)"
+              maxLength={200}
             />
+            <p className={`text-xs mt-1 ${isDescriptionValid ? 'text-muted-foreground' : 'text-destructive'}`}>
+              {formData.description.length}/200 tegn (minimum 10)
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -362,7 +382,7 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
             <Button 
               type="submit" 
               variant="cta"
-              disabled={uploading || !beforePreview || !afterPreview || updateProject.isPending}
+              disabled={uploading || !isFormValid || !afterPreview || updateProject.isPending}
             >
               {(uploading || updateProject.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Send inn på nytt
