@@ -107,6 +107,30 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
     }
   }, [blog, hasFormDraft]);
 
+  // Restore File object from base64 draft when dialog opens
+  useEffect(() => {
+    const convertBase64ToFile = async (base64: string, filename: string): Promise<File> => {
+      const response = await fetch(base64);
+      const blob = await response.blob();
+      return new File([blob], filename, { type: blob.type });
+    };
+
+    const restoreImageFromDraft = async () => {
+      if (previews.cover && !coverImage) {
+        try {
+          const file = await convertBase64ToFile(previews.cover, 'cover-draft.jpg');
+          setCoverImage(file);
+        } catch (e) {
+          console.error('Error restoring cover image:', e);
+        }
+      }
+    };
+
+    if (open && hasImageDraft) {
+      restoreImageFromDraft();
+    }
+  }, [open, hasImageDraft, previews.cover]);
+
   const handleImageChange = (file: File | null) => {
     if (!file) return;
     

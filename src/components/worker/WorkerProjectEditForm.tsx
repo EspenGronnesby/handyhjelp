@@ -113,6 +113,38 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
     }
   }, [project, hasFormDraft]);
 
+  // Restore File objects from base64 drafts when dialog opens
+  useEffect(() => {
+    const convertBase64ToFile = async (base64: string, filename: string): Promise<File> => {
+      const response = await fetch(base64);
+      const blob = await response.blob();
+      return new File([blob], filename, { type: blob.type });
+    };
+
+    const restoreImagesFromDraft = async () => {
+      if (previews.before && !beforeImage) {
+        try {
+          const file = await convertBase64ToFile(previews.before, 'before-draft.jpg');
+          setBeforeImage(file);
+        } catch (e) {
+          console.error('Error restoring before image:', e);
+        }
+      }
+      if (previews.after && !afterImage) {
+        try {
+          const file = await convertBase64ToFile(previews.after, 'after-draft.jpg');
+          setAfterImage(file);
+        } catch (e) {
+          console.error('Error restoring after image:', e);
+        }
+      }
+    };
+
+    if (open && hasImageDraft) {
+      restoreImagesFromDraft();
+    }
+  }, [open, hasImageDraft, previews.before, previews.after]);
+
   const handleImageChange = (type: 'before' | 'after', file: File | null) => {
     if (!file) return;
     
