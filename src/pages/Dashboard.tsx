@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useAdmin } from '@/hooks/useAdmin';
+import { useRole } from '@/hooks/useRole';
 import { Button } from '@/components/ui/button';
-import { Loader2, User, Bell, Briefcase, Star, Shield, Home } from 'lucide-react';
+import { Loader2, User, Bell, Briefcase, Shield, Home, Crown, Hammer, Upload } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { CustomerTypeModal } from '@/components/CustomerTypeModal';
 import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isPlatformOwner, isTenantAdmin, isWorker, isAdmin, loading: roleLoading } = useRole();
   const navigate = useNavigate();
   const location = useLocation();
   const [showCustomerTypeModal, setShowCustomerTypeModal] = useState(false);
@@ -45,7 +45,7 @@ const Dashboard = () => {
     }
   }, [user, loading, navigate]);
 
-  if (loading) {
+  if (loading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -59,10 +59,14 @@ const Dashboard = () => {
 
   const navItems = [
     { path: '/dashboard', label: 'Oversikt', icon: Briefcase },
-    // { path: '/dashboard/loyalty', label: 'Kundeklubb', icon: Star }, // Hidden temporarily
     { path: '/dashboard/profile', label: 'Profil', icon: User },
     { path: '/dashboard/notifications', label: 'Varsler', icon: Bell },
-    ...(isAdmin ? [{ path: '/dashboard/admin', label: 'Admin', icon: Shield }] : [])
+    // Rolle-spesifikke lenker
+    ...(isPlatformOwner ? [{ path: '/platform', label: 'Plattform', icon: Crown }] : []),
+    ...(isTenantAdmin && !isPlatformOwner ? [{ path: '/tenant-admin', label: 'Admin', icon: Shield }] : []),
+    ...(isWorker ? [{ path: '/worker', label: 'Innleveringer', icon: Upload }] : []),
+    // Legacy admin for brukere med kun admin-rolle (ikke platform_owner eller tenant_admin)
+    ...(isAdmin && !isPlatformOwner && !isTenantAdmin ? [{ path: '/dashboard/admin', label: 'Admin', icon: Shield }] : []),
   ];
 
   return (
