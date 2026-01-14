@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { useNavigationBadges } from '@/hooks/useNavigationBadges';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,11 +22,50 @@ const WorkerDashboard = () => {
   const { isWorker, isAdmin, isOwner, loading: roleLoading } = useRole();
   const { badges } = useNavigationBadges();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('projects');
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [showBlogForm, setShowBlogForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
+
+  // Delete mutations
+  const deleteProject = useMutation({
+    mutationFn: async (projectId: string) => {
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId)
+        .eq('submitted_by', user?.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['worker-projects'] });
+      toast({ title: 'Slettet', description: 'Prosjektet ble slettet.' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Feil', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  const deleteBlog = useMutation({
+    mutationFn: async (blogId: string) => {
+      const { error } = await supabase
+        .from('blog_posts')
+        .delete()
+        .eq('id', blogId)
+        .eq('submitted_by', user?.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['worker-blogs'] });
+      toast({ title: 'Slettet', description: 'Blogginnlegget ble slettet.' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Feil', description: error.message, variant: 'destructive' });
+    },
+  });
 
   // Workers, admins, and owners can access worker dashboard
   const canAccess = isWorker || isAdmin || isOwner;
@@ -127,6 +169,7 @@ const WorkerDashboard = () => {
               type="projects" 
               userId={user.id} 
               onEditProject={setEditingProject}
+              onDeleteProject={(id) => deleteProject.mutate(id)}
             />
           </TabsContent>
 
@@ -135,6 +178,7 @@ const WorkerDashboard = () => {
               type="blog" 
               userId={user.id}
               onEditBlog={setEditingBlog}
+              onDeleteBlog={(id) => deleteBlog.mutate(id)}
             />
           </TabsContent>
         </Tabs>

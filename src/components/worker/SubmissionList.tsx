@@ -3,13 +3,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Camera, FileText, Clock, CheckCircle, XCircle, FileEdit, Edit } from 'lucide-react';
+import { Loader2, Camera, FileText, Clock, CheckCircle, XCircle, FileEdit, Edit, Trash2 } from 'lucide-react';
 
 interface SubmissionListProps {
   type: 'projects' | 'blog';
   userId: string;
   onEditProject?: (project: Project) => void;
   onEditBlog?: (blog: BlogPost) => void;
+  onDeleteProject?: (projectId: string) => void;
+  onDeleteBlog?: (blogId: string) => void;
 }
 
 export interface Project {
@@ -48,7 +50,7 @@ const statusConfig: Record<string, { label: string; icon: React.ElementType; col
   rejected: { label: 'Avslått', icon: XCircle, color: 'bg-red-500' },
 };
 
-export const SubmissionList = ({ type, userId, onEditProject, onEditBlog }: SubmissionListProps) => {
+export const SubmissionList = ({ type, userId, onEditProject, onEditBlog, onDeleteProject, onDeleteBlog }: SubmissionListProps) => {
   const { data: submissions, isLoading } = useQuery({
     queryKey: [type === 'projects' ? 'worker-projects' : 'worker-blogs', userId],
     queryFn: async () => {
@@ -142,22 +144,39 @@ export const SubmissionList = ({ type, userId, onEditProject, onEditBlog }: Subm
                 </div>
               )}
 
-              {item.status === 'rejected' && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full mt-2"
-                  onClick={() => {
-                    if (type === 'projects' && onEditProject) {
-                      onEditProject(item as Project);
-                    } else if (type === 'blog' && onEditBlog) {
-                      onEditBlog(item as BlogPost);
-                    }
-                  }}
-                >
-                  <Edit className="h-4 w-4 mr-1" />
-                  Rediger og send på nytt
-                </Button>
+              {(item.status === 'rejected' || item.status === 'draft') && (
+                <div className="flex gap-2 mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => {
+                      if (type === 'projects' && onEditProject) {
+                        onEditProject(item as Project);
+                      } else if (type === 'blog' && onEditBlog) {
+                        onEditBlog(item as BlogPost);
+                      }
+                    }}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Rediger
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => {
+                      if (type === 'projects' && onDeleteProject) {
+                        onDeleteProject(item.id);
+                      } else if (type === 'blog' && onDeleteBlog) {
+                        onDeleteBlog(item.id);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Slett
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>

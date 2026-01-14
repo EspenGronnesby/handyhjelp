@@ -3,6 +3,7 @@ import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { useNavigationBadges } from '@/hooks/useNavigationBadges';
+import { useNotificationSound } from '@/hooks/useNotificationSound';
 import { Button } from '@/components/ui/button';
 import { Loader2, User, Bell, Briefcase, Shield, Home, Crown, Upload } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
@@ -16,6 +17,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showCustomerTypeModal, setShowCustomerTypeModal] = useState(false);
+  
+  // Enable sound and browser notifications for realtime alerts
+  useNotificationSound();
 
   useEffect(() => {
     if (!loading && !user) {
