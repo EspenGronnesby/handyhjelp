@@ -157,7 +157,15 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
     },
   });
 
-  const handleClose = () => {
+  const hasUnsavedChanges = () => {
+    return formData.title !== '' || 
+           formData.description !== '' || 
+           formData.location !== '' ||
+           beforeImage !== null || 
+           afterImage !== null;
+  };
+
+  const resetFormData = () => {
     setFormData({
       title: '',
       description: '',
@@ -169,7 +177,30 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
     setAfterImage(null);
     setBeforePreview('');
     setAfterPreview('');
+  };
+
+  // Called only on successful submission
+  const handleClose = () => {
+    resetFormData();
     onClose();
+  };
+
+  // Called when user explicitly clicks "Avbryt"
+  const handleCancel = () => {
+    if (hasUnsavedChanges()) {
+      if (!confirm('Du har ulagrede endringer. Er du sikker på at du vil avbryte?')) {
+        return;
+      }
+    }
+    resetFormData();
+    onClose();
+  };
+
+  // Called on dialog backdrop click or escape - preserve data
+  const handleDialogChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      onClose(); // Just close, don't reset data
+    }
   };
 
   const isTitleValid = formData.title.length >= 5 && formData.title.length <= 100;
@@ -190,7 +221,7 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nytt prosjekt</DialogTitle>
@@ -344,7 +375,7 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Avbryt
             </Button>
             <Button 

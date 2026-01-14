@@ -189,7 +189,17 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
     },
   });
 
-  const handleClose = () => {
+  const hasUnsavedChanges = () => {
+    if (!project) return false;
+    return formData.title !== project.title || 
+           formData.description !== project.description || 
+           formData.location !== project.location ||
+           formData.category !== project.category ||
+           beforeImage !== null || 
+           afterImage !== null;
+  };
+
+  const resetFormData = () => {
     setFormData({
       title: '',
       description: '',
@@ -201,7 +211,30 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
     setAfterImage(null);
     setBeforePreview('');
     setAfterPreview('');
+  };
+
+  // Called only on successful submission
+  const handleClose = () => {
+    resetFormData();
     onClose();
+  };
+
+  // Called when user explicitly clicks "Avbryt"
+  const handleCancel = () => {
+    if (hasUnsavedChanges()) {
+      if (!confirm('Du har ulagrede endringer. Er du sikker på at du vil avbryte?')) {
+        return;
+      }
+    }
+    resetFormData();
+    onClose();
+  };
+
+  // Called on dialog backdrop click or escape - preserve data
+  const handleDialogChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      onClose(); // Just close, don't reset data
+    }
   };
 
   const isTitleValid = formData.title.length >= 5 && formData.title.length <= 100;
@@ -222,7 +255,7 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Rediger prosjekt</DialogTitle>
@@ -376,7 +409,7 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Avbryt
             </Button>
             <Button 
