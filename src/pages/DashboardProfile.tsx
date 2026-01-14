@@ -6,10 +6,31 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Shield, LogOut, Home, Building2 } from 'lucide-react';
+import { Loader2, Shield, LogOut, Home, Building2, Crown, Hammer, UserCheck, User as UserIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import type { LucideIcon } from 'lucide-react';
+
+// Norske rolle-etiketter
+const roleLabels: Record<string, string> = {
+  platform_owner: 'Plattform-eier',
+  tenant_admin: 'Administrator',
+  worker: 'Medarbeider',
+  admin: 'Admin',
+  moderator: 'Moderator',
+  user: 'Bruker'
+};
+
+// Ikoner per rolle
+const roleIcons: Record<string, LucideIcon> = {
+  platform_owner: Crown,
+  tenant_admin: Shield,
+  worker: Hammer,
+  admin: Shield,
+  moderator: UserCheck,
+  user: UserIcon
+};
 
 interface Profile {
   full_name: string;
@@ -144,12 +165,15 @@ const DashboardProfile = () => {
                 )}
               </Badge>
             )}
-            {roles.length > 0 && roles.map((role) => (
-              <Badge key={role} variant="default" className="flex items-center gap-1">
-                <Shield className="h-3 w-3" />
-                {role.charAt(0).toUpperCase() + role.slice(1)}
-              </Badge>
-            ))}
+            {roles.length > 0 && roles.map((role) => {
+              const Icon = roleIcons[role] || Shield;
+              return (
+                <Badge key={role} variant="default" className="flex items-center gap-1">
+                  <Icon className="h-3 w-3" />
+                  {roleLabels[role] || role}
+                </Badge>
+              );
+            })}
           </div>
         </div>
         <p className="text-muted-foreground">
