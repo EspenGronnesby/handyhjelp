@@ -8,7 +8,9 @@ import { Loader2, Camera, FileText, Home, Plus } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { WorkerProjectForm } from '@/components/worker/WorkerProjectForm';
 import { WorkerBlogForm } from '@/components/worker/WorkerBlogForm';
-import { SubmissionList } from '@/components/worker/SubmissionList';
+import { WorkerProjectEditForm } from '@/components/worker/WorkerProjectEditForm';
+import { WorkerBlogEditForm } from '@/components/worker/WorkerBlogEditForm';
+import { SubmissionList, type Project, type BlogPost } from '@/components/worker/SubmissionList';
 
 const WorkerDashboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -17,6 +19,8 @@ const WorkerDashboard = () => {
   const [activeTab, setActiveTab] = useState('projects');
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [showBlogForm, setShowBlogForm] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editingBlog, setEditingBlog] = useState<BlogPost | null>(null);
 
   // Workers, admins, and owners can access worker dashboard
   const canAccess = isWorker || isAdmin || isOwner;
@@ -106,11 +110,19 @@ const WorkerDashboard = () => {
           </div>
 
           <TabsContent value="projects">
-            <SubmissionList type="projects" userId={user.id} />
+            <SubmissionList 
+              type="projects" 
+              userId={user.id} 
+              onEditProject={setEditingProject}
+            />
           </TabsContent>
 
           <TabsContent value="blog">
-            <SubmissionList type="blog" userId={user.id} />
+            <SubmissionList 
+              type="blog" 
+              userId={user.id}
+              onEditBlog={setEditingBlog}
+            />
           </TabsContent>
         </Tabs>
 
@@ -124,6 +136,20 @@ const WorkerDashboard = () => {
         <WorkerBlogForm 
           open={showBlogForm} 
           onClose={() => setShowBlogForm(false)} 
+        />
+
+        {/* Project Edit Form Modal */}
+        <WorkerProjectEditForm 
+          project={editingProject}
+          open={!!editingProject}
+          onClose={() => setEditingProject(null)}
+        />
+
+        {/* Blog Edit Form Modal */}
+        <WorkerBlogEditForm 
+          blog={editingBlog}
+          open={!!editingBlog}
+          onClose={() => setEditingBlog(null)}
         />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -24,7 +24,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface WorkerProjectFormProps {
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  location: string;
+  completed_date: string;
+  before_image_url: string;
+  after_image_url: string;
+}
+
+interface WorkerProjectEditFormProps {
+  project: Project | null;
   open: boolean;
   onClose: () => void;
 }
@@ -37,7 +49,7 @@ const categoryOptions = [
   { value: 'annet', label: 'Annet' },
 ];
 
-export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => {
+export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectEditFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -54,6 +66,21 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
   const [beforePreview, setBeforePreview] = useState('');
   const [afterPreview, setAfterPreview] = useState('');
   const [uploading, setUploading] = useState(false);
+
+  // Pre-fill form when project changes
+  useEffect(() => {
+    if (project) {
+      setFormData({
+        title: project.title,
+        description: project.description,
+        category: project.category,
+        location: project.location,
+        completed_date: project.completed_date.split('T')[0],
+      });
+      setBeforePreview(project.before_image_url);
+      setAfterPreview(project.after_image_url);
+    }
+  }, [project]);
 
   const handleImageChange = (type: 'before' | 'after', file: File | null) => {
     if (!file) return;
@@ -94,20 +121,26 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
     return data.publicUrl;
   };
 
-  const submitProject = useMutation({
+  const updateProject = useMutation({
     mutationFn: async () => {
-      if (!beforeImage || !afterImage) {
-        throw new Error('Begge bilder må lastes opp');
-      }
+      if (!project) throw new Error('No project to update');
 
       setUploading(true);
       
-      const beforeUrl = await uploadImage(beforeImage, 'before');
-      const afterUrl = await uploadImage(afterImage, 'after');
+      // Only upload new images if they were changed
+      let beforeUrl = project.before_image_url;
+      let afterUrl = project.after_image_url;
+      
+      if (beforeImage) {
+        beforeUrl = await uploadImage(beforeImage, 'before');
+      }
+      if (afterImage) {
+        afterUrl = await uploadImage(afterImage, 'after');
+      }
 
-      const { data: project, error } = await supabase
+      const { error } = await supabase
         .from('projects')
-        .insert([{
+        .update({
           title: formData.title,
           description: formData.description,
           category: formData.category,
@@ -116,11 +149,12 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
           before_image_url: beforeUrl,
           after_image_url: afterUrl,
           status: 'pending_approval',
-          submitted_by: user?.id,
           submitted_at: new Date().toISOString(),
-        }])
-        .select()
-        .single();
+          rejection_reason: null,
+          reviewed_at: null,
+          reviewed_by: null,
+        })
+        .eq('id', project.id);
 
       if (error) throw error;
 
@@ -133,20 +167,18 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
       if (adminUsers && adminUsers.length > 0) {
         const notifications = adminUsers.map((admin) => ({
           user_id: admin.user_id,
-          title: 'Nytt prosjekt til godkjenning',
-          message: `${user?.email || 'En worker'} har sendt inn prosjektet "${formData.title}"`,
+          title: 'Redigert prosjekt til godkjenning',
+          message: `${user?.email || 'En worker'} har sendt inn prosjektet "${formData.title}" på nytt`,
           type: 'content_submission',
         }));
 
         await supabase.from('notifications').insert(notifications);
       }
-
-      return project;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['worker-projects'] });
       queryClient.invalidateQueries({ queryKey: ['pending-projects'] });
-      toast({ title: 'Innsendt', description: 'Prosjektet er sendt til godkjenning.' });
+      toast({ title: 'Innsendt', description: 'Prosjektet er sendt til godkjenning på nytt.' });
       handleClose();
     },
     onError: (error: any) => {
@@ -174,16 +206,16 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    submitProject.mutate();
+    updateProject.mutate();
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nytt prosjekt</DialogTitle>
+          <DialogTitle>Rediger prosjekt</DialogTitle>
           <DialogDescription>
-            Fyll ut informasjon og last opp før/etter bilder
+            Gjør endringer og send inn på nytt til godkjenning
           </DialogDescription>
         </DialogHeader>
         
@@ -330,10 +362,10 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
             <Button 
               type="submit" 
               variant="cta"
-              disabled={uploading || !beforeImage || !afterImage || submitProject.isPending}
+              disabled={uploading || !beforePreview || !afterPreview || updateProject.isPending}
             >
-              {(uploading || submitProject.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Send til godkjenning
+              {(uploading || updateProject.isPending) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Send inn på nytt
             </Button>
           </DialogFooter>
         </form>
