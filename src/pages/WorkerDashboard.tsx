@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
+import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Loader2, Camera, FileText, Home, Plus } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { WorkerProjectForm } from '@/components/worker/WorkerProjectForm';
@@ -15,6 +17,7 @@ import { SubmissionList, type Project, type BlogPost } from '@/components/worker
 const WorkerDashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const { isWorker, isAdmin, isOwner, loading: roleLoading } = useRole();
+  const { badges } = useNavigationBadges();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('projects');
   const [showProjectForm, setShowProjectForm] = useState(false);
@@ -83,6 +86,11 @@ const WorkerDashboard = () => {
               >
                 <Camera className="h-4 w-4" />
                 Prosjekter
+                {(badges.workerDetails.pendingProjects + badges.workerDetails.rejectedProjects) > 0 && (
+                  <Badge variant="destructive" className="text-xs ml-1">
+                    {badges.workerDetails.pendingProjects + badges.workerDetails.rejectedProjects}
+                  </Badge>
+                )}
               </TabsTrigger>
               <TabsTrigger 
                 value="blog" 
@@ -90,6 +98,11 @@ const WorkerDashboard = () => {
               >
                 <FileText className="h-4 w-4" />
                 Blogginnlegg
+                {(badges.workerDetails.pendingBlogs + badges.workerDetails.rejectedBlogs) > 0 && (
+                  <Badge variant="destructive" className="text-xs ml-1">
+                    {badges.workerDetails.pendingBlogs + badges.workerDetails.rejectedBlogs}
+                  </Badge>
+                )}
               </TabsTrigger>
             </TabsList>
             
