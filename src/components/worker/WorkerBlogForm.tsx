@@ -166,7 +166,14 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
     },
   });
 
-  const handleClose = () => {
+  const hasUnsavedChanges = () => {
+    return formData.title !== '' || 
+           formData.summary !== '' || 
+           formData.content !== '' ||
+           coverImage !== null;
+  };
+
+  const resetFormData = () => {
     setFormData({
       title: '',
       summary: '',
@@ -175,7 +182,30 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
     });
     setCoverImage(null);
     setCoverPreview('');
+  };
+
+  // Called only on successful submission
+  const handleClose = () => {
+    resetFormData();
     onClose();
+  };
+
+  // Called when user explicitly clicks "Avbryt"
+  const handleCancel = () => {
+    if (hasUnsavedChanges()) {
+      if (!confirm('Du har ulagrede endringer. Er du sikker på at du vil avbryte?')) {
+        return;
+      }
+    }
+    resetFormData();
+    onClose();
+  };
+
+  // Called on dialog backdrop click or escape - preserve data
+  const handleDialogChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      onClose(); // Just close, don't reset data
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -184,7 +214,7 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nytt blogginnlegg</DialogTitle>
@@ -293,7 +323,7 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Avbryt
             </Button>
             <Button 
