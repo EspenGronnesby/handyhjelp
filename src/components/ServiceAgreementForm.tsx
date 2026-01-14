@@ -353,7 +353,7 @@ export const ServiceAgreementForm = () => {
                           className="w-full justify-start text-left font-normal"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value ? format(field.value, "PPP", { locale: nb }) : "Velg dato"}
+                          {field.value ? format(field.value, "dd.MM.yyyy", { locale: nb }) : "Velg dato"}
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
