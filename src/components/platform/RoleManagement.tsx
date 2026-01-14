@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Plus, X, Loader2, User } from 'lucide-react';
+import { Search, Plus, X, Loader2, User, Crown, Shield, Hammer } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -25,12 +25,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import type { LucideIcon } from 'lucide-react';
 
 interface Profile {
   id: string;
   email: string;
   full_name: string;
-  tenant_id: string | null;
 }
 
 interface UserRole {
@@ -39,28 +39,31 @@ interface UserRole {
   role: string;
 }
 
-interface Tenant {
-  id: string;
-  name: string;
-  slug: string;
-}
-
+// Norwegian role labels
 const roleLabels: Record<string, string> = {
-  platform_owner: 'Platform Owner',
-  tenant_admin: 'Tenant Admin',
-  worker: 'Worker',
-  admin: 'Admin (Legacy)',
+  platform_owner: 'Eier',
+  admin: 'Administrator',
+  worker: 'Medarbeider',
   moderator: 'Moderator',
   user: 'Bruker',
 };
 
+// Role colors
 const roleColors: Record<string, string> = {
   platform_owner: 'bg-purple-500',
-  tenant_admin: 'bg-blue-500',
+  admin: 'bg-blue-500',
   worker: 'bg-green-500',
-  admin: 'bg-orange-500',
   moderator: 'bg-yellow-500',
   user: 'bg-gray-500',
+};
+
+// Role icons
+const roleIcons: Record<string, LucideIcon> = {
+  platform_owner: Crown,
+  admin: Shield,
+  worker: Hammer,
+  moderator: User,
+  user: User,
 };
 
 export const RoleManagement = () => {
@@ -69,40 +72,32 @@ export const RoleManagement = () => {
   const [searchEmail, setSearchEmail] = useState('');
   const [selectedUser, setSelectedUser] = useState<Profile | null>(null);
   const [newRole, setNewRole] = useState<string>('');
-  const [newTenantId, setNewTenantId] = useState<string>('');
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; roleId: string | null; roleName: string }>({ 
     open: false, 
     roleId: null,
     roleName: '' 
   });
 
-  const { data: tenants } = useQuery({
-    queryKey: ['tenants'],
+  // Fetch all registered users
+  const { data: allUsers, isLoading: loadingUsers } = useQuery({
+    queryKey: ['all-users'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tenants')
-        .select('id, name, slug')
-        .eq('is_active', true)
-        .order('name');
-      if (error) throw error;
-      return data as Tenant[];
-    },
-  });
-
-  const { data: searchResults, isLoading: searching, refetch: searchUsers } = useQuery({
-    queryKey: ['user-search', searchEmail],
-    queryFn: async () => {
-      if (!searchEmail || searchEmail.length < 3) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, email, full_name, tenant_id')
-        .ilike('email', `%${searchEmail}%`)
-        .limit(5);
+        .select('id, email, full_name')
+        .order('created_at', { ascending: false });
       if (error) throw error;
       return data as Profile[];
     },
-    enabled: searchEmail.length >= 3,
   });
+
+  // Search results (filter from all users)
+  const searchResults = searchEmail.length >= 2
+    ? allUsers?.filter(u => 
+        u.email.toLowerCase().includes(searchEmail.toLowerCase()) ||
+        u.full_name?.toLowerCase().includes(searchEmail.toLowerCase())
+      ).slice(0, 10)
+    : [];
 
   const { data: userRoles, refetch: refetchRoles } = useQuery({
     queryKey: ['user-roles', selectedUser?.id],
@@ -134,7 +129,9 @@ export const RoleManagement = () => {
     onError: (error: any) => {
       toast({ 
         title: 'Feil', 
-        description: error.message || 'Kunne ikke legge til rolle.', 
+        description: error.message?.includes('duplicate') 
+          ? 'Brukeren har allerede denne rollen.' 
+          : error.message || 'Kunne ikke legge til rolle.', 
         variant: 'destructive' 
       });
     },
@@ -163,49 +160,16 @@ export const RoleManagement = () => {
     },
   });
 
-  const updateTenant = useMutation({
-    mutationFn: async ({ userId, tenantId }: { userId: string; tenantId: string | null }) => {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ tenant_id: tenantId })
-        .eq('id', userId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast({ title: 'Tenant oppdatert', description: 'Brukerens tenant er endret.' });
-      if (selectedUser) {
-        setSelectedUser({ ...selectedUser, tenant_id: newTenantId || null });
-      }
-    },
-    onError: (error: any) => {
-      toast({ 
-        title: 'Feil', 
-        description: error.message || 'Kunne ikke oppdatere tenant.', 
-        variant: 'destructive' 
-      });
-    },
-  });
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    searchUsers();
-  };
-
   const handleAddRole = () => {
     if (!selectedUser || !newRole) return;
     addRole.mutate({ userId: selectedUser.id, role: newRole });
-  };
-
-  const handleUpdateTenant = () => {
-    if (!selectedUser) return;
-    updateTenant.mutate({ userId: selectedUser.id, tenantId: newTenantId || null });
   };
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Brukeradministrasjon</h2>
-        <p className="text-muted-foreground">Søk etter brukere og administrer roller</p>
+        <p className="text-muted-foreground">Se registrerte brukere og administrer roller</p>
       </div>
 
       {/* Search */}
@@ -214,31 +178,32 @@ export const RoleManagement = () => {
           <CardTitle className="text-lg">Søk etter bruker</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <Input
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
-              placeholder="Søk på e-post..."
-              className="flex-1"
-            />
-            <Button type="submit" disabled={searching || searchEmail.length < 3}>
-              {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-            </Button>
-          </form>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={searchEmail}
+                onChange={(e) => setSearchEmail(e.target.value)}
+                placeholder="Søk på e-post eller navn..."
+                className="pl-10"
+              />
+            </div>
+          </div>
 
-          {/* Search Results */}
-          {searchResults && searchResults.length > 0 && (
-            <div className="mt-4 space-y-2">
-              {searchResults.map((user) => (
+          {/* All users list or search results */}
+          <div className="mt-4 space-y-2 max-h-[300px] overflow-y-auto">
+            {loadingUsers ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            ) : (
+              (searchEmail.length >= 2 ? searchResults : allUsers?.slice(0, 10))?.map((user) => (
                 <div 
                   key={user.id}
                   className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                     selectedUser?.id === user.id ? 'border-primary bg-primary/5' : 'hover:bg-muted'
                   }`}
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setNewTenantId(user.tenant_id || '');
-                  }}
+                  onClick={() => setSelectedUser(user)}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
@@ -250,13 +215,19 @@ export const RoleManagement = () => {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              ))
+            )}
+            
+            {!loadingUsers && allUsers && allUsers.length > 10 && searchEmail.length < 2 && (
+              <p className="text-center text-sm text-muted-foreground py-2">
+                Viser 10 av {allUsers.length} brukere. Søk for å finne flere.
+              </p>
+            )}
 
-          {searchResults && searchResults.length === 0 && searchEmail.length >= 3 && (
-            <p className="mt-4 text-muted-foreground text-center py-4">Ingen brukere funnet</p>
-          )}
+            {searchEmail.length >= 2 && searchResults?.length === 0 && (
+              <p className="text-muted-foreground text-center py-4">Ingen brukere funnet</p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -268,6 +239,7 @@ export const RoleManagement = () => {
               <User className="h-5 w-5" />
               {selectedUser.full_name || selectedUser.email}
             </CardTitle>
+            <p className="text-sm text-muted-foreground">{selectedUser.email}</p>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Current Roles */}
@@ -275,20 +247,24 @@ export const RoleManagement = () => {
               <Label className="text-sm font-medium mb-2 block">Nåværende roller</Label>
               <div className="flex flex-wrap gap-2">
                 {userRoles && userRoles.length > 0 ? (
-                  userRoles.map((role) => (
-                    <Badge 
-                      key={role.id} 
-                      className={`${roleColors[role.role] || 'bg-gray-500'} flex items-center gap-1`}
-                    >
-                      {roleLabels[role.role] || role.role}
-                      <button
-                        onClick={() => setDeleteDialog({ open: true, roleId: role.id, roleName: roleLabels[role.role] || role.role })}
-                        className="ml-1 hover:bg-white/20 rounded-full p-0.5"
+                  userRoles.map((role) => {
+                    const Icon = roleIcons[role.role] || User;
+                    return (
+                      <Badge 
+                        key={role.id} 
+                        className={`${roleColors[role.role] || 'bg-gray-500'} flex items-center gap-1`}
                       >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))
+                        <Icon className="h-3 w-3" />
+                        {roleLabels[role.role] || role.role}
+                        <button
+                          onClick={() => setDeleteDialog({ open: true, roleId: role.id, roleName: roleLabels[role.role] || role.role })}
+                          className="ml-1 hover:bg-white/20 rounded-full p-0.5"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    );
+                  })
                 ) : (
                   <span className="text-muted-foreground text-sm">Ingen roller tildelt</span>
                 )}
@@ -304,11 +280,8 @@ export const RoleManagement = () => {
                     <SelectValue placeholder="Velg rolle..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="platform_owner">Platform Owner</SelectItem>
-                    <SelectItem value="tenant_admin">Tenant Admin</SelectItem>
-                    <SelectItem value="worker">Worker</SelectItem>
-                    <SelectItem value="admin">Admin (Legacy)</SelectItem>
-                    <SelectItem value="moderator">Moderator</SelectItem>
+                    <SelectItem value="admin">Administrator</SelectItem>
+                    <SelectItem value="worker">Medarbeider</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button 
@@ -318,32 +291,9 @@ export const RoleManagement = () => {
                   {addRole.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                 </Button>
               </div>
-            </div>
-
-            {/* Assign Tenant */}
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Tilordne tenant</Label>
-              <div className="flex gap-2">
-                <Select value={newTenantId} onValueChange={setNewTenantId}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Velg tenant..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Ingen tenant</SelectItem>
-                    {tenants?.map((tenant) => (
-                      <SelectItem key={tenant.id} value={tenant.id}>
-                        {tenant.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button 
-                  onClick={handleUpdateTenant}
-                  disabled={updateTenant.isPending}
-                >
-                  {updateTenant.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Lagre'}
-                </Button>
-              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Administrator: Full driftstilgang. Medarbeider: Kan sende inn innhold til godkjenning.
+              </p>
             </div>
           </CardContent>
         </Card>

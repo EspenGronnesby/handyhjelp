@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useTenant } from '@/hooks/useTenant';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,7 +46,6 @@ interface PendingBlogPost {
 
 export const ContentApprovalQueue = () => {
   const { user } = useAuth();
-  const { tenantId } = useTenant();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('projects');
@@ -64,38 +62,28 @@ export const ContentApprovalQueue = () => {
   const [rejectReason, setRejectReason] = useState('');
 
   const { data: pendingProjects, isLoading: loadingProjects } = useQuery({
-    queryKey: ['pending-projects', tenantId],
+    queryKey: ['pending-projects'],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('projects')
         .select('*')
         .eq('status', 'pending_approval')
         .order('submitted_at', { ascending: false });
-      
-      if (tenantId) {
-        query = query.eq('tenant_id', tenantId);
-      }
 
-      const { data, error } = await query;
       if (error) throw error;
       return data as PendingProject[];
     },
   });
 
   const { data: pendingBlogs, isLoading: loadingBlogs } = useQuery({
-    queryKey: ['pending-blogs', tenantId],
+    queryKey: ['pending-blogs'],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('blog_posts')
         .select('*')
         .eq('status', 'pending_approval')
         .order('submitted_at', { ascending: false });
-      
-      if (tenantId) {
-        query = query.eq('tenant_id', tenantId);
-      }
 
-      const { data, error } = await query;
       if (error) throw error;
       return data as PendingBlogPost[];
     },

@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useTenant } from './useTenant';
 import type { Json } from '@/integrations/supabase/types';
 
 interface AuditLog {
@@ -18,10 +17,8 @@ interface AuditLog {
 }
 
 export const useAuditLogs = (limit = 50) => {
-  const { tenantId } = useTenant();
-
   return useQuery({
-    queryKey: ['audit-logs', tenantId, limit],
+    queryKey: ['audit-logs', limit],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('audit_logs')
@@ -36,7 +33,6 @@ export const useAuditLogs = (limit = 50) => {
 
       return data as AuditLog[];
     },
-    enabled: !!tenantId,
   });
 };
 
@@ -52,16 +48,9 @@ export const logAudit = async (
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('tenant_id')
-      .eq('id', user.id)
-      .single();
-
     const { error } = await supabase
       .from('audit_logs')
       .insert([{
-        tenant_id: profile?.tenant_id ?? null,
         user_id: user.id,
         action,
         table_name: tableName,

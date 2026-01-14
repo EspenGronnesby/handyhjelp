@@ -15,8 +15,7 @@ import DashboardActivity from "./pages/DashboardActivity";
 import DashboardProfile from "./pages/DashboardProfile";
 import DashboardNotifications from "./pages/DashboardNotifications";
 import AdminDashboard from "./pages/AdminDashboard";
-import PlatformDashboard from "./pages/PlatformDashboard";
-import TenantAdminDashboard from "./pages/TenantAdminDashboard";
+import OwnerDashboard from "./pages/OwnerDashboard";
 import WorkerDashboard from "./pages/WorkerDashboard";
 import FAQ from "./pages/FAQ";
 import Projects from "./pages/Projects";
@@ -90,8 +89,7 @@ const App = () => (
                     </ErrorBoundary>
                   } />
                 </Route>
-                <Route path="/platform" element={<PlatformDashboard />} />
-                <Route path="/tenant-admin" element={<TenantAdminDashboard />} />
+                <Route path="/owner" element={<OwnerDashboard />} />
                 <Route path="/worker" element={<WorkerDashboard />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

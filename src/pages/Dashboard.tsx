@@ -3,14 +3,14 @@ import { useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { Button } from '@/components/ui/button';
-import { Loader2, User, Bell, Briefcase, Shield, Home, Crown, Hammer, Upload } from 'lucide-react';
+import { Loader2, User, Bell, Briefcase, Shield, Home, Crown, Upload } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { CustomerTypeModal } from '@/components/CustomerTypeModal';
 import { supabase } from '@/integrations/supabase/client';
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
-  const { isPlatformOwner, isTenantAdmin, isWorker, isAdmin, loading: roleLoading } = useRole();
+  const { isOwner, isAdmin, isWorker, loading: roleLoading } = useRole();
   const navigate = useNavigate();
   const location = useLocation();
   const [showCustomerTypeModal, setShowCustomerTypeModal] = useState(false);
@@ -61,12 +61,19 @@ const Dashboard = () => {
     { path: '/dashboard', label: 'Oversikt', icon: Briefcase },
     { path: '/dashboard/profile', label: 'Profil', icon: User },
     { path: '/dashboard/notifications', label: 'Varsler', icon: Bell },
-    // Rolle-spesifikke lenker
-    ...(isPlatformOwner ? [{ path: '/platform', label: 'Plattform', icon: Crown }] : []),
-    ...(isTenantAdmin && !isPlatformOwner ? [{ path: '/tenant-admin', label: 'Admin', icon: Shield }] : []),
-    ...(isWorker ? [{ path: '/worker', label: 'Innleveringer', icon: Upload }] : []),
-    // Legacy admin for brukere med kun admin-rolle (ikke platform_owner eller tenant_admin)
-    ...(isAdmin && !isPlatformOwner && !isTenantAdmin ? [{ path: '/dashboard/admin', label: 'Admin', icon: Shield }] : []),
+    // Owner: Access to both Owner panel and Admin panel
+    ...(isOwner ? [
+      { path: '/owner', label: 'Eier', icon: Crown },
+      { path: '/dashboard/admin', label: 'Admin', icon: Shield },
+    ] : []),
+    // Admin (not owner): Only Admin panel
+    ...(isAdmin && !isOwner ? [
+      { path: '/dashboard/admin', label: 'Admin', icon: Shield },
+    ] : []),
+    // Worker: Submissions
+    ...(isWorker ? [
+      { path: '/worker', label: 'Innleveringer', icon: Upload },
+    ] : []),
   ];
 
   return (
