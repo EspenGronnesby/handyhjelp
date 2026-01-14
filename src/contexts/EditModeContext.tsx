@@ -5,49 +5,65 @@ import { useAuth } from '@/hooks/useAuth';
 interface EditModeContextType {
   editMode: boolean;
   setEditMode: (value: boolean) => void;
-  isAdmin: boolean;
+  isAdmin: boolean; // Legacy - true for platform_owner
+  isPlatformOwner: boolean;
+  isTenantAdmin: boolean;
+  canEditSite: boolean; // Only platform_owner can edit site content
 }
 
 const EditModeContext = createContext<EditModeContextType>({
   editMode: false,
   setEditMode: () => {},
-  isAdmin: false
+  isAdmin: false,
+  isPlatformOwner: false,
+  isTenantAdmin: false,
+  canEditSite: false,
 });
 
 export const EditModeProvider = ({ children }: { children: ReactNode }) => {
   const [editMode, setEditModeState] = useState(false);
   const { user } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isPlatformOwner, setIsPlatformOwner] = useState(false);
+  const [isTenantAdmin, setIsTenantAdmin] = useState(false);
+  const [isLegacyAdmin, setIsLegacyAdmin] = useState(false);
 
   useEffect(() => {
-    const checkAdminAndEditMode = async () => {
+    const checkRolesAndEditMode = async () => {
       if (!user) {
-        setIsAdmin(false);
+        setIsPlatformOwner(false);
+        setIsTenantAdmin(false);
+        setIsLegacyAdmin(false);
         setEditModeState(false);
         return;
       }
 
       try {
-        // Check if user has admin role
-        const { data: roleData, error: roleError } = await supabase
+        // Fetch all roles for the user
+        const { data: rolesData, error: rolesError } = await supabase
           .from('user_roles')
           .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .maybeSingle();
+          .eq('user_id', user.id);
 
-        if (roleError) {
-          console.error('Error checking admin role:', roleError);
-          setIsAdmin(false);
+        if (rolesError) {
+          console.error('Error checking roles:', rolesError);
+          setIsPlatformOwner(false);
+          setIsTenantAdmin(false);
+          setIsLegacyAdmin(false);
           setEditModeState(false);
           return;
         }
 
-        const userIsAdmin = !!roleData;
-        setIsAdmin(userIsAdmin);
+        const roles = (rolesData || []).map(r => r.role);
+        const userIsPlatformOwner = roles.includes('platform_owner');
+        const userIsTenantAdmin = roles.includes('tenant_admin');
+        const userIsLegacyAdmin = roles.includes('admin');
 
-        if (userIsAdmin) {
-          // Fetch edit mode status from profile
+        setIsPlatformOwner(userIsPlatformOwner);
+        setIsTenantAdmin(userIsTenantAdmin);
+        setIsLegacyAdmin(userIsLegacyAdmin || userIsPlatformOwner);
+
+        // Only platform_owner can use edit mode
+        if (userIsPlatformOwner) {
           const { data: profileData } = await supabase
             .from('profiles')
             .select('edit_mode_enabled')
@@ -59,17 +75,20 @@ export const EditModeProvider = ({ children }: { children: ReactNode }) => {
           setEditModeState(false);
         }
       } catch (error) {
-        console.error('Error in checkAdminAndEditMode:', error);
-        setIsAdmin(false);
+        console.error('Error in checkRolesAndEditMode:', error);
+        setIsPlatformOwner(false);
+        setIsTenantAdmin(false);
+        setIsLegacyAdmin(false);
         setEditModeState(false);
       }
     };
 
-    checkAdminAndEditMode();
+    checkRolesAndEditMode();
   }, [user]);
 
   const setEditMode = async (value: boolean) => {
-    if (!user || !isAdmin) return;
+    // Only platform_owner can toggle edit mode
+    if (!user || !isPlatformOwner) return;
 
     setEditModeState(value);
 
@@ -85,8 +104,18 @@ export const EditModeProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // canEditSite is true only for platform_owner with editMode enabled
+  const canEditSite = isPlatformOwner && editMode;
+
   return (
-    <EditModeContext.Provider value={{ editMode, setEditMode, isAdmin }}>
+    <EditModeContext.Provider value={{ 
+      editMode, 
+      setEditMode, 
+      isAdmin: isLegacyAdmin || isPlatformOwner,
+      isPlatformOwner,
+      isTenantAdmin,
+      canEditSite,
+    }}>
       {children}
     </EditModeContext.Provider>
   );
