@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload, X } from 'lucide-react';
+import { Loader2, Upload, X, FileText, Trash2 } from 'lucide-react';
+import { useFormDraft, useImageDraft } from '@/hooks/useFormDraft';
 import {
   Dialog,
   DialogContent,
@@ -54,22 +55,54 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: 'vaktmester',
-    location: '',
-    completed_date: new Date().toISOString().split('T')[0],
+  const initialFormData = {
+    title: project?.title || '',
+    description: project?.description || '',
+    category: project?.category || 'vaktmester',
+    location: project?.location || '',
+    completed_date: project?.completed_date?.split('T')[0] || new Date().toISOString().split('T')[0],
+  };
+  
+  // Use draft hooks for persistent storage with project-specific key
+  const draftKey = project ? `worker-project-edit-${project.id}` : 'worker-project-edit-new';
+  
+  const { 
+    data: formData, 
+    setData: setFormData, 
+    hasDraft: hasFormDraft, 
+    clearDraft: clearFormDraft 
+  } = useFormDraft({
+    key: draftKey,
+    initialData: initialFormData,
+    userId: user?.id,
+    enabled: open && !!project,
   });
+  
+  const {
+    previews,
+    setPreview,
+    clearPreview,
+    clearAllPreviews,
+    hasDraft: hasImageDraft,
+  } = useImageDraft({
+    key: draftKey,
+    userId: user?.id,
+    enabled: open && !!project,
+  });
+  
   const [beforeImage, setBeforeImage] = useState<File | null>(null);
   const [afterImage, setAfterImage] = useState<File | null>(null);
-  const [beforePreview, setBeforePreview] = useState('');
-  const [afterPreview, setAfterPreview] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  // Pre-fill form when project changes
+  // Get previews from draft, state, or project
+  const beforePreview = previews.before || project?.before_image_url || '';
+  const afterPreview = previews.after || project?.after_image_url || '';
+  
+  const hasDraft = hasFormDraft || hasImageDraft;
+
+  // Pre-fill form when project changes (only if no draft exists)
   useEffect(() => {
-    if (project) {
+    if (project && !hasFormDraft) {
       setFormData({
         title: project.title,
         description: project.description,
@@ -77,10 +110,8 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
         location: project.location,
         completed_date: project.completed_date.split('T')[0],
       });
-      setBeforePreview(project.before_image_url);
-      setAfterPreview(project.after_image_url);
     }
-  }, [project]);
+  }, [project, hasFormDraft]);
 
   const handleImageChange = (type: 'before' | 'after', file: File | null) => {
     if (!file) return;
@@ -92,12 +123,13 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
 
     const reader = new FileReader();
     reader.onloadend = () => {
+      const base64 = reader.result as string;
       if (type === 'before') {
         setBeforeImage(file);
-        setBeforePreview(reader.result as string);
+        setPreview('before', base64);
       } else {
         setAfterImage(file);
-        setAfterPreview(reader.result as string);
+        setPreview('after', base64);
       }
     };
     reader.readAsDataURL(file);
@@ -179,7 +211,7 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
       queryClient.invalidateQueries({ queryKey: ['worker-projects'] });
       queryClient.invalidateQueries({ queryKey: ['pending-projects'] });
       toast({ title: 'Innsendt', description: 'Prosjektet er sendt til godkjenning på nytt.' });
-      handleClose();
+      handleSuccessClose();
     },
     onError: (error: any) => {
       toast({ title: 'Feil', description: error.message, variant: 'destructive' });
@@ -189,51 +221,34 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
     },
   });
 
-  const hasUnsavedChanges = () => {
-    if (!project) return false;
-    return formData.title !== project.title || 
-           formData.description !== project.description || 
-           formData.location !== project.location ||
-           formData.category !== project.category ||
-           beforeImage !== null || 
-           afterImage !== null;
-  };
-
-  const resetFormData = () => {
-    setFormData({
-      title: '',
-      description: '',
-      category: 'vaktmester',
-      location: '',
-      completed_date: new Date().toISOString().split('T')[0],
-    });
+  const clearAllDrafts = () => {
+    clearFormDraft();
+    clearAllPreviews();
     setBeforeImage(null);
     setAfterImage(null);
-    setBeforePreview('');
-    setAfterPreview('');
   };
 
-  // Called only on successful submission
-  const handleClose = () => {
-    resetFormData();
+  // Called only on successful submission - clear drafts
+  const handleSuccessClose = () => {
+    clearAllDrafts();
     onClose();
   };
 
   // Called when user explicitly clicks "Avbryt"
   const handleCancel = () => {
-    if (hasUnsavedChanges()) {
-      if (!confirm('Du har ulagrede endringer. Er du sikker på at du vil avbryte?')) {
+    if (hasDraft) {
+      if (!confirm('Du har et utkast lagret. Vil du slette utkastet og avbryte?')) {
         return;
       }
+      clearAllDrafts();
     }
-    resetFormData();
     onClose();
   };
 
-  // Called on dialog backdrop click or escape - preserve data
+  // Called on dialog backdrop click or escape - just close, keep draft
   const handleDialogChange = (isOpen: boolean) => {
     if (!isOpen) {
-      onClose(); // Just close, don't reset data
+      onClose();
     }
   };
 
@@ -263,6 +278,25 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
             Gjør endringer og send inn på nytt til godkjenning
           </DialogDescription>
         </DialogHeader>
+        
+        {hasDraft && (
+          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
+              <FileText className="h-4 w-4" />
+              <span>Utkast lastet inn automatisk</span>
+            </div>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm"
+              onClick={clearAllDrafts}
+              className="text-blue-800 dark:text-blue-200 hover:text-blue-900 dark:hover:text-blue-100"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Slett utkast
+            </Button>
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -353,7 +387,7 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
                       className="absolute top-2 right-2"
                       onClick={() => {
                         setBeforeImage(null);
-                        setBeforePreview('');
+                        clearPreview('before');
                       }}
                     >
                       <X className="h-4 w-4" />
@@ -386,7 +420,7 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
                       className="absolute top-2 right-2"
                       onClick={() => {
                         setAfterImage(null);
-                        setAfterPreview('');
+                        clearPreview('after');
                       }}
                     >
                       <X className="h-4 w-4" />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload, X } from 'lucide-react';
+import { Loader2, Upload, X, FileText, Trash2 } from 'lucide-react';
+import { useFormDraft, useImageDraft } from '@/hooks/useFormDraft';
 import {
   Dialog,
   DialogContent,
@@ -37,23 +38,53 @@ const categoryOptions = [
   { value: 'annet', label: 'Annet' },
 ];
 
+const initialFormData = {
+  title: '',
+  description: '',
+  category: 'vaktmester',
+  location: '',
+  completed_date: new Date().toISOString().split('T')[0],
+};
+
 export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: 'vaktmester',
-    location: '',
-    completed_date: new Date().toISOString().split('T')[0],
+  // Use draft hooks for persistent storage
+  const { 
+    data: formData, 
+    setData: setFormData, 
+    hasDraft: hasFormDraft, 
+    clearDraft: clearFormDraft 
+  } = useFormDraft({
+    key: 'worker-project-form',
+    initialData: initialFormData,
+    userId: user?.id,
+    enabled: open,
   });
+  
+  const {
+    previews,
+    setPreview,
+    clearPreview,
+    clearAllPreviews,
+    hasDraft: hasImageDraft,
+  } = useImageDraft({
+    key: 'worker-project-form',
+    userId: user?.id,
+    enabled: open,
+  });
+  
   const [beforeImage, setBeforeImage] = useState<File | null>(null);
   const [afterImage, setAfterImage] = useState<File | null>(null);
-  const [beforePreview, setBeforePreview] = useState('');
-  const [afterPreview, setAfterPreview] = useState('');
   const [uploading, setUploading] = useState(false);
+
+  // Get previews from draft or state
+  const beforePreview = previews.before || '';
+  const afterPreview = previews.after || '';
+  
+  const hasDraft = hasFormDraft || hasImageDraft;
 
   const handleImageChange = (type: 'before' | 'after', file: File | null) => {
     if (!file) return;
@@ -65,12 +96,13 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
 
     const reader = new FileReader();
     reader.onloadend = () => {
+      const base64 = reader.result as string;
       if (type === 'before') {
         setBeforeImage(file);
-        setBeforePreview(reader.result as string);
+        setPreview('before', base64);
       } else {
         setAfterImage(file);
-        setAfterPreview(reader.result as string);
+        setPreview('after', base64);
       }
     };
     reader.readAsDataURL(file);
@@ -147,7 +179,7 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
       queryClient.invalidateQueries({ queryKey: ['worker-projects'] });
       queryClient.invalidateQueries({ queryKey: ['pending-projects'] });
       toast({ title: 'Innsendt', description: 'Prosjektet er sendt til godkjenning.' });
-      handleClose();
+      handleSuccessClose();
     },
     onError: (error: any) => {
       toast({ title: 'Feil', description: error.message, variant: 'destructive' });
@@ -157,55 +189,46 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
     },
   });
 
-  const hasUnsavedChanges = () => {
-    return formData.title !== '' || 
-           formData.description !== '' || 
-           formData.location !== '' ||
-           beforeImage !== null || 
-           afterImage !== null;
-  };
-
-  const resetFormData = () => {
-    setFormData({
-      title: '',
-      description: '',
-      category: 'vaktmester',
-      location: '',
-      completed_date: new Date().toISOString().split('T')[0],
-    });
+  const clearAllDrafts = () => {
+    clearFormDraft();
+    clearAllPreviews();
     setBeforeImage(null);
     setAfterImage(null);
-    setBeforePreview('');
-    setAfterPreview('');
   };
 
-  // Called only on successful submission
-  const handleClose = () => {
-    resetFormData();
+  // Called only on successful submission - clear drafts
+  const handleSuccessClose = () => {
+    clearAllDrafts();
     onClose();
   };
 
   // Called when user explicitly clicks "Avbryt"
   const handleCancel = () => {
-    if (hasUnsavedChanges()) {
-      if (!confirm('Du har ulagrede endringer. Er du sikker på at du vil avbryte?')) {
+    const hasData = formData.title !== '' || 
+                   formData.description !== '' || 
+                   formData.location !== '' ||
+                   beforePreview !== '' || 
+                   afterPreview !== '';
+    
+    if (hasData) {
+      if (!confirm('Du har et utkast lagret. Vil du slette utkastet og avbryte?')) {
         return;
       }
+      clearAllDrafts();
     }
-    resetFormData();
     onClose();
   };
 
-  // Called on dialog backdrop click or escape - preserve data
+  // Called on dialog backdrop click or escape - just close, keep draft
   const handleDialogChange = (isOpen: boolean) => {
     if (!isOpen) {
-      onClose(); // Just close, don't reset data
+      onClose();
     }
   };
 
   const isTitleValid = formData.title.length >= 5 && formData.title.length <= 100;
   const isDescriptionValid = formData.description.length >= 10 && formData.description.length <= 200;
-  const isFormValid = isTitleValid && isDescriptionValid && beforeImage && afterImage;
+  const isFormValid = isTitleValid && isDescriptionValid && (beforeImage || beforePreview) && (afterImage || afterPreview);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -215,6 +238,14 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
     }
     if (!isDescriptionValid) {
       toast({ title: 'Feil', description: 'Beskrivelse må være mellom 10 og 200 tegn', variant: 'destructive' });
+      return;
+    }
+    if (!beforeImage && !beforePreview) {
+      toast({ title: 'Feil', description: 'Du må laste opp et før-bilde', variant: 'destructive' });
+      return;
+    }
+    if (!afterImage && !afterPreview) {
+      toast({ title: 'Feil', description: 'Du må laste opp et etter-bilde', variant: 'destructive' });
       return;
     }
     submitProject.mutate();
@@ -229,6 +260,25 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
             Fyll ut informasjon og last opp før/etter bilder
           </DialogDescription>
         </DialogHeader>
+        
+        {hasDraft && (
+          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
+              <FileText className="h-4 w-4" />
+              <span>Utkast lastet inn automatisk</span>
+            </div>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm"
+              onClick={clearAllDrafts}
+              className="text-blue-800 dark:text-blue-200 hover:text-blue-900 dark:hover:text-blue-100"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Slett utkast
+            </Button>
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -319,7 +369,7 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
                       className="absolute top-2 right-2"
                       onClick={() => {
                         setBeforeImage(null);
-                        setBeforePreview('');
+                        clearPreview('before');
                       }}
                     >
                       <X className="h-4 w-4" />
@@ -352,7 +402,7 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
                       className="absolute top-2 right-2"
                       onClick={() => {
                         setAfterImage(null);
-                        setAfterPreview('');
+                        clearPreview('after');
                       }}
                     >
                       <X className="h-4 w-4" />

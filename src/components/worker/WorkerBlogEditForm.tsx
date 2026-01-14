@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload, X } from 'lucide-react';
+import { Loader2, Upload, X, FileText, Trash2 } from 'lucide-react';
+import { useFormDraft, useImageDraft } from '@/hooks/useFormDraft';
 import {
   Dialog,
   DialogContent,
@@ -52,28 +53,59 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const [formData, setFormData] = useState({
-    title: '',
-    summary: '',
-    content: '',
-    category: 'vaktmester',
+  const initialFormData = {
+    title: blog?.title || '',
+    summary: blog?.summary || '',
+    content: blog?.content || '',
+    category: blog?.category || 'vaktmester',
+  };
+  
+  // Use draft hooks for persistent storage with blog-specific key
+  const draftKey = blog ? `worker-blog-edit-${blog.id}` : 'worker-blog-edit-new';
+  
+  const { 
+    data: formData, 
+    setData: setFormData, 
+    hasDraft: hasFormDraft, 
+    clearDraft: clearFormDraft 
+  } = useFormDraft({
+    key: draftKey,
+    initialData: initialFormData,
+    userId: user?.id,
+    enabled: open && !!blog,
   });
+  
+  const {
+    previews,
+    setPreview,
+    clearPreview,
+    clearAllPreviews,
+    hasDraft: hasImageDraft,
+  } = useImageDraft({
+    key: draftKey,
+    userId: user?.id,
+    enabled: open && !!blog,
+  });
+  
   const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [coverPreview, setCoverPreview] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  // Pre-fill form when blog changes
+  // Get preview from draft, state, or blog
+  const coverPreview = previews.cover || blog?.cover_image_url || '';
+  
+  const hasDraft = hasFormDraft || hasImageDraft;
+
+  // Pre-fill form when blog changes (only if no draft exists)
   useEffect(() => {
-    if (blog) {
+    if (blog && !hasFormDraft) {
       setFormData({
         title: blog.title,
         summary: blog.summary,
         content: blog.content,
         category: blog.category,
       });
-      setCoverPreview(blog.cover_image_url);
     }
-  }, [blog]);
+  }, [blog, hasFormDraft]);
 
   const handleImageChange = (file: File | null) => {
     if (!file) return;
@@ -85,8 +117,9 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
 
     const reader = new FileReader();
     reader.onloadend = () => {
+      const base64 = reader.result as string;
       setCoverImage(file);
-      setCoverPreview(reader.result as string);
+      setPreview('cover', base64);
     };
     reader.readAsDataURL(file);
   };
@@ -169,7 +202,7 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
       queryClient.invalidateQueries({ queryKey: ['worker-blogs'] });
       queryClient.invalidateQueries({ queryKey: ['pending-blogs'] });
       toast({ title: 'Innsendt', description: 'Blogginnlegget er sendt til godkjenning på nytt.' });
-      handleClose();
+      handleSuccessClose();
     },
     onError: (error: any) => {
       toast({ title: 'Feil', description: error.message, variant: 'destructive' });
@@ -179,47 +212,33 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
     },
   });
 
-  const hasUnsavedChanges = () => {
-    if (!blog) return false;
-    return formData.title !== blog.title || 
-           formData.summary !== blog.summary || 
-           formData.content !== blog.content ||
-           formData.category !== blog.category ||
-           coverImage !== null;
-  };
-
-  const resetFormData = () => {
-    setFormData({
-      title: '',
-      summary: '',
-      content: '',
-      category: 'vaktmester',
-    });
+  const clearAllDrafts = () => {
+    clearFormDraft();
+    clearAllPreviews();
     setCoverImage(null);
-    setCoverPreview('');
   };
 
-  // Called only on successful submission
-  const handleClose = () => {
-    resetFormData();
+  // Called only on successful submission - clear drafts
+  const handleSuccessClose = () => {
+    clearAllDrafts();
     onClose();
   };
 
   // Called when user explicitly clicks "Avbryt"
   const handleCancel = () => {
-    if (hasUnsavedChanges()) {
-      if (!confirm('Du har ulagrede endringer. Er du sikker på at du vil avbryte?')) {
+    if (hasDraft) {
+      if (!confirm('Du har et utkast lagret. Vil du slette utkastet og avbryte?')) {
         return;
       }
+      clearAllDrafts();
     }
-    resetFormData();
     onClose();
   };
 
-  // Called on dialog backdrop click or escape - preserve data
+  // Called on dialog backdrop click or escape - just close, keep draft
   const handleDialogChange = (isOpen: boolean) => {
     if (!isOpen) {
-      onClose(); // Just close, don't reset data
+      onClose();
     }
   };
 
@@ -237,6 +256,25 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
             Gjør endringer og send inn på nytt til godkjenning
           </DialogDescription>
         </DialogHeader>
+        
+        {hasDraft && (
+          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-blue-800 dark:text-blue-200">
+              <FileText className="h-4 w-4" />
+              <span>Utkast lastet inn automatisk</span>
+            </div>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm"
+              onClick={clearAllDrafts}
+              className="text-blue-800 dark:text-blue-200 hover:text-blue-900 dark:hover:text-blue-100"
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Slett utkast
+            </Button>
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -298,7 +336,7 @@ export const WorkerBlogEditForm = ({ blog, open, onClose }: WorkerBlogEditFormPr
                     className="absolute top-2 right-2"
                     onClick={() => {
                       setCoverImage(null);
-                      setCoverPreview('');
+                      clearPreview('cover');
                     }}
                   >
                     <X className="h-4 w-4" />
