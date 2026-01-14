@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
 const FUNCTION_NAME = "send-agreement-status-email";
 
@@ -7,7 +8,6 @@ const FUNCTION_NAME = "send-agreement-status-email";
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_MAX_REQUESTS = 10;
 const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
-
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const record = rateLimits.get(ip);
@@ -185,11 +185,33 @@ const handler = async (req: Request): Promise<Response> => {
 
   const { contactPerson, email, address, services, status, agreementId, offerAmount, offerDocumentUrl, contractDocumentUrl, rejectionReason } = requestData;
 
-  // Bygg nedlastings-URL for dokumenter (bruker edge function for sikker nedlasting)
+  // Initialize Supabase client for generating secure download tokens
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const buildDownloadUrl = (type: "offer" | "contract") => {
-    if (!agreementId || !supabaseUrl) return null;
-    return `${supabaseUrl}/functions/v1/download-agreement-document?id=${agreementId}&type=${type}`;
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  
+  // Helper function to generate secure download token and build URL
+  const generateSecureDownloadUrl = async (type: "offer" | "contract"): Promise<string | null> => {
+    if (!agreementId || !supabaseUrl || !supabaseServiceKey) return null;
+    
+    try {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      // Generate a secure, single-use download token
+      const { data: token, error } = await supabase.rpc('generate_download_token', {
+        p_agreement_id: agreementId,
+        p_document_type: type
+      });
+      
+      if (error || !token) {
+        log.error("Failed to generate download token", error, { requestId, agreementId, type });
+        return null;
+      }
+      
+      return `${supabaseUrl}/functions/v1/download-agreement-document?token=${token}`;
+    } catch (err) {
+      log.error("Error generating download URL", err, { requestId, agreementId, type });
+      return null;
+    }
   };
 
   if (!contactPerson || !email || !status) {
@@ -225,18 +247,19 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     // Bygg tilbudsdetaljer hvis relevant
     let offerSection = '';
-    if (status === 'offer_sent' && offerAmount) {
-      const offerDownloadUrl = buildDownloadUrl('offer');
+    if (status === 'offer_sent' && offerAmount && offerDocumentUrl) {
+      const offerDownloadUrl = await generateSecureDownloadUrl('offer');
       offerSection = `
         <div style="background-color: #EDE9FE; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #8B5CF6;">
           <h3 style="margin: 0 0 10px 0; color: #5B21B6;">Tilbudsdetaljer</h3>
           <p style="font-size: 24px; font-weight: bold; color: #5B21B6; margin: 0;">
             kr ${offerAmount.toLocaleString('nb-NO')}/mnd
           </p>
-          ${offerDownloadUrl && offerDocumentUrl ? `
+          ${offerDownloadUrl ? `
             <a href="${offerDownloadUrl}" style="display: inline-block; margin-top: 15px; background-color: #8B5CF6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
               Last ned tilbudsdokument
             </a>
+            <p style="font-size: 12px; color: #6B7280; margin-top: 10px;">Lenken er gyldig i 7 dager og kan kun brukes én gang.</p>
           ` : ''}
         </div>
       `;
@@ -244,9 +267,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Bygg kontraktdetaljer hvis relevant
     let contractSection = '';
-    if (status === 'contract_signed') {
-      const contractDownloadUrl = buildDownloadUrl('contract');
-      if (contractDownloadUrl && contractDocumentUrl) {
+    if (status === 'contract_signed' && contractDocumentUrl) {
+      const contractDownloadUrl = await generateSecureDownloadUrl('contract');
+      if (contractDownloadUrl) {
         contractSection = `
           <div style="background-color: #D1FAE5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #10B981;">
             <h3 style="margin: 0 0 10px 0; color: #047857;">Din kontrakt</h3>
@@ -254,6 +277,7 @@ const handler = async (req: Request): Promise<Response> => {
             <a href="${contractDownloadUrl}" style="display: inline-block; background-color: #10B981; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">
               Last ned kontrakt
             </a>
+            <p style="font-size: 12px; color: #6B7280; margin-top: 10px;">Lenken er gyldig i 7 dager og kan kun brukes én gang.</p>
           </div>
         `;
       }

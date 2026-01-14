@@ -5,7 +5,7 @@ const FUNCTION_NAME = "download-agreement-document";
 
 // Rate limiting
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX_REQUESTS = 20;
+const RATE_LIMIT_MAX_REQUESTS = 10;
 const RATE_LIMIT_WINDOW_MS = 60000;
 
 function checkRateLimit(ip: string): boolean {
@@ -80,10 +80,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Validate UUID format
-function isValidUUID(str: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(str);
+// Validate token format (64 hex characters)
+function isValidToken(str: string): boolean {
+  const tokenRegex = /^[0-9a-f]{64}$/i;
+  return tokenRegex.test(str);
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -115,36 +115,27 @@ const handler = async (req: Request): Promise<Response> => {
 
   // Parse query parameters
   const url = new URL(req.url);
-  const agreementId = url.searchParams.get("id");
-  const type = url.searchParams.get("type"); // 'offer' or 'contract'
+  const token = url.searchParams.get("token");
 
-  // Validate parameters
-  if (!agreementId || !type) {
-    log.warn("Missing parameters", { requestId, agreementId: !!agreementId, type: !!type });
-    return new Response("Mangler påkrevde parametere (id og type)", {
+  // Validate token parameter
+  if (!token) {
+    log.warn("Missing token parameter", { requestId });
+    return new Response("Ugyldig eller manglende nedlastingslenke", {
       status: 400,
       headers: { "Content-Type": "text/plain", ...corsHeaders }
     });
   }
 
-  if (!isValidUUID(agreementId)) {
-    log.warn("Invalid agreement ID format", { requestId, agreementId });
-    return new Response("Ugyldig avtale-ID", {
-      status: 400,
-      headers: { "Content-Type": "text/plain", ...corsHeaders }
-    });
-  }
-
-  if (!["offer", "contract"].includes(type)) {
-    log.warn("Invalid document type", { requestId, type });
-    return new Response("Ugyldig dokumenttype (må være 'offer' eller 'contract')", {
+  if (!isValidToken(token)) {
+    log.warn("Invalid token format", { requestId });
+    return new Response("Ugyldig nedlastingslenke", {
       status: 400,
       headers: { "Content-Type": "text/plain", ...corsHeaders }
     });
   }
 
   try {
-    // Create Supabase client with service role for storage access
+    // Create Supabase client with service role for token validation
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
@@ -158,35 +149,53 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Fetch agreement from database
-    const { data: agreement, error: dbError } = await supabase
-      .from("service_agreements")
-      .select("offer_document_url, contract_document_url, contact_person")
-      .eq("id", agreementId)
-      .single();
+    // Validate and consume the download token using the secure RPC function
+    const { data: tokenData, error: tokenError } = await supabase
+      .rpc('validate_download_token', { 
+        p_token: token, 
+        p_ip_address: clientIP 
+      });
 
-    if (dbError || !agreement) {
-      log.warn("Agreement not found", { requestId, agreementId, error: dbError });
-      return new Response("Avtale ikke funnet", {
+    if (tokenError) {
+      log.error("Token validation failed", tokenError, { requestId });
+      return new Response("Kunne ikke validere nedlastingslenke", {
+        status: 500,
+        headers: { "Content-Type": "text/plain", ...corsHeaders }
+      });
+    }
+
+    if (!tokenData || tokenData.length === 0) {
+      log.warn("Token not found", { requestId });
+      return new Response("Nedlastingslenken er ugyldig eller utløpt", {
         status: 404,
+        headers: { "Content-Type": "text/plain", ...corsHeaders }
+      });
+    }
+
+    const validatedToken = tokenData[0];
+
+    if (!validatedToken.is_valid) {
+      log.warn("Token is invalid or expired", { requestId, agreementId: validatedToken.agreement_id });
+      return new Response("Nedlastingslenken er allerede brukt eller utløpt. Vennligst kontakt oss for en ny lenke.", {
+        status: 410,
         headers: { "Content-Type": "text/plain", ...corsHeaders }
       });
     }
 
     // Get the correct document URL based on type
-    const documentPath = type === "contract" 
-      ? agreement.contract_document_url 
-      : agreement.offer_document_url;
+    const documentPath = validatedToken.document_type === "contract" 
+      ? validatedToken.contract_document_url 
+      : validatedToken.offer_document_url;
 
     if (!documentPath) {
-      log.warn("Document not available", { requestId, agreementId, type });
-      return new Response(`${type === "contract" ? "Kontrakt" : "Tilbud"} er ikke tilgjengelig`, {
+      log.warn("Document not available", { requestId, agreementId: validatedToken.agreement_id, type: validatedToken.document_type });
+      return new Response(`${validatedToken.document_type === "contract" ? "Kontrakt" : "Tilbud"} er ikke tilgjengelig`, {
         status: 404,
         headers: { "Content-Type": "text/plain", ...corsHeaders }
       });
     }
 
-    log.info("Downloading document from storage", { requestId, agreementId, type, documentPath });
+    log.info("Downloading document from storage", { requestId, agreementId: validatedToken.agreement_id, type: validatedToken.document_type, documentPath });
 
     // Download file from storage
     const { data: fileData, error: storageError } = await supabase.storage
@@ -202,11 +211,11 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Generate filename
-    const filename = type === "contract" 
-      ? `kontrakt-${agreement.contact_person?.replace(/\s+/g, '-').toLowerCase() || 'dokument'}.pdf`
-      : `tilbud-${agreement.contact_person?.replace(/\s+/g, '-').toLowerCase() || 'dokument'}.pdf`;
+    const filename = validatedToken.document_type === "contract" 
+      ? `kontrakt-${validatedToken.contact_person?.replace(/\s+/g, '-').toLowerCase() || 'dokument'}.pdf`
+      : `tilbud-${validatedToken.contact_person?.replace(/\s+/g, '-').toLowerCase() || 'dokument'}.pdf`;
 
-    log.info("Document download successful", { requestId, agreementId, type, filename });
+    log.info("Document download successful", { requestId, agreementId: validatedToken.agreement_id, type: validatedToken.document_type, filename });
 
     // Return the file as a downloadable PDF
     return new Response(fileData, {
@@ -214,13 +223,13 @@ const handler = async (req: Request): Promise<Response> => {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="${filename}"`,
-        "Cache-Control": "private, max-age=3600",
+        "Cache-Control": "private, no-store",
         ...corsHeaders
       }
     });
 
   } catch (error) {
-    log.error("Unexpected error during download", error, { requestId, agreementId, type });
+    log.error("Unexpected error during download", error, { requestId });
     return new Response("En uventet feil oppstod", {
       status: 500,
       headers: { "Content-Type": "text/plain", ...corsHeaders }
