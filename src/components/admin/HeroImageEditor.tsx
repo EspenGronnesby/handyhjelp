@@ -36,9 +36,9 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Filen er for stor. Maks 5MB.');
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Filen er for stor. Maks 10MB.');
       return;
     }
 
@@ -158,7 +158,7 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
                   Klikk for å laste opp nytt bilde
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  JPG, PNG eller WebP (maks 5MB)
+                  JPG, PNG eller WebP (maks 10MB)
                 </p>
               </label>
             </div>
