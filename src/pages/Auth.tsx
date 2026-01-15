@@ -7,6 +7,16 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Home, Building2 } from 'lucide-react';
+import { CompanySearch } from '@/components/CompanySearch';
+
+interface Company {
+  orgNumber: string;
+  name: string;
+  organizationForm: string;
+  address: string;
+  postalCode: string;
+  city: string;
+}
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -15,6 +25,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [customerType, setCustomerType] = useState<'private' | 'business' | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(false);
   const { signUp, signIn, user } = useAuth();
   const { toast } = useToast();
@@ -49,7 +60,27 @@ const Auth = () => {
           setLoading(false);
           return;
         }
-        const { error } = await signUp(email, password, fullName, phone, customerType);
+        
+        // Bedriftskunder må velge en bedrift
+        if (customerType === 'business' && !selectedCompany) {
+          toast({
+            title: 'Feil',
+            description: 'Vennligst søk opp og velg din bedrift',
+            variant: 'destructive'
+          });
+          setLoading(false);
+          return;
+        }
+        
+        const { error } = await signUp(
+          email, 
+          password, 
+          fullName, 
+          phone, 
+          customerType,
+          selectedCompany?.orgNumber,
+          selectedCompany?.name
+        );
         if (error) throw error;
         toast({
           title: 'Konto opprettet!',
@@ -146,13 +177,27 @@ const Auth = () => {
                       type="button"
                       variant={customerType === "business" ? "default" : "outline"}
                       className="h-24 md:h-20 flex flex-col items-center justify-center space-y-2 active:scale-95"
-                      onClick={() => setCustomerType('business')}
+                      onClick={() => {
+                        setCustomerType('business');
+                        setSelectedCompany(null);
+                      }}
                     >
                       <Building2 className="h-7 w-7 md:h-6 md:w-6" />
                       <span className="text-sm md:text-base">Bedrift</span>
                     </Button>
                   </div>
                 </div>
+                
+                {/* Vis CompanySearch når bedrift er valgt */}
+                {customerType === 'business' && (
+                  <div className="space-y-2">
+                    <CompanySearch
+                      onCompanySelect={setSelectedCompany}
+                      selectedCompany={selectedCompany}
+                      disabled={loading}
+                    />
+                  </div>
+                )}
               </>
             )}
             <div className="space-y-2">
