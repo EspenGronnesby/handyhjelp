@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building, CheckCircle, Loader2 } from "lucide-react";
+import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building, CheckCircle, Loader2, UserPlus } from "lucide-react";
 import { CompanySearch } from "./CompanySearch";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
@@ -46,6 +47,8 @@ export const QuoteForm = () => {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createAccount, setCreateAccount] = useState(false);
+  const [password, setPassword] = useState('');
   const [formData, setFormData] = useState<FormData>({
     type: null,
     name: "",
@@ -117,6 +120,12 @@ export const QuoteForm = () => {
       if (formData.type === 'business' && !formData.selectedCompany) {
         currentErrors.company = "Vennligst velg din bedrift";
       }
+      // Valider passord hvis bruker vil opprette konto
+      if (!user && createAccount) {
+        if (!password || password.length < 6) {
+          currentErrors.password = "Passord må være minst 6 tegn";
+        }
+      }
     } else if (step === 3) {
       if (!formData.description.trim()) {
         currentErrors.description = "Beskrivelse er påkrevd";
@@ -137,6 +146,45 @@ export const QuoteForm = () => {
     setIsSubmitting(true);
 
     try {
+      let newUserId = user?.id || null;
+      
+      // Opprett bruker hvis avkrysset og ikke innlogget
+      if (createAccount && !user) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/dashboard`,
+            data: {
+              full_name: formData.name,
+              phone: formData.phone,
+              customer_type: formData.type,
+              org_number: formData.selectedCompany?.orgNumber || null,
+              company_name: formData.selectedCompany?.name || null
+            }
+          }
+        });
+
+        if (signUpError) {
+          if (signUpError.message.includes('already registered') || signUpError.message.includes('already exists')) {
+            toast({
+              title: "E-post allerede registrert",
+              description: "Logg inn for å knytte forespørselen til din konto, eller bruk en annen e-postadresse.",
+              variant: "destructive"
+            });
+            setIsSubmitting(false);
+            return;
+          }
+          console.error('SignUp error:', signUpError);
+        } else if (signUpData?.user) {
+          newUserId = signUpData.user.id;
+          toast({
+            title: "Konto opprettet!",
+            description: "Du kan nå logge inn med din e-post og passord.",
+          });
+        }
+      }
+
       // 1. Lagre til database FØRST
       const quoteData = {
         type: formData.type || 'private',
@@ -148,7 +196,7 @@ export const QuoteForm = () => {
         org_number: formData.selectedCompany?.orgNumber || null,
         description: formData.description,
         status: 'pending',
-        user_id: user?.id || null,
+        user_id: newUserId,
       };
 
       
@@ -165,10 +213,10 @@ export const QuoteForm = () => {
       } else {
         
         
-        // Opprett notifikasjon for innlogget bruker
-        if (user?.id) {
+        // Opprett notifikasjon for bruker (ny eller eksisterende)
+        if (newUserId) {
           await supabase.from('notifications').insert({
-            user_id: user.id,
+            user_id: newUserId,
             type: 'quote_update',
             title: 'Forespørsel mottatt',
             message: 'Vi har mottatt din forespørsel og vil ta kontakt innen 1-3 virkedager.',
@@ -252,7 +300,8 @@ export const QuoteForm = () => {
       const basicValid = !!(formData.name.trim() && formData.email.trim() && formData.phone.trim());
       const companyValid = formData.type === 'business' ? !!formData.selectedCompany : true;
       const addressValid = formData.type === 'private' ? !!formData.address.trim() : true;
-      return basicValid && companyValid && addressValid;
+      const passwordValid = (!user && createAccount) ? password.length >= 6 : true;
+      return basicValid && companyValid && addressValid && passwordValid;
     }
     if (step === 3) return formData.description.trim().length >= 10;
     return false;
@@ -430,6 +479,60 @@ export const QuoteForm = () => {
                   <div className="flex items-center gap-1 text-sm text-destructive">
                     <AlertCircle className="h-3 w-3" />
                     {errors.company}
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Avkrysningsboks for automatisk kontoopprettelse - kun for ikke-innloggede */}
+            {!user && (
+              <div className="pt-4 border-t space-y-4">
+                <div className="flex items-start space-x-3">
+                  <Checkbox 
+                    id="createAccount" 
+                    checked={createAccount}
+                    onCheckedChange={(checked) => {
+                      setCreateAccount(checked === true);
+                      if (!checked) {
+                        setPassword('');
+                        setErrors(prev => ({ ...prev, password: '' }));
+                      }
+                    }}
+                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="createAccount" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                      <UserPlus className="h-4 w-4" />
+                      Opprett en konto
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Følg med på din forespørsel og få tilgang til kundeportalen
+                    </p>
+                  </div>
+                </div>
+                
+                {createAccount && (
+                  <div className="space-y-2 ml-6">
+                    <Label htmlFor="password" className="text-sm">Velg et passord</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Minst 6 tegn"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (errors.password) {
+                          setErrors(prev => ({ ...prev, password: '' }));
+                        }
+                      }}
+                      className={errors.password ? 'border-destructive' : ''}
+                      minLength={6}
+                    />
+                    {errors.password && (
+                      <div className="flex items-center gap-1 text-sm text-destructive">
+                        <AlertCircle className="h-3 w-3" />
+                        {errors.password}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

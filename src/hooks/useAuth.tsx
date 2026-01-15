@@ -27,7 +27,15 @@ export const useAuth = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, phone: string, customerType: 'private' | 'business') => {
+  const signUp = async (
+    email: string, 
+    password: string, 
+    fullName: string, 
+    phone: string, 
+    customerType: 'private' | 'business',
+    orgNumber?: string,
+    companyName?: string
+  ) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -36,7 +44,9 @@ export const useAuth = () => {
         data: {
           full_name: fullName,
           phone: phone,
-          customer_type: customerType
+          customer_type: customerType,
+          org_number: orgNumber || null,
+          company_name: companyName || null
         }
       }
     });
@@ -44,7 +54,7 @@ export const useAuth = () => {
     // Welcome bonus is now awarded automatically via database trigger
     // See: award_welcome_bonus_trigger() function
 
-    return { error };
+    return { data, error };
   };
 
   const signIn = async (email: string, password: string) => {
