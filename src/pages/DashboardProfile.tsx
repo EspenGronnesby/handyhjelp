@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Shield, LogOut, Home, Building2, Crown, Hammer, UserCheck, User as UserIcon } from 'lucide-react';
+import { Loader2, Shield, LogOut, Home, Building2, Crown, Hammer, UserCheck, User as UserIcon, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -55,6 +55,9 @@ const DashboardProfile = () => {
   const [roles, setRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
   const { toast } = useToast();
   const { signOut } = useAuth();
   const navigate = useNavigate();
@@ -125,6 +128,49 @@ const DashboardProfile = () => {
       });
     }
     setSaving(false);
+  };
+
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmPassword) {
+      toast({
+        title: 'Feil',
+        description: 'Passordene stemmer ikke overens.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      toast({
+        title: 'Feil',
+        description: 'Passordet må være minst 6 tegn.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    setChangingPassword(true);
+    
+    const { error } = await supabase.auth.updateUser({ 
+      password: newPassword 
+    });
+    
+    if (error) {
+      toast({
+        title: 'Feil',
+        description: 'Kunne ikke endre passord. Prøv igjen.',
+        variant: 'destructive'
+      });
+    } else {
+      toast({
+        title: 'Passord endret!',
+        description: 'Ditt nye passord er nå aktivt.'
+      });
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+    
+    setChangingPassword(false);
   };
 
   const handleSignOut = async () => {
@@ -262,6 +308,46 @@ const DashboardProfile = () => {
           <Button onClick={handleSave} disabled={saving}>
             {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Lagre endringer
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="h-5 w-5" />
+            Endre passord
+          </CardTitle>
+          <CardDescription>
+            Oppdater passordet ditt for økt sikkerhet
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="new_password">Nytt passord</Label>
+            <Input
+              id="new_password"
+              type="password"
+              placeholder="Minst 6 tegn"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              minLength={6}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm_password">Bekreft nytt passord</Label>
+            <Input
+              id="confirm_password"
+              type="password"
+              placeholder="Skriv passordet på nytt"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              minLength={6}
+            />
+          </div>
+          <Button onClick={handlePasswordChange} disabled={changingPassword || !newPassword || !confirmPassword}>
+            {changingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Endre passord
           </Button>
         </CardContent>
       </Card>

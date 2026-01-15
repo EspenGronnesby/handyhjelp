@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle, Clock, Mail, Phone, ArrowRight, Home } from "lucide-react";
+import { CheckCircle, Clock, Mail, Phone, ArrowRight, Home, UserPlus, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Header } from "@/components/Header";
@@ -14,6 +14,7 @@ const ThankYou = () => {
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
   const type = searchParams.get("type");
+  const accountCreated = searchParams.get("accountCreated") === "true";
 
   useEffect(() => {
     // If accessed directly without email param, redirect to home
@@ -47,6 +48,30 @@ const ThankYou = () => {
               Vi har mottatt din {type === "business" ? "bedrifts" : "private"} forespørsel
             </p>
           </div>
+
+          {/* Account Created Card */}
+          {accountCreated && (
+            <Card className="p-6 mb-8 bg-success/10 border-success/20 shadow-lg">
+              <div className="flex items-start gap-4">
+                <UserPlus className="w-6 h-6 text-success flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">Konto opprettet!</h3>
+                  <p className="text-foreground mb-3">
+                    Din konto er nå opprettet med e-postadressen <strong>{email}</strong>. 
+                    Logg inn for å følge med på din forespørsel og få oppdateringer.
+                  </p>
+                  <Button 
+                    onClick={() => navigate('/auth')} 
+                    variant="default" 
+                    className="gap-2"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Logg inn på min konto
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Confirmation Card */}
           <Card className="p-8 mb-8 shadow-lg">

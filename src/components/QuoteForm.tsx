@@ -280,7 +280,8 @@ export const QuoteForm = () => {
         description: "Vi tar kontakt med deg innen 1-3 virkedager.",
       });
 
-      navigate(`/takk?email=${encodeURIComponent(formData.email)}&type=${formData.type}`);
+      const accountParam = (createAccount && !user && newUserId) ? '&accountCreated=true' : '';
+      navigate(`/takk?email=${encodeURIComponent(formData.email)}&type=${formData.type}${accountParam}`);
 
     } catch (error) {
       console.error('Form submission error:', error);
