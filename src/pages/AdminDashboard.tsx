@@ -3,7 +3,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Briefcase, CreditCard, FileText, Settings, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Briefcase, CreditCard, FileText, Settings, Package, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter, SingleJobStatusFilter, SINGLE_JOB_STATUS_LABELS } from '@/types/admin';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +37,7 @@ import { QuickFeedbackStats } from '@/components/admin/QuickFeedbackStats';
 import { OfferModal } from '@/components/admin/OfferModal';
 import { ContractModal } from '@/components/admin/ContractModal';
 import { RejectAgreementModal } from '@/components/admin/RejectAgreementModal';
+import { CreateJobModal } from '@/components/admin/CreateJobModal';
 
 type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'innstillinger';
 
@@ -48,7 +49,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('single-jobs');
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
-    type: 'start' | 'complete' | 'delete' | null;
+    type: 'start' | 'complete' | 'delete' | 'complete_directly' | null;
     item: Quote | Job | null;
   }>({ open: false, type: null, item: null });
   const [selectedCustomer, setSelectedCustomer] = useState<Profile | null>(null);
@@ -58,6 +59,7 @@ const AdminDashboard = () => {
   const [rejectAgreement, setRejectAgreement] = useState<ServiceAgreement | null>(null);
   const [agreementStatusFilter, setAgreementStatusFilter] = useState<AgreementStatusFilter>('new');
   const [singleJobStatusFilter, setSingleJobStatusFilter] = useState<SingleJobStatusFilter>('pending');
+  const [showCreateJobModal, setShowCreateJobModal] = useState(false);
 
   const {
     profiles,
@@ -79,6 +81,8 @@ const AdminDashboard = () => {
     handleStartJob,
     handleCompleteJob,
     handleDeleteJob,
+    handleCreateJob,
+    handleCompleteJobWithoutStart,
     handleUpdateAgreementStatus,
     handleRejectAgreement,
     refreshData,
@@ -178,6 +182,11 @@ const AdminDashboard = () => {
     await handleRejectAgreement(agreementId, reason);
   };
 
+  const handleConfirmedCompleteJobDirectly = async (quote: Quote) => {
+    await handleCompleteJobWithoutStart(quote);
+    setConfirmDialog({ open: false, type: null, item: null });
+  };
+
   // Filter agreements by status
   const filteredAgreements = agreementStatusFilter === 'all' 
     ? agreements 
@@ -260,7 +269,7 @@ const AdminDashboard = () => {
         {/* Enkelt-jobber */}
         <TabsContent value="single-jobs" className="space-y-4">
           {/* Status filter buttons */}
-          <div className="flex flex-wrap gap-2 pb-2">
+          <div className="flex flex-wrap gap-2 pb-2 items-center">
             {(Object.keys(SINGLE_JOB_STATUS_LABELS) as SingleJobStatusFilter[]).map((status) => {
               const statusBadge = status === 'pending' ? badges.adminDetails.pendingQuotes : 
                                   status === 'in_progress' ? badges.adminDetails.activeJobs : 0;
@@ -281,6 +290,12 @@ const AdminDashboard = () => {
                 </Button>
               );
             })}
+            <div className="ml-auto">
+              <Button onClick={() => setShowCreateJobModal(true)} variant="outline" size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                Opprett oppdrag
+              </Button>
+            </div>
           </div>
 
           {/* Nye forespørsler (pending) */}
@@ -292,6 +307,7 @@ const AdminDashboard = () => {
                   quote={quote}
                   actionLoading={actionLoading}
                   onStartJob={(q) => setConfirmDialog({ open: true, type: 'start', item: q })}
+                  onCompleteDirectly={(q) => setConfirmDialog({ open: true, type: 'complete_directly', item: q })}
                 />
               ))}
             </>
@@ -537,6 +553,7 @@ const AdminDashboard = () => {
         onStartJob={handleConfirmedStartJob}
         onCompleteJob={handleConfirmedCompleteJob}
         onDeleteJob={handleConfirmedDeleteJob}
+        onCompleteJobDirectly={handleConfirmedCompleteJobDirectly}
       />
 
       <CustomerDetailModal
@@ -571,6 +588,15 @@ const AdminDashboard = () => {
         open={!!rejectAgreement}
         onClose={() => setRejectAgreement(null)}
         onConfirm={handleConfirmedRejectAgreement}
+      />
+
+      <CreateJobModal
+        open={showCreateJobModal}
+        onClose={() => setShowCreateJobModal(false)}
+        profiles={profiles}
+        onCreateJob={async (profile, description, address, startImmediately) => {
+          await handleCreateJob(profile, description, address, startImmediately);
+        }}
       />
     </div>
   );

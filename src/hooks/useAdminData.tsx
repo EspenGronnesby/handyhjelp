@@ -191,6 +191,160 @@ export const useAdminData = (isAdmin: boolean) => {
     }
   };
 
+  // New function: Create job manually for an existing customer
+  const handleCreateJob = async (
+    profile: Profile,
+    description: string,
+    address: string | null,
+    startImmediately: boolean
+  ) => {
+    setActionLoading('create-job');
+    
+    try {
+      // 1. Create quote with profile data
+      const quoteData = {
+        user_id: profile.id,
+        type: profile.customer_type || 'private',
+        name: profile.full_name,
+        email: profile.email,
+        phone: profile.phone || '',
+        company_name: profile.company_name,
+        org_number: profile.org_number,
+        description: description,
+        address: address,
+        status: startImmediately ? 'in_progress' : 'pending',
+      };
+      
+      const { data: quote, error: quoteError } = await supabase
+        .from('quotes')
+        .insert(quoteData)
+        .select()
+        .single();
+
+      if (quoteError) throw quoteError;
+
+      // 2. If startImmediately, create job and send email
+      if (startImmediately) {
+        const { error: jobError } = await supabase
+          .from('jobs')
+          .insert({
+            quote_id: quote.id,
+            user_id: profile.id,
+            status: 'in_progress',
+            started_at: new Date().toISOString(),
+          });
+
+        if (jobError) throw jobError;
+
+        // Send notification to user
+        await supabase.from('notifications').insert({
+          user_id: profile.id,
+          type: 'job_update',
+          title: 'Nytt oppdrag startet',
+          message: `Vi har startet arbeidet med: "${description.substring(0, 100)}"`,
+          read: false
+        });
+
+        // Send email via edge function
+        supabase.functions.invoke('send-job-status-email', {
+          body: {
+            customerName: profile.customer_type === 'business' ? profile.company_name : profile.full_name,
+            customerEmail: profile.email,
+            jobDescription: description,
+            status: 'started',
+          },
+        }).catch(console.error);
+      }
+
+      await fetchData();
+
+      toast({
+        title: "Oppdrag opprettet!",
+        description: startImmediately 
+          ? "Oppdraget er opprettet og startet. Kunden har mottatt e-post."
+          : "Oppdraget er opprettet og venter på å bli startet.",
+      });
+
+    } catch (error: any) {
+      console.error('Error creating job:', error);
+      toast({
+        title: "Feil",
+        description: `Kunne ikke opprette oppdrag: ${error?.message || 'Ukjent feil'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // New function: Complete a job without starting it first
+  const handleCompleteJobWithoutStart = async (quote: Quote) => {
+    setActionLoading(quote.id);
+    
+    try {
+      // 1. Create job with completed status directly
+      const { data: job, error: jobError } = await supabase
+        .from('jobs')
+        .insert({
+          quote_id: quote.id,
+          user_id: quote.user_id,
+          status: 'completed',
+          completed_date: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (jobError) throw jobError;
+
+      // 2. Update quote to completed
+      const { error: quoteError } = await supabase
+        .from('quotes')
+        .update({ status: 'completed' })
+        .eq('id', quote.id);
+
+      if (quoteError) throw quoteError;
+
+      // 3. Create notification for user
+      if (quote.user_id) {
+        await supabase.from('notifications').insert({
+          user_id: quote.user_id,
+          type: 'job_update',
+          title: 'Oppdraget ditt er fullført',
+          message: `Oppdraget "${quote.description.substring(0, 100)}" er nå ferdig. Takk for at du valgte HandyHjelp!`,
+          read: false
+        });
+      }
+
+      // 4. Send only completion email (not started email)
+      supabase.functions.invoke('send-job-status-email', {
+        body: {
+          customerName: quote.type === 'business' ? quote.company_name : quote.name,
+          customerEmail: quote.email,
+          jobDescription: quote.description,
+          status: 'completed',
+          jobId: job.id,
+        },
+      }).catch(console.error);
+
+      await fetchData();
+
+      toast({
+        title: "Suksess!",
+        description: "Oppdraget er fullført og kunden har mottatt bekreftelse på e-post.",
+      });
+
+    } catch (error: any) {
+      console.error('Error completing job without start:', error);
+      toast({
+        title: "Feil",
+        description: `Kunne ikke fullføre oppdraget: ${error?.message || 'Ukjent feil'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleUpdateAgreementStatus = async (agreementId: string, newStatus: string) => {
     setActionLoading(agreementId);
     
@@ -389,6 +543,8 @@ export const useAdminData = (isAdmin: boolean) => {
     handleStartJob,
     handleCompleteJob,
     handleDeleteJob,
+    handleCreateJob,
+    handleCompleteJobWithoutStart,
     handleUpdateAgreementStatus,
     handleRejectAgreement,
     refreshData,
