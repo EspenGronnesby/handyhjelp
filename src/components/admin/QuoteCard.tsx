@@ -3,16 +3,17 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { Loader2, Play } from 'lucide-react';
+import { Loader2, Play, CheckCircle } from 'lucide-react';
 import { Quote, STATUS_COLORS, STATUS_LABELS } from '@/types/admin';
 
 interface QuoteCardProps {
   quote: Quote;
   actionLoading: string | null;
   onStartJob: (quote: Quote) => void;
+  onCompleteDirectly?: (quote: Quote) => void;
 }
 
-export const QuoteCard = ({ quote, actionLoading, onStartJob }: QuoteCardProps) => {
+export const QuoteCard = ({ quote, actionLoading, onStartJob, onCompleteDirectly }: QuoteCardProps) => {
   return (
     <Card>
       <CardHeader>
@@ -60,17 +61,33 @@ export const QuoteCard = ({ quote, actionLoading, onStartJob }: QuoteCardProps) 
             </div>
           )}
         </div>
-        <Button 
-          onClick={() => onStartJob(quote)}
-          disabled={actionLoading === quote.id}
-          className="w-full sm:w-auto"
-        >
-          {actionLoading === quote.id ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Starter...</>
-          ) : (
-            <><Play className="mr-2 h-4 w-4" /> Start jobb</>
+        <div className="flex flex-wrap gap-2">
+          <Button 
+            onClick={() => onStartJob(quote)}
+            disabled={actionLoading === quote.id}
+            className="w-full sm:w-auto"
+          >
+            {actionLoading === quote.id ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Starter...</>
+            ) : (
+              <><Play className="mr-2 h-4 w-4" /> Start jobb</>
+            )}
+          </Button>
+          {onCompleteDirectly && (
+            <Button 
+              variant="outline"
+              onClick={() => onCompleteDirectly(quote)}
+              disabled={actionLoading === quote.id}
+              className="w-full sm:w-auto"
+            >
+              {actionLoading === quote.id ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Fullfører...</>
+              ) : (
+                <><CheckCircle className="mr-2 h-4 w-4" /> Avslutt direkte</>
+              )}
+            </Button>
           )}
-        </Button>
+        </div>
       </CardContent>
     </Card>
   );
