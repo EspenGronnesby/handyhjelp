@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Users, Palette, ScrollText, Home, Shield } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { RoleManagement } from '@/components/platform/RoleManagement';
-import { AuditLogViewer } from '@/components/platform/AuditLogViewer';
+import { ActivityLogViewer } from '@/components/platform/ActivityLogViewer';
 import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 
 const OwnerDashboard = () => {
@@ -104,7 +104,7 @@ const OwnerDashboard = () => {
           </TabsContent>
 
           <TabsContent value="audit">
-            <AuditLogViewer />
+            <ActivityLogViewer />
           </TabsContent>
         </Tabs>
       </div>

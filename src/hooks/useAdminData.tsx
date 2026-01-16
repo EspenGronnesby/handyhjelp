@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Quote, Job, Profile, ServiceAgreement } from '@/types/admin';
-
+import { logActivity } from '@/hooks/useActivityLog';
 const JOBS_PER_PAGE = 10;
 
 export const useAdminData = (isAdmin: boolean) => {
@@ -85,6 +85,14 @@ export const useAdminData = (isAdmin: boolean) => {
         },
       }).catch(console.error);
 
+      // Log activity
+      await logActivity(
+        'job_started',
+        'job_management',
+        `Startet oppdrag for ${quote.type === 'business' ? quote.company_name : quote.name}: "${quote.description.substring(0, 50)}..."`,
+        { quote_id: quote.id, customer_name: quote.name }
+      );
+
       toast({
         title: "Suksess!",
         description: "Jobben er startet og kunde vil motta e-post.",
@@ -147,6 +155,14 @@ export const useAdminData = (isAdmin: boolean) => {
         },
       }).catch(console.error);
 
+      // Log activity
+      await logActivity(
+        'job_completed',
+        'job_management',
+        `Fullførte oppdrag for ${job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name}: "${job.quotes.description.substring(0, 50)}..."`,
+        { job_id: job.id, quote_id: job.quote_id }
+      );
+
       toast({
         title: "Suksess!",
         description: "Jobben er fullført og kunde vil motta e-post.",
@@ -173,6 +189,14 @@ export const useAdminData = (isAdmin: boolean) => {
       if (error) throw error;
 
       setJobs(prevJobs => prevJobs.filter(j => j.id !== job.id));
+      
+      // Log activity
+      await logActivity(
+        'job_deleted',
+        'job_management',
+        `Slettet oppdrag: "${job.quotes.description.substring(0, 50)}..."`,
+        { job_id: job.id, quote_id: job.quote_id }
+      );
       
       toast({
         title: "Slettet",
@@ -299,6 +323,19 @@ export const useAdminData = (isAdmin: boolean) => {
 
       await fetchData();
 
+      // Log activity
+      const actionLabels = {
+        register: 'job_created',
+        start: 'job_started',
+        complete: 'job_completed',
+      };
+      await logActivity(
+        actionLabels[action] as 'job_created' | 'job_started' | 'job_completed',
+        'job_management',
+        `Opprettet oppdrag for ${profile.customer_type === 'business' ? profile.company_name : profile.full_name}: "${description.substring(0, 50)}..." (${action === 'register' ? 'registrert' : action === 'start' ? 'startet' : 'fullført'})`,
+        { profile_id: profile.id, action }
+      );
+
       const messages = {
         register: "Oppdraget er registrert og venter på å bli startet.",
         start: "Oppdraget er opprettet og startet. Kunden har mottatt e-post.",
@@ -372,6 +409,14 @@ export const useAdminData = (isAdmin: boolean) => {
       }).catch(console.error);
 
       await fetchData();
+
+      // Log activity
+      await logActivity(
+        'job_completed',
+        'job_management',
+        `Fullførte oppdrag direkte for ${quote.type === 'business' ? quote.company_name : quote.name}: "${quote.description.substring(0, 50)}..."`,
+        { quote_id: quote.id }
+      );
 
       toast({
         title: "Suksess!",

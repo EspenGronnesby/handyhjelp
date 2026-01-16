@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_category: string
+          action_type: string
+          created_at: string | null
+          description: string
+          id: string
+          metadata: Json | null
+          target_user_id: string | null
+          target_user_name: string | null
+          user_id: string | null
+          user_name: string | null
+          user_role: string
+        }
+        Insert: {
+          action_category: string
+          action_type: string
+          created_at?: string | null
+          description: string
+          id?: string
+          metadata?: Json | null
+          target_user_id?: string | null
+          target_user_name?: string | null
+          user_id?: string | null
+          user_name?: string | null
+          user_role: string
+        }
+        Update: {
+          action_category?: string
+          action_type?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          metadata?: Json | null
+          target_user_id?: string | null
+          target_user_name?: string | null
+          user_id?: string | null
+          user_name?: string | null
+          user_role?: string
+        }
+        Relationships: []
+      }
       agreement_activities: {
         Row: {
           action: string
