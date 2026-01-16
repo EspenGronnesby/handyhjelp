@@ -196,11 +196,16 @@ export const useAdminData = (isAdmin: boolean) => {
     profile: Profile,
     description: string,
     address: string | null,
-    startImmediately: boolean
+    action: 'register' | 'start' | 'complete'
   ) => {
     setActionLoading('create-job');
     
     try {
+      // Determine initial status based on action
+      let quoteStatus = 'pending';
+      if (action === 'start') quoteStatus = 'in_progress';
+      if (action === 'complete') quoteStatus = 'completed';
+
       // 1. Create quote with profile data
       const quoteData = {
         user_id: profile.id,
@@ -212,7 +217,7 @@ export const useAdminData = (isAdmin: boolean) => {
         org_number: profile.org_number,
         description: description,
         address: address,
-        status: startImmediately ? 'in_progress' : 'pending',
+        status: quoteStatus,
       };
       
       const { data: quote, error: quoteError } = await supabase
@@ -223,8 +228,9 @@ export const useAdminData = (isAdmin: boolean) => {
 
       if (quoteError) throw quoteError;
 
-      // 2. If startImmediately, create job and send email
-      if (startImmediately) {
+      // 2. Handle based on action
+      if (action === 'start') {
+        // Create job with in_progress status
         const { error: jobError } = await supabase
           .from('jobs')
           .insert({
@@ -254,15 +260,54 @@ export const useAdminData = (isAdmin: boolean) => {
             status: 'started',
           },
         }).catch(console.error);
+      } else if (action === 'complete') {
+        // Create job with completed status directly
+        const { data: job, error: jobError } = await supabase
+          .from('jobs')
+          .insert({
+            quote_id: quote.id,
+            user_id: profile.id,
+            status: 'completed',
+            completed_date: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (jobError) throw jobError;
+
+        // Send notification to user
+        await supabase.from('notifications').insert({
+          user_id: profile.id,
+          type: 'job_update',
+          title: 'Oppdraget ditt er fullført',
+          message: `Oppdraget "${description.substring(0, 100)}" er nå ferdig. Takk for at du valgte HandyHjelp!`,
+          read: false
+        });
+
+        // Send completion email via edge function
+        supabase.functions.invoke('send-job-status-email', {
+          body: {
+            customerName: profile.customer_type === 'business' ? profile.company_name : profile.full_name,
+            customerEmail: profile.email,
+            jobDescription: description,
+            status: 'completed',
+            jobId: job.id,
+          },
+        }).catch(console.error);
       }
+      // For action === 'register', we just create the quote without a job
 
       await fetchData();
 
+      const messages = {
+        register: "Oppdraget er registrert og venter på å bli startet.",
+        start: "Oppdraget er opprettet og startet. Kunden har mottatt e-post.",
+        complete: "Oppdraget er opprettet og fullført. Kunden har mottatt bekreftelse på e-post.",
+      };
+
       toast({
         title: "Oppdrag opprettet!",
-        description: startImmediately 
-          ? "Oppdraget er opprettet og startet. Kunden har mottatt e-post."
-          : "Oppdraget er opprettet og venter på å bli startet.",
+        description: messages[action],
       });
 
     } catch (error: any) {

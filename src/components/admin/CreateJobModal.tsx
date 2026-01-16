@@ -4,14 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Loader2, Search, User, Building2, Mail, Phone, MapPin, Check, ChevronsUpDown } from 'lucide-react';
+import { Loader2, User, Building2, Mail, Phone, MapPin, Check, ChevronsUpDown } from 'lucide-react';
 import { Profile } from '@/types/admin';
 import { cn } from '@/lib/utils';
+
+type JobAction = 'register' | 'start' | 'complete';
 
 interface CreateJobModalProps {
   open: boolean;
@@ -21,7 +23,7 @@ interface CreateJobModalProps {
     profile: Profile,
     description: string,
     address: string | null,
-    startImmediately: boolean
+    action: JobAction
   ) => Promise<void>;
 }
 
@@ -34,7 +36,7 @@ export const CreateJobModal = ({
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
-  const [startImmediately, setStartImmediately] = useState(false);
+  const [action, setAction] = useState<JobAction>('register');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -61,7 +63,7 @@ export const CreateJobModal = ({
         selectedProfile,
         description.trim(),
         address.trim() || null,
-        startImmediately
+        action
       );
       handleReset();
       onClose();
@@ -74,7 +76,7 @@ export const CreateJobModal = ({
     setSelectedProfile(null);
     setDescription('');
     setAddress('');
-    setStartImmediately(false);
+    setAction('register');
     setSearchQuery('');
   };
 
@@ -239,19 +241,29 @@ export const CreateJobModal = ({
             />
           </div>
 
-          {/* Start Immediately Checkbox */}
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="startImmediately" 
-              checked={startImmediately}
-              onCheckedChange={(checked) => setStartImmediately(checked === true)}
-            />
-            <Label 
-              htmlFor="startImmediately" 
-              className="text-sm font-normal cursor-pointer"
-            >
-              Start oppdraget umiddelbart (sender e-post til kunden)
-            </Label>
+          {/* Action Selection */}
+          <div className="space-y-3">
+            <Label>Handling ved opprettelse</Label>
+            <RadioGroup value={action} onValueChange={(value) => setAction(value as JobAction)}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="register" id="register" />
+                <Label htmlFor="register" className="text-sm font-normal cursor-pointer">
+                  Bare registrer oppdraget (ingen e-post)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="start" id="start" />
+                <Label htmlFor="start" className="text-sm font-normal cursor-pointer">
+                  Start oppdraget umiddelbart (sender e-post til kunden)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="complete" id="complete" />
+                <Label htmlFor="complete" className="text-sm font-normal cursor-pointer">
+                  Avslutt oppdraget umiddelbart (sender fullført-e-post til kunden)
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
         </div>
 

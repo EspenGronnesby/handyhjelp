@@ -594,8 +594,8 @@ const AdminDashboard = () => {
         open={showCreateJobModal}
         onClose={() => setShowCreateJobModal(false)}
         profiles={profiles}
-        onCreateJob={async (profile, description, address, startImmediately) => {
-          await handleCreateJob(profile, description, address, startImmediately);
+        onCreateJob={async (profile, description, address, action) => {
+          await handleCreateJob(profile, description, address, action);
         }}
       />
     </div>
