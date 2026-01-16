@@ -3,7 +3,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Briefcase, CreditCard, FileText, Settings, Package, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Loader2, Briefcase, CreditCard, FileText, Package, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter, SingleJobStatusFilter, SINGLE_JOB_STATUS_LABELS } from '@/types/admin';
 import { Badge } from '@/components/ui/badge';
