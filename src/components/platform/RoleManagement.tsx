@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { logActivity } from '@/hooks/useActivityLog';
 import { Search, Plus, X, Loader2, User, Crown, Shield, Hammer } from 'lucide-react';
 import {
   Select,
@@ -114,17 +115,28 @@ export const RoleManagement = () => {
   });
 
   const addRole = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+    mutationFn: async ({ userId, role, userName }: { userId: string; role: string; userName: string }) => {
       const { error } = await supabase
         .from('user_roles')
         .insert([{ user_id: userId, role: role as any }]);
       if (error) throw error;
+      return { userName, role };
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-roles', selectedUser?.id] });
       refetchRoles();
       toast({ title: 'Rolle lagt til', description: 'Brukerens rolle er oppdatert.' });
       setNewRole('');
+      
+      // Log activity
+      await logActivity(
+        'role_assigned',
+        'role_management',
+        `Tildelte rollen "${roleLabels[data.role] || data.role}" til ${data.userName}`,
+        { role: data.role },
+        selectedUser?.id,
+        data.userName
+      );
     },
     onError: (error: any) => {
       toast({ 
@@ -138,17 +150,29 @@ export const RoleManagement = () => {
   });
 
   const removeRole = useMutation({
-    mutationFn: async (roleId: string) => {
+    mutationFn: async ({ roleId, roleName }: { roleId: string; roleName: string }) => {
       const { error } = await supabase
         .from('user_roles')
         .delete()
         .eq('id', roleId);
       if (error) throw error;
+      return { roleName };
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-roles', selectedUser?.id] });
       refetchRoles();
       toast({ title: 'Rolle fjernet', description: 'Brukerens rolle er fjernet.' });
+      
+      // Log activity
+      await logActivity(
+        'role_removed',
+        'role_management',
+        `Fjernet rollen "${data.roleName}" fra ${selectedUser?.full_name || selectedUser?.email}`,
+        { role: deleteDialog.roleName },
+        selectedUser?.id,
+        selectedUser?.full_name || selectedUser?.email
+      );
+      
       setDeleteDialog({ open: false, roleId: null, roleName: '' });
     },
     onError: (error: any) => {
@@ -162,7 +186,7 @@ export const RoleManagement = () => {
 
   const handleAddRole = () => {
     if (!selectedUser || !newRole) return;
-    addRole.mutate({ userId: selectedUser.id, role: newRole });
+    addRole.mutate({ userId: selectedUser.id, role: newRole, userName: selectedUser.full_name || selectedUser.email });
   };
 
   return (
@@ -313,7 +337,7 @@ export const RoleManagement = () => {
             <AlertDialogAction
               onClick={() => {
                 if (deleteDialog.roleId) {
-                  removeRole.mutate(deleteDialog.roleId);
+                  removeRole.mutate({ roleId: deleteDialog.roleId, roleName: deleteDialog.roleName });
                 }
               }}
             >

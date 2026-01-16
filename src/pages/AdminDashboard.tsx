@@ -29,7 +29,6 @@ import { CustomerDetailModal } from '@/components/admin/CustomerDetailModal';
 import { AdminConfirmDialog } from '@/components/admin/AdminConfirmDialog';
 import { ProjectManagement } from '@/components/admin/ProjectManagement';
 import { BlogManagement } from '@/components/admin/BlogManagement';
-import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 import { InvoiceUploadModal } from '@/components/admin/InvoiceUploadModal';
 import { InvoiceManagement } from '@/components/admin/InvoiceManagement';
 import ReviewManagement from '@/components/admin/ReviewManagement';
@@ -39,7 +38,7 @@ import { ContractModal } from '@/components/admin/ContractModal';
 import { RejectAgreementModal } from '@/components/admin/RejectAgreementModal';
 import { CreateJobModal } from '@/components/admin/CreateJobModal';
 
-type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'innstillinger';
+type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold';
 
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
@@ -128,14 +127,6 @@ const AdminDashboard = () => {
         { key: 'reviews', label: 'Anmeldelser', count: null, badge: badges.adminDetails.pendingReviews },
       ],
       totalBadge: badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs + badges.adminDetails.pendingReviews,
-    },
-    innstillinger: {
-      label: 'Innstillinger / redigering',
-      icon: Settings,
-      tabs: [
-        { key: 'site-editing', label: 'Redigering', count: null, badge: 0 },
-      ],
-      totalBadge: 0,
     },
   };
 
@@ -541,10 +532,6 @@ const AdminDashboard = () => {
           <ReviewManagement />
         </TabsContent>
 
-        {/* Site Editing Tab */}
-        <TabsContent value="site-editing">
-          <SiteEditingPanel />
-        </TabsContent>
       </Tabs>
 
       <AdminConfirmDialog
