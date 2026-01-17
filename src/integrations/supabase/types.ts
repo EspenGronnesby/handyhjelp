@@ -262,6 +262,107 @@ export type Database = {
           },
         ]
       }
+      email_logs: {
+        Row: {
+          batch_id: string | null
+          content: string
+          error_message: string | null
+          id: string
+          included_feedback_button: boolean | null
+          recipient_email: string
+          recipient_name: string | null
+          recipient_type: string
+          recipient_user_id: string | null
+          sender_name: string | null
+          sender_role: string | null
+          sender_user_id: string
+          sent_at: string | null
+          status: string | null
+          subject: string
+          template_id: string | null
+          template_name: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          content: string
+          error_message?: string | null
+          id?: string
+          included_feedback_button?: boolean | null
+          recipient_email: string
+          recipient_name?: string | null
+          recipient_type?: string
+          recipient_user_id?: string | null
+          sender_name?: string | null
+          sender_role?: string | null
+          sender_user_id: string
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+          template_id?: string | null
+          template_name?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          content?: string
+          error_message?: string | null
+          id?: string
+          included_feedback_button?: boolean | null
+          recipient_email?: string
+          recipient_name?: string | null
+          recipient_type?: string
+          recipient_user_id?: string | null
+          sender_name?: string | null
+          sender_role?: string | null
+          sender_user_id?: string
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+          template_id?: string | null
+          template_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          include_feedback_button: boolean | null
+          name: string
+          subject: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          include_feedback_button?: boolean | null
+          name: string
+          subject: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          include_feedback_button?: boolean | null
+          name?: string
+          subject?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       hero_images: {
         Row: {
           created_at: string | null
