@@ -1087,39 +1087,48 @@ export type Database = {
           approved_by: string | null
           comment: string | null
           created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          feedback_type: string | null
           id: string
-          job_id: string
+          job_id: string | null
           rating: number
           status: string
           tenant_id: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
           comment?: string | null
           created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          feedback_type?: string | null
           id?: string
-          job_id: string
+          job_id?: string | null
           rating: number
           status?: string
           tenant_id?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           approved_at?: string | null
           approved_by?: string | null
           comment?: string | null
           created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          feedback_type?: string | null
           id?: string
-          job_id?: string
+          job_id?: string | null
           rating?: number
           status?: string
           tenant_id?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {

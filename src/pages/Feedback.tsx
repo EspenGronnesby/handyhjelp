@@ -39,12 +39,13 @@ export default function Feedback() {
 
     setLoading(true);
     try {
-      // Store feedback in general_feedback table
-      const { error } = await supabase.from('general_feedback').insert({
+      // Store feedback in reviews table with feedback_type 'general'
+      const { error } = await supabase.from('reviews').insert({
         rating: rating,
         comment: formData.comment || null,
-        name: formData.name || null,
-        email: formData.email || null,
+        customer_name: formData.name || null,
+        customer_email: formData.email || null,
+        feedback_type: 'general',
         status: 'pending'
       });
 

@@ -9,6 +9,8 @@ interface Review {
   rating: number;
   comment: string | null;
   created_at: string;
+  feedback_type: string | null;
+  customer_name: string | null;
   profiles?: {
     full_name: string;
     customer_type: string | null;
@@ -34,25 +36,46 @@ const TestimonialsSection = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
+        // Fetch reviews without foreign key joins to handle nullable fields
         const { data, error } = await supabase
           .from('reviews')
-          .select(`
-            id,
-            rating,
-            comment,
-            created_at,
-            profiles!reviews_user_id_fkey(full_name, customer_type, company_name),
-            jobs!reviews_job_id_fkey(
-              quotes(type, name, company_name)
-            )
-          `)
+          .select('id, rating, comment, created_at, feedback_type, customer_name, user_id, job_id')
           .eq('status', 'approved')
           .gte('rating', 4)
           .order('created_at', { ascending: false })
           .limit(10);
 
         if (error) throw error;
-        setReviews(data || []);
+        
+        // Fetch related data separately
+        const reviewsWithRelations = await Promise.all(
+          (data || []).map(async (review) => {
+            let profiles = undefined;
+            let jobs = undefined;
+            
+            if (review.user_id) {
+              const { data: profileData } = await supabase
+                .from('profiles')
+                .select('full_name, customer_type, company_name')
+                .eq('id', review.user_id)
+                .single();
+              profiles = profileData || undefined;
+            }
+            
+            if (review.job_id) {
+              const { data: jobData } = await supabase
+                .from('jobs')
+                .select('quotes(type, name, company_name)')
+                .eq('id', review.job_id)
+                .single();
+              jobs = jobData || undefined;
+            }
+            
+            return { ...review, profiles, jobs };
+          })
+        );
+        
+        setReviews(reviewsWithRelations);
       } catch (error) {
         console.error('Error fetching reviews:', error);
       } finally {
@@ -125,6 +148,14 @@ const TestimonialsSection = () => {
   };
 
   const getCustomerDisplay = (review: Review) => {
+    // Handle general feedback
+    if (review.feedback_type === 'general') {
+      return {
+        name: review.customer_name?.split(' ')[0] || 'Kunde',
+        isBusiness: false
+      };
+    }
+    
     const profile = review.profiles;
     const quote = review.jobs?.quotes;
     

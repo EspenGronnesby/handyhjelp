@@ -23,13 +23,16 @@ import { cn } from '@/lib/utils';
 
 interface Review {
   id: string;
-  job_id: string;
-  user_id: string;
+  job_id: string | null;
+  user_id: string | null;
   rating: number;
   comment: string | null;
   status: string;
   created_at: string;
   approved_at: string | null;
+  customer_name: string | null;
+  customer_email: string | null;
+  feedback_type: string | null;
   profiles?: {
     full_name: string;
     email: string;
@@ -56,16 +59,51 @@ const ReviewManagement = () => {
       const { data, error } = await supabase
         .from('reviews')
         .select(`
-          *,
-          profiles!reviews_user_id_fkey(full_name, email),
-          jobs!reviews_job_id_fkey(
-            quotes(type, name)
-          )
+          id,
+          job_id,
+          user_id,
+          rating,
+          comment,
+          status,
+          created_at,
+          approved_at,
+          customer_name,
+          customer_email,
+          feedback_type
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setReviews(data || []);
+      
+      // Fetch related data separately for reviews with job_id/user_id
+      const reviewsWithRelations = await Promise.all(
+        (data || []).map(async (review) => {
+          let profiles = undefined;
+          let jobs = undefined;
+          
+          if (review.user_id) {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('full_name, email')
+              .eq('id', review.user_id)
+              .single();
+            profiles = profileData || undefined;
+          }
+          
+          if (review.job_id) {
+            const { data: jobData } = await supabase
+              .from('jobs')
+              .select('quotes(type, name)')
+              .eq('id', review.job_id)
+              .single();
+            jobs = jobData || undefined;
+          }
+          
+          return { ...review, profiles, jobs };
+        })
+      );
+      
+      setReviews(reviewsWithRelations);
     } catch (error) {
       console.error('Error fetching reviews:', error);
       toast({
@@ -219,8 +257,12 @@ const ReviewManagement = () => {
     : '-';
 
   const ReviewCard = ({ review }: { review: Review }) => {
-    const customerName = review.profiles?.full_name || review.jobs?.quotes?.name || 'Ukjent kunde';
-    const serviceType = review.jobs?.quotes?.type || 'ukjent';
+    const isGeneralFeedback = review.feedback_type === 'general';
+    const customerName = isGeneralFeedback 
+      ? (review.customer_name || 'Anonym') 
+      : (review.profiles?.full_name || review.jobs?.quotes?.name || 'Ukjent kunde');
+    const customerEmail = isGeneralFeedback ? review.customer_email : review.profiles?.email;
+    const serviceType = review.jobs?.quotes?.type;
 
     return (
       <Card className={cn(
@@ -235,15 +277,36 @@ const ReviewManagement = () => {
             <div className="flex-1 space-y-3">
               {/* Customer info */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <User className="h-5 w-5 text-primary" />
+                <div className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center",
+                  isGeneralFeedback ? "bg-blue-100 dark:bg-blue-900/30" : "bg-primary/10"
+                )}>
+                  {isGeneralFeedback ? (
+                    <MessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  ) : (
+                    <User className="h-5 w-5 text-primary" />
+                  )}
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">{customerName}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-foreground">{customerName}</p>
+                    {isGeneralFeedback && (
+                      <Badge variant="secondary" className="text-xs">Generell</Badge>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Briefcase className="h-3 w-3" />
-                    <span>{getServiceTypeName(serviceType)}</span>
-                    <span>•</span>
+                    {serviceType ? (
+                      <>
+                        <Briefcase className="h-3 w-3" />
+                        <span>{getServiceTypeName(serviceType)}</span>
+                        <span>•</span>
+                      </>
+                    ) : customerEmail ? (
+                      <>
+                        <span>{customerEmail}</span>
+                        <span>•</span>
+                      </>
+                    ) : null}
                     <span>{formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: nb })}</span>
                   </div>
                 </div>
