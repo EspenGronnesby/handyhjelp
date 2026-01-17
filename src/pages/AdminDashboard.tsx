@@ -33,6 +33,7 @@ import { InvoiceUploadModal } from '@/components/admin/InvoiceUploadModal';
 import { InvoiceManagement } from '@/components/admin/InvoiceManagement';
 import ReviewManagement from '@/components/admin/ReviewManagement';
 import { QuickFeedbackStats } from '@/components/admin/QuickFeedbackStats';
+import GeneralFeedbackManagement from '@/components/admin/GeneralFeedbackManagement';
 import { OfferModal } from '@/components/admin/OfferModal';
 import { ContractModal } from '@/components/admin/ContractModal';
 import { RejectAgreementModal } from '@/components/admin/RejectAgreementModal';
@@ -126,10 +127,10 @@ const AdminDashboard = () => {
       tabs: [
         { key: 'projects', label: 'Prosjekter', count: null, badge: badges.adminDetails.pendingProjects },
         { key: 'blog', label: 'Blogg', count: null, badge: badges.adminDetails.pendingBlogs },
-        { key: 'feedback', label: 'Tilbakemeldinger', count: null, badge: 0 },
+        { key: 'feedback', label: 'Tilbakemeldinger', count: null, badge: badges.adminDetails.pendingFeedback },
         { key: 'reviews', label: 'Anmeldelser', count: null, badge: badges.adminDetails.pendingReviews },
       ],
-      totalBadge: badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs + badges.adminDetails.pendingReviews,
+      totalBadge: badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs + badges.adminDetails.pendingReviews + badges.adminDetails.pendingFeedback,
     },
     mail: {
       label: 'E-post',
@@ -535,9 +536,9 @@ const AdminDashboard = () => {
           <BlogManagement />
         </TabsContent>
 
-        {/* Quick Feedback Stats Tab */}
+        {/* General Feedback Tab */}
         <TabsContent value="feedback">
-          <QuickFeedbackStats />
+          <GeneralFeedbackManagement />
         </TabsContent>
 
         {/* Reviews Tab */}

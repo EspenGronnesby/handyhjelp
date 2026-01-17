@@ -363,6 +363,53 @@ export type Database = {
         }
         Relationships: []
       }
+      general_feedback: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          comment: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          rating: number
+          rejection_reason: string | null
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          comment?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          rating: number
+          rejection_reason?: string | null
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          comment?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          rating?: number
+          rejection_reason?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "general_feedback_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hero_images: {
         Row: {
           created_at: string | null
