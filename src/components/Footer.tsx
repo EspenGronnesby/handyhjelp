@@ -38,6 +38,7 @@ export const Footer = () => {
   const { content: linkedinUrl } = useEditableContent('footer', 'linkedin_url');
   const { content: tiktokUrl } = useEditableContent('footer', 'tiktok_url');
   const { content: copyright } = useEditableContent('footer', 'copyright');
+  const { content: googleReviewUrl } = useEditableContent('footer', 'google_review_url');
 
   // Default values - empty for social URLs means they won't show
   const footerData = {
@@ -50,7 +51,8 @@ export const Footer = () => {
     instagramUrl: instagramUrl || '',
     linkedinUrl: linkedinUrl || '',
     tiktokUrl: tiktokUrl || '',
-    copyright: copyright || '© 2025 HandyHjelp. Alle rettigheter reservert.'
+    copyright: copyright || '© 2025 HandyHjelp. Alle rettigheter reservert.',
+    googleReviewUrl: googleReviewUrl || 'https://www.google.com/search?q=HandyHjelp&stick=H4sIAAAAAAAA_-NgU1I1qDAzs0iyTEpNSrI0TDZIM0qzMqhIskxONDEzSjI2T06zMDNLWcTK5ZGYl1LpkZWaUwAAlxRHNTYAAAA&hl=no&mat=CXN9U6uXy7S5ElcBTVDHnmCFoNnRZBpcne27wWNKhGmOqvkQJQsI1NBAqpIkoJf5CnhvLjb9bX-_4I5nT7RZNFDfMkLfVfY0zZ2_SbDj7d9CzfARLJ7GTNBzuv1GlCEKaq8&authuser=0&sei=U_Jraba5F92xwPAP8euBgAc'
   };
 
   return (
@@ -206,9 +208,17 @@ export const Footer = () => {
                     {footerData.email}
                   </a>
                 </li>
-                <li className="flex items-start gap-2 py-1">
-                  <Clock className="h-4 w-4 mt-1 flex-shrink-0 text-primary" />
-                  <span>{footerData.hours}</span>
+                <li>
+                  <a 
+                    href={footerData.googleReviewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 py-2 min-h-[44px] hover:text-primary transition-colors active:text-primary/80"
+                    title="Se våre anmeldelser på Google"
+                  >
+                    <Clock className="h-4 w-4 flex-shrink-0 text-primary" />
+                    <span>{footerData.hours}</span>
+                  </a>
                 </li>
               </ul>
             </div>

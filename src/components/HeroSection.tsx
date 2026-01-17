@@ -13,6 +13,7 @@ export const HeroSection = () => {
   const {
     heroImage,
     opacity,
+    loading,
     refetch
   } = useHeroImage('home', heroDefaultImage);
   const {
@@ -34,11 +35,14 @@ export const HeroSection = () => {
   const displayCtaText = ctaText || 'Få tilbud';
   return <>
       <section className="min-h-[100svh] md:min-h-screen relative flex items-center pt-24 md:pt-20">
-        {/* Background Image - smaller on mobile */}
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{
-        backgroundImage: `url(${heroImage})`,
-        backgroundPosition: 'center 30%'
-      }}>
+        {/* Background Image - fade in when loaded */}
+        <div 
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
+          style={{
+            backgroundImage: `url(${heroImage})`,
+            backgroundPosition: 'center 30%'
+          }}
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 to-secondary/90 md:from-secondary md:to-secondary" style={{
           opacity
         }}></div>
