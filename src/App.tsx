@@ -38,6 +38,7 @@ import Personvern from "./pages/Personvern";
 import Cookies from "./pages/Cookies";
 import Vilkaar from "./pages/Vilkaar";
 import DashboardLoyalty from "./pages/DashboardLoyalty";
+import Feedback from "./pages/Feedback";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,7 @@ const App = () => (
                 <Route path="/personvern" element={<Personvern />} />
                 <Route path="/cookies" element={<Cookies />} />
                 <Route path="/vilkaar" element={<Vilkaar />} />
+                <Route path="/tilbakemelding" element={<Feedback />} />
                 <Route path="/dashboard" element={
                   <ErrorBoundary>
                     <Dashboard />
