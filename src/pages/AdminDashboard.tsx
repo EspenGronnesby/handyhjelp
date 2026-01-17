@@ -3,7 +3,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Briefcase, CreditCard, FileText, Package, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import { Loader2, Briefcase, CreditCard, FileText, Package, ChevronLeft, ChevronRight, Plus, Mail } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter, SingleJobStatusFilter, SINGLE_JOB_STATUS_LABELS } from '@/types/admin';
 import { Badge } from '@/components/ui/badge';
@@ -37,8 +37,11 @@ import { OfferModal } from '@/components/admin/OfferModal';
 import { ContractModal } from '@/components/admin/ContractModal';
 import { RejectAgreementModal } from '@/components/admin/RejectAgreementModal';
 import { CreateJobModal } from '@/components/admin/CreateJobModal';
+import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
+import { EmailComposer } from '@/components/admin/EmailComposer';
+import { EmailHistory } from '@/components/admin/EmailHistory';
 
-type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold';
+type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'mail';
 
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
@@ -127,6 +130,16 @@ const AdminDashboard = () => {
         { key: 'reviews', label: 'Anmeldelser', count: null, badge: badges.adminDetails.pendingReviews },
       ],
       totalBadge: badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs + badges.adminDetails.pendingReviews,
+    },
+    mail: {
+      label: 'E-post',
+      icon: Mail,
+      tabs: [
+        { key: 'templates', label: 'Maler', count: null, badge: 0 },
+        { key: 'compose', label: 'Send e-post', count: null, badge: 0 },
+        { key: 'history', label: 'Historikk', count: null, badge: 0 },
+      ],
+      totalBadge: 0,
     },
   };
 
