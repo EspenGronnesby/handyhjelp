@@ -104,7 +104,7 @@ function generateEmailHtml(
   
   const feedbackButtonHtml = includeFeedbackButton ? `
     <div style="text-align: center; margin: 30px 0;">
-      <a href="https://handyhjelp.lovable.app/tilbakemelding" 
+      <a href="https://handyhjelp.no/tilbakemelding" 
          style="display: inline-block; background: linear-gradient(135deg, #0891B2 0%, #06B6D4 100%); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
         Gi oss din tilbakemelding
       </a>
