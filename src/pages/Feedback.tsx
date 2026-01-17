@@ -39,21 +39,16 @@ export default function Feedback() {
 
     setLoading(true);
     try {
-      // Store feedback as notification to admin
-      const { data: admins } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .eq('role', 'admin')
-        .limit(1);
+      // Store feedback in general_feedback table
+      const { error } = await supabase.from('general_feedback').insert({
+        rating: rating,
+        comment: formData.comment || null,
+        name: formData.name || null,
+        email: formData.email || null,
+        status: 'pending'
+      });
 
-      if (admins && admins.length > 0) {
-        await supabase.from('notifications').insert({
-          user_id: admins[0].user_id,
-          type: 'feedback',
-          title: 'Ny generell tilbakemelding',
-          message: `${formData.name || 'Anonym'} (${formData.email || 'ingen e-post'}) ga ${rating} stjerner: "${formData.comment}"`,
-        });
-      }
+      if (error) throw error;
 
       setSubmitted(true);
       toast({

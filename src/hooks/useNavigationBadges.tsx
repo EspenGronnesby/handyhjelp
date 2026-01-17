@@ -11,6 +11,7 @@ interface AdminDetails {
   pendingReviews: number;
   pendingProjects: number;
   pendingBlogs: number;
+  pendingFeedback: number;
 }
 
 interface WorkerDetails {
@@ -41,6 +42,7 @@ const defaultBadges: NavigationBadges = {
     pendingReviews: 0,
     pendingProjects: 0,
     pendingBlogs: 0,
+    pendingFeedback: 0,
   },
   workerDetails: {
     pendingProjects: 0,
@@ -104,6 +106,7 @@ export function useNavigationBadges() {
         pendingReviews: 0,
         pendingProjects: 0,
         pendingBlogs: 0,
+        pendingFeedback: 0,
       };
 
       if (isAdmin || isOwner) {
@@ -114,6 +117,7 @@ export function useNavigationBadges() {
           adminPendingReviewsResult,
           adminPendingProjectsResult,
           adminPendingBlogsResult,
+          adminPendingFeedbackResult,
         ] = await Promise.all([
           supabase
             .from("quotes")
@@ -144,6 +148,11 @@ export function useNavigationBadges() {
             .from("blog_posts")
             .select("*", { count: "exact", head: true })
             .eq("status", "pending_approval"),
+
+          supabase
+            .from("general_feedback")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "pending"),
         ]);
 
         adminDetails = {
@@ -153,6 +162,7 @@ export function useNavigationBadges() {
           pendingReviews: adminPendingReviewsResult.count || 0,
           pendingProjects: adminPendingProjectsResult.count || 0,
           pendingBlogs: adminPendingBlogsResult.count || 0,
+          pendingFeedback: adminPendingFeedbackResult.count || 0,
         };
 
         adminCount = 
@@ -160,7 +170,8 @@ export function useNavigationBadges() {
           adminDetails.newAgreements +
           adminDetails.pendingReviews +
           adminDetails.pendingProjects +
-          adminDetails.pendingBlogs;
+          adminDetails.pendingBlogs +
+          adminDetails.pendingFeedback;
       }
 
       // Worker-specific queries with detailed counts
@@ -271,6 +282,11 @@ export function useNavigationBadges() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'blog_posts' },
+        () => queryClient.invalidateQueries({ queryKey: ["navigation-badges"] })
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'general_feedback' },
         () => queryClient.invalidateQueries({ queryKey: ["navigation-badges"] })
       )
       .subscribe();
