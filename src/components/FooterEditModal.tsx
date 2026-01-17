@@ -23,6 +23,7 @@ interface FooterEditModalProps {
     linkedinUrl: string;
     tiktokUrl: string;
     copyright: string;
+    googleReviewUrl: string;
   };
 }
 
@@ -62,7 +63,8 @@ export const FooterEditModal = ({
         { section: 'footer', content_key: 'instagram_url', content_value: formData.instagramUrl, content_type: 'text', updated_by: user.id },
         { section: 'footer', content_key: 'linkedin_url', content_value: formData.linkedinUrl, content_type: 'text', updated_by: user.id },
         { section: 'footer', content_key: 'tiktok_url', content_value: formData.tiktokUrl, content_type: 'text', updated_by: user.id },
-        { section: 'footer', content_key: 'copyright', content_value: formData.copyright, content_type: 'text', updated_by: user.id }
+        { section: 'footer', content_key: 'copyright', content_value: formData.copyright, content_type: 'text', updated_by: user.id },
+        { section: 'footer', content_key: 'google_review_url', content_value: formData.googleReviewUrl, content_type: 'text', updated_by: user.id }
       ];
 
       for (const update of updates) {
@@ -157,6 +159,17 @@ export const FooterEditModal = ({
                   onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
                   maxLength={100}
                   placeholder="Man-Fre 09:00-17:00"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="googleReviewUrl">Google Business URL (lenke fra åpningstider)</Label>
+                <Input
+                  id="googleReviewUrl"
+                  value={formData.googleReviewUrl || ''}
+                  onChange={(e) => setFormData({ ...formData, googleReviewUrl: e.target.value })}
+                  maxLength={500}
+                  placeholder="https://www.google.com/search?q=HandyHjelp..."
                 />
               </div>
             </div>

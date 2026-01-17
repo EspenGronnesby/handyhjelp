@@ -20,7 +20,7 @@ import { EditableServiceBenefits } from "@/components/service-edit/EditableServi
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 
 const ServiceTakrennerens = () => {
-  const { heroImage, opacity, refetch } = useHeroImage('services-takrennerens', servicesBackground);
+  const { heroImage, loading, refetch } = useHeroImage('services-takrennerens', servicesBackground);
 
   return (
     <div className="min-h-screen">
@@ -32,9 +32,9 @@ const ServiceTakrennerens = () => {
       <Header />
       <BreadcrumbNavigation />
       
-      {/* Hero Section with Background */}
+      {/* Hero Section with Background - fade in when loaded */}
       <div 
-        className="relative h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat"
+        className={`relative h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
         style={{ backgroundImage: `url(${heroImage})` }}
       >
         <div 
