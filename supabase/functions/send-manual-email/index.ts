@@ -186,6 +186,19 @@ function generateEmailHtml(
             <div class="signature">
               <p style="margin: 0;">Med vennlig hilsen,<br><strong>HandyHjelp-teamet</strong></p>
             </div>
+            
+            <div style="background-color: #e0f7fa; border-radius: 8px; padding: 20px; margin-top: 24px; text-align: left;">
+              <p style="margin: 0 0 10px 0; font-weight: 600; color: #333;">Har du spørsmål?</p>
+              <p style="margin: 0 0 6px 0; font-size: 14px; color: #555;">
+                Telefon: <a href="tel:+4741250553" style="color: #0891B2; text-decoration: none;">+47 412 50 553</a>
+              </p>
+              <p style="margin: 0 0 6px 0; font-size: 14px; color: #555;">
+                E-post: <a href="mailto:team@handyhjelp.no" style="color: #0891B2; text-decoration: none;">team@handyhjelp.no</a>
+              </p>
+              <p style="margin: 0; font-size: 14px; color: #555;">
+                Åpningstid: Man-Fre 09:00-17:00
+              </p>
+            </div>
           </div>
           
           <div class="footer">
