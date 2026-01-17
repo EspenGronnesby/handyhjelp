@@ -37,12 +37,13 @@ interface Profile {
   full_name: string;
 }
 
-export function EmailComposer() {
+interface EmailComposerProps {
+  profiles: Profile[];
+}
+
+export function EmailComposer({ profiles }: EmailComposerProps) {
   const { templates, loading: templatesLoading } = useEmailTemplates();
   const { sendEmail, loading: sendLoading } = useSendEmail();
-  
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [profilesLoading, setProfilesLoading] = useState(true);
   
   const [recipients, setRecipients] = useState<EmailRecipient[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
@@ -55,26 +56,6 @@ export function EmailComposer() {
   
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-
-  // Fetch profiles
-  useEffect(() => {
-    async function fetchProfiles() {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('id, email, full_name')
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        setProfiles(data || []);
-      } catch (error) {
-        console.error('Error fetching profiles:', error);
-      } finally {
-        setProfilesLoading(false);
-      }
-    }
-    fetchProfiles();
-  }, []);
 
   // Handle template selection
   const handleTemplateChange = (templateId: string) => {
@@ -189,12 +170,7 @@ export function EmailComposer() {
                 <SelectValue placeholder="Søk og velg kunde..." />
               </SelectTrigger>
               <SelectContent>
-                {profilesLoading ? (
-                  <div className="p-2 text-center text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin inline-block mr-2" />
-                    Laster...
-                  </div>
-                ) : availableProfiles.length === 0 ? (
+                {availableProfiles.length === 0 ? (
                   <div className="p-2 text-center text-sm text-muted-foreground">
                     Ingen flere kunder tilgjengelig
                   </div>
