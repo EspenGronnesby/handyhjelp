@@ -545,6 +545,21 @@ const AdminDashboard = () => {
           <ReviewManagement />
         </TabsContent>
 
+        {/* Email Templates Tab */}
+        <TabsContent value="templates">
+          <EmailTemplateManager />
+        </TabsContent>
+
+        {/* Email Composer Tab */}
+        <TabsContent value="compose">
+          <EmailComposer profiles={profiles} />
+        </TabsContent>
+
+        {/* Email History Tab */}
+        <TabsContent value="history">
+          <EmailHistory />
+        </TabsContent>
+
       </Tabs>
 
       <AdminConfirmDialog
