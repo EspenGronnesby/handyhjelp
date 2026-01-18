@@ -204,7 +204,7 @@ export const Header = () => {
 
           {/* Mobile/Tablet Navigation Menu */}
           {isMenuOpen && (
-            <div className="lg:hidden absolute top-full left-0 right-0 bg-background border-t border-border shadow-lg z-50">
+            <div className="lg:hidden absolute top-full left-0 right-0 bg-background border-t border-border shadow-lg z-50 animate-fade-in" style={{ animationDuration: '0.2s' }}>
               <nav className="container mx-auto px-4 py-2" aria-label="Mobilmeny">
                 <Link 
                   to="/" 

@@ -9,6 +9,7 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { SectionHeadingEditModal } from "./SectionHeadingEditModal";
 import { ServiceBadge } from "@/lib/serviceIcons";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 interface Project {
   id: string;
@@ -34,6 +35,7 @@ export const ProjectsSection = () => {
   
   const displayHeading = heading || 'Våre prosjekter';
   const displaySubheading = subheading || 'Se resultatet av vårt arbeid – før og etter bilder av våre siste prosjekter';
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.15 });
 
   useEffect(() => {
     fetchProjects();
@@ -104,9 +106,9 @@ export const ProjectsSection = () => {
   };
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-16 bg-muted/30" ref={ref}>
       <div className="container mx-auto px-4">
-        <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12">
+        <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="relative text-center mb-12">
           {isAdmin && editMode && (
             <button
@@ -136,11 +138,12 @@ export const ProjectsSection = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {projects.map((project) => (
+              {projects.map((project, index) => (
               <Link
                 key={project.id}
                 to={`/prosjekter/${project.id}`}
-                className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 block"
+                className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer card-hover-lift transition-all duration-300 block animate-fade-in-stagger"
+                style={{ animationDelay: `${index * 150}ms` }}
                 onMouseEnter={() => setHoveredProject(project.id)}
                 onMouseLeave={() => setHoveredProject(null)}
                 onTouchStart={() => setTouchedProject(project.id)}
