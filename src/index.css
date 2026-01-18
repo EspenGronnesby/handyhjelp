@@ -436,11 +436,6 @@ html, body {
   .reveal-stagger-4 { animation-delay: 450ms; }
   .reveal-stagger-5 { animation-delay: 600ms; }
 
-  /* Scroll indicator pulse */
-  .scroll-indicator-pulse {
-    animation: scrollPulse 2s ease-in-out infinite;
-  }
-
   /* Mobile-optimized card grid */
   @media (max-width: 768px) {
     .mobile-card-compact {
@@ -454,12 +449,6 @@ html, body {
     .mobile-text-compact {
       @apply text-sm;
     }
-  }
-
-  /* Parallax container */
-  .parallax-slow {
-    will-change: transform;
-    transform: translateZ(0);
   }
 
   /* Mobile section transition */

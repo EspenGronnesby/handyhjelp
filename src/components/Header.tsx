@@ -9,6 +9,7 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { useLogoSettings } from "@/hooks/useLogoSettings";
 import { LogoSettingsModal } from "@/components/LogoSettingsModal";
 import { ThemeToggleButton } from "@/components/ThemeToggle";
+import { useHeaderVisibility } from "@/hooks/useHeaderVisibility";
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 
@@ -22,6 +23,10 @@ export const Header = () => {
   const { resolvedTheme } = useTheme();
   const { editMode, isAdmin } = useEditMode();
   const { settings: logoSettings, updateSettings: updateLogoSettings } = useLogoSettings();
+  const { isVisible, isAtTop } = useHeaderVisibility();
+
+  // Force header visible when menu is open
+  const headerVisible = isMenuOpen || isVisible;
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -40,7 +45,7 @@ export const Header = () => {
       <a href="#main-content" className="skip-to-content">
         Hopp til hovedinnhold
       </a>
-      <header className="fixed top-0 left-0 w-full bg-background/95 backdrop-blur-md border-b border-border z-50">
+      <header className={`fixed top-0 left-0 w-full bg-background/95 backdrop-blur-md border-b border-border z-50 transition-transform duration-300 ease-out ${headerVisible ? 'translate-y-0' : '-translate-y-full'} ${!isAtTop && headerVisible ? 'shadow-md' : ''}`}>
         <div className="container mx-auto px-4">
         {/* Top Contact Bar - Hidden on mobile/tablet */}
         <div className="hidden lg:block bg-secondary text-secondary-foreground py-1.5">
