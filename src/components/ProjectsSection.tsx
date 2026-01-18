@@ -172,6 +172,7 @@ export const ProjectsSection = () => {
                     <ServiceBadge 
                       serviceId={project.category} 
                       className="bg-background/90 backdrop-blur-sm"
+                      showIcon={false}
                     />
                     <Badge
                       variant="secondary"
