@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ServiceCardEditModal } from './ServiceCardEditModal';
 import { getDisplayValue } from '@/lib/gridUtils';
-import { ServiceIcon, getServiceColors } from '@/lib/serviceIcons';
+import { ServiceIcon, getServiceColors, popularColors } from '@/lib/serviceIcons';
 
 interface EditableServiceCardProps {
   section: string;
@@ -51,7 +51,8 @@ export const EditableServiceCard = ({
   }
 
   // Get service-specific colors for the card background tint
-  const colors = getServiceColors(id);
+  // Use emerald colors for popular cards, otherwise use standard service colors
+  const colors = popular ? popularColors : getServiceColors(id);
 
   return (
     <>

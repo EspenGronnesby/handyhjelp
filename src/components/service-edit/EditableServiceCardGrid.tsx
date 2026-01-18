@@ -9,7 +9,7 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ServiceIcon, getServiceColors } from "@/lib/serviceIcons";
+import { ServiceIcon, getServiceColors, popularColors } from "@/lib/serviceIcons";
 
 interface ServiceCard {
   id: string;
@@ -160,14 +160,15 @@ const EditableServiceCardGrid = () => {
             <div className={getGridClass()}>
               {visibleServices.map((service, index) => {
                 const isHidden = isServiceHidden(service);
-                const colors = getServiceColors(service.id);
+                // Use emerald colors for popular cards, otherwise use standard service colors
+                const colors = service.popular ? popularColors : getServiceColors(service.id);
                 
                 return (
                   <Card 
                     key={service.id}
                     id={service.id}
-                    className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-6 min-h-[520px] flex flex-col animate-fade-in overflow-hidden ${getCardWidthClass()} ${colors.bg} ${
-                      service.popular ? 'border-primary border-2 shadow-lg' : `${colors.border}`
+                    className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-6 min-h-[520px] flex flex-col animate-fade-in overflow-hidden ${getCardWidthClass()} ${colors.bg} ${colors.border} ${
+                      service.popular ? 'border-2 shadow-lg ring-1 ring-emerald-400/30 dark:ring-emerald-500/20' : ''
                     } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''}`}
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
