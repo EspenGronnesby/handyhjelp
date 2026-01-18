@@ -57,7 +57,7 @@ export const EditableServiceCard = ({
   return (
     <>
       <div 
-        className={`relative rounded-lg p-6 transition-all duration-300 border card-hover-lift icon-hover-bounce ${colors.bg} ${
+        className={`relative rounded-lg p-4 md:p-6 transition-all duration-300 border card-hover-lift icon-hover-bounce reveal-scale perf-contain ${colors.bg} ${
           popular ? 'border-success border-2 shadow-lg' : `border ${colors.border}`
         } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''} 
         dark:ring-1 dark:ring-white/5`}
@@ -98,7 +98,8 @@ export const EditableServiceCard = ({
           {displaySubtitle}
         </p>
         
-        <ul className="space-y-2 mb-6">
+        {/* Hide bullets on mobile for cleaner look */}
+        <ul className="hidden md:block space-y-2 mb-6">
           {displayBullet1 && (
             <li className="flex items-start text-sm">
               <Check className="h-4 w-4 text-success mr-2 mt-0.5 flex-shrink-0" />
@@ -118,6 +119,9 @@ export const EditableServiceCard = ({
             </li>
           )}
         </ul>
+        
+        {/* Mobile spacer */}
+        <div className="md:hidden mb-4" />
         
         <Link to={`/tjenester/${id}`}>
           <Button 

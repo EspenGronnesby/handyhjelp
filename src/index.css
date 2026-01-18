@@ -406,6 +406,72 @@ html, body {
   .progress-fill {
     animation: progressFill 5s linear;
   }
+
+  /* ===== Apple-Style Mobile Scroll Sections ===== */
+  
+  /* Full-height mobile sections */
+  .section-mobile {
+    @apply min-h-[100svh] flex flex-col justify-center;
+    @apply py-8 md:py-16 md:min-h-0;
+    contain: layout;
+  }
+
+  /* Cinematic reveal animation */
+  .reveal-up {
+    opacity: 0;
+    transform: translateY(40px);
+    animation: revealUp 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  .reveal-scale {
+    opacity: 0;
+    transform: scale(0.96);
+    animation: revealScale 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  /* Staggered reveal delays */
+  .reveal-stagger-1 { animation-delay: 0ms; }
+  .reveal-stagger-2 { animation-delay: 150ms; }
+  .reveal-stagger-3 { animation-delay: 300ms; }
+  .reveal-stagger-4 { animation-delay: 450ms; }
+  .reveal-stagger-5 { animation-delay: 600ms; }
+
+  /* Scroll indicator pulse */
+  .scroll-indicator-pulse {
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  /* Mobile-optimized card grid */
+  @media (max-width: 768px) {
+    .mobile-card-compact {
+      @apply p-4;
+    }
+    
+    .mobile-card-compact ul {
+      @apply hidden;
+    }
+    
+    .mobile-text-compact {
+      @apply text-sm;
+    }
+  }
+
+  /* Parallax container */
+  .parallax-slow {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  /* Mobile section transition */
+  .mobile-section-fade {
+    @apply transition-opacity duration-700 ease-out;
+  }
+
+  /* Optimized performance containment */
+  .perf-contain {
+    contain: layout style;
+    will-change: opacity, transform;
+  }
 }
 
 @keyframes fadeInUp {
@@ -490,6 +556,40 @@ html, body {
 @keyframes progressFill {
   0% { width: 0%; }
   100% { width: 100%; }
+}
+
+/* Apple-style reveal animations */
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes revealScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scrollPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(8px);
+  }
 }
 
 /* Blog Content Styling - Theme-aware */

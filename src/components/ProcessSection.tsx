@@ -7,16 +7,16 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { Pencil } from "lucide-react";
 import { ProcessStepEditModal } from "@/components/ProcessStepEditModal";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useScrollProgress } from "@/hooks/useScrollProgress";
 
 // Component for each process step
-const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, delay }: {
+const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, index }: {
   number: number;
   section: string;
   defaultTitle: string;
   defaultDescription: string;
   icon: any;
-  delay: number;
+  index: number;
 }) => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,34 +30,38 @@ const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, 
   return (
     <>
       <Card 
-        className="card-professional p-6 text-center card-hover-lift relative bg-primary/5 dark:bg-primary/10 icon-hover-bounce animate-fade-in-stagger"
-        style={{ animationDelay: `${delay}ms` }}
+        className="card-professional p-5 md:p-6 text-center card-hover-lift relative bg-primary/5 dark:bg-primary/10 reveal-scale perf-contain"
+        style={{ animationDelay: `${index * 150}ms` }}
       >
         {isAdmin && editMode && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
+            className="absolute top-3 right-3 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
             aria-label={`Rediger steg ${number}`}
           >
-            <Pencil className="h-5 w-5 text-primary" />
+            <Pencil className="h-4 w-4 text-primary" />
           </button>
         )}
         
-        <div className="flex justify-center mb-4">
-          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-            <IconComponent className="h-8 w-8 text-primary-foreground" />
+        {/* Large step number for mobile */}
+        <div className="flex justify-center mb-3 md:mb-4">
+          <div className="w-14 h-14 md:w-16 md:h-16 bg-primary rounded-full flex items-center justify-center relative">
+            <IconComponent className="h-7 w-7 md:h-8 md:w-8 text-primary-foreground" />
+            <span className="absolute -top-1 -right-1 w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center md:hidden">
+              {number}
+            </span>
           </div>
         </div>
         
-        <div className="mb-4">
-          <div className="text-sm font-medium text-primary mb-2">
+        <div className="mb-3 md:mb-4">
+          <div className="text-sm font-medium text-primary mb-1 md:mb-2 hidden md:block">
             Steg {number}
           </div>
-          <h3 className="text-xl font-bold text-foreground mb-2">
+          <h3 className="text-lg md:text-xl font-bold text-foreground mb-1 md:mb-2">
             {displayTitle}
           </h3>
           
-          <p className="text-muted-foreground font-medium">
+          <p className="text-sm md:text-base text-muted-foreground font-medium">
             {displayDescription}
           </p>
         </div>
@@ -81,15 +85,15 @@ export const ProcessSection = () => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { content: heading } = useEditableContent('home-sections', 'how-it-works-heading');
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
+  const { ref, isVisible } = useScrollProgress({ threshold: 0.15 });
   
   const displayHeading = heading || 'Slik fungerer det';
   
   return (
-    <section className="py-16" ref={ref}>
+    <section className="py-12 md:py-16 section-mobile" ref={ref}>
       <div className="container mx-auto px-4">
-        <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="relative text-center mb-12">
+        <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-6 md:p-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="relative text-center mb-8 md:mb-12">
           {isAdmin && editMode && (
             <button
               onClick={() => setIsModalOpen(true)}
@@ -100,47 +104,60 @@ export const ProcessSection = () => {
             </button>
           )}
           
-          <h2 id="process-heading" className="heading-section">
+          <h2 id="process-heading" className="heading-section text-2xl md:text-3xl lg:text-4xl">
             {displayHeading}
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Enkelt, trygt og forutsigbart. Fra første kontakt til ferdig jobb.
+          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
+            Enkelt, trygt og forutsigbart
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          <ProcessStep
-            number={1}
-            section="how-it-works-step-1"
-            defaultTitle="Ta kontakt"
-            defaultDescription="Ring oss eller send inn skjema"
-            icon={Phone}
-            delay={0}
-          />
+        {/* Mobile: Horizontal scroll, Desktop: Grid */}
+        <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-8 mb-8 md:mb-12 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-4 md:pb-0 -mx-2 px-2 md:mx-0 md:px-0">
+          <div className="flex-shrink-0 w-[75vw] md:w-auto snap-center">
+            <ProcessStep
+              number={1}
+              section="how-it-works-step-1"
+              defaultTitle="Ta kontakt"
+              defaultDescription="Ring oss eller send inn skjema"
+              icon={Phone}
+              index={0}
+            />
+          </div>
           
-          <ProcessStep
-            number={2}
-            section="how-it-works-step-2"
-            defaultTitle="Få tilbud"
-            defaultDescription="Tilbud tilpasset ditt behov"
-            icon={Calculator}
-            delay={150}
-          />
+          <div className="flex-shrink-0 w-[75vw] md:w-auto snap-center">
+            <ProcessStep
+              number={2}
+              section="how-it-works-step-2"
+              defaultTitle="Få tilbud"
+              defaultDescription="Tilbud tilpasset ditt behov"
+              icon={Calculator}
+              index={1}
+            />
+          </div>
           
-          <ProcessStep
-            number={3}
-            section="how-it-works-step-3"
-            defaultTitle="Vi løser det"
-            defaultDescription="Profesjonell utførelse"
-            icon={CheckCircle}
-            delay={300}
-          />
+          <div className="flex-shrink-0 w-[75vw] md:w-auto snap-center">
+            <ProcessStep
+              number={3}
+              section="how-it-works-step-3"
+              defaultTitle="Vi løser det"
+              defaultDescription="Profesjonell utførelse"
+              icon={CheckCircle}
+              index={2}
+            />
+          </div>
         </div>
+
+        {/* Mobile swipe hint */}
+        <p className="text-center text-xs text-muted-foreground mb-6 md:hidden">
+          Sveip for å se alle steg
+        </p>
 
         <div className="text-center">
           <Button 
             size="lg" 
-            className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4"
+            className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4 reveal-up"
+            style={{ animationDelay: '400ms' }}
             onClick={() => window.location.href = '/tilbud'}
           >
             Kom i gang nå

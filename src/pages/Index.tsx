@@ -17,6 +17,7 @@ import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
+import { ScrollProgress } from "@/components/ScrollProgress";
 import { Helmet } from "react-helmet";
 
 // Component for Services Section Heading
@@ -109,13 +110,13 @@ const Index = () => {
         <TestimonialsSection />
 
         {/* Services Section - Compact Overview */}
-        <section className="py-16 bg-background" id="services">
+        <section className="py-12 md:py-16 bg-background section-mobile" id="services">
           <div className="container mx-auto px-4">
-            <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12">
+            <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-6 md:p-12">
             <ServicesHeading />
 
             
-            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 max-w-5xl mx-auto mb-8 md:mb-12">
               <EditableServiceCard
                 section="service-vaktmester"
                 id="vaktmester"
@@ -205,6 +206,9 @@ const Index = () => {
       </div>
 
       <Footer />
+      
+      {/* Scroll Progress Indicator - Mobile only */}
+      <ScrollProgress />
       
       {/* Sticky Mobile CTA */}
       <StickyMobileCTA />
