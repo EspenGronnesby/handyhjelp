@@ -242,7 +242,7 @@ export const Footer = () => {
                   className="hover:text-primary transition-colors text-xs"
                   title="Se våre Google-anmeldelser"
                 >
-                  5.0 på Google
+                  Google
                 </a>
               </div>
               <div className="flex flex-wrap justify-center gap-4 md:gap-6">

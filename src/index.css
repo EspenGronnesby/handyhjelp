@@ -275,13 +275,22 @@
     animation: scaleIn 0.4s ease-out forwards;
   }
 
-  /* Card hover lift effect */
+  /* Card hover lift effect - Enhanced */
   .card-hover-lift {
     @apply transition-all duration-300 ease-out;
   }
   
   .card-hover-lift:hover {
-    @apply -translate-y-1 shadow-xl;
+    @apply -translate-y-2 shadow-2xl;
+    box-shadow: 
+      0 25px 50px -12px rgba(0,0,0,0.15),
+      0 0 0 1px hsl(var(--primary) / 0.1);
+  }
+
+  .dark .card-hover-lift:hover {
+    box-shadow: 
+      0 25px 50px -12px rgba(0,0,0,0.4),
+      0 0 0 1px hsl(var(--primary) / 0.2);
   }
 
   /* Subtle pulse animation for badges */
@@ -292,6 +301,104 @@
   /* Scroll down indicator bounce */
   .animate-bounce-down {
     animation: bounceDown 2s ease-in-out infinite;
+  }
+
+  /* Staggered animation delays */
+  .animate-stagger-1 { animation-delay: 0ms; }
+  .animate-stagger-2 { animation-delay: 100ms; }
+  .animate-stagger-3 { animation-delay: 200ms; }
+  .animate-stagger-4 { animation-delay: 300ms; }
+  .animate-stagger-5 { animation-delay: 400ms; }
+  .animate-stagger-6 { animation-delay: 500ms; }
+
+  /* Fade in with stagger support */
+  .animate-fade-in-stagger {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  /* Icon bounce on hover */
+  .icon-hover-bounce:hover svg {
+    animation: iconBounce 0.4s ease-out;
+  }
+
+  /* Text glow on hover */
+  .link-glow {
+    transition: text-shadow 0.3s ease;
+  }
+  .link-glow:hover {
+    text-shadow: 0 0 12px hsl(var(--primary) / 0.4);
+  }
+
+  /* Shimmer effect for skeleton loading */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 25%,
+      hsl(var(--muted-foreground) / 0.1) 50%,
+      hsl(var(--muted)) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Gradient orb for decorative backgrounds */
+  .gradient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* Dots pattern background */
+  .bg-dots-pattern {
+    background-image: radial-gradient(
+      circle,
+      hsl(var(--primary) / 0.08) 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+  }
+
+  /* Focus ring animation for inputs */
+  .input-focus-ring:focus {
+    animation: focusRing 0.2s ease-out forwards;
+  }
+
+  /* Scroll reveal animation */
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  
+  .scroll-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Carousel fade edges */
+  .carousel-fade-edges {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 5%,
+      black 95%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 5%,
+      black 95%,
+      transparent 100%
+    );
+  }
+
+  /* Progress bar animation */
+  .progress-fill {
+    animation: progressFill 5s linear;
   }
 }
 
@@ -357,6 +464,26 @@
   50% {
     transform: translateY(8px);
   }
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes focusRing {
+  0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  100% { box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15); }
+}
+
+@keyframes progressFill {
+  0% { width: 0%; }
+  100% { width: 100%; }
 }
 
 /* Blog Content Styling - Theme-aware */

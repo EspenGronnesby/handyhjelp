@@ -7,14 +7,16 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { Pencil } from "lucide-react";
 import { ProcessStepEditModal } from "@/components/ProcessStepEditModal";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 // Component for each process step
-const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon }: {
+const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, delay }: {
   number: number;
   section: string;
   defaultTitle: string;
   defaultDescription: string;
   icon: any;
+  delay: number;
 }) => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,7 +29,10 @@ const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon }
   
   return (
     <>
-      <Card className="card-professional p-6 text-center card-hover-lift relative bg-primary/5 dark:bg-primary/10">
+      <Card 
+        className="card-professional p-6 text-center card-hover-lift relative bg-primary/5 dark:bg-primary/10 icon-hover-bounce animate-fade-in-stagger"
+        style={{ animationDelay: `${delay}ms` }}
+      >
         {isAdmin && editMode && (
           <button
             onClick={() => setIsModalOpen(true)}
@@ -76,13 +81,14 @@ export const ProcessSection = () => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { content: heading } = useEditableContent('home-sections', 'how-it-works-heading');
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.2 });
   
   const displayHeading = heading || 'Slik fungerer det';
   
   return (
-    <section className="py-16">
+    <section className="py-16" ref={ref}>
       <div className="container mx-auto px-4">
-        <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12">
+        <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="relative text-center mb-12">
           {isAdmin && editMode && (
             <button
@@ -109,6 +115,7 @@ export const ProcessSection = () => {
             defaultTitle="Ta kontakt"
             defaultDescription="Ring oss eller send inn skjema"
             icon={Phone}
+            delay={0}
           />
           
           <ProcessStep
@@ -117,6 +124,7 @@ export const ProcessSection = () => {
             defaultTitle="Få tilbud"
             defaultDescription="Tilbud tilpasset ditt behov"
             icon={Calculator}
+            delay={150}
           />
           
           <ProcessStep
@@ -125,6 +133,7 @@ export const ProcessSection = () => {
             defaultTitle="Vi løser det"
             defaultDescription="Profesjonell utførelse"
             icon={CheckCircle}
+            delay={300}
           />
         </div>
 
