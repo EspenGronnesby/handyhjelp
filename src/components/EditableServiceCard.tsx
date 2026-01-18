@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ServiceCardEditModal } from './ServiceCardEditModal';
 import { getDisplayValue } from '@/lib/gridUtils';
-import { ServiceIcon, getServiceColors, popularColors } from '@/lib/serviceIcons';
+import { ServiceIcon, getServiceColors, popularColors, getServiceConfig } from '@/lib/serviceIcons';
 
 interface EditableServiceCardProps {
   section: string;
@@ -50,6 +50,9 @@ export const EditableServiceCard = ({
     return null;
   }
 
+  // Get service config for short label on mobile
+  const config = getServiceConfig(id);
+  
   // Get service-specific colors for the card background tint
   // Use emerald colors for popular cards, otherwise use standard service colors
   const colors = popular ? popularColors : getServiceColors(id);
@@ -57,7 +60,7 @@ export const EditableServiceCard = ({
   return (
     <>
       <div 
-        className={`relative rounded-lg p-3 md:p-6 transition-all duration-300 border card-hover-lift icon-hover-bounce reveal-scale perf-contain overflow-hidden ${colors.bg} ${
+        className={`relative rounded-lg p-4 md:p-6 transition-all duration-300 border card-hover-lift icon-hover-bounce reveal-scale perf-contain overflow-hidden ${colors.bg} ${
           popular ? 'border-success border-2 shadow-lg' : `border ${colors.border}`
         } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''} 
         dark:ring-1 dark:ring-white/5`}
@@ -86,15 +89,16 @@ export const EditableServiceCard = ({
         )}
         
         {/* Professional Lucide icon in circular container */}
-        <div className="mb-4">
-          <ServiceIcon serviceId={id} size="md" useServiceColor={true} />
+        <div className="mb-3 md:mb-4">
+          <ServiceIcon serviceId={id} size="sm" useServiceColor={true} className="md:!w-14 md:!h-14" />
         </div>
         
-        <h3 className="text-lg md:text-xl font-bold text-foreground mb-1 font-heading break-words">
-          {displayTitle}
+        <h3 className="text-base md:text-xl font-bold text-foreground mb-1 font-heading">
+          <span className="md:hidden">{config.labelShort}</span>
+          <span className="hidden md:inline">{displayTitle}</span>
         </h3>
 
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="hidden md:block text-sm text-muted-foreground mb-4">
           {displaySubtitle}
         </p>
         
@@ -121,7 +125,7 @@ export const EditableServiceCard = ({
         </ul>
         
         {/* Mobile spacer */}
-        <div className="md:hidden mb-4" />
+        <div className="md:hidden mb-3" />
         
         <Link to={`/tjenester/${id}`}>
           <Button 
