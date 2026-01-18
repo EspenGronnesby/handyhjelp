@@ -100,9 +100,11 @@ const EditableWhyChooseSection = () => {
               return (
                 <div 
                   key={index} 
-                  className={`text-center p-6 rounded-lg hover:bg-background transition-colors duration-300 ${getCardWidthClass()} ${
-                    isHidden && isAdmin && editMode ? 'opacity-50 border-2 border-dashed border-muted-foreground' : ''
-                  }`}
+                  className={`text-center p-6 rounded-xl transition-all duration-300 ${getCardWidthClass()}
+                    bg-cyan-50/60 dark:bg-cyan-950/30 
+                    border border-cyan-200/60 dark:border-cyan-800/40
+                    hover:shadow-lg dark:ring-1 dark:ring-white/5
+                    ${isHidden && isAdmin && editMode ? 'opacity-50 border-2 border-dashed border-muted-foreground' : ''}`}
                 >
                   {/* Hidden indicator for admin */}
                   {isHidden && isAdmin && editMode && (
@@ -112,8 +114,8 @@ const EditableWhyChooseSection = () => {
                     </div>
                   )}
                   
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="h-8 w-8 text-primary" />
+                  <div className="w-16 h-16 rounded-full bg-cyan-500 dark:bg-cyan-600 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="h-8 w-8 text-white" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">{item.title}</h3>
                   <p className="text-muted-foreground">

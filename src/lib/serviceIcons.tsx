@@ -23,32 +23,19 @@ export const serviceIcons: Record<string, ServiceConfig> = {
   takrennerens: { icon: CloudRain, label: 'Takrennerens', labelShort: 'Takrenner' },
 };
 
-// Subtle color tints for each service - provides visual differentiation
+// Unified cyan color for all services - consistent visual expression
+const unifiedColors: ServiceColors = {
+  bg: 'bg-cyan-50/60 dark:bg-cyan-950/30',
+  border: 'border-cyan-200/60 dark:border-cyan-800/40',
+  iconBg: 'bg-cyan-500 dark:bg-cyan-600',
+  iconColor: 'text-white',
+};
+
 export const serviceColors: Record<string, ServiceColors> = {
-  vaktmester: {
-    bg: 'bg-blue-50/60 dark:bg-blue-950/30',
-    border: 'border-blue-200/60 dark:border-blue-800/40',
-    iconBg: 'bg-blue-500 dark:bg-blue-600',
-    iconColor: 'text-white',
-  },
-  tomrer: {
-    bg: 'bg-amber-50/60 dark:bg-amber-950/30',
-    border: 'border-amber-200/60 dark:border-amber-800/40',
-    iconBg: 'bg-amber-500 dark:bg-amber-600',
-    iconColor: 'text-white',
-  },
-  blikk: {
-    bg: 'bg-cyan-50/60 dark:bg-cyan-950/30',
-    border: 'border-cyan-200/60 dark:border-cyan-800/40',
-    iconBg: 'bg-cyan-500 dark:bg-cyan-600',
-    iconColor: 'text-white',
-  },
-  takrennerens: {
-    bg: 'bg-emerald-50/60 dark:bg-emerald-950/30',
-    border: 'border-emerald-200/60 dark:border-emerald-800/40',
-    iconBg: 'bg-emerald-500 dark:bg-emerald-600',
-    iconColor: 'text-white',
-  },
+  vaktmester: unifiedColors,
+  tomrer: unifiedColors,
+  blikk: unifiedColors,
+  takrennerens: unifiedColors,
 };
 
 // Default fallback for unknown services
