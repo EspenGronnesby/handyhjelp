@@ -274,6 +274,25 @@
   .animate-scale-in {
     animation: scaleIn 0.4s ease-out forwards;
   }
+
+  /* Card hover lift effect */
+  .card-hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .card-hover-lift:hover {
+    @apply -translate-y-1 shadow-xl;
+  }
+
+  /* Subtle pulse animation for badges */
+  .animate-subtle-pulse {
+    animation: subtlePulse 2s ease-in-out infinite;
+  }
+
+  /* Scroll down indicator bounce */
+  .animate-bounce-down {
+    animation: bounceDown 2s ease-in-out infinite;
+  }
 }
 
 @keyframes fadeInUp {
@@ -317,6 +336,26 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 hsla(var(--success), 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 4px hsla(var(--success), 0);
+  }
+}
+
+@keyframes bounceDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
   }
 }
 

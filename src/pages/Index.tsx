@@ -16,6 +16,7 @@ import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
 import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { Helmet } from "react-helmet";
 
 // Component for Services Section Heading
@@ -204,6 +205,9 @@ const Index = () => {
       </div>
 
       <Footer />
+      
+      {/* Sticky Mobile CTA */}
+      <StickyMobileCTA />
     </div>
   );
 };

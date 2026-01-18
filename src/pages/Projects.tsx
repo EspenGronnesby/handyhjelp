@@ -135,27 +135,24 @@ const Projects = () => {
                 variant={activeCategory === "vaktmester" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("vaktmester")}
                 aria-label="Filtrer etter vaktmester"
-                className="flex-shrink-0 px-4 md:px-6 min-h-[44px] gap-2"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
-                <ServiceIcon serviceId="vaktmester" size="sm" className="w-6 h-6" />
                 Vaktmester ({projects.filter(p => p.category === "vaktmester").length})
               </Button>
               <Button
                 variant={activeCategory === "tomrer" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("tomrer")}
                 aria-label="Filtrer etter tømrer"
-                className="flex-shrink-0 px-4 md:px-6 min-h-[44px] gap-2"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
-                <ServiceIcon serviceId="tomrer" size="sm" className="w-6 h-6" />
                 Tømrer ({projects.filter(p => p.category === "tomrer").length})
               </Button>
               <Button
                 variant={activeCategory === "blikk" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("blikk")}
                 aria-label="Filtrer etter blikk"
-                className="flex-shrink-0 px-4 md:px-6 min-h-[44px] gap-2"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
               >
-                <ServiceIcon serviceId="blikk" size="sm" className="w-6 h-6" />
                 Blikk ({projects.filter(p => p.category === "blikk").length})
               </Button>
             </div>
