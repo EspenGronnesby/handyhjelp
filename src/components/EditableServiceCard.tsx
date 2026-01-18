@@ -60,7 +60,7 @@ export const EditableServiceCard = ({
   return (
     <>
       <div 
-        className={`relative rounded-lg p-4 md:p-6 transition-all duration-300 border card-hover-lift icon-hover-bounce reveal-scale perf-contain overflow-hidden ${colors.bg} ${
+        className={`relative rounded-lg p-4 md:p-6 transition-all duration-300 border card-hover-lift icon-hover-bounce reveal-scale perf-contain ${colors.bg} ${
           popular ? 'border-success border-2 shadow-lg' : `border ${colors.border}`
         } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''} 
         dark:ring-1 dark:ring-white/5`}
