@@ -31,6 +31,14 @@ const unifiedColors: ServiceColors = {
   iconColor: 'text-white',
 };
 
+// Special emerald colors for popular/featured cards
+export const popularColors: ServiceColors = {
+  bg: 'bg-emerald-50/60 dark:bg-emerald-950/30',
+  border: 'border-emerald-300/70 dark:border-emerald-700/50',
+  iconBg: 'bg-emerald-500 dark:bg-emerald-600',
+  iconColor: 'text-white',
+};
+
 export const serviceColors: Record<string, ServiceColors> = {
   vaktmester: unifiedColors,
   tomrer: unifiedColors,
