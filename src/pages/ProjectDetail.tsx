@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, ArrowLeft } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { ServiceBadge } from "@/lib/serviceIcons";
 
 interface Project {
   id: string;
@@ -60,18 +61,7 @@ const ProjectDetail = () => {
     setIsLoading(false);
   };
 
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case "vaktmester":
-        return "🔧 Vaktmester";
-      case "tomrer":
-        return "🔨 Tømrer";
-      case "blikk":
-        return "💧 Blikk";
-      default:
-        return category;
-    }
-  };
+  // Removed getCategoryLabel - now using ServiceBadge component
 
   if (isLoading) {
     return (
@@ -149,12 +139,10 @@ const ProjectDetail = () => {
           </Button>
 
           {/* Category Badge */}
-          <Badge
-            variant="secondary"
-            className="bg-background/90 backdrop-blur-sm text-foreground font-semibold mb-4"
-          >
-            {getCategoryLabel(project.category)}
-          </Badge>
+          <ServiceBadge 
+            serviceId={project.category}
+            className="mb-4"
+          />
 
           {/* Title */}
           <h1 className="heading-section font-heading mb-4">

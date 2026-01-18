@@ -4,11 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, Pencil } from "lucide-react";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
-import { Pencil } from "lucide-react";
 import { SectionHeadingEditModal } from "./SectionHeadingEditModal";
+import { ServiceBadge } from "@/lib/serviceIcons";
 
 interface Project {
   id: string;
@@ -169,13 +169,10 @@ export const ProjectsSection = () => {
 
                   {/* Badges */}
                   <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
-                    <Badge
-                      variant="secondary"
-                      className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
-                    >
-                      {project.category === "vaktmester" ? "🔧 Vaktmester" : 
-                       project.category === "tomrer" ? "🔨 Tømrer" : "💧 Blikk"}
-                    </Badge>
+                    <ServiceBadge 
+                      serviceId={project.category} 
+                      className="bg-background/90 backdrop-blur-sm"
+                    />
                     <Badge
                       variant="secondary"
                       className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"

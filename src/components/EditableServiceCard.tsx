@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { Pencil, EyeOff } from 'lucide-react';
+import { Pencil, EyeOff, Check } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { ServiceCardEditModal } from './ServiceCardEditModal';
 import { getDisplayValue } from '@/lib/gridUtils';
+import { ServiceIcon, getServiceColors } from '@/lib/serviceIcons';
 
 interface EditableServiceCardProps {
   section: string;
   id: string;
-  icon: string;
+  icon?: string; // Keep for backwards compatibility but will be ignored
   popular?: boolean;
   defaultTitle: string;
   defaultSubtitle: string;
@@ -20,7 +21,6 @@ interface EditableServiceCardProps {
 export const EditableServiceCard = ({
   section,
   id,
-  icon,
   popular = false,
   defaultTitle,
   defaultSubtitle,
@@ -50,12 +50,16 @@ export const EditableServiceCard = ({
     return null;
   }
 
+  // Get service-specific colors for the card background tint
+  const colors = getServiceColors(id);
+
   return (
     <>
       <div 
-        className={`relative bg-card rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-300 border ${
-          popular ? 'border-success border-2' : 'border-border'
-        } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''}`}
+        className={`relative rounded-lg p-6 transition-all duration-300 border ${colors.bg} ${
+          popular ? 'border-success border-2 shadow-lg' : `border ${colors.border}`
+        } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''} 
+        hover:shadow-xl dark:ring-1 dark:ring-white/5`}
       >
         {isAdmin && editMode && (
           <button
@@ -80,7 +84,10 @@ export const EditableServiceCard = ({
           </div>
         )}
         
-        <div className="text-4xl mb-3">{icon}</div>
+        {/* Professional Lucide icon in circular container */}
+        <div className="mb-4">
+          <ServiceIcon serviceId={id} size="md" useServiceColor={true} />
+        </div>
         
         <h3 className="text-xl font-bold text-foreground mb-1 font-heading">
           {displayTitle}
@@ -93,19 +100,19 @@ export const EditableServiceCard = ({
         <ul className="space-y-2 mb-6">
           {displayBullet1 && (
             <li className="flex items-start text-sm">
-              <span className="text-success mr-2 mt-0.5">✓</span>
+              <Check className="h-4 w-4 text-success mr-2 mt-0.5 flex-shrink-0" />
               <span className="text-muted-foreground">{displayBullet1}</span>
             </li>
           )}
           {displayBullet2 && (
             <li className="flex items-start text-sm">
-              <span className="text-success mr-2 mt-0.5">✓</span>
+              <Check className="h-4 w-4 text-success mr-2 mt-0.5 flex-shrink-0" />
               <span className="text-muted-foreground">{displayBullet2}</span>
             </li>
           )}
           {displayBullet3 && (
             <li className="flex items-start text-sm">
-              <span className="text-success mr-2 mt-0.5">✓</span>
+              <Check className="h-4 w-4 text-success mr-2 mt-0.5 flex-shrink-0" />
               <span className="text-muted-foreground">{displayBullet3}</span>
             </li>
           )}

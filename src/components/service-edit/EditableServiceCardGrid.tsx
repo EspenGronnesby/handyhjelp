@@ -9,12 +9,13 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ServiceIcon, getServiceColors } from "@/lib/serviceIcons";
 
 interface ServiceCard {
   id: string;
   title: string;
   subtitle: string;
-  icon: string;
+  icon: string; // Kept for backwards compatibility in data, but not used for display
   services: string[];
   targetAudience: string;
   popular?: boolean;
@@ -31,7 +32,7 @@ const EditableServiceCardGrid = () => {
       id: "vaktmester",
       title: "Vaktmestertjenester",
       subtitle: "Profesjonell eiendomspleie og vedlikehold",
-      icon: "🔧",
+      icon: "vaktmester",
       services: [
         "Daglig/ukentlig/månedlig tilsyn av bygg",
         "Renhold av fellesarealer og uteområder",
@@ -45,7 +46,7 @@ const EditableServiceCardGrid = () => {
       id: "tomrer",
       title: "Tømrertjenester",
       subtitle: "Kvalitetssnekring og konstruksjonsarbeid",
-      icon: "🔨",
+      icon: "tomrer",
       services: [
         "Bygging og reparasjon av terrasser",
         "Montering av dører, vinduer og innredning",
@@ -59,7 +60,7 @@ const EditableServiceCardGrid = () => {
       id: "blikk",
       title: "Blikkenslagertjenester",
       subtitle: "Sikker taktekningsløsninger og vannsystemer",
-      icon: "💧",
+      icon: "blikk",
       services: [
         "Montering og vedlikehold av takrenner",
         "Beslag og blikk på tak og vegger",
@@ -73,7 +74,7 @@ const EditableServiceCardGrid = () => {
       id: "takrennerens",
       title: "Takrennerens",
       subtitle: "Profesjonell rensing og vedlikehold av takrenner",
-      icon: "🌧️",
+      icon: "takrennerens",
       services: [
         "Grundig rensing av alle takrenner",
         "Inspeksjon av beslag og feste",
@@ -145,7 +146,7 @@ const EditableServiceCardGrid = () => {
     <>
       <section className="py-20 bg-muted">
         <div className="container mx-auto px-4 max-w-7xl relative">
-          <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12">
+          <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12 dark:ring-1 dark:ring-white/5">
             {isAdmin && editMode && (
               <button
                 onClick={() => setIsEditing(true)}
@@ -159,13 +160,14 @@ const EditableServiceCardGrid = () => {
             <div className={getGridClass()}>
               {visibleServices.map((service, index) => {
                 const isHidden = isServiceHidden(service);
+                const colors = getServiceColors(service.id);
                 
                 return (
                   <Card 
                     key={service.id}
                     id={service.id}
-                    className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-6 min-h-[520px] flex flex-col animate-fade-in overflow-hidden ${getCardWidthClass()} ${
-                      service.popular ? 'border-primary border-2 shadow-lg' : 'border-border'
+                    className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-6 min-h-[520px] flex flex-col animate-fade-in overflow-hidden ${getCardWidthClass()} ${colors.bg} ${
+                      service.popular ? 'border-primary border-2 shadow-lg' : `${colors.border}`
                     } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''}`}
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
@@ -183,10 +185,14 @@ const EditableServiceCardGrid = () => {
                       </Badge>
                     )}
                     
+                    {/* Professional Lucide icon */}
                     <div className="flex justify-start mb-4">
-                      <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
-                        <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{service.icon}</span>
-                      </div>
+                      <ServiceIcon 
+                        serviceId={service.id} 
+                        size="md" 
+                        useServiceColor={true}
+                        className="group-hover:scale-110 transition-transform duration-300"
+                      />
                     </div>
 
                     <div className="mb-3">
@@ -255,14 +261,6 @@ const EditableServiceCardGrid = () => {
                     <Input
                       value={service.subtitle}
                       onChange={(e) => updateService(serviceIndex, 'subtitle', e.target.value)}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label>Ikon (emoji)</Label>
-                    <Input
-                      value={service.icon}
-                      onChange={(e) => updateService(serviceIndex, 'icon', e.target.value)}
                     />
                   </div>
 

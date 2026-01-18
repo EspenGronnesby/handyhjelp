@@ -102,9 +102,10 @@
     --hero-text: 210 20% 98%;
     --hero-text-muted: 215 20% 80%;
 
-    --card: 222 47% 12%;
+    /* Improved card contrast for visibility */
+    --card: 222 47% 14%;
     --card-foreground: 210 20% 95%;
-    --card-elevated: 222 47% 15%;
+    --card-elevated: 222 47% 18%;
 
     /* Primary stays turquoise for visibility */
     --primary: 188 94% 45%;
@@ -115,13 +116,13 @@
     --success-hover: 142 76% 55%;
     --success-foreground: 222 47% 8%;
 
-    --secondary: 222 47% 18%;
-    --secondary-hover: 222 47% 22%;
+    --secondary: 222 47% 20%;
+    --secondary-hover: 222 47% 24%;
     --secondary-foreground: 210 20% 95%;
 
-    --muted: 222 47% 15%;
-    --muted-hover: 222 47% 20%;
-    --muted-foreground: 215 15% 70%;
+    --muted: 222 47% 16%;
+    --muted-hover: 222 47% 22%;
+    --muted-foreground: 215 15% 72%;
 
     /* Keep orange accent for hover states */
     --accent: 24 95% 53%;
@@ -131,23 +132,28 @@
     --destructive: 0 72% 55%;
     --destructive-foreground: 210 20% 98%;
 
-    --border: 222 47% 22%;
-    --border-input: 222 47% 28%;
-    --input: 222 47% 15%;
+    /* Enhanced border visibility */
+    --border: 222 47% 28%;
+    --border-input: 222 47% 35%;
+    --input: 222 47% 16%;
     --input-foreground: 210 20% 95%;
     --ring: 188 94% 45%;
 
     /* Popover in dark mode */
-    --popover: 222 47% 12%;
+    --popover: 222 47% 14%;
     --popover-foreground: 210 20% 95%;
+    
+    /* Enhanced shadows for dark mode */
+    --shadow-card: 0 4px 12px -2px hsl(222 47% 5% / 0.5), 0 2px 6px -2px hsl(222 47% 5% / 0.3);
+    --shadow-elevated: 0 10px 25px -5px hsl(222 47% 5% / 0.6), 0 6px 10px -4px hsl(222 47% 5% / 0.4);
     
     --sidebar-background: 222 47% 10%;
     --sidebar-foreground: 210 20% 95%;
     --sidebar-primary: 188 94% 45%;
     --sidebar-primary-foreground: 222 47% 8%;
-    --sidebar-accent: 222 47% 18%;
+    --sidebar-accent: 222 47% 20%;
     --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 222 47% 20%;
+    --sidebar-border: 222 47% 24%;
     --sidebar-ring: 188 94% 45%;
   }
 }
@@ -194,11 +200,12 @@
     @apply transition-all duration-300 ease-out;
   }
 
-  /* Professional Card Styles */
+  /* Professional Card Styles - Enhanced for dark mode visibility */
   .card-professional {
     @apply bg-card border border-border rounded-xl;
+    @apply dark:ring-1 dark:ring-white/5;
     box-shadow: var(--shadow-card);
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
   }
 
   .card-professional:hover {
@@ -207,7 +214,28 @@
 
   .card-elevated {
     @apply bg-card-elevated border border-border rounded-xl;
+    @apply dark:ring-1 dark:ring-white/10;
     box-shadow: var(--shadow-elevated);
+  }
+
+  /* Enhanced card styling for better dark mode visibility */
+  .card-enhanced {
+    @apply bg-card border border-border rounded-xl;
+    @apply shadow-md dark:shadow-lg;
+    @apply dark:ring-1 dark:ring-white/10;
+    @apply transition-all duration-300;
+  }
+
+  .card-enhanced:hover {
+    @apply shadow-xl dark:shadow-2xl;
+    @apply -translate-y-1;
+  }
+
+  /* Image frame for better visibility */
+  .image-frame {
+    @apply rounded-lg overflow-hidden;
+    @apply ring-1 ring-border/50 dark:ring-white/15;
+    @apply shadow-md dark:shadow-xl;
   }
 
   /* Form Styles */
