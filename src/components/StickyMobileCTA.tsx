@@ -20,9 +20,10 @@ export const StickyMobileCTA = () => {
   return (
     <div 
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-40 p-4 bg-background/95 backdrop-blur-md border-t border-border shadow-lg md:hidden transition-transform duration-300",
+        "fixed bottom-0 left-0 right-0 z-40 p-4 bg-background/95 backdrop-blur-md border-t border-border shadow-lg md:hidden transition-transform duration-300 overflow-hidden",
         isVisible ? "translate-y-0" : "translate-y-full"
       )}
+      style={{ width: '100%', maxWidth: '100vw' }}
     >
       <Link to="/tilbud" className="block w-full">
         <Button 
