@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, MapPin } from "lucide-react";
 import { EditableHero } from "@/components/EditableHero";
 import { Helmet } from "react-helmet";
+import { ServiceIcon, ServiceBadge, getCategoryLabel } from "@/lib/serviceIcons";
 
 interface Project {
   id: string;
@@ -134,25 +135,28 @@ const Projects = () => {
                 variant={activeCategory === "vaktmester" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("vaktmester")}
                 aria-label="Filtrer etter vaktmester"
-                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px] gap-2"
               >
-                🔧 Vaktmester ({projects.filter(p => p.category === "vaktmester").length})
+                <ServiceIcon serviceId="vaktmester" size="sm" className="w-6 h-6" />
+                Vaktmester ({projects.filter(p => p.category === "vaktmester").length})
               </Button>
               <Button
                 variant={activeCategory === "tomrer" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("tomrer")}
                 aria-label="Filtrer etter tømrer"
-                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px] gap-2"
               >
-                🔨 Tømrer ({projects.filter(p => p.category === "tomrer").length})
+                <ServiceIcon serviceId="tomrer" size="sm" className="w-6 h-6" />
+                Tømrer ({projects.filter(p => p.category === "tomrer").length})
               </Button>
               <Button
                 variant={activeCategory === "blikk" ? "default" : "outline"}
                 onClick={() => handleCategoryFilter("blikk")}
                 aria-label="Filtrer etter blikk"
-                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px] gap-2"
               >
-                💧 Blikk ({projects.filter(p => p.category === "blikk").length})
+                <ServiceIcon serviceId="blikk" size="sm" className="w-6 h-6" />
+                Blikk ({projects.filter(p => p.category === "blikk").length})
               </Button>
             </div>
           )}
@@ -219,13 +223,10 @@ const Projects = () => {
 
                         {/* Badges */}
                         <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
-                          <Badge
-                            variant="secondary"
-                            className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
-                          >
-                            {project.category === "vaktmester" ? "🔧 Vaktmester" : 
-                             project.category === "tomrer" ? "🔨 Tømrer" : "💧 Blikk"}
-                          </Badge>
+                          <ServiceBadge 
+                            serviceId={project.category}
+                            className="bg-background/90 backdrop-blur-sm"
+                          />
                           <Badge
                             variant="secondary"
                             className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
