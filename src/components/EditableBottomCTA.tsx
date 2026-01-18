@@ -43,20 +43,25 @@ export const EditableBottomCTA = () => {
           <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto opacity-95">
             {defaultData.description}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
-            <Link to="/tilbud">
-              <Button variant="outline" size="lg" className="text-lg px-10 bg-success border-success text-success-foreground">
-                {defaultData.button1}
+          <div className="flex flex-col items-center gap-6">
+            {/* Top row: Get quote + Call us */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/tilbud">
+                <Button variant="outline" size="lg" className="text-lg px-10 bg-success border-success text-success-foreground hover:bg-success/90">
+                  {defaultData.button1}
+                </Button>
+              </Link>
+              <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'} className="bg-background text-primary hover:bg-warning hover:text-warning-foreground hover:border-warning text-lg px-10 border-primary-foreground transition-colors">
+                {defaultData.button2}
               </Button>
-            </Link>
+            </div>
+            
+            {/* Bottom: Fixed agreements as primary CTA */}
             <Link to="/fast-avtale">
-              <Button variant="outline" size="lg" className="text-lg px-10 bg-primary/20 border-primary text-primary-foreground hover:bg-primary/40">
-                Faste oppdrag
+              <Button variant="cta" size="lg" className="text-lg px-12 py-4 shadow-lg hover:shadow-xl transition-all font-semibold">
+                ⭐ Faste oppdrag – Bli prioritert kunde
               </Button>
             </Link>
-            <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'} className="bg-background text-primary hover:bg-warning hover:text-warning-foreground hover:border-warning text-lg px-10 border-primary-foreground transition-colors">
-              {defaultData.button2}
-            </Button>
           </div>
         </div>
       </section>
