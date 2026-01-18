@@ -183,19 +183,19 @@ const TestimonialsSection = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden">
+    <section id="testimonials" className="py-12 md:py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden section-mobile">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <Star className="h-4 w-4 fill-primary" />
+        {/* Section Header - Compact on mobile */}
+        <div className="text-center mb-8 md:mb-12">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium mb-3 md:mb-4 reveal-up">
+            <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary" />
             <span>Kundeanmeldelser</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Hva kundene sier om oss
+          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4 reveal-up reveal-stagger-2">
+            Hva kundene sier
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Les hva våre fornøyde kunder mener om arbeidet vårt
+          <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto reveal-up reveal-stagger-3">
+            Les hva våre fornøyde kunder mener
           </p>
         </div>
 
@@ -238,12 +238,13 @@ const TestimonialsSection = () => {
                 <div
                   key={review.id}
                   className={cn(
-                    "flex-shrink-0 w-[85vw] md:w-[450px] snap-center",
-                    "group"
+                    "flex-shrink-0 w-[88vw] md:w-[450px] snap-center",
+                    "group reveal-scale perf-contain"
                   )}
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className={cn(
-                    "relative h-full bg-card rounded-2xl p-8 shadow-lg border border-border/50",
+                    "relative h-full bg-card rounded-2xl p-6 md:p-8 shadow-lg border border-border/50",
                     "transition-all duration-500 ease-out",
                     "hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1",
                     index === currentIndex && "ring-2 ring-primary/20"

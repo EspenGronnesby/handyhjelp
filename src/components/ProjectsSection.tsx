@@ -9,7 +9,7 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { SectionHeadingEditModal } from "./SectionHeadingEditModal";
 import { ServiceBadge } from "@/lib/serviceIcons";
-import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { useScrollProgress } from "@/hooks/useScrollProgress";
 
 interface Project {
   id: string;
@@ -34,8 +34,8 @@ export const ProjectsSection = () => {
   const { content: subheading } = useEditableContent('home-sections', 'projects-subheading');
   
   const displayHeading = heading || 'Våre prosjekter';
-  const displaySubheading = subheading || 'Se resultatet av vårt arbeid – før og etter bilder av våre siste prosjekter';
-  const { ref, isVisible } = useScrollAnimation({ threshold: 0.15 });
+  const displaySubheading = subheading || 'Se resultatet av vårt arbeid';
+  const { ref, isVisible } = useScrollProgress({ threshold: 0.12 });
 
   useEffect(() => {
     fetchProjects();
@@ -93,7 +93,8 @@ export const ProjectsSection = () => {
       }
       
       console.log("📊 Selected projects for homepage:", selectedProjects.length);
-      setProjects(selectedProjects.slice(0, 3)); // Ensure max 3 projects
+      // On mobile, show only 2 projects for cleaner view
+      setProjects(selectedProjects.slice(0, 3));
     }
   };
 
@@ -106,10 +107,10 @@ export const ProjectsSection = () => {
   };
 
   return (
-    <section className="py-16 bg-muted/30" ref={ref}>
+    <section id="projects" className="py-12 md:py-16 bg-muted/30 section-mobile" ref={ref}>
       <div className="container mx-auto px-4">
-        <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="relative text-center mb-12">
+        <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-6 md:p-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="relative text-center mb-8 md:mb-12">
           {isAdmin && editMode && (
             <button
               onClick={() => setIsModalOpen(true)}
@@ -120,37 +121,38 @@ export const ProjectsSection = () => {
             </button>
           )}
           
-          <h2 className="heading-section font-heading mb-4">
+          <h2 className="heading-section font-heading text-2xl md:text-3xl lg:text-4xl mb-3 md:mb-4">
             {displayHeading}
           </h2>
           
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             {displaySubheading}
           </p>
         </div>
 
         {projects.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <p className="text-lg">
+          <div className="text-center py-8 md:py-12 text-muted-foreground">
+            <p className="text-base md:text-lg">
               Vi legger snart ut bilder fra våre prosjekter
             </p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {projects.map((project, index) => (
+            {/* Mobile: Show 2 projects in larger cards, Desktop: 3 in grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+              {projects.slice(0, typeof window !== 'undefined' && window.innerWidth < 768 ? 2 : 3).map((project, index) => (
               <Link
                 key={project.id}
                 to={`/prosjekter/${project.id}`}
-                className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer card-hover-lift transition-all duration-300 block animate-fade-in-stagger"
+                className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer card-hover-lift transition-all duration-300 block reveal-scale perf-contain"
                 style={{ animationDelay: `${index * 150}ms` }}
                 onMouseEnter={() => setHoveredProject(project.id)}
                 onMouseLeave={() => setHoveredProject(null)}
                 onTouchStart={() => setTouchedProject(project.id)}
                 onTouchEnd={() => setTouchedProject(null)}
               >
-                {/* Image Container */}
-                <div className="relative aspect-[4/3] overflow-hidden">
+                {/* Image Container - Taller on mobile */}
+                <div className="relative aspect-[4/3] md:aspect-[4/3] overflow-hidden">
                   {/* Before Image */}
                   <img
                     src={project.before_image_url}
@@ -171,15 +173,15 @@ export const ProjectsSection = () => {
                   />
 
                   {/* Badges */}
-                  <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
+                  <div className="absolute top-3 left-3 right-3 z-10 flex justify-between items-start">
                     <ServiceBadge 
                       serviceId={project.category} 
-                      className="bg-background/90 backdrop-blur-sm"
+                      className="bg-background/90 backdrop-blur-sm text-xs"
                       showIcon={false}
                     />
                     <Badge
                       variant="secondary"
-                      className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
+                      className="bg-background/90 backdrop-blur-sm text-foreground font-semibold text-xs"
                     >
                       {isShowingAfter(project.id) ? "ETTER" : "FØR"}
                     </Badge>
@@ -189,18 +191,18 @@ export const ProjectsSection = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
 
-                {/* Content */}
-                <div className="p-4 bg-card">
-                  <h3 className="font-heading font-bold text-lg mb-2 text-foreground">
+                {/* Content - Compact on mobile */}
+                <div className="p-3 md:p-4 bg-card">
+                  <h3 className="font-heading font-bold text-base md:text-lg mb-1 md:mb-2 text-foreground line-clamp-1">
                     {project.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                  <p className="text-muted-foreground text-xs md:text-sm mb-2 md:mb-3 line-clamp-1 md:line-clamp-2">
                     {project.description}
                   </p>
-                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-3 md:gap-4 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
-                      <span>{project.location}</span>
+                      <span className="truncate max-w-[80px] md:max-w-none">{project.location}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
@@ -217,14 +219,20 @@ export const ProjectsSection = () => {
             ))}
           </div>
 
-          <div className="text-center mt-8">
+          {/* Mobile tap hint */}
+          <p className="text-center text-xs text-muted-foreground mb-4 md:hidden">
+            Trykk på bildet for å se før/etter
+          </p>
+
+          <div className="text-center">
             <Button
               variant="default"
               size="lg"
               onClick={() => navigate("/prosjekter")}
-              className="hover-scale px-8"
+              className="hover-scale px-6 md:px-8 reveal-up"
+              style={{ animationDelay: '300ms' }}
             >
-              Se alle våre prosjekter →
+              Se alle prosjekter →
             </Button>
           </div>
           </>
