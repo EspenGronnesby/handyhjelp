@@ -27,7 +27,7 @@ const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon }
   
   return (
     <>
-      <Card className="card-professional p-6 text-center hover:scale-105 transition-transform duration-300 relative">
+      <Card className="card-professional p-6 text-center card-hover-lift relative bg-primary/5 dark:bg-primary/10">
         {isAdmin && editMode && (
           <button
             onClick={() => setIsModalOpen(true)}

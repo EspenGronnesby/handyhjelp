@@ -143,25 +143,25 @@ export const Header = () => {
           <div className="hidden lg:flex items-center space-x-4">
             {/* Navigation Links */}
             <nav className="flex items-center space-x-6">
-              <Link to="/" className={`transition-colors text-sm ${isActive('/') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
+              <Link to="/" className={`relative transition-colors text-sm py-1 ${isActive('/') ? 'text-primary font-medium after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary' : 'text-foreground hover:text-primary'}`}>
                 Hjem
               </Link>
-              <Link to="/tjenester" className={`transition-colors text-sm ${isActive('/tjenester') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
+              <Link to="/tjenester" className={`relative transition-colors text-sm py-1 ${isActive('/tjenester') ? 'text-primary font-medium after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary' : 'text-foreground hover:text-primary'}`}>
                 Tjenester
               </Link>
-              <Link to="/prosjekter" className={`transition-colors text-sm ${isActive('/prosjekter') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
+              <Link to="/prosjekter" className={`relative transition-colors text-sm py-1 ${isActive('/prosjekter') ? 'text-primary font-medium after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary' : 'text-foreground hover:text-primary'}`}>
                 Prosjekter
               </Link>
-              <Link to="/raad" className={`transition-colors text-sm ${isActive('/raad') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
+              <Link to="/raad" className={`relative transition-colors text-sm py-1 ${isActive('/raad') ? 'text-primary font-medium after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary' : 'text-foreground hover:text-primary'}`}>
                 Råd
               </Link>
-              <Link to="/om-oss" className={`transition-colors text-sm ${isActive('/om-oss') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
+              <Link to="/om-oss" className={`relative transition-colors text-sm py-1 ${isActive('/om-oss') ? 'text-primary font-medium after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary' : 'text-foreground hover:text-primary'}`}>
                 Om oss
               </Link>
-              <Link to="/kontakt" className={`transition-colors text-sm ${isActive('/kontakt') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
+              <Link to="/kontakt" className={`relative transition-colors text-sm py-1 ${isActive('/kontakt') ? 'text-primary font-medium after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary' : 'text-foreground hover:text-primary'}`}>
                 Kontakt
               </Link>
-              <Link to="/faq" className={`transition-colors text-sm ${isActive('/faq') ? 'text-primary font-medium' : 'text-foreground hover:text-primary'}`}>
+              <Link to="/faq" className={`relative transition-colors text-sm py-1 ${isActive('/faq') ? 'text-primary font-medium after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary' : 'text-foreground hover:text-primary'}`}>
                 FAQ
               </Link>
             </nav>

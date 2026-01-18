@@ -80,7 +80,7 @@ export const EditableServiceCard = ({
         )}
 
         {popular && !editMode && !isHidden && (
-          <div className="absolute top-4 right-4 bg-success text-success-foreground text-xs font-semibold px-3 py-1 rounded-full">
+          <div className="absolute top-4 right-4 bg-success text-success-foreground text-xs font-semibold px-3 py-1 rounded-full animate-subtle-pulse">
             Populær
           </div>
         )}

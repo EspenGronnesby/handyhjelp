@@ -68,6 +68,7 @@ const App = () => (
                 <Route path="/tjenester/takrennerens" element={<ServiceTakrennerens />} />
                 <Route path="/tjenester/tomrer" element={<ServiceTomrer />} />
                 <Route path="/tjenester/blikk" element={<ServiceBlikk />} />
+                <Route path="/blog" element={<Blog />} />
                 <Route path="/raad" element={<Blog />} />
                 <Route path="/raad/:slug" element={<BlogDetail />} />
                 <Route path="/takk" element={<ThankYou />} />
