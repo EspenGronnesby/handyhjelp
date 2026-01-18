@@ -71,7 +71,7 @@ export const ScrollProgress: React.FC<ScrollProgressProps> = ({
   return (
     <div 
       className={cn(
-        'fixed right-2 top-1/2 -translate-y-1/2 z-50 transition-opacity duration-500',
+        'fixed right-3 top-1/2 -translate-y-1/2 z-50 transition-opacity duration-500',
         isVisible ? 'opacity-100' : 'opacity-0',
         className
       )}
@@ -81,25 +81,16 @@ export const ScrollProgress: React.FC<ScrollProgressProps> = ({
       aria-valuemax={100}
       aria-label="Side scroll fremdrift"
     >
-      {/* Progress track */}
-      <div className="w-1 h-24 bg-muted/30 rounded-full relative overflow-hidden backdrop-blur-sm">
-        {/* Progress fill */}
-        <div 
-          className="absolute bottom-0 left-0 right-0 bg-primary/60 rounded-full transition-all duration-300"
-          style={{ height: `${progress * 100}%` }}
-        />
-      </div>
-
-      {/* Section dots */}
-      <div className="absolute inset-0 flex flex-col justify-between py-1">
+      {/* Section dots only - no vertical line */}
+      <div className="flex flex-col gap-3">
         {sections.map((_, index) => (
           <div
             key={index}
             className={cn(
-              'w-1 h-1 rounded-full mx-auto transition-all duration-300',
+              'w-2 h-2 rounded-full transition-all duration-300',
               index === activeSection 
-                ? 'bg-primary scale-150' 
-                : 'bg-muted-foreground/30'
+                ? 'bg-primary scale-125' 
+                : 'bg-muted-foreground/20'
             )}
           />
         ))}

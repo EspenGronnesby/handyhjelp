@@ -112,46 +112,35 @@ export const ProcessSection = () => {
           </p>
         </div>
 
-        {/* Mobile: Horizontal scroll, Desktop: Grid */}
-        <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-8 mb-8 md:mb-12 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-4 md:pb-0 -mx-2 px-2 md:mx-0 md:px-0">
-          <div className="flex-shrink-0 w-[75vw] md:w-auto snap-center">
-            <ProcessStep
-              number={1}
-              section="how-it-works-step-1"
-              defaultTitle="Ta kontakt"
-              defaultDescription="Ring oss eller send inn skjema"
-              icon={Phone}
-              index={0}
-            />
-          </div>
+        {/* Mobile: Vertical stack, Desktop: Grid */}
+        <div className="flex flex-col gap-6 md:grid md:grid-cols-3 md:gap-8 mb-8 md:mb-12">
+          <ProcessStep
+            number={1}
+            section="how-it-works-step-1"
+            defaultTitle="Ta kontakt"
+            defaultDescription="Ring oss eller send inn skjema"
+            icon={Phone}
+            index={0}
+          />
           
-          <div className="flex-shrink-0 w-[75vw] md:w-auto snap-center">
-            <ProcessStep
-              number={2}
-              section="how-it-works-step-2"
-              defaultTitle="Få tilbud"
-              defaultDescription="Tilbud tilpasset ditt behov"
-              icon={Calculator}
-              index={1}
-            />
-          </div>
+          <ProcessStep
+            number={2}
+            section="how-it-works-step-2"
+            defaultTitle="Få tilbud"
+            defaultDescription="Tilbud tilpasset ditt behov"
+            icon={Calculator}
+            index={1}
+          />
           
-          <div className="flex-shrink-0 w-[75vw] md:w-auto snap-center">
-            <ProcessStep
-              number={3}
-              section="how-it-works-step-3"
-              defaultTitle="Vi løser det"
-              defaultDescription="Profesjonell utførelse"
-              icon={CheckCircle}
-              index={2}
-            />
-          </div>
+          <ProcessStep
+            number={3}
+            section="how-it-works-step-3"
+            defaultTitle="Vi løser det"
+            defaultDescription="Profesjonell utførelse"
+            icon={CheckCircle}
+            index={2}
+          />
         </div>
-
-        {/* Mobile swipe hint */}
-        <p className="text-center text-xs text-muted-foreground mb-6 md:hidden">
-          Sveip for å se alle steg
-        </p>
 
         <div className="text-center">
           <Button 
