@@ -9,7 +9,7 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { SectionHeadingEditModal } from "./SectionHeadingEditModal";
 import { ServiceBadge } from "@/lib/serviceIcons";
-import { useScrollProgress } from "@/hooks/useScrollProgress";
+import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 
 interface Project {
   id: string;
@@ -35,7 +35,7 @@ export const ProjectsSection = () => {
   
   const displayHeading = heading || 'Våre prosjekter';
   const displaySubheading = subheading || 'Se resultatet av vårt arbeid';
-  const { ref, isVisible } = useScrollProgress({ threshold: 0.12 });
+  const { ref, isVisible, getItemStyle } = useStaggeredGridReveal(3, 3, { threshold: 0.12 });
 
   useEffect(() => {
     fetchProjects();
@@ -144,8 +144,8 @@ export const ProjectsSection = () => {
               <Link
                 key={project.id}
                 to={`/prosjekter/${project.id}`}
-                className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer card-hover-lift transition-all duration-300 block reveal-scale perf-contain"
-                style={{ animationDelay: `${index * 150}ms` }}
+                className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer card-hover-lift transition-all duration-300 block perf-contain"
+                style={getItemStyle(index)}
                 onMouseEnter={() => setHoveredProject(project.id)}
                 onMouseLeave={() => setHoveredProject(null)}
                 onTouchStart={() => setTouchedProject(project.id)}
@@ -229,8 +229,7 @@ export const ProjectsSection = () => {
               variant="default"
               size="lg"
               onClick={() => navigate("/prosjekter")}
-              className="hover-scale px-6 md:px-8 reveal-up"
-              style={{ animationDelay: '300ms' }}
+              className="hover-scale px-6 md:px-8"
             >
               Se alle prosjekter →
             </Button>

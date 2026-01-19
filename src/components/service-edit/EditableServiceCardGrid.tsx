@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ServiceIcon, getServiceColors, popularColors } from "@/lib/serviceIcons";
+import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 
 interface ServiceCard {
   id: string;
@@ -137,6 +138,9 @@ const EditableServiceCardGrid = () => {
     setEditedServices(updated);
   };
 
+  // Use staggered grid animation
+  const { ref, isVisible, getItemStyle } = useStaggeredGridReveal(visibleServices.length, 2, { threshold: 0.1 });
+
   // Don't render section if no visible services
   if (visibleServices.length === 0 && !(isAdmin && editMode)) {
     return null;
@@ -144,9 +148,9 @@ const EditableServiceCardGrid = () => {
 
   return (
     <>
-      <section className="py-20 bg-muted">
+      <section className="py-20 bg-muted" ref={ref}>
         <div className="container mx-auto px-4 max-w-7xl relative">
-          <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12 dark:ring-1 dark:ring-white/5">
+          <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12 dark:ring-1 dark:ring-white/5 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {isAdmin && editMode && (
               <button
                 onClick={() => setIsEditing(true)}
@@ -167,10 +171,10 @@ const EditableServiceCardGrid = () => {
                   <Card 
                     key={service.id}
                     id={service.id}
-                    className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-6 min-h-[520px] flex flex-col animate-fade-in overflow-hidden ${getCardWidthClass()} ${colors.bg} ${colors.border} ${
+                    className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-6 min-h-[520px] flex flex-col overflow-hidden ${getCardWidthClass()} ${colors.bg} ${colors.border} ${
                       service.popular ? 'border-2 shadow-lg ring-1 ring-emerald-400/30 dark:ring-emerald-500/20' : ''
                     } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''}`}
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    style={getItemStyle(index)}
                   >
                     {/* Hidden indicator for admin */}
                     {isHidden && isAdmin && editMode && (

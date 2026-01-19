@@ -15,11 +15,18 @@ import { EditableWhyUs } from "@/components/EditableWhyUs";
 import { EditableCertifications } from "@/components/EditableCertifications";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
+import { useFadeInUp, useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 
 const About = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('about', heroAboutImg);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Scroll animations
+  const { ref: aboutRef, style: aboutStyle } = useFadeInUp({ threshold: 0.1 });
+  const { ref: whyUsRef, style: whyUsStyle } = useFadeInUp({ threshold: 0.1 });
+  const { ref: teamRef, isVisible: teamVisible, getItemStyle: getTeamItemStyle } = useStaggeredGridReveal(8, 4, { threshold: 0.1 });
+  const { ref: certRef, style: certStyle } = useFadeInUp({ threshold: 0.1 });
 
   const fetchTeamMembers = async () => {
     try {
@@ -66,18 +73,22 @@ const About = () => {
 
         {/* Main Content */}
         <section className="container mx-auto px-4 py-20">
-          <EditableAboutContent />
+          <div ref={aboutRef} style={aboutStyle}>
+            <EditableAboutContent />
+          </div>
 
           {/* Timeline Section */}
           <EditableTimeline />
 
           {/* Why Choose Us Section */}
-          <EditableWhyUs />
+          <div ref={whyUsRef} style={whyUsStyle}>
+            <EditableWhyUs />
+          </div>
 
           {/* Team Section with Admin Editing */}
-          <div className="bg-muted rounded-2xl p-12 mb-20">
-            <h2 className="text-3xl font-bold text-center mb-4">Møt teamet</h2>
-            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
+          <div id="team" className="bg-muted rounded-2xl p-12 mb-20 scroll-mt-24" ref={teamRef}>
+            <h2 className={`text-3xl font-bold text-center mb-4 transition-all duration-700 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>Møt teamet</h2>
+            <p className={`text-center text-muted-foreground mb-12 max-w-2xl mx-auto transition-all duration-700 delay-100 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               Våre erfarne fagfolk er klar til å hjelpe deg med alle dine eiendomsbehov
             </p>
             
@@ -87,8 +98,8 @@ const About = () => {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-                {teamMembers.map((member) => (
-                  <Card key={member.id} className="relative group">
+                {teamMembers.map((member, index) => (
+                  <Card key={member.id} className="relative group" style={getTeamItemStyle(index)}>
                     <TeamMemberEditor member={member} onUpdate={fetchTeamMembers} />
                     <CardContent className="pt-6 text-center">
                       <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
@@ -111,7 +122,9 @@ const About = () => {
           </div>
 
           {/* Certifications Section */}
-          <EditableCertifications />
+          <div ref={certRef} style={certStyle}>
+            <EditableCertifications />
+          </div>
         </section>
 
         {/* CTA Section */}

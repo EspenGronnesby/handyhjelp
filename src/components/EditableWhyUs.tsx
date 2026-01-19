@@ -5,6 +5,7 @@ import { useEditableContent } from '@/hooks/useEditableContent';
 import { WhyUsEditModal } from './WhyUsEditModal';
 import { Card, CardContent } from '@/components/ui/card';
 import { getDisplayValue } from '@/lib/gridUtils';
+import { useStaggeredGridReveal } from '@/hooks/useScrollAnimation';
 
 const iconMap = {
   Clock, Shield, Award, Users, CheckCircle2, Star
@@ -57,6 +58,9 @@ export const EditableWhyUs = () => {
     ? items 
     : items.filter(item => !isItemHidden(item));
 
+  // Use staggered grid animation
+  const { ref, getItemStyle } = useStaggeredGridReveal(visibleItems.length, 3, { threshold: 0.1 });
+
   // Hvis alle items er skjult og ikke i edit mode, skjul hele seksjonen
   if (visibleItems.length === 0 && (!isAdmin || !editMode)) {
     return null;
@@ -72,7 +76,7 @@ export const EditableWhyUs = () => {
 
   return (
     <>
-      <div className="mb-20 relative">
+      <div className="mb-20 relative" ref={ref}>
         {isAdmin && editMode && (
           <button
             onClick={() => setIsModalOpen(true)}
@@ -99,6 +103,7 @@ export const EditableWhyUs = () => {
                 className={`border-2 hover:border-primary transition-colors relative ${getCardWidthClass()} ${
                   isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''
                 }`}
+                style={getItemStyle(index)}
               >
                 {isHidden && isAdmin && editMode && (
                   <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">

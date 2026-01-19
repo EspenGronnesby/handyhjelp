@@ -19,6 +19,7 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { Helmet } from "react-helmet";
+import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 
 // Component for Services Section Heading
 const ServicesHeading = () => {
@@ -69,6 +70,7 @@ const ServicesHeading = () => {
 
 const Index = () => {
   const { user } = useAuth();
+  const { ref: servicesRef, isVisible: servicesVisible, getItemStyle } = useStaggeredGridReveal(4, 2, { threshold: 0.1 });
   
   return (
     <div className="min-h-screen">
@@ -110,65 +112,73 @@ const Index = () => {
         <TestimonialsSection />
 
         {/* Services Section - Compact Overview */}
-        <section className="py-12 md:py-16 bg-background section-mobile" id="services">
+        <section className="py-12 md:py-16 bg-background section-mobile" id="services" ref={servicesRef}>
           <div className="container mx-auto px-4">
-            <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-6 md:p-12">
+            <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-6 md:p-12 transition-all duration-700 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <ServicesHeading />
 
             
             <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 max-w-5xl mx-auto mb-8 md:mb-12">
-              <EditableServiceCard
-                section="service-vaktmester"
-                id="vaktmester"
-                icon="🔧"
-                defaultTitle="Vaktmestertjenester"
-                defaultSubtitle="Profesjonell eiendomspleie og vedlikehold"
-                defaultBullets={[
-                  "Daglig/ukentlig/månedlig tilsyn av bygg",
-                  "Renhold av fellesarealer og uteområder",
-                  "Vintervedlikehold (strøing, snørydding)"
-                ]}
-              />
+              <div style={getItemStyle(0)}>
+                <EditableServiceCard
+                  section="service-vaktmester"
+                  id="vaktmester"
+                  icon="🔧"
+                  defaultTitle="Vaktmestertjenester"
+                  defaultSubtitle="Profesjonell eiendomspleie og vedlikehold"
+                  defaultBullets={[
+                    "Daglig/ukentlig/månedlig tilsyn av bygg",
+                    "Renhold av fellesarealer og uteområder",
+                    "Vintervedlikehold (strøing, snørydding)"
+                  ]}
+                />
+              </div>
 
-              <EditableServiceCard
-                section="service-takrennerens"
-                id="takrennerens"
-                icon="🌧️"
-                popular={true}
-                defaultTitle="Takrennerens"
-                defaultSubtitle="Profesjonell rensing og vedlikehold av takrenner"
-                defaultBullets={[
-                  "Grundig rensing av alle takrenner",
-                  "Fjerning av løv, mose og rusk",
-                  "Fast pris: 3 390 kr for enebolig"
-                ]}
-              />
+              <div style={getItemStyle(1)}>
+                <EditableServiceCard
+                  section="service-takrennerens"
+                  id="takrennerens"
+                  icon="🌧️"
+                  popular={true}
+                  defaultTitle="Takrennerens"
+                  defaultSubtitle="Profesjonell rensing og vedlikehold av takrenner"
+                  defaultBullets={[
+                    "Grundig rensing av alle takrenner",
+                    "Fjerning av løv, mose og rusk",
+                    "Fast pris: 3 390 kr for enebolig"
+                  ]}
+                />
+              </div>
 
-              <EditableServiceCard
-                section="service-tomrer"
-                id="tomrer"
-                icon="🔨"
-                defaultTitle="Tømrertjenester"
-                defaultSubtitle="Kvalitetssnekring og konstruksjonsarbeid"
-                defaultBullets={[
-                  "Bygging og reparasjon av terrasser",
-                  "Montering av dører, vinduer og innredning",
-                  "Takarbeid og taktekking"
-                ]}
-              />
+              <div style={getItemStyle(2)}>
+                <EditableServiceCard
+                  section="service-tomrer"
+                  id="tomrer"
+                  icon="🔨"
+                  defaultTitle="Tømrertjenester"
+                  defaultSubtitle="Kvalitetssnekring og konstruksjonsarbeid"
+                  defaultBullets={[
+                    "Bygging og reparasjon av terrasser",
+                    "Montering av dører, vinduer og innredning",
+                    "Takarbeid og taktekking"
+                  ]}
+                />
+              </div>
 
-              <EditableServiceCard
-                section="service-blikk"
-                id="blikk"
-                icon="💧"
-                defaultTitle="Blikkenslagertjenester"
-                defaultSubtitle="Sikker taktekningsløsninger og vannsystemer"
-                defaultBullets={[
-                  "Montering og vedlikehold av takrenner",
-                  "Beslag og blikk på tak og vegger",
-                  "Tetting og vannsikring"
-                ]}
-              />
+              <div style={getItemStyle(3)}>
+                <EditableServiceCard
+                  section="service-blikk"
+                  id="blikk"
+                  icon="💧"
+                  defaultTitle="Blikkenslagertjenester"
+                  defaultSubtitle="Sikker taktekningsløsninger og vannsystemer"
+                  defaultBullets={[
+                    "Montering og vedlikehold av takrenner",
+                    "Beslag og blikk på tak og vegger",
+                    "Tetting og vannsikring"
+                  ]}
+                />
+              </div>
             </div>
 
             <div className="text-center">
