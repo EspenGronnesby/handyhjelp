@@ -211,11 +211,17 @@ html, body {
     @apply bg-card border border-border rounded-xl;
     @apply dark:ring-1 dark:ring-white/5;
     box-shadow: var(--shadow-card);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    transition: box-shadow 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out;
+    filter: brightness(1);
   }
 
   .card-professional:hover {
     box-shadow: var(--shadow-elevated);
+    filter: brightness(1.03);
+  }
+
+  .dark .card-professional:hover {
+    filter: brightness(1.08);
   }
 
   .card-elevated {
@@ -229,12 +235,18 @@ html, body {
     @apply bg-card border border-border rounded-xl;
     @apply shadow-md dark:shadow-lg;
     @apply dark:ring-1 dark:ring-white/10;
-    @apply transition-all duration-300;
+    transition: all 0.5s ease-out;
+    filter: brightness(1);
   }
 
   .card-enhanced:hover {
     @apply shadow-xl dark:shadow-2xl;
     @apply -translate-y-1;
+    filter: brightness(1.03);
+  }
+
+  .dark .card-enhanced:hover {
+    filter: brightness(1.08);
   }
 
   /* Image frame for better visibility */
@@ -281,22 +293,25 @@ html, body {
     animation: scaleIn 0.4s ease-out forwards;
   }
 
-  /* Card hover lift effect - Enhanced */
+  /* Card hover lift effect - Smooth and persistent */
   .card-hover-lift {
-    @apply transition-all duration-300 ease-out;
+    transition: all 0.5s ease-out;
+    filter: brightness(1);
   }
   
   .card-hover-lift:hover {
-    @apply -translate-y-2 shadow-2xl;
+    @apply -translate-y-2;
+    filter: brightness(1.05);
     box-shadow: 
       0 25px 50px -12px rgba(0,0,0,0.15),
-      0 0 0 1px hsl(var(--primary) / 0.1);
+      0 0 0 1px hsl(var(--primary) / 0.15);
   }
 
   .dark .card-hover-lift:hover {
+    filter: brightness(1.12);
     box-shadow: 
       0 25px 50px -12px rgba(0,0,0,0.4),
-      0 0 0 1px hsl(var(--primary) / 0.2);
+      0 0 0 1px hsl(var(--primary) / 0.25);
   }
 
   /* Subtle pulse animation for badges */
@@ -323,9 +338,13 @@ html, body {
     animation: fadeInUp 0.6s ease-out forwards;
   }
 
-  /* Icon bounce on hover */
+  /* Icon lift on hover - Smooth and persistent */
+  .icon-hover-bounce svg {
+    transition: transform 0.5s ease-out;
+  }
+
   .icon-hover-bounce:hover svg {
-    animation: iconBounce 0.4s ease-out;
+    transform: translateY(-4px);
   }
 
   /* Text glow on hover */
