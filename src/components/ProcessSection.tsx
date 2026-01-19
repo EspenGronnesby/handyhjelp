@@ -7,16 +7,16 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { Pencil } from "lucide-react";
 import { ProcessStepEditModal } from "@/components/ProcessStepEditModal";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
-import { useScrollProgress } from "@/hooks/useScrollProgress";
+import { useSequentialReveal } from "@/hooks/useScrollAnimation";
 
 // Component for each process step
-const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, index }: {
+const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, style }: {
   number: number;
   section: string;
   defaultTitle: string;
   defaultDescription: string;
   icon: any;
-  index: number;
+  style: React.CSSProperties;
 }) => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,43 +29,44 @@ const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, 
   
   return (
     <>
-      <Card 
-        className="card-professional p-5 md:p-6 text-center card-hover-lift relative bg-primary/5 dark:bg-primary/10 reveal-scale perf-contain"
-        style={{ animationDelay: `${index * 150}ms` }}
-      >
-        {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-3 right-3 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-            aria-label={`Rediger steg ${number}`}
-          >
-            <Pencil className="h-4 w-4 text-primary" />
-          </button>
-        )}
-        
-        {/* Large step number for mobile */}
-        <div className="flex justify-center mb-3 md:mb-4">
-          <div className="w-14 h-14 md:w-16 md:h-16 bg-primary rounded-full flex items-center justify-center relative">
-            <IconComponent className="h-7 w-7 md:h-8 md:w-8 text-primary-foreground" />
-            <span className="absolute -top-1 -right-1 w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center md:hidden">
-              {number}
-            </span>
-          </div>
-        </div>
-        
-        <div className="mb-3 md:mb-4">
-          <div className="text-sm font-medium text-primary mb-1 md:mb-2 hidden md:block">
-            Steg {number}
-          </div>
-          <h3 className="text-lg md:text-xl font-bold text-foreground mb-1 md:mb-2">
-            {displayTitle}
-          </h3>
+      <div style={style}>
+        <Card 
+          className="card-professional p-5 md:p-6 text-center card-hover-lift relative bg-primary/5 dark:bg-primary/10 perf-contain h-full"
+        >
+          {isAdmin && editMode && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="absolute top-3 right-3 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
+              aria-label={`Rediger steg ${number}`}
+            >
+              <Pencil className="h-4 w-4 text-primary" />
+            </button>
+          )}
           
-          <p className="text-sm md:text-base text-muted-foreground font-medium">
-            {displayDescription}
-          </p>
-        </div>
-      </Card>
+          {/* Large step number for mobile */}
+          <div className="flex justify-center mb-3 md:mb-4">
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-primary rounded-full flex items-center justify-center relative">
+              <IconComponent className="h-7 w-7 md:h-8 md:w-8 text-primary-foreground" />
+              <span className="absolute -top-1 -right-1 w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center md:hidden">
+                {number}
+              </span>
+            </div>
+          </div>
+          
+          <div className="mb-3 md:mb-4">
+            <div className="text-sm font-medium text-primary mb-1 md:mb-2 hidden md:block">
+              Steg {number}
+            </div>
+            <h3 className="text-lg md:text-xl font-bold text-foreground mb-1 md:mb-2">
+              {displayTitle}
+            </h3>
+            
+            <p className="text-sm md:text-base text-muted-foreground font-medium">
+              {displayDescription}
+            </p>
+          </div>
+        </Card>
+      </div>
       
       <ProcessStepEditModal
         isOpen={isModalOpen}
@@ -85,7 +86,7 @@ export const ProcessSection = () => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { content: heading } = useEditableContent('home-sections', 'how-it-works-heading');
-  const { ref, isVisible } = useScrollProgress({ threshold: 0.15 });
+  const { ref, isVisible, getItemStyle } = useSequentialReveal(3, { threshold: 0.2 });
   
   const displayHeading = heading || 'Slik fungerer det';
   
@@ -120,7 +121,7 @@ export const ProcessSection = () => {
             defaultTitle="Ta kontakt"
             defaultDescription="Ring oss eller send inn skjema"
             icon={Phone}
-            index={0}
+            style={getItemStyle(0)}
           />
           
           <ProcessStep
@@ -129,7 +130,7 @@ export const ProcessSection = () => {
             defaultTitle="Få tilbud"
             defaultDescription="Tilbud tilpasset ditt behov"
             icon={Calculator}
-            index={1}
+            style={getItemStyle(1)}
           />
           
           <ProcessStep
@@ -138,15 +139,14 @@ export const ProcessSection = () => {
             defaultTitle="Vi løser det"
             defaultDescription="Profesjonell utførelse"
             icon={CheckCircle}
-            index={2}
+            style={getItemStyle(2)}
           />
         </div>
 
-        <div className="text-center">
+        <div className="text-center" style={getItemStyle(3)}>
           <Button 
             size="lg" 
-            className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4 reveal-up"
-            style={{ animationDelay: '400ms' }}
+            className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4"
             onClick={() => window.location.href = '/tilbud'}
           >
             Kom i gang nå

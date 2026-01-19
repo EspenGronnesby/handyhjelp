@@ -22,6 +22,11 @@ export const EditableAboutContent = () => {
     button2: button2 || 'Få tilbud'
   };
 
+  const handleScrollToTeam = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    document.getElementById('team')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <>
       <div className="text-center max-w-3xl mx-auto mb-20 relative">
@@ -41,9 +46,9 @@ export const EditableAboutContent = () => {
           {defaultData.description}
         </p>
         <div className="flex gap-4 justify-center">
-          <Link to="/kontakt">
+          <a href="#team" onClick={handleScrollToTeam}>
             <Button variant="cta" size="lg">{defaultData.button1}</Button>
-          </Link>
+          </a>
           <Link to="/#quote-form">
             <Button variant="cta-outline" size="lg">{defaultData.button2}</Button>
           </Link>

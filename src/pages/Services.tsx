@@ -14,9 +14,13 @@ import EditableWhyChooseSection from "@/components/service-edit/EditableWhyChoos
 import EditablePricingDetails from "@/components/service-edit/EditablePricingDetails";
 import EditableComparisonSection from "@/components/service-edit/EditableComparisonSection";
 import { Helmet } from "react-helmet";
+import { useFadeInUp } from "@/hooks/useScrollAnimation";
 
 const Services = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('services', servicesBackground);
+  const { ref: whyChooseRef, style: whyChooseStyle } = useFadeInUp({ threshold: 0.1 });
+  const { ref: pricingRef, style: pricingStyle } = useFadeInUp({ threshold: 0.1 });
+  const { ref: comparisonRef, style: comparisonStyle } = useFadeInUp({ threshold: 0.1 });
 
   // Handle smooth scroll to anchor on load
   useEffect(() => {
@@ -83,11 +87,17 @@ const Services = () => {
 
       <EditableServiceCardGrid />
 
-      <EditableWhyChooseSection />
+      <div ref={whyChooseRef} style={whyChooseStyle}>
+        <EditableWhyChooseSection />
+      </div>
 
-      <EditablePricingDetails />
+      <div ref={pricingRef} style={pricingStyle}>
+        <EditablePricingDetails />
+      </div>
 
-      <EditableComparisonSection />
+      <div ref={comparisonRef} style={comparisonStyle}>
+        <EditableComparisonSection />
+      </div>
 
       {/* Editable Bottom CTA Section */}
       <EditableBottomCTA />
