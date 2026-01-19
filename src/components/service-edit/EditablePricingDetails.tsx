@@ -75,7 +75,7 @@ const EditablePricingDetails = () => {
             </h2>
             
             <div className="grid md:grid-cols-2 gap-8">
-              <Card className="p-6 hover:shadow-lg transition-shadow duration-300">
+              <Card className="p-6 subtle-hover">
                 <CardHeader>
                   <CardTitle className="text-xl">{data.includedTitle}</CardTitle>
                 </CardHeader>
@@ -89,7 +89,7 @@ const EditablePricingDetails = () => {
                 </CardContent>
               </Card>
 
-              <Card className="p-6 hover:shadow-lg transition-shadow duration-300">
+              <Card className="p-6 subtle-hover">
                 <CardHeader>
                   <CardTitle className="text-xl">{data.separateTitle}</CardTitle>
                 </CardHeader>

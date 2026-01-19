@@ -191,7 +191,7 @@ const Projects = () => {
                     <Link
                       key={project.id}
                       to={`/prosjekter/${project.id}`}
-                      className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 block"
+                      className="group relative overflow-hidden rounded-lg shadow-lg cursor-pointer animate-fade-in card-hover-lift block"
                       onMouseEnter={() => setHoveredProject(project.id)}
                       onMouseLeave={() => setHoveredProject(null)}
                       onTouchStart={() => setTouchedProject(project.id)}

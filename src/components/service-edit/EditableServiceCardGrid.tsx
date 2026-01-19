@@ -171,7 +171,7 @@ const EditableServiceCardGrid = () => {
                   <Card 
                     key={service.id}
                     id={service.id}
-                    className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 relative scroll-mt-24 p-6 min-h-[520px] flex flex-col overflow-hidden ${getCardWidthClass()} ${colors.bg} ${colors.border} ${
+                    className={`group card-hover-lift relative scroll-mt-24 p-6 min-h-[520px] flex flex-col overflow-hidden ${getCardWidthClass()} ${colors.bg} ${colors.border} ${
                       service.popular ? 'border-2 shadow-lg ring-1 ring-emerald-400/30 dark:ring-emerald-500/20' : ''
                     } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''}`}
                     style={getItemStyle(index)}

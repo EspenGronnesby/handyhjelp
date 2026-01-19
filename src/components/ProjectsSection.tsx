@@ -144,7 +144,7 @@ export const ProjectsSection = () => {
               <Link
                 key={project.id}
                 to={`/prosjekter/${project.id}`}
-                className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer card-hover-lift transition-all duration-300 block perf-contain"
+                className="group relative overflow-hidden rounded-xl shadow-lg cursor-pointer card-hover-lift block perf-contain"
                 style={getItemStyle(index)}
                 onMouseEnter={() => setHoveredProject(project.id)}
                 onMouseLeave={() => setHoveredProject(null)}
