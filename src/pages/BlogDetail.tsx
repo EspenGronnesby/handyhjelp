@@ -195,12 +195,12 @@ const BlogDetail = () => {
                 <div className="grid md:grid-cols-3 gap-6">
                   {relatedPosts.map((related) => (
                     <Link key={related.id} to={`/raad/${related.slug}`}>
-                      <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden group cursor-pointer">
+                      <Card className="h-full overflow-hidden group cursor-pointer card-hover-lift">
                         <div className="aspect-video bg-muted relative overflow-hidden">
                           <img 
                             src={related.cover_image_url} 
                             alt={related.title}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover object-center image-hover"
                           />
                         </div>
                         <CardHeader>

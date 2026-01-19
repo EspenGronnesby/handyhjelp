@@ -347,6 +347,51 @@ html, body {
     transform: translateY(-4px);
   }
 
+  /* ==============================
+   * STANDARDIZED HOVER CLASSES
+   * Use these for consistent hover effects
+   * ============================== */
+
+  /* Standard interactive card - for clickable cards in admin/lists */
+  .interactive-card {
+    transition: all 0.5s ease-out;
+    filter: brightness(1);
+  }
+
+  .interactive-card:hover {
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    filter: brightness(1.03);
+    transform: translateY(-4px);
+  }
+
+  .dark .interactive-card:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+  }
+
+  /* Subtle hover - for smaller elements that shouldn't lift */
+  .subtle-hover {
+    transition: all 0.5s ease-out;
+    filter: brightness(1);
+  }
+
+  .subtle-hover:hover {
+    filter: brightness(1.03);
+  }
+
+  .dark .subtle-hover:hover {
+    filter: brightness(1.08);
+  }
+
+  /* Image hover - for images with scale effect */
+  .image-hover {
+    transition: transform 0.5s ease-out, filter 0.5s ease-out;
+  }
+
+  .image-hover:hover {
+    transform: scale(1.05);
+  }
+
   /* Text glow on hover */
   .link-glow {
     transition: text-shadow 0.3s ease;

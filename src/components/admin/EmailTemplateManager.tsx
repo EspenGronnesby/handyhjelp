@@ -135,7 +135,7 @@ export function EmailTemplateManager() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {templates.map((template) => (
-            <Card key={template.id} className="hover:shadow-md transition-shadow">
+            <Card key={template.id} className="interactive-card">
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">

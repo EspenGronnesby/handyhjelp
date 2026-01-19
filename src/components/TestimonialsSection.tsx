@@ -244,9 +244,8 @@ const TestimonialsSection = () => {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className={cn(
-                    "relative h-full bg-card rounded-2xl p-6 md:p-8 shadow-lg border border-border/50",
-                    "transition-all duration-500 ease-out",
-                    "hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1",
+                    "relative h-full bg-card rounded-2xl p-6 md:p-8 shadow-lg border border-border/50 card-hover-lift",
+                    "hover:border-primary/30",
                     index === currentIndex && "ring-2 ring-primary/20"
                   )}>
                     {/* Quote Icon */}

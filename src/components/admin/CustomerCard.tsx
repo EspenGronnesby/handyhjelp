@@ -14,7 +14,7 @@ interface CustomerCardProps {
 export const CustomerCard = ({ profile, onClick }: CustomerCardProps) => {
   return (
     <Card 
-      className="cursor-pointer hover:shadow-md transition-shadow hover:border-primary/50"
+      className="cursor-pointer interactive-card hover:border-primary/50"
       onClick={onClick}
     >
       <CardHeader>

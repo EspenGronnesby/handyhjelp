@@ -194,12 +194,12 @@ const Blog = () => {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredPosts.map((post) => (
                     <Link key={post.id} to={`/raad/${post.slug}`}>
-                      <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden group cursor-pointer">
+                      <Card className="h-full overflow-hidden group cursor-pointer card-hover-lift">
                         <div className="aspect-video bg-muted relative overflow-hidden">
                           <img 
                             src={post.cover_image_url} 
                             alt={post.title}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover object-center image-hover"
                           />
                           <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
                             {categoryLabels[post.category]}
