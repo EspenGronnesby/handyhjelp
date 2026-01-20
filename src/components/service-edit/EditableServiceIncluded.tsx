@@ -121,7 +121,7 @@ export const EditableServiceIncluded = ({
         )}
         
         <h2 className="text-3xl font-heading font-bold mb-6">Hva er inkludert?</h2>
-        <Card>
+        <Card className="subtle-hover">
           <CardContent className="pt-6">
             <div className={getGridClass()}>
               {displayItems.map((item, idx) => {

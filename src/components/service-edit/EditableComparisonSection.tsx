@@ -85,7 +85,7 @@ const EditableComparisonSection = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Card className="p-6">
+            <Card className="p-6 card-hover-lift">
               <CardHeader>
                 <CardTitle className="text-2xl">{data.oneTimeTitle}</CardTitle>
               </CardHeader>
@@ -99,7 +99,7 @@ const EditableComparisonSection = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-primary border-2 shadow-lg p-6">
+            <Card className="border-primary border-2 shadow-lg p-6 card-hover-lift">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle className="text-2xl">{data.fixedTitle}</CardTitle>

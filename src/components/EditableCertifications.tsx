@@ -93,7 +93,7 @@ export const EditableCertifications = () => {
         <div className={`${gridClass} max-w-4xl mx-auto`}>
           {/* Card 1 - Show if has content OR in edit mode */}
           {(card1HasContent || isEditModeActive) && (
-            <Card className={`${!card1HasContent ? 'opacity-50 border-dashed border-2' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
+            <Card className={`card-hover-lift ${!card1HasContent ? 'opacity-50 border-dashed border-2' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
               <CardContent className="pt-6">
                 {!card1HasContent && isEditModeActive && (
                   <div className="flex items-center gap-2 text-muted-foreground mb-4">
@@ -120,7 +120,7 @@ export const EditableCertifications = () => {
 
           {/* Card 2 - Show if has content OR in edit mode */}
           {(card2HasContent || isEditModeActive) && (
-            <Card className={`${!card2HasContent ? 'opacity-50 border-dashed border-2' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
+            <Card className={`card-hover-lift ${!card2HasContent ? 'opacity-50 border-dashed border-2' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
               <CardContent className="pt-6">
                 {!card2HasContent && isEditModeActive && (
                   <div className="flex items-center gap-2 text-muted-foreground mb-4">

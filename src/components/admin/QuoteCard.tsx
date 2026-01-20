@@ -15,7 +15,7 @@ interface QuoteCardProps {
 
 export const QuoteCard = ({ quote, actionLoading, onStartJob, onCompleteDirectly }: QuoteCardProps) => {
   return (
-    <Card>
+    <Card className="interactive-card">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>

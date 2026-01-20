@@ -303,7 +303,7 @@ export const ContentApprovalQueue = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pendingProjects?.map((project) => (
-                  <Card key={project.id}>
+                  <Card key={project.id} className="interactive-card">
                     <div className="relative h-40 overflow-hidden rounded-t-lg">
                       <img 
                         src={project.after_image_url} 
@@ -377,7 +377,7 @@ export const ContentApprovalQueue = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pendingBlogs?.map((blog) => (
-                  <Card key={blog.id}>
+                  <Card key={blog.id} className="interactive-card">
                     <div className="relative h-40 overflow-hidden rounded-t-lg">
                       <img 
                         src={blog.cover_image_url} 

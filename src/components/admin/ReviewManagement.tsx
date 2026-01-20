@@ -459,7 +459,7 @@ const ReviewManagement = () => {
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="interactive-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
@@ -472,7 +472,7 @@ const ReviewManagement = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="interactive-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
@@ -485,7 +485,7 @@ const ReviewManagement = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="interactive-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
@@ -498,7 +498,7 @@ const ReviewManagement = () => {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="interactive-card">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">

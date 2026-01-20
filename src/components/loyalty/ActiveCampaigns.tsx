@@ -86,7 +86,7 @@ export const ActiveCampaigns = () => {
         {campaigns.map((campaign) => (
           <div
             key={campaign.id}
-            className="p-4 rounded-lg border bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20"
+            className="p-4 rounded-lg border bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 subtle-hover"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">

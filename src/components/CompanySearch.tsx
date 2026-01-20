@@ -204,7 +204,7 @@ export const CompanySearch = ({ onCompanySelect, selectedCompany, disabled = fal
           {companies.map((company, index) => (
             <Card
               key={`${company.orgNumber}-${index}`}
-              className="p-3 cursor-pointer hover:bg-muted/50 transition-colors"
+              className="p-3 cursor-pointer subtle-hover"
               onClick={() => handleCompanySelect(company)}
             >
               <div className="flex items-start gap-3">

@@ -100,7 +100,7 @@ export const EditableWhyUs = () => {
             return (
               <Card 
                 key={index} 
-                className={`border-2 hover:border-primary transition-colors relative ${getCardWidthClass()} ${
+                className={`border-2 card-hover-lift relative ${getCardWidthClass()} ${
                   isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''
                 }`}
                 style={getItemStyle(index)}

@@ -101,7 +101,7 @@ const Contact = () => {
           <div className="grid lg:grid-cols-2 gap-12 mb-20">
             {/* Contact Form */}
             <div>
-              <Card>
+              <Card className="subtle-hover">
                 <CardContent className="pt-6">
                   <h2 className="text-2xl font-bold mb-6">Send oss en melding</h2>
                   <form onSubmit={handleSubmit} className="space-y-4">
@@ -152,7 +152,7 @@ const Contact = () => {
 
             {/* Contact Info */}
             <div className="space-y-6">
-              <Card>
+              <Card className="subtle-hover">
                 <CardContent className="pt-6">
                   <h2 className="text-2xl font-bold mb-6">Kontaktinformasjon</h2>
                   <EditableContactInfo />
@@ -175,7 +175,7 @@ const Contact = () => {
               </Card>
 
               {/* How We Work */}
-              <Card>
+              <Card className="subtle-hover">
                 <CardContent className="pt-6">
                   <EditableHowWeWork />
                 </CardContent>

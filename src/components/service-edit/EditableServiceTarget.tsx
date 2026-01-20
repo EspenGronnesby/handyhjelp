@@ -89,7 +89,7 @@ export const EditableServiceTarget = ({
         )}
         
         <h2 className="text-3xl font-heading font-bold mb-6">Hvem er dette for?</h2>
-        <Card>
+        <Card className="subtle-hover">
           <CardContent className="pt-6">
             <p className="text-lg">
               <strong>Passer for:</strong> {displayData.target}

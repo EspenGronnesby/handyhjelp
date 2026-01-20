@@ -117,7 +117,7 @@ export const ServiceAgreementCard = ({
   };
 
   return (
-    <Card>
+    <Card className="interactive-card">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>

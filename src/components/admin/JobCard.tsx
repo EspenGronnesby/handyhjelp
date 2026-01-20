@@ -144,7 +144,7 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
   };
 
   return (
-    <Card className={hasInvoiceRequest ? 'ring-2 ring-orange-400' : ''}>
+    <Card className={`interactive-card ${hasInvoiceRequest ? 'ring-2 ring-orange-400' : ''}`}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
