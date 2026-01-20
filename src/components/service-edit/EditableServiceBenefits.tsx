@@ -139,7 +139,7 @@ export const EditableServiceBenefits = ({
             return (
               <Card 
                 key={idx} 
-                className={`${getCardWidthClass()} ${
+                className={`subtle-hover ${getCardWidthClass()} ${
                   isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''
                 }`}
               >

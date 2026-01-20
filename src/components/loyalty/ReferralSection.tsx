@@ -141,7 +141,7 @@ export const ReferralSection = () => {
 
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="card-hover-lift">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
@@ -181,7 +181,7 @@ export const ReferralSection = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="card-hover-lift">
         <CardHeader>
           <CardTitle>Har du en kode?</CardTitle>
           <CardDescription>Bruk en venns referansekode og få 250 poeng</CardDescription>

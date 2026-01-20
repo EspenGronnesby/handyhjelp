@@ -100,10 +100,10 @@ const EditableWhyChooseSection = () => {
               return (
                 <div 
                   key={index} 
-                  className={`text-center p-6 rounded-xl transition-all duration-300 ${getCardWidthClass()}
+                  className={`text-center p-6 rounded-xl card-hover-lift ${getCardWidthClass()}
                     bg-cyan-50/60 dark:bg-cyan-950/30 
                     border border-cyan-200/60 dark:border-cyan-800/40
-                    hover:shadow-lg dark:ring-1 dark:ring-white/5
+                    dark:ring-1 dark:ring-white/5
                     ${isHidden && isAdmin && editMode ? 'opacity-50 border-2 border-dashed border-muted-foreground' : ''}`}
                 >
                   {/* Hidden indicator for admin */}

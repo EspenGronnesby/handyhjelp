@@ -604,7 +604,7 @@ export const ProjectManagement = () => {
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredProjects.map((project) => (
-          <Card key={project.id} className="flex flex-col h-[400px]">
+          <Card key={project.id} className="flex flex-col h-[400px] interactive-card">
             {/* Image Section - Fixed Height */}
             <div className="relative h-[160px] flex-shrink-0">
               <img

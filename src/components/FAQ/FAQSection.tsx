@@ -16,7 +16,7 @@ export const FAQSection = () => {
             {defaultFAQItems.map((item, index) => <EditableFAQItem key={index} section={`faq-item-${index + 1}`} defaultQuestion={item.question} defaultAnswer={item.answer} index={index} />)}
           </Accordion>
 
-          <div className="text-center mt-12 p-8 bg-muted/30 rounded-xl">
+          <div className="text-center mt-12 p-8 bg-muted/30 rounded-xl subtle-hover">
             <h3 className="text-xl font-bold text-foreground mb-4">
               Har du flere spørsmål?
             </h3>

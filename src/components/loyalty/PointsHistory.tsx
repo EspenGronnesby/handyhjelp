@@ -79,7 +79,7 @@ export const PointsHistory = ({ transactions }: PointsHistoryProps) => {
           {transactions.map((transaction) => (
             <div
               key={transaction.id}
-              className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+              className="flex items-center justify-between p-3 rounded-lg border bg-card subtle-hover"
             >
               <div className="flex items-center gap-3 flex-1">
                 <div className="flex-shrink-0">

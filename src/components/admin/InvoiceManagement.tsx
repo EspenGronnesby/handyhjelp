@@ -184,7 +184,7 @@ export const InvoiceManagement = () => {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="interactive-card">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -197,7 +197,7 @@ export const InvoiceManagement = () => {
           </CardContent>
         </Card>
         
-        <Card className="border-l-4 border-l-yellow-500">
+        <Card className="border-l-4 border-l-yellow-500 interactive-card">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -210,7 +210,7 @@ export const InvoiceManagement = () => {
           </CardContent>
         </Card>
         
-        <Card className="border-l-4 border-l-green-500">
+        <Card className="border-l-4 border-l-green-500 interactive-card">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -223,7 +223,7 @@ export const InvoiceManagement = () => {
           </CardContent>
         </Card>
         
-        <Card className="border-l-4 border-l-red-500">
+        <Card className="border-l-4 border-l-red-500 interactive-card">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>

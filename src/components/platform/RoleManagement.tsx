@@ -224,8 +224,8 @@ export const RoleManagement = () => {
               (searchEmail.length >= 2 ? searchResults : allUsers?.slice(0, 10))?.map((user) => (
                 <div 
                   key={user.id}
-                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                    selectedUser?.id === user.id ? 'border-primary bg-primary/5' : 'hover:bg-muted'
+                  className={`p-3 rounded-lg border cursor-pointer subtle-hover ${
+                    selectedUser?.id === user.id ? 'border-primary bg-primary/5' : ''
                   }`}
                   onClick={() => setSelectedUser(user)}
                 >

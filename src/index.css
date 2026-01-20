@@ -293,25 +293,48 @@ html, body {
     animation: scaleIn 0.4s ease-out forwards;
   }
 
-  /* Card hover lift effect - Smooth and persistent */
+  /* Card hover lift effect - Stable pseudo-element overlay */
   .card-hover-lift {
-    transition: all 0.5s ease-out;
-    filter: brightness(1);
+    position: relative;
+    transition: transform 0.5s ease-out, box-shadow 0.5s ease-out;
+    overflow: hidden;
+  }
+  
+  .card-hover-lift::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 1;
   }
   
   .card-hover-lift:hover {
-    @apply -translate-y-2;
-    filter: brightness(1.05);
+    transform: translateY(-8px);
     box-shadow: 
       0 25px 50px -12px rgba(0,0,0,0.15),
       0 0 0 1px hsl(var(--primary) / 0.15);
   }
+  
+  .card-hover-lift:hover::before {
+    opacity: 1;
+  }
 
+  .dark .card-hover-lift::before {
+    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
+  }
+  
   .dark .card-hover-lift:hover {
-    filter: brightness(1.12);
     box-shadow: 
       0 25px 50px -12px rgba(0,0,0,0.4),
       0 0 0 1px hsl(var(--primary) / 0.25);
+  }
+  
+  .dark .card-hover-lift:hover::before {
+    opacity: 1;
   }
 
   /* Subtle pulse animation for badges */
@@ -352,40 +375,80 @@ html, body {
    * Use these for consistent hover effects
    * ============================== */
 
-  /* Standard interactive card - for clickable cards in admin/lists */
+  /* Standard interactive card - stable pseudo-element overlay for admin/lists */
   .interactive-card {
-    transition: all 0.5s ease-out;
-    filter: brightness(1);
+    position: relative;
+    transition: transform 0.5s ease-out, box-shadow 0.5s ease-out;
+    overflow: hidden;
+  }
+
+  .interactive-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 1;
   }
 
   .interactive-card:hover {
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-    filter: brightness(1.03);
     transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+  }
+
+  .interactive-card:hover::before {
+    opacity: 1;
+  }
+
+  .dark .interactive-card::before {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%);
   }
 
   .dark .interactive-card:hover {
-    filter: brightness(1.08);
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
   }
 
-  /* Subtle hover - for smaller elements that shouldn't lift */
+  .dark .interactive-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Subtle hover - stable pseudo-element overlay for smaller elements */
   .subtle-hover {
-    transition: all 0.5s ease-out;
-    filter: brightness(1);
+    position: relative;
+    transition: box-shadow 0.5s ease-out;
+    overflow: hidden;
   }
 
-  .subtle-hover:hover {
-    filter: brightness(1.03);
+  .subtle-hover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 1;
   }
 
-  .dark .subtle-hover:hover {
-    filter: brightness(1.08);
+  .subtle-hover:hover::before {
+    opacity: 1;
+  }
+
+  .dark .subtle-hover::before {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%);
+  }
+
+  .dark .subtle-hover:hover::before {
+    opacity: 1;
   }
 
   /* Image hover - for images with scale effect */
   .image-hover {
-    transition: transform 0.5s ease-out, filter 0.5s ease-out;
+    transition: transform 0.5s ease-out;
   }
 
   .image-hover:hover {
