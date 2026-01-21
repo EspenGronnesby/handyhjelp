@@ -86,12 +86,13 @@ export const useSequentialReveal = (itemCount: number, options: UseScrollAnimati
 };
 
 // Hook for grid-based staggered reveal (left-to-right, top-to-bottom)
+// Synced with useSequentialReveal for consistent premium animation feel
 export const useStaggeredGridReveal = (
   itemCount: number, 
   columns: number = 2, 
   options: UseScrollAnimationOptions = {}
 ) => {
-  const { ref, isVisible } = useScrollAnimation({ ...options, threshold: options.threshold ?? 0.15 });
+  const { ref, isVisible } = useScrollAnimation({ ...options, threshold: options.threshold ?? 0.2 });
   
   const prefersReducedMotion = typeof window !== 'undefined' 
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
@@ -105,12 +106,12 @@ export const useStaggeredGridReveal = (
     // Calculate row and column for proper delay order
     const row = Math.floor(index / columns);
     const col = index % columns;
-    const delay = (row * columns + col) * 100; // 100ms between each item
+    const delay = (row * columns + col) * 200; // 200ms between each item (matches useSequentialReveal)
     
     return {
       opacity: isVisible ? 1 : 0,
-      transform: isVisible ? 'translateY(0)' : 'translateY(24px)',
-      transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+      transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+      transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
       transitionDelay: isVisible ? `${delay}ms` : '0ms',
     };
   }, [isVisible, columns, prefersReducedMotion]);
