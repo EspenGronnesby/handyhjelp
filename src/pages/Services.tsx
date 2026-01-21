@@ -14,13 +14,11 @@ import EditableWhyChooseSection from "@/components/service-edit/EditableWhyChoos
 import EditablePricingDetails from "@/components/service-edit/EditablePricingDetails";
 import EditableComparisonSection from "@/components/service-edit/EditableComparisonSection";
 import { Helmet } from "react-helmet";
-import { useFadeInUp } from "@/hooks/useScrollAnimation";
+import { useScrollProgressReveal } from "@/hooks/useScrollAnimation";
 
 const Services = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('services', servicesBackground);
-  const { ref: whyChooseRef, style: whyChooseStyle } = useFadeInUp({ threshold: 0.1 });
-  const { ref: pricingRef, style: pricingStyle } = useFadeInUp({ threshold: 0.1 });
-  const { ref: comparisonRef, style: comparisonStyle } = useFadeInUp({ threshold: 0.1 });
+  const { ref: sectionsRef, getItemStyle } = useScrollProgressReveal(4);
 
   // Handle smooth scroll to anchor on load
   useEffect(() => {
@@ -85,18 +83,22 @@ const Services = () => {
         </main>
       </div>
 
-      <EditableServiceCardGrid />
+      <div ref={sectionsRef}>
+        <div style={getItemStyle(0)}>
+          <EditableServiceCardGrid />
+        </div>
 
-      <div ref={whyChooseRef} style={whyChooseStyle}>
-        <EditableWhyChooseSection />
-      </div>
+        <div style={getItemStyle(1)}>
+          <EditableWhyChooseSection />
+        </div>
 
-      <div ref={pricingRef} style={pricingStyle}>
-        <EditablePricingDetails />
-      </div>
+        <div style={getItemStyle(2)}>
+          <EditablePricingDetails />
+        </div>
 
-      <div ref={comparisonRef} style={comparisonStyle}>
-        <EditableComparisonSection />
+        <div style={getItemStyle(3)}>
+          <EditableComparisonSection />
+        </div>
       </div>
 
       {/* Editable Bottom CTA Section */}

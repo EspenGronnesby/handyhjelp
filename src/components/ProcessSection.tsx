@@ -7,8 +7,7 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { Pencil } from "lucide-react";
 import { ProcessStepEditModal } from "@/components/ProcessStepEditModal";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
-import { useSequentialReveal } from "@/hooks/useScrollAnimation";
-
+import { useScrollProgressReveal } from "@/hooks/useScrollAnimation";
 // Component for each process step
 const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, style }: {
   number: number;
@@ -86,7 +85,7 @@ export const ProcessSection = () => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { content: heading } = useEditableContent('home-sections', 'how-it-works-heading');
-  const { ref, isVisible, getItemStyle } = useSequentialReveal(3, { threshold: 0.2 });
+  const { ref, isInView: isVisible, getItemStyle } = useScrollProgressReveal(4);
   
   const displayHeading = heading || 'Slik fungerer det';
   

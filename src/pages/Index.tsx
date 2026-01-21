@@ -19,7 +19,7 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { Helmet } from "react-helmet";
-import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
+import { useScrollGridReveal } from "@/hooks/useScrollAnimation";
 
 // Component for Services Section Heading
 const ServicesHeading = () => {
@@ -70,7 +70,7 @@ const ServicesHeading = () => {
 
 const Index = () => {
   const { user } = useAuth();
-  const { ref: servicesRef, isVisible: servicesVisible, getItemStyle } = useStaggeredGridReveal(4, 2, { threshold: 0.1 });
+  const { ref: servicesRef, isInView: servicesVisible, getItemStyle } = useScrollGridReveal(4, 2);
   
   return (
     <div className="min-h-screen">
