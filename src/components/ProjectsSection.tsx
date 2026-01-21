@@ -9,7 +9,7 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { SectionHeadingEditModal } from "./SectionHeadingEditModal";
 import { ServiceBadge } from "@/lib/serviceIcons";
-import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
+import { useScrollGridReveal } from "@/hooks/useScrollAnimation";
 
 interface Project {
   id: string;
@@ -35,7 +35,7 @@ export const ProjectsSection = () => {
   
   const displayHeading = heading || 'Våre prosjekter';
   const displaySubheading = subheading || 'Se resultatet av vårt arbeid';
-  const { ref, isVisible, getItemStyle } = useStaggeredGridReveal(3, 3, { threshold: 0.12 });
+  const { ref, isInView: isVisible, getItemStyle } = useScrollGridReveal(3, 3);
 
   useEffect(() => {
     fetchProjects();

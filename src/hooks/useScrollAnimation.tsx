@@ -136,6 +136,152 @@ export const useFadeInUp = (options: UseScrollAnimationOptions = {}) => {
   return { ref, isVisible, style };
 };
 
+// Hook for scroll-progress based reveal (not time-based)
+// Items reveal sequentially as user scrolls through the section
+export const useScrollProgressReveal = (itemCount: number) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isInView, setIsInView] = useState(false);
+
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    if (prefersReducedMotion) {
+      setIsInView(true);
+      setScrollProgress(1);
+      return;
+    }
+
+    const handleScroll = () => {
+      const rect = container.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Check if container is in view
+      if (rect.top < windowHeight * 0.8 && rect.bottom > 0) {
+        setIsInView(true);
+        
+        // Calculate how far user has scrolled through the container
+        const startPoint = windowHeight * 0.8;
+        const endPoint = -rect.height * 0.5;
+        const totalRange = startPoint - endPoint;
+        const currentPosition = startPoint - rect.top;
+        
+        const progress = Math.max(0, Math.min(1, currentPosition / totalRange));
+        setScrollProgress(progress);
+      } else if (rect.top >= windowHeight) {
+        setIsInView(false);
+        setScrollProgress(0);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [prefersReducedMotion]);
+
+  const getItemStyle = useCallback((index: number): React.CSSProperties => {
+    if (prefersReducedMotion) {
+      return { opacity: 1, transform: 'translateY(0)' };
+    }
+
+    // Each item has its own reveal threshold
+    const itemThreshold = index / (itemCount + 1);
+    const itemProgress = Math.max(0, Math.min(1, (scrollProgress - itemThreshold) * (itemCount + 1)));
+
+    return {
+      opacity: itemProgress,
+      transform: `translateY(${(1 - itemProgress) * 20}px)`,
+      transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
+    };
+  }, [scrollProgress, itemCount, prefersReducedMotion]);
+
+  return { ref: containerRef, isInView, scrollProgress, getItemStyle };
+};
+
+// Hook for scroll-based grid reveal with directional movement
+// Top row fades from top, bottom row fades from bottom
+export const useScrollGridReveal = (
+  itemCount: number, 
+  columns: number = 2
+) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [isInView, setIsInView] = useState(false);
+
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    if (prefersReducedMotion) {
+      setIsInView(true);
+      setScrollProgress(1);
+      return;
+    }
+
+    const handleScroll = () => {
+      const rect = container.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      if (rect.top < windowHeight * 0.75 && rect.bottom > 0) {
+        setIsInView(true);
+        
+        const startPoint = windowHeight * 0.75;
+        const endPoint = -rect.height * 0.3;
+        const totalRange = startPoint - endPoint;
+        const currentPosition = startPoint - rect.top;
+        
+        const progress = Math.max(0, Math.min(1, currentPosition / totalRange));
+        setScrollProgress(progress);
+      } else if (rect.top >= windowHeight) {
+        setIsInView(false);
+        setScrollProgress(0);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [prefersReducedMotion]);
+
+  const getItemStyle = useCallback((index: number): React.CSSProperties => {
+    if (prefersReducedMotion) {
+      return { opacity: 1, transform: 'translateY(0)' };
+    }
+
+    // Calculate row for directional animation
+    const row = Math.floor(index / columns);
+    const isTopRow = row === 0;
+    
+    // Items reveal in reading order: top-left, top-right, bottom-left, bottom-right
+    const itemThreshold = index / (itemCount + 1);
+    const itemProgress = Math.max(0, Math.min(1, (scrollProgress - itemThreshold) * (itemCount + 1) * 0.8));
+
+    // Top row: fade from top, Bottom row: fade from bottom
+    const translateY = isTopRow 
+      ? (1 - itemProgress) * -20  // From top
+      : (1 - itemProgress) * 20;  // From bottom
+
+    return {
+      opacity: itemProgress,
+      transform: `translateY(${translateY}px)`,
+      transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+    };
+  }, [scrollProgress, itemCount, columns, prefersReducedMotion]);
+
+  return { ref: containerRef, isInView, scrollProgress, getItemStyle };
+};
+
 // Hook for sticky timeline with scroll-based reveal
 export const useStickyTimelineReveal = (itemCount: number) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -159,20 +305,20 @@ export const useStickyTimelineReveal = (itemCount: number) => {
       const windowHeight = window.innerHeight;
       
       // Check if in view
-      if (rect.top < windowHeight && rect.bottom > 0) {
+      if (rect.top < windowHeight * 0.6 && rect.bottom > windowHeight * 0.2) {
         setIsInView(true);
         
-        // Calculate scroll progress within the container
-        const containerTop = rect.top;
-        const containerHeight = rect.height;
-        const scrollableRange = containerHeight - windowHeight * 0.5;
-        
-        if (scrollableRange > 0) {
-          const progress = Math.max(0, Math.min(1, (windowHeight * 0.3 - containerTop) / scrollableRange));
-          setScrollProgress(progress);
-        }
-      } else {
+        // Improved calculation: spread items across full scroll range
+        const containerScrollRange = rect.height + windowHeight * 0.4;
+        const scrolled = windowHeight * 0.6 - rect.top;
+        const progress = Math.max(0, Math.min(1, scrolled / containerScrollRange));
+        setScrollProgress(progress);
+      } else if (rect.top >= windowHeight * 0.6) {
         setIsInView(false);
+        setScrollProgress(0);
+      } else if (rect.bottom <= windowHeight * 0.2) {
+        // Keep fully revealed after scrolling past
+        setScrollProgress(1);
       }
     };
 
@@ -188,13 +334,14 @@ export const useStickyTimelineReveal = (itemCount: number) => {
     }
 
     // Each item reveals at a specific scroll progress point
-    const itemThreshold = index / itemCount;
-    const itemProgress = Math.max(0, Math.min(1, (scrollProgress - itemThreshold) * itemCount));
+    // +1 to ensure last item isn't at 100%
+    const itemThreshold = index / (itemCount + 1);
+    const itemProgress = Math.max(0, Math.min(1, (scrollProgress - itemThreshold) * (itemCount + 1)));
     
     return {
       opacity: itemProgress,
-      transform: `translateY(${(1 - itemProgress) * 20}px)`,
-      transition: 'opacity 0.3s ease-out, transform 0.3s ease-out',
+      transform: `translateY(${(1 - itemProgress) * 24}px)`,
+      transition: 'opacity 0.35s ease-out, transform 0.35s ease-out',
     };
   }, [scrollProgress, itemCount, prefersReducedMotion]);
 

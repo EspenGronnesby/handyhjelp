@@ -183,7 +183,7 @@ const TestimonialsSection = () => {
   }
 
   return (
-    <section id="testimonials" className="py-12 md:py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden section-mobile">
+    <section id="testimonials" className="py-12 md:py-20 bg-gradient-to-b from-muted/30 to-background section-mobile">
       <div className="container mx-auto px-4">
         {/* Section Header - Compact on mobile */}
         <div className="text-center mb-8 md:mb-12">
@@ -223,11 +223,11 @@ const TestimonialsSection = () => {
             <ChevronRight className="h-5 w-5" />
           </Button>
 
-          {/* Scrollable Container with fade edges */}
+          {/* Scrollable Container with fade edges - fixed overflow */}
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4 px-4 md:px-12 carousel-fade-edges"
+            className="flex gap-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scrollbar-hide pb-8 pt-6 px-4 md:px-12 carousel-fade-edges"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {reviews.map((review, index) => {

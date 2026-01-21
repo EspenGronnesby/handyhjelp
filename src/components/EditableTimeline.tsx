@@ -54,8 +54,8 @@ export const EditableTimeline = () => {
     <>
       <div 
         ref={ref}
-        className="bg-muted rounded-2xl p-8 md:p-12 mb-20 relative overflow-hidden"
-        style={{ minHeight: `${Math.max(400, visibleTimeline.length * 120)}px` }}
+        className="bg-muted rounded-2xl p-8 md:p-12 mb-20 relative"
+        style={{ minHeight: `${Math.max(600, visibleTimeline.length * 150)}px` }}
       >
         {isAdmin && editMode && (
           <button
