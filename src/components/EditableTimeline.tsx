@@ -1,113 +1,223 @@
-import { useState } from 'react';
-import { Pencil, EyeOff } from 'lucide-react';
-import { useEditMode } from '@/contexts/EditModeContext';
-import { useEditableContent } from '@/hooks/useEditableContent';
-import { TimelineEditModal } from './TimelineEditModal';
-import { useStickyTimelineReveal } from '@/hooks/useScrollAnimation';
+import { useMemo, useState } from "react";
+import { Pencil, EyeOff } from "lucide-react";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { useEditableContent } from "@/hooks/useEditableContent";
+import { TimelineEditModal } from "./TimelineEditModal";
+import { RoadmapTimeline, type RoadmapMilestone } from "@/components/timeline/RoadmapTimeline";
 
 export const EditableTimeline = () => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { content: heading } = useEditableContent('about-timeline', 'heading');
-  const { content: year1 } = useEditableContent('about-timeline', 'year_1');
-  const { content: event1 } = useEditableContent('about-timeline', 'event_1');
-  const { content: year2 } = useEditableContent('about-timeline', 'year_2');
-  const { content: event2 } = useEditableContent('about-timeline', 'event_2');
-  const { content: year3 } = useEditableContent('about-timeline', 'year_3');
-  const { content: event3 } = useEditableContent('about-timeline', 'event_3');
-  const { content: year4 } = useEditableContent('about-timeline', 'year_4');
-  const { content: event4 } = useEditableContent('about-timeline', 'event_4');
-  const { content: year5 } = useEditableContent('about-timeline', 'year_5');
-  const { content: event5 } = useEditableContent('about-timeline', 'event_5');
-  const { content: year6 } = useEditableContent('about-timeline', 'year_6');
-  const { content: event6 } = useEditableContent('about-timeline', 'event_6');
+  // New roadmap fields (title/description). We keep legacy `event_*` as fallback for description.
+  const { content: year1 } = useEditableContent("about-timeline", "year_1");
+  const { content: title1 } = useEditableContent("about-timeline", "title_1");
+  const { content: desc1 } = useEditableContent("about-timeline", "desc_1");
+  const { content: legacyEvent1 } = useEditableContent("about-timeline", "event_1");
 
-  const timeline = [
-    { year: year1, event: event1, defaultYear: '2004', defaultEvent: 'HandyHjelp ble grunnlagt i Kristiansand' },
-    { year: year2, event: event2, defaultYear: '2008', defaultEvent: 'Utvidet til å tilby blikkenslagertjenester' },
-    { year: year3, event: event3, defaultYear: '2012', defaultEvent: 'Nådde milepælen med 100 fornøyde bedriftskunder' },
-    { year: year4, event: event4, defaultYear: '2016', defaultEvent: 'Fikk sertifisering som godkjent entreprenør' },
-    { year: year5, event: event5, defaultYear: '2020', defaultEvent: 'Lanserte faste vedlikeholdsavtaler for bedrifter' },
-    { year: year6, event: event6, defaultYear: '2025', defaultEvent: 'Over 200 faste kunder og 20+ års erfaring' },
-  ];
+  const { content: year2 } = useEditableContent("about-timeline", "year_2");
+  const { content: title2 } = useEditableContent("about-timeline", "title_2");
+  const { content: desc2 } = useEditableContent("about-timeline", "desc_2");
+  const { content: legacyEvent2 } = useEditableContent("about-timeline", "event_2");
 
-  // Sjekk om et item er skjult (både år og event er tomme strenger)
-  const isItemHidden = (item: typeof timeline[0]) => {
-    return item.year?.trim() === '' && item.event?.trim() === '';
-  };
+  const { content: year3 } = useEditableContent("about-timeline", "year_3");
+  const { content: title3 } = useEditableContent("about-timeline", "title_3");
+  const { content: desc3 } = useEditableContent("about-timeline", "desc_3");
+  const { content: legacyEvent3 } = useEditableContent("about-timeline", "event_3");
 
-  // Filtrer ut skjulte items når ikke i edit mode
-  const visibleTimeline = isAdmin && editMode 
-    ? timeline 
-    : timeline.filter(item => !isItemHidden(item));
+  const { content: year4 } = useEditableContent("about-timeline", "year_4");
+  const { content: title4 } = useEditableContent("about-timeline", "title_4");
+  const { content: desc4 } = useEditableContent("about-timeline", "desc_4");
+  const { content: legacyEvent4 } = useEditableContent("about-timeline", "event_4");
 
-  // Use sticky timeline reveal animation
-  const { ref, getItemStyle } = useStickyTimelineReveal(visibleTimeline.length);
+  const { content: year5 } = useEditableContent("about-timeline", "year_5");
+  const { content: title5 } = useEditableContent("about-timeline", "title_5");
+  const { content: desc5 } = useEditableContent("about-timeline", "desc_5");
+  const { content: legacyEvent5 } = useEditableContent("about-timeline", "event_5");
+
+  const { content: year6 } = useEditableContent("about-timeline", "year_6");
+  const { content: title6 } = useEditableContent("about-timeline", "title_6");
+  const { content: desc6 } = useEditableContent("about-timeline", "desc_6");
+  const { content: legacyEvent6 } = useEditableContent("about-timeline", "event_6");
+
+  const { content: year7 } = useEditableContent("about-timeline", "year_7");
+  const { content: title7 } = useEditableContent("about-timeline", "title_7");
+  const { content: desc7 } = useEditableContent("about-timeline", "desc_7");
+  const { content: legacyEvent7 } = useEditableContent("about-timeline", "event_7");
+
+  const { content: year8 } = useEditableContent("about-timeline", "year_8");
+  const { content: title8 } = useEditableContent("about-timeline", "title_8");
+  const { content: desc8 } = useEditableContent("about-timeline", "desc_8");
+  const { content: legacyEvent8 } = useEditableContent("about-timeline", "event_8");
+
+  const timeline = useMemo(
+    () =>
+      [
+        {
+          year: year1,
+          title: title1,
+          description: desc1 || legacyEvent1,
+          defaults: {
+            year: "2004",
+            title: "Oppstart",
+            description: "HandyHjelp ble grunnlagt i Kristiansand.",
+          },
+        },
+        {
+          year: year2,
+          title: title2,
+          description: desc2 || legacyEvent2,
+          defaults: {
+            year: "2008",
+            title: "Utvidelse",
+            description: "Utvidet tilbudet med flere fagområder og kapasitet.",
+          },
+        },
+        {
+          year: year3,
+          title: title3,
+          description: desc3 || legacyEvent3,
+          defaults: {
+            year: "2012",
+            title: "Vekst",
+            description: "Milepæl med over 100 fornøyde bedriftskunder.",
+          },
+        },
+        {
+          year: year4,
+          title: title4,
+          description: desc4 || legacyEvent4,
+          defaults: {
+            year: "2016",
+            title: "Kvalitet",
+            description: "Styrket kvalitetssystemer og dokumentasjon i leveransene.",
+          },
+        },
+        {
+          year: year5,
+          title: title5,
+          description: desc5 || legacyEvent5,
+          defaults: {
+            year: "2020",
+            title: "Avtaler",
+            description: "Lanserte faste vedlikeholdsavtaler for bedrifter.",
+          },
+        },
+        {
+          year: year6,
+          title: title6,
+          description: desc6 || legacyEvent6,
+          defaults: {
+            year: "2025",
+            title: "I dag",
+            description: "Over 200 faste kunder og 20+ års erfaring.",
+          },
+        },
+        {
+          year: year7,
+          title: title7,
+          description: desc7 || legacyEvent7,
+          defaults: {
+            year: "2026",
+            title: "Neste steg",
+            description: "Videreutvikler kundereisen og enda mer forutsigbar drift.",
+          },
+        },
+        {
+          year: year8,
+          title: title8,
+          description: desc8 || legacyEvent8,
+          defaults: {
+            year: "2027",
+            title: "Fremover",
+            description: "Skalerer leveransen med samme kvalitet og responstid.",
+          },
+        },
+      ],
+    [
+      year1,
+      title1,
+      desc1,
+      legacyEvent1,
+      year2,
+      title2,
+      desc2,
+      legacyEvent2,
+      year3,
+      title3,
+      desc3,
+      legacyEvent3,
+      year4,
+      title4,
+      desc4,
+      legacyEvent4,
+      year5,
+      title5,
+      desc5,
+      legacyEvent5,
+      year6,
+      title6,
+      desc6,
+      legacyEvent6,
+      year7,
+      title7,
+      desc7,
+      legacyEvent7,
+      year8,
+      title8,
+      desc8,
+      legacyEvent8,
+    ]
+  );
+
+  const milestones: RoadmapMilestone[] = useMemo(
+    () =>
+      timeline.map((item) => {
+        const year = item.year?.trim() || item.defaults.year;
+        const title = item.title?.trim() || item.defaults.title;
+        const description = item.description?.trim() || item.defaults.description;
+        const hidden =
+          (item.year?.trim() ?? "") === "" &&
+          (item.title?.trim() ?? "") === "" &&
+          (item.description?.trim() ?? "") === "";
+
+        return { year, title, description, hidden };
+      }),
+    [timeline]
+  );
+
+  const visibleMilestones = isAdmin && editMode ? milestones : milestones.filter((m) => !m.hidden);
 
   // Hvis alle items er skjult og ikke i edit mode, skjul hele seksjonen
-  if (visibleTimeline.length === 0 && (!isAdmin || !editMode)) {
+  if (visibleMilestones.length === 0 && (!isAdmin || !editMode)) {
     return null;
   }
 
   return (
     <>
-      <div 
-        ref={ref}
-        className="bg-muted rounded-2xl p-8 md:p-12 mb-20 relative"
-        style={{ minHeight: `${Math.max(600, visibleTimeline.length * 150)}px` }}
-      >
+      <div className="bg-muted rounded-2xl p-6 md:p-12 mb-20 relative overflow-hidden">
         {isAdmin && editMode && (
           <button
             onClick={() => setIsModalOpen(true)}
             className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
+            aria-label="Rediger Vår reise"
           >
             <Pencil className="h-5 w-5 text-primary" />
           </button>
         )}
 
-        <div className="sticky top-24">
-          <h2 className="text-3xl font-bold text-center mb-12">{heading || 'Vår reise'}</h2>
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-6 md:space-y-8">
-              {timeline.map((item, index) => {
-                const isHidden = isItemHidden(item);
-                
-                // I edit mode: vis alle, men marker skjulte
-                if (!isAdmin || !editMode) {
-                  if (isHidden) return null;
-                }
+        {isAdmin && editMode && milestones.some((m) => m.hidden) && (
+          <div className="absolute top-4 left-4 z-10 flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground">
+            <EyeOff className="h-3.5 w-3.5" />
+            <span>Skjulte punkter vises i redigeringsmodus</span>
+          </div>
+        )}
 
-                const displayYear = item.year?.trim() || item.defaultYear;
-                const displayEvent = item.event?.trim() || item.defaultEvent;
-
-                return (
-                  <div 
-                    key={index} 
-                    className={`flex gap-4 md:gap-6 items-start relative ${
-                      isHidden && isAdmin && editMode ? 'opacity-50' : ''
-                    }`}
-                    style={getItemStyle(index)}
-                  >
-                    {isHidden && isAdmin && editMode && (
-                      <div className="absolute -top-2 left-0 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded z-10">
-                        <EyeOff className="h-3 w-3" />
-                        <span>Skjult</span>
-                      </div>
-                    )}
-                    <div className="flex-shrink-0 w-16 md:w-20 text-right">
-                      <span className="text-xl md:text-2xl font-bold text-primary">{displayYear}</span>
-                    </div>
-                    <div className="flex-shrink-0 mt-2">
-                      <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-primary"></div>
-                    </div>
-                    <div className="flex-1 pb-6 md:pb-8 border-l-2 border-border pl-4 md:pl-6 -ml-1.5 md:-ml-2">
-                      <p className="text-base md:text-lg">{displayEvent}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        {/* Give the section enough scroll range for scrollytelling */}
+        <div style={{ minHeight: `${Math.max(900, visibleMilestones.length * 220)}px` }}>
+          <div className="sticky top-24">
+            <RoadmapTimeline heading={heading || "Vår reise"} milestones={visibleMilestones} />
           </div>
         </div>
       </div>
@@ -116,10 +226,14 @@ export const EditableTimeline = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         section="about-timeline"
-        currentData={{ heading: heading || 'Vår reise', timeline: timeline.map(t => ({
-          year: t.year || t.defaultYear,
-          event: t.event || t.defaultEvent
-        })) }}
+        currentData={{
+          heading: heading || "Vår reise",
+          timeline: milestones.map((m) => ({
+            year: m.year,
+            title: m.title,
+            description: m.description,
+          })),
+        }}
       />
     </>
   );
