@@ -150,8 +150,8 @@ export function RoadmapTimeline({ heading, milestones }: RoadmapTimelineProps) {
 
                     {/* Layout */}
                     <div className="md:grid md:grid-cols-[1fr_72px_1fr] md:items-start">
-                      {/* Left column */}
-                      <div className={isLeft ? "md:pr-10" : "md:pr-10 md:opacity-0"}>
+                      {/* Desktop/tablet (md+): alternating left/right cards */}
+                      <div className={isLeft ? "hidden md:block md:pr-10" : "hidden md:block md:pr-10 md:opacity-0"}>
                         {isLeft ? (
                           <MilestoneCard
                             milestone={milestone}
@@ -164,10 +164,9 @@ export function RoadmapTimeline({ heading, milestones }: RoadmapTimelineProps) {
                       </div>
 
                       {/* Middle spacer (line lives here) */}
-                      <div />
+                      <div className="hidden md:block" />
 
-                      {/* Right column */}
-                      <div className={!isLeft ? "md:pl-10" : "md:pl-10 md:opacity-0"}>
+                      <div className={!isLeft ? "hidden md:block md:pl-10" : "hidden md:block md:pl-10 md:opacity-0"}>
                         {!isLeft ? (
                           <MilestoneCard
                             milestone={milestone}
@@ -179,7 +178,7 @@ export function RoadmapTimeline({ heading, milestones }: RoadmapTimelineProps) {
                         ) : null}
                       </div>
 
-                      {/* Mobile card (always) */}
+                      {/* Mobile (<md): single-column card (prevents duplicate render) */}
                       <div className="md:hidden pl-10">
                         <MilestoneCard
                           milestone={milestone}
