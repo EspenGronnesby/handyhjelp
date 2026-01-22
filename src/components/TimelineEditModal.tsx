@@ -14,7 +14,7 @@ interface TimelineEditModalProps {
   section: string;
   currentData: {
     heading: string;
-    timeline: Array<{ year: string; event: string }>;
+    timeline: Array<{ year: string; title: string; description: string }>;
   };
 }
 
@@ -34,6 +34,24 @@ export const TimelineEditModal = ({ isOpen, onClose, section, currentData }: Tim
     setFormData({ ...formData, timeline: newTimeline });
   };
 
+  const updateItem = (index: number, field: "year" | "title" | "description", value: string) => {
+    const next = [...formData.timeline];
+    next[index] = { ...next[index], [field]: value };
+    setFormData({ ...formData, timeline: next });
+  };
+
+  const addItem = () => {
+    setFormData({
+      ...formData,
+      timeline: [...formData.timeline, { year: "", title: "", description: "" }],
+    });
+  };
+
+  const removeItem = (index: number) => {
+    const next = formData.timeline.filter((_, i) => i !== index);
+    setFormData({ ...formData, timeline: next });
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
 
@@ -48,7 +66,10 @@ export const TimelineEditModal = ({ isOpen, onClose, section, currentData }: Tim
       formData.timeline.forEach((item, index) => {
         updates.push(
           { section, content_key: `year_${index + 1}`, content_value: item.year, content_type: 'text', updated_by: user.id },
-          { section, content_key: `event_${index + 1}`, content_value: item.event, content_type: 'text', updated_by: user.id }
+          { section, content_key: `title_${index + 1}`, content_value: item.title, content_type: 'text', updated_by: user.id },
+          { section, content_key: `desc_${index + 1}`, content_value: item.description, content_type: 'text', updated_by: user.id },
+          // Backward compatibility for older UI reading `event_*`
+          { section, content_key: `event_${index + 1}`, content_value: item.description, content_type: 'text', updated_by: user.id }
         );
       });
 
@@ -89,29 +110,57 @@ export const TimelineEditModal = ({ isOpen, onClose, section, currentData }: Tim
 
           {formData.timeline.map((item, index) => (
             <div key={index} className="border rounded-lg p-4 space-y-3">
-              <h4 className="font-semibold">Punkt {index + 1}</h4>
+              <div className="flex items-center justify-between gap-3">
+                <h4 className="font-semibold">Punkt {index + 1}</h4>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeItem(index)}
+                  disabled={isSaving || formData.timeline.length <= 1}
+                >
+                  Fjern
+                </Button>
+              </div>
+
               <div className="grid grid-cols-4 gap-3">
                 <div className="space-y-2">
                   <Label>År</Label>
                   <Input
                     value={item.year}
-                    onChange={(e) => updateTimelineItem(index, 'year', e.target.value)}
+                    onChange={(e) => updateItem(index, "year", e.target.value)}
                     maxLength={4}
                     placeholder="2004"
                   />
                 </div>
                 <div className="col-span-3 space-y-2">
-                  <Label>Hendelse</Label>
+                  <Label>Tittel</Label>
                   <Input
-                    value={item.event}
-                    onChange={(e) => updateTimelineItem(index, 'event', e.target.value)}
-                    maxLength={150}
-                    placeholder="Beskrivelse av hendelse"
+                    value={item.title}
+                    onChange={(e) => updateItem(index, "title", e.target.value)}
+                    maxLength={60}
+                    placeholder="Kort tittel"
                   />
                 </div>
               </div>
+
+              <div className="space-y-2">
+                <Label>Beskrivelse</Label>
+                <Input
+                  value={item.description}
+                  onChange={(e) => updateItem(index, "description", e.target.value)}
+                  maxLength={200}
+                  placeholder="Kort beskrivelse"
+                />
+              </div>
             </div>
           ))}
+
+          <div className="pt-2">
+            <Button type="button" variant="outline" onClick={addItem} disabled={isSaving}>
+              Legg til punkt
+            </Button>
+          </div>
         </div>
 
         <DialogFooter>
