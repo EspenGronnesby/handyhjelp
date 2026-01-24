@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useRef } from "react";
 import { QuoteForm } from "@/components/QuoteForm";
 import { Phone } from "lucide-react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
@@ -9,7 +8,13 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { Pencil } from "lucide-react";
 import { HeroSectionEditModal } from "./HeroSectionEditModal";
 import heroDefaultImage from "@/assets/hero-building-maintenance.jpg";
+import { MotionButton } from "@/components/motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+
 export const HeroSection = () => {
+  const containerRef = useRef<HTMLElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+  
   const {
     heroImage,
     opacity,
@@ -33,20 +38,51 @@ export const HeroSection = () => {
   const displayTitle = title || 'Vi tar vare på dine bygg';
   const displaySubtitle = subtitle || 'Vaktmester • Tømrer • Blikk';
   const displayCtaText = ctaText || 'Få tilbud';
+
+  // Parallax effect for background
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+  
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+
   return <>
-      <section id="hero" className="min-h-[100svh] md:min-h-screen relative flex items-center pt-20 md:pt-20 section-mobile">
-        {/* Background Image - static, no parallax */}
-        <div 
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundPosition: 'center 30%'
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 to-secondary/90 md:from-secondary md:to-secondary" style={{
-          opacity
-        }}></div>
-        </div>
+      <section 
+        ref={containerRef}
+        id="hero" 
+        className="min-h-[100svh] md:min-h-screen relative flex items-center pt-20 md:pt-20 section-mobile overflow-hidden"
+      >
+        {/* Background Image - with subtle parallax */}
+        {shouldReduceMotion ? (
+          <div 
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}
+            style={{
+              backgroundImage: `url(${heroImage})`,
+              backgroundPosition: 'center 30%'
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 to-secondary/90 md:from-secondary md:to-secondary" style={{
+              opacity
+            }}></div>
+          </div>
+        ) : (
+          <motion.div 
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 will-change-transform ${loading ? 'opacity-0' : 'opacity-100'}`}
+            style={{
+              backgroundImage: `url(${heroImage})`,
+              backgroundPosition: 'center 30%',
+              y: backgroundY,
+              // Extend the background slightly to prevent gaps during parallax
+              top: -20,
+              bottom: -20,
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 to-secondary/90 md:from-secondary md:to-secondary" style={{
+              opacity
+            }}></div>
+          </motion.div>
+        )}
         
         <HeroImageEditor page="home" currentImageUrl={heroImage} onImageUpdate={refetch} />
         
@@ -68,18 +104,28 @@ export const HeroSection = () => {
                 {displaySubtitle}
               </p>
 
-              {/* CTA Buttons - Prominent on mobile */}
+              {/* CTA Buttons - With motion */}
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-12">
-                <Button size="lg" variant="cta" className="text-lg md:text-lg px-8 md:px-8 py-5 md:py-6 font-semibold" onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({
-                behavior: 'smooth'
-              })}>
+                <MotionButton 
+                  size="lg" 
+                  variant="cta" 
+                  className="text-lg md:text-lg px-8 md:px-8 py-5 md:py-6 font-semibold" 
+                  onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({
+                    behavior: 'smooth'
+                  })}
+                >
                   {displayCtaText}
-                </Button>
-                <Button variant="cta-outline" size="lg" className="text-base md:text-lg px-6 md:px-6 py-4 md:py-6 bg-white/10 text-white border-white/30 hover:bg-white/20" onClick={() => document.getElementById('services')?.scrollIntoView({
-                behavior: 'smooth'
-              })}>
+                </MotionButton>
+                <MotionButton 
+                  variant="cta-outline" 
+                  size="lg" 
+                  className="text-base md:text-lg px-6 md:px-6 py-4 md:py-6 bg-white/10 text-white border-white/30 hover:bg-white/20" 
+                  onClick={() => document.getElementById('services')?.scrollIntoView({
+                    behavior: 'smooth'
+                  })}
+                >
                   Se tjenester
-                </Button>
+                </MotionButton>
               </div>
 
               {/* 24/7 Contact */}
