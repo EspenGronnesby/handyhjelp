@@ -1485,7 +1485,47 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          customer_name: string | null
+          feedback_type: string | null
+          id: string | null
+          job_id: string | null
+          rating: number | null
+          status: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          feedback_type?: string | null
+          id?: string | null
+          job_id?: string | null
+          rating?: number | null
+          status?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          feedback_type?: string | null
+          id?: string | null
+          job_id?: string | null
+          rating?: number | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       award_points: {
