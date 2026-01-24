@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import DOMPurify from 'dompurify';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -495,7 +496,7 @@ export const ContentApprovalQueue = () => {
                 <p className="text-muted-foreground">{(previewDialog.item as PendingBlogPost).summary}</p>
               </div>
               <div className="prose max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: (previewDialog.item as PendingBlogPost).content }} />
+                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize((previewDialog.item as PendingBlogPost).content) }} />
               </div>
             </div>
           )}

@@ -62,7 +62,6 @@ export const ProjectsSection = () => {
   }, []);
 
   const fetchProjects = async () => {
-    console.log("🔍 Fetching projects for homepage...");
     const { data, error } = await supabase
       .from("projects")
       .select("*")
@@ -70,10 +69,8 @@ export const ProjectsSection = () => {
       .order("completed_date", { ascending: false });
 
     if (error) {
-      console.error("❌ Error fetching projects:", error);
       setProjects([]);
     } else {
-      console.log("✅ All projects loaded:", data?.length || 0);
       
       // Select 1 project from each category (vaktmester, tomrer, blikk)
       const selectedProjects: Project[] = [];
@@ -92,7 +89,6 @@ export const ProjectsSection = () => {
         selectedProjects.push(...remaining.slice(0, 3 - selectedProjects.length));
       }
       
-      console.log("📊 Selected projects for homepage:", selectedProjects.length);
       // On mobile, show only 2 projects for cleaner view
       setProjects(selectedProjects.slice(0, 3));
     }

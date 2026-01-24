@@ -133,18 +133,18 @@ export const Footer = () => {
             <div>
               <h4 className="font-semibold mb-3 md:mb-4 text-base md:text-lg">Tjenester</h4>
               <ul className="space-y-1">
-                <li>
-                  <Link to="/tjenester#vaktmester" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
+              <li>
+                  <Link to="/tjenester/vaktmester" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
                     Vaktmester
                   </Link>
                 </li>
                 <li>
-                  <Link to="/tjenester#toemrer" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
+                  <Link to="/tjenester/toemrer" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
                     Tømrer
                   </Link>
                 </li>
                 <li>
-                  <Link to="/tjenester#blikk" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
+                  <Link to="/tjenester/blikk" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
                     Blikk
                   </Link>
                 </li>

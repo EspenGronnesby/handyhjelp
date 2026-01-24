@@ -21,9 +21,6 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [opacity, setOpacity] = useState<number>(85);
 
-  // Debug logging for admin status
-  console.log('HeroImageEditor - isAdmin:', isAdmin, 'page:', page);
-
   if (!isAdmin) return null;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
