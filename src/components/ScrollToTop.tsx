@@ -4,14 +4,50 @@ import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Marketing routes that use page transitions (instant scroll)
+const MARKETING_ROUTES = [
+  '/',
+  '/tilbud',
+  '/fast-avtale',
+  '/faq',
+  '/prosjekter',
+  '/om-oss',
+  '/kontakt',
+  '/tjenester',
+  '/blog',
+  '/raad',
+  '/takk',
+  '/takk-avtale',
+  '/personvern',
+  '/cookies',
+  '/vilkaar',
+  '/tilbakemelding',
+];
+
+const isMarketingRoute = (pathname: string): boolean => {
+  // Check exact matches first
+  if (MARKETING_ROUTES.includes(pathname)) return true;
+  
+  // Check prefix matches for dynamic routes
+  if (pathname.startsWith('/prosjekter/')) return true;
+  if (pathname.startsWith('/tjenester/')) return true;
+  if (pathname.startsWith('/raad/')) return true;
+  if (pathname.startsWith('/anmeldelse/')) return true;
+  
+  return false;
+};
+
 export const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
   const [showButton, setShowButton] = useState(false);
 
   // Scroll to top on route change
+  // Use instant scroll for marketing routes (page transitions handle smoothness)
+  // Use smooth scroll for dashboard routes (no page transitions)
   useEffect(() => {
     if (!hash) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const behavior = isMarketingRoute(pathname) ? 'auto' : 'smooth';
+      window.scrollTo({ top: 0, behavior });
     }
   }, [pathname, hash]);
 

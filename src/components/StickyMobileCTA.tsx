@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { MotionButton } from '@/components/motion';
 
 export const StickyMobileCTA = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,12 +26,12 @@ export const StickyMobileCTA = () => {
       style={{ width: '100%', maxWidth: '100vw' }}
     >
       <Link to="/tilbud" className="block w-full">
-        <Button 
+        <MotionButton 
           size="lg" 
           className="w-full bg-success hover:bg-success-hover text-success-foreground font-semibold text-lg py-6"
         >
           Få gratis tilbud
-        </Button>
+        </MotionButton>
       </Link>
     </div>
   );

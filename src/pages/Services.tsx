@@ -2,7 +2,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
@@ -15,10 +15,21 @@ import EditablePricingDetails from "@/components/service-edit/EditablePricingDet
 import EditableComparisonSection from "@/components/service-edit/EditableComparisonSection";
 import { Helmet } from "react-helmet";
 import { useScrollProgressReveal } from "@/hooks/useScrollAnimation";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 const Services = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('services', servicesBackground);
   const { ref: sectionsRef, getItemStyle } = useScrollProgressReveal(4);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Parallax for hero background
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 40]);
 
   // Handle smooth scroll to anchor on load
   useEffect(() => {
@@ -54,11 +65,30 @@ const Services = () => {
       <Header />
       <BreadcrumbNavigation />
       
-      {/* Hero Section - Enhanced with gradient overlay */}
+      {/* Hero Section - Enhanced with gradient overlay and parallax */}
       <div 
-        className="relative min-h-[600px] flex items-center bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        ref={heroRef}
+        className="relative min-h-[600px] flex items-center overflow-hidden"
       >
+        {/* Background with parallax */}
+        {shouldReduceMotion ? (
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${heroImage})` }}
+          />
+        ) : (
+          <motion.div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-transform"
+            style={{ 
+              backgroundImage: `url(${heroImage})`,
+              y: backgroundY,
+              // Extend slightly to prevent gaps
+              top: -15,
+              bottom: -15,
+            }}
+          />
+        )}
+        
         {/* Enhanced gradient overlay for better readability */}
         <div 
           className="absolute inset-0 bg-gradient-to-b from-background via-background to-background backdrop-blur-[3px]"
