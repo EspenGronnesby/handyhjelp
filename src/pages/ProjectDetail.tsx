@@ -36,7 +36,6 @@ const ProjectDetail = () => {
   }, [id]);
 
   const fetchProject = async (projectId: string) => {
-    console.log("🔍 [Project Detail] Fetching project:", projectId);
     setIsLoading(true);
     setNotFound(false);
 
@@ -47,14 +46,9 @@ const ProjectDetail = () => {
       .eq("status", "published")
       .maybeSingle();
 
-    if (error) {
-      console.error("❌ [Project Detail] Error fetching project:", error);
-      setNotFound(true);
-    } else if (!data) {
-      console.log("⚠️ [Project Detail] Project not found");
+    if (error || !data) {
       setNotFound(true);
     } else {
-      console.log("✅ [Project Detail] Project loaded:", data);
       setProject(data);
     }
 
