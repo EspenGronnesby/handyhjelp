@@ -11,11 +11,8 @@ interface Review {
   created_at: string;
   feedback_type: string | null;
   customer_name: string | null;
-  profiles?: {
-    full_name: string;
-    customer_type: string | null;
-    company_name: string | null;
-  };
+  // Note: profiles removed - we use customer_name from the secure view instead
+  // This prevents exposing user_id which could be used to look up more data
   jobs?: {
     quotes?: {
       type: string;
@@ -36,11 +33,11 @@ const TestimonialsSection = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        // Fetch reviews without foreign key joins to handle nullable fields
+        // Use the secure public_reviews view that excludes customer_email for privacy
+        // The view only returns approved reviews with non-sensitive fields
         const { data, error } = await supabase
-          .from('reviews')
-          .select('id, rating, comment, created_at, feedback_type, customer_name, user_id, job_id')
-          .eq('status', 'approved')
+          .from('public_reviews' as any)
+          .select('id, rating, comment, created_at, feedback_type, customer_name, job_id')
           .gte('rating', 4)
           .order('created_at', { ascending: false })
           .limit(10);
@@ -48,19 +45,11 @@ const TestimonialsSection = () => {
         if (error) throw error;
         
         // Fetch related data separately
+        // Note: public_reviews view doesn't include user_id for privacy
+        // We can still fetch job data for service type display
         const reviewsWithRelations = await Promise.all(
-          (data || []).map(async (review) => {
-            let profiles = undefined;
+          (data || []).map(async (review: any) => {
             let jobs = undefined;
-            
-            if (review.user_id) {
-              const { data: profileData } = await supabase
-                .from('profiles')
-                .select('full_name, customer_type, company_name')
-                .eq('id', review.user_id)
-                .single();
-              profiles = profileData || undefined;
-            }
             
             if (review.job_id) {
               const { data: jobData } = await supabase
@@ -71,7 +60,7 @@ const TestimonialsSection = () => {
               jobs = jobData || undefined;
             }
             
-            return { ...review, profiles, jobs };
+            return { ...review, jobs };
           })
         );
         
@@ -148,32 +137,23 @@ const TestimonialsSection = () => {
   };
 
   const getCustomerDisplay = (review: Review) => {
-    // Handle general feedback
-    if (review.feedback_type === 'general') {
-      return {
-        name: review.customer_name?.split(' ')[0] || 'Kunde',
-        isBusiness: false
-      };
-    }
-    
-    const profile = review.profiles;
     const quote = review.jobs?.quotes;
     
-    // Check if business customer
-    const isBusiness = profile?.customer_type === 'business' || quote?.company_name;
+    // Check if business customer based on quote data
+    const isBusiness = !!quote?.company_name;
     
     if (isBusiness) {
-      const companyName = profile?.company_name || quote?.company_name;
       return {
-        name: companyName || profile?.full_name?.split(' ')[0] || quote?.name?.split(' ')[0] || 'Kunde',
+        name: quote.company_name || quote?.name?.split(' ')[0] || 'Bedrift',
         isBusiness: true
       };
     }
     
-    // Private customer - only first name
-    const fullName = profile?.full_name || quote?.name || 'Kunde';
+    // For all other cases, use customer_name from the secure view
+    // Only show first name for privacy
+    const displayName = review.customer_name || quote?.name || 'Kunde';
     return {
-      name: fullName.split(' ')[0],
+      name: displayName.split(' ')[0],
       isBusiness: false
     };
   };
