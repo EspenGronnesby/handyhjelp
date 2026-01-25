@@ -1,124 +1,101 @@
 # HandyHjelp
 
-Facility management services platform for Kristiansand, Norway. Provides property maintenance services (vaktmester, carpentry, roofing), service agreements, quote management, and multi-role dashboards.
+Facility management services platform for Kristiansand, Norway. Handles property maintenance (vaktmester, carpentry, roofing), service quotes, job management, and multi-role dashboards.
 
 **Language**: Norwegian UI
+
+> **IMPORTANT**: When you work on a new feature or bug, create a git branch first. Then work on changes in that branch for the remainder of the session.
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Framework | Vite 5 + React 18 + TypeScript |
-| Styling | Tailwind CSS + shadcn/ui (Radix primitives) |
+| Build | Vite 5 |
+| UI | React 18 + TypeScript |
+| Styling | Tailwind CSS + shadcn/ui (Radix) |
 | Backend | Supabase (PostgreSQL + Auth + Edge Functions) |
 | State | TanStack React Query |
-| Forms | React Hook Form + Zod validation |
+| Forms | React Hook Form + Zod |
 | Animation | Framer Motion |
-| Icons | Lucide React |
 
 ## Commands
 
 ```bash
-npm run dev       # Start dev server at localhost:8080
+npm run dev       # Dev server at localhost:8080
 npm run build     # Production build
-npm run lint      # Run ESLint
-npm run preview   # Preview production build
+npm run lint      # ESLint
+npm run preview   # Preview build
 ```
 
 ## Project Structure
 
 ```
 src/
-├── pages/              # 33 route pages (Index, Auth, Dashboard, Admin, etc.)
+├── pages/                  # Route pages (33 files)
 ├── components/
-│   ├── ui/             # shadcn/ui components
-│   ├── admin/          # Admin dashboard components
-│   ├── worker/         # Worker submission components
-│   ├── loyalty/        # Loyalty program components
-│   ├── motion/         # Animation wrappers
-│   └── SEO/            # Meta tags and structured data
-├── hooks/              # 27 custom hooks (useAuth, useAdmin, useAdminData, etc.)
-├── contexts/           # React contexts (EditModeContext)
-├── lib/
-│   ├── validations/    # Zod schemas (quoteFormSchema, serviceAgreementSchema)
-│   └── utils.ts        # Utility functions
-├── integrations/
-│   └── supabase/
-│       ├── client.ts   # Supabase client
-│       └── types.ts    # Auto-generated types (DO NOT EDIT)
-└── types/              # TypeScript definitions
+│   ├── ui/                 # shadcn/ui components
+│   ├── admin/              # Admin dashboard
+│   ├── worker/             # Worker features
+│   ├── loyalty/            # Loyalty program
+│   └── motion/             # Animation wrappers
+├── hooks/                  # Custom hooks (27 files)
+├── contexts/               # EditModeContext
+├── lib/validations/        # Zod schemas
+├── integrations/supabase/  # Client + auto-generated types
+└── types/                  # TypeScript definitions
 
 supabase/
-├── config.toml         # Supabase project config
-├── migrations/         # 52 database migrations
-└── functions/          # 12 Edge Functions
+├── migrations/             # 52 database migrations
+└── functions/              # 12 Edge Functions
 ```
 
 ## Key Files
 
-- **Entry**: `src/main.tsx`, `src/App.tsx`
-- **Routing**: `src/App.tsx` (React Router v7)
-- **Auth hook**: `src/hooks/useAuth.tsx`
-- **Admin data**: `src/hooks/useAdminData.tsx`
-- **Supabase types**: `src/integrations/supabase/types.ts` (auto-generated from DB)
-- **Quote form**: `src/components/QuoteForm.tsx`
-- **Validation schemas**: `src/lib/validations/`
+| Purpose | Location |
+|---------|----------|
+| Entry | `src/main.tsx:1`, `src/App.tsx:1` |
+| Routing | `src/App.tsx:60-130` |
+| Auth hook | `src/hooks/useAuth.tsx:1` |
+| Role hook | `src/hooks/useRole.tsx:1` |
+| Admin data | `src/hooks/useAdminData.tsx:1` |
+| Supabase client | `src/integrations/supabase/client.ts:1` |
+| Supabase types | `src/integrations/supabase/types.ts` (auto-generated) |
+| Quote validation | `src/lib/validations/quoteFormSchema.ts:1` |
+| Agreement validation | `src/lib/validations/serviceAgreementSchema.ts:1` |
 
 ## Environment Variables
 
 Required in `.env`:
 ```
-VITE_SUPABASE_URL=https://[project-id].supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=[anon-key]
-VITE_SUPABASE_PROJECT_ID=[project-id]
+VITE_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY
+VITE_SUPABASE_PROJECT_ID
 ```
 
-## Patterns
+## Quick Reference
 
-### Path Alias
-`@/*` maps to `src/*`. Use `@/components/ui/button` instead of relative paths.
+**Path alias**: `@/*` maps to `src/*`
 
-### Authentication & Roles
-Four user roles via Supabase Auth:
-- `platform_owner` - Full access, can edit content inline
-- `admin` - Manages jobs, quotes, content
-- `customer` - Views own data, submits quotes
-- `worker` - Submits work, views assigned jobs
+**User roles**: `platform_owner`, `admin`, `worker`, `moderator`, `user`
+- Check with `useRole()` hook returning `{ isOwner, isAdmin, isWorker }`
 
-Check roles with `useAuth()` or `useAdmin()` hooks.
+**Database types**: Auto-generated in `src/integrations/supabase/types.ts`
+- Regenerate with Supabase CLI after schema changes
 
-### Forms
-Multi-step forms use React Hook Form with Zod schemas:
-```typescript
-import { quoteFormSchema } from '@/lib/validations/quoteFormSchema';
-```
+**Norwegian validation**: Phone must be 8 digits, names allow æøå
 
-Norwegian-specific validation:
-- Phone: exactly 8 digits
-- Characters: æ, ø, å allowed in names
+## Database Tables
 
-### Row-Level Security
-Supabase RLS controls data access. Customers see only their data; admins see all.
+Core tables: `profiles`, `user_roles`, `quotes`, `jobs`, `service_agreements`, `reviews`, `blog_posts`, `projects`, `invoices`, `audit_logs`, `email_logs`, `notifications`
 
-### Edit Mode
-Platform owners can toggle inline editing via `EditModeContext`. Content editable components check this context.
+RLS enforces access: customers see own data, admins see all.
 
-## Database
+## Additional Documentation
 
-PostgreSQL via Supabase with key tables:
-- `profiles` - User data
-- `user_roles` - Role assignments
-- `quotes` - Customer quote requests
-- `jobs` - Work jobs
-- `service_agreements` - Contracts
-- `reviews` - Customer reviews (public_reviews view for privacy)
-- `blog_posts`, `projects` - Content
+Check these files for detailed patterns and conventions:
 
-Edge Functions handle email notifications and document generation.
+| Topic | File |
+|-------|------|
+| Architectural patterns | [.claude/docs/architectural_patterns.md](.claude/docs/architectural_patterns.md) |
 
-## Development Notes
-
-- **No test framework** - Tests not configured
-- **Lenient TypeScript** - `strictNullChecks: false`, `noImplicitAny: false`
-- **XSS protection** - DOMPurify sanitizes user content
-- **Type generation** - `supabase/types.ts` is auto-generated; regenerate with Supabase CLI after schema changes
+When working on specific areas, consult the relevant documentation above.
