@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { TeamMemberEditor } from "@/components/admin/TeamMemberEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +11,6 @@ import { Helmet } from "react-helmet";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import heroAboutImg from "@/assets/hero-caretaker.jpg";
 import { EditableHero } from "@/components/EditableHero";
-import { EditableAboutContent } from "@/components/EditableAboutContent";
 import { EditableTimeline } from "@/components/EditableTimeline";
 import { EditableWhyUs } from "@/components/EditableWhyUs";
 import { EditableCertifications } from "@/components/EditableCertifications";
@@ -23,7 +24,6 @@ const About = () => {
   const [loading, setLoading] = useState(true);
 
   // Scroll animations
-  const { ref: aboutRef, style: aboutStyle } = useFadeInUp({ threshold: 0.1 });
   const { ref: whyUsRef, style: whyUsStyle } = useFadeInUp({ threshold: 0.1 });
   const { ref: teamRef, isVisible: teamVisible, getItemStyle: getTeamItemStyle } = useStaggeredGridReveal(8, 4, { threshold: 0.1 });
   const { ref: certRef, style: certStyle } = useFadeInUp({ threshold: 0.1 });
@@ -62,21 +62,27 @@ const About = () => {
         {/* Hero Section with Background Image */}
         <div className="relative">
           <HeroImageEditor page="about" currentImageUrl={heroImage} onImageUpdate={refetchHero} />
-          <EditableHero 
+          <EditableHero
             section="hero-om-oss"
             defaultHeading="Om HandyHjelp"
             defaultSubtext="Din pålitelige partner for eiendomspleie og håndverksarbeid"
             backgroundImage={heroImage}
             className="h-[500px]"
-          />
+            contentPosition="lower"
+          >
+            <div className="flex gap-4 justify-center">
+              <a href="#team" onClick={(e) => { e.preventDefault(); document.getElementById('team')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                <Button variant="cta" size="lg" className="md:text-lg md:px-8">Møt teamet</Button>
+              </a>
+              <Link to="/#quote-form">
+                <Button variant="cta-outline" size="lg" className="bg-white/10 border-white text-white hover:bg-white/20 md:text-lg md:px-8">Få tilbud</Button>
+              </Link>
+            </div>
+          </EditableHero>
         </div>
 
         {/* Main Content */}
         <section className="container mx-auto px-4 py-20">
-          <div ref={aboutRef} style={aboutStyle}>
-            <EditableAboutContent />
-          </div>
-
           {/* Timeline Section */}
           <EditableTimeline />
 

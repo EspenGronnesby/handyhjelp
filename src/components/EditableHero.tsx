@@ -10,6 +10,8 @@ interface EditableHeroProps {
   defaultSubtext: string;
   backgroundImage?: string;
   className?: string;
+  children?: React.ReactNode;
+  contentPosition?: 'center' | 'lower';
 }
 
 export const EditableHero = ({
@@ -17,7 +19,9 @@ export const EditableHero = ({
   defaultHeading,
   defaultSubtext,
   backgroundImage,
-  className = ''
+  className = '',
+  children,
+  contentPosition = 'center'
 }: EditableHeroProps) => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,7 +34,7 @@ export const EditableHero = ({
 
   return (
     <>
-      <section className={`relative flex items-center justify-center text-center ${className}`}>
+      <section className={`relative flex justify-center text-center ${contentPosition === 'lower' ? 'items-end pb-16' : 'items-center'} ${className}`}>
         {/* Edit icon - always visible in edit mode */}
         {isAdmin && editMode && (
           <button
@@ -57,6 +61,7 @@ export const EditableHero = ({
           <p className={`text-lg max-w-2xl mx-auto ${backgroundImage ? 'text-white/90 drop-shadow' : 'text-muted-foreground'}`}>
             {displaySubtext}
           </p>
+          {children && <div className="mt-8 md:mt-14">{children}</div>}
         </div>
       </section>
 
