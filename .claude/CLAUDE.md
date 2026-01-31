@@ -99,3 +99,25 @@ Check these files for detailed patterns and conventions:
 | Architectural patterns | [.claude/docs/architectural_patterns.md](.claude/docs/architectural_patterns.md) |
 
 When working on specific areas, consult the relevant documentation above.
+
+## Instruction Files
+
+| File | When to read |
+|------|--------------|
+| `.claude/security.md` | Before security work, RLS changes, or audits |
+| `.claude/lessons.md` | When encountering problems or similar tasks |
+| `.claude/architectural_patterns.md` | When writing new hooks, forms, or components |
+
+## Automatic Behaviors
+
+**Before solving any problem:**
+1. Check `.claude/lessons.md` for similar issues
+2. If found, follow the documented solution
+
+**After solving a problem:**
+1. Ask: "Should I add this to lessons.md?"
+2. If yes, use the format defined in that file
+
+**Before writing new hooks, forms, or components:**
+1. Check `.claude/architectural_patterns.md` for existing patterns
+2. Follow established patterns for consistency
