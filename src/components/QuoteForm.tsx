@@ -35,9 +35,7 @@ interface FormData {
   description: string;
 }
 
-// Web3Forms access key - dette er en PUBLISHABLE key (som Stripe publishable key)
-// og er ment å være synlig i frontend-kode. Se: https://web3forms.com/
-const WEB3FORMS_ACCESS_KEY = "e73de942-c444-45b1-ba7a-1556f5862bfd";
+const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
 
 export const QuoteForm = () => {
   const { toast } = useToast();
@@ -227,7 +225,7 @@ export const QuoteForm = () => {
 
       // 2. Send til Web3Forms
       const web3FormData = {
-        access_key: 'e73de942-c444-45b1-ba7a-1556f5862bfd',
+        access_key: WEB3FORMS_ACCESS_KEY,
         subject: `Ny tilbudsforespørsel fra ${formData.name}`,
         from_name: "HandyHjelp Nettside",
         type: formData.type === 'private' ? 'Privat' : 'Bedrift',

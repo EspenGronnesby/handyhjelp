@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const WEB3FORMS_ACCESS_KEY = "e73de942-c444-45b1-ba7a-1556f5862bfd";
+const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
 const WEB3FORMS_URL = "https://api.web3forms.com/submit";
 
 interface Web3FormsData {
