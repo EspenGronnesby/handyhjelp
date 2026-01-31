@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import {
   Dialog,
   DialogContent,
@@ -83,7 +84,7 @@ export function EmailPreviewModal({
         <ScrollArea className="max-h-[70vh]">
           <div 
             className="rounded-md overflow-hidden border"
-            dangerouslySetInnerHTML={{ __html: emailHtml }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(emailHtml) }}
           />
         </ScrollArea>
       </DialogContent>
