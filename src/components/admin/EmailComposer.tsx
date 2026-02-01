@@ -43,7 +43,7 @@ interface EmailComposerProps {
 
 export function EmailComposer({ profiles }: EmailComposerProps) {
   const { templates, loading: templatesLoading } = useEmailTemplates();
-  const { sendEmail, loading: sendLoading } = useSendEmail();
+  const { sendEmail, loading: sendLoading, cooldownSeconds } = useSendEmail();
   
   const [recipients, setRecipients] = useState<EmailRecipient[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
@@ -381,6 +381,7 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
         includeFeedbackButton={includeFeedbackButton}
         onConfirm={confirmSend}
         loading={sendLoading}
+        cooldownSeconds={cooldownSeconds}
       />
 
       {/* Preview Modal */}

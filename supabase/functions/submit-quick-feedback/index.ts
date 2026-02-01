@@ -4,6 +4,33 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const FUNCTION_NAME = "submit-quick-feedback";
 const REDIRECT_URL = "https://handyhjelp.no";
 
+// Rate limiting - 1 request per 10 minutes per IP
+const rateLimits = new Map<string, number>();
+const COOLDOWN_MS = 600000; // 10 minutes
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const lastTime = rateLimits.get(ip);
+
+  if (rateLimits.size > 10000) {
+    for (const [key, value] of rateLimits.entries()) {
+      if (now - value > COOLDOWN_MS) rateLimits.delete(key);
+    }
+  }
+
+  if (!lastTime || now - lastTime >= COOLDOWN_MS) {
+    rateLimits.set(ip, now);
+    return true;
+  }
+  return false;
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+}
+
 const getThankYouHtml = () => `
 <!DOCTYPE html>
 <html lang="no">
@@ -125,6 +152,17 @@ const log = {
 };
 
 const handler = async (req: Request): Promise<Response> => {
+  const clientIP = getClientIP(req);
+
+  // Rate limiting check (1 per 10 minutes)
+  if (!checkRateLimit(clientIP)) {
+    log.info("Rate limit exceeded for quick feedback", { clientIP });
+    return new Response(null, {
+      status: 302,
+      headers: { "Location": REDIRECT_URL }
+    });
+  }
+
   const url = new URL(req.url);
   const token = url.searchParams.get('token');
   const rating = url.searchParams.get('rating') as 'happy' | 'neutral' | 'sad' | null;

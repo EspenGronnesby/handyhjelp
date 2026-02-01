@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
@@ -24,6 +25,8 @@ const Contact = () => {
     phone: "",
     message: ""
   });
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
   const {
     submitToWeb3Forms,
     sendConfirmationEmail
@@ -39,14 +42,17 @@ const Contact = () => {
   });
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!captchaToken) {
+      return;
+    }
     await submit(async () => {
-      // Send to Web3Forms
+      // Send to Web3Forms with hCaptcha token
       const success = await submitToWeb3Forms({
         subject: `Kontaktskjema fra ${formData.name}`,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        message: formData.message
+        message: formData.message,
       });
       if (!success) {
         throw new Error("Kan ikke sende melding. Ring oss på +47 41250553");
@@ -60,13 +66,15 @@ const Contact = () => {
         customerType: "private"
       });
 
-      // Reset form
+      // Reset form and captcha
       setFormData({
         name: "",
         email: "",
         phone: "",
         message: ""
       });
+      setCaptchaToken(null);
+      captchaRef.current?.resetCaptcha();
     });
   };
   return <div className="min-h-screen">
@@ -139,7 +147,15 @@ const Contact = () => {
                     <p className="text-sm text-muted-foreground">
                       <span className="text-destructive">*</span> Obligatoriske felt
                     </p>
-                    <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {import.meta.env.VITE_HCAPTCHA_SITE_KEY && (
+                      <HCaptcha
+                        ref={captchaRef}
+                        sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY}
+                        onVerify={(token) => setCaptchaToken(token)}
+                        onExpire={() => setCaptchaToken(null)}
+                      />
+                    )}
+                    <Button type="submit" className="w-full" disabled={isSubmitting || (!captchaToken && !!import.meta.env.VITE_HCAPTCHA_SITE_KEY)}>
                       {isSubmitting ? <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Sender...
