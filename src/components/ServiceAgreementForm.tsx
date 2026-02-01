@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,9 @@ const TOTAL_STEPS = 7;
 export const ServiceAgreementForm = () => {
   const navigate = useNavigate();
   const { submitToWeb3Forms, sendAgreementConfirmation } = useWeb3Forms();
+  
+  // Honeypot field for bot protection
+  const [honeypot, setHoneypot] = useState('');
 
   const form = useForm<ServiceAgreementFormData>({
     resolver: zodResolver(serviceAgreementSchema),
@@ -60,6 +64,12 @@ export const ServiceAgreementForm = () => {
   const contactRole = form.watch("contactRole");
 
   const onSubmit = async (data: ServiceAgreementFormData) => {
+    // Bot protection: if honeypot is filled, silently reject
+    if (honeypot) {
+      navigate("/takk-avtale");
+      return;
+    }
+    
     await submit(async () => {
       // Get current user if logged in
       const { data: { user } } = await supabase.auth.getUser();
@@ -567,6 +577,17 @@ export const ServiceAgreementForm = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Honeypot field - hidden from users, visible to bots */}
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute -left-[9999px] opacity-0 pointer-events-none"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+          />
           {renderStep()}
 
           <div className="flex justify-between pt-6">

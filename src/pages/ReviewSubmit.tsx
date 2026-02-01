@@ -26,6 +26,7 @@ const ReviewSubmit = () => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [honeypot, setHoneypot] = useState(''); // Bot protection
   const [existingReview, setExistingReview] = useState(false);
 
   useEffect(() => {
@@ -98,6 +99,12 @@ const ReviewSubmit = () => {
   }, [jobId]);
 
   const handleSubmit = async () => {
+    // Bot protection: if honeypot is filled, silently reject
+    if (honeypot) {
+      setSubmitted(true);
+      return;
+    }
+    
     if (rating === 0) {
       toast({
         title: 'Velg en vurdering',
@@ -256,6 +263,17 @@ const ReviewSubmit = () => {
               <CardDescription>Velg antall stjerner</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Honeypot field - hidden from users, visible to bots */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute -left-[9999px] opacity-0 pointer-events-none"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+              />
               {/* Star Rating */}
               <div className="flex flex-col items-center gap-3">
                 <div className="flex gap-2">
