@@ -33,8 +33,14 @@ Deno.serve(async (req) => {
       throw new Error('Referral code is required');
     }
 
-    // Validate referral code
-    const { data: referralData, error: codeError } = await supabaseClient
+    // Use admin client to validate referral code (users can no longer read all codes for security)
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Validate referral code using admin client
+    const { data: referralData, error: codeError } = await supabaseAdmin
       .from('referral_codes')
       .select('referrer_user_id, uses_count')
       .eq('code', referralCode)
@@ -61,10 +67,7 @@ Deno.serve(async (req) => {
       throw new Error('Du har allerede brukt en referansekode');
     }
 
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    // supabaseAdmin already declared above
 
     // Award 250 points to the new user (referee)
     await supabaseAdmin.rpc('award_points', {
