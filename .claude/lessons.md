@@ -118,6 +118,23 @@ Velg rate limiting-strategi basert på bruksmønster: cooldown med timer for adm
 
 ---
 
+### Lovable Cloud: VITE_-variabler må ligge i .env, ikke Cloud Secrets
+**Date:** 2026-02-01
+**Category:** Lovable
+**Affected files:** .env
+
+**Problem:**
+hCaptcha vistes ikke i produksjon på handyhjelp.no fordi `VITE_HCAPTCHA_SITE_KEY` var lagt til som Cloud Secret. `VITE_`-variabler bakes inn ved build-tid og må ligge i `.env`-filen for å være tilgjengelige i frontend.
+
+**Solution:**
+La til `VITE_HCAPTCHA_SITE_KEY` i `.env`-filen i Lovable og trigget ny build.
+
+**Prevention:**
+- `VITE_`-prefiks = frontend, må i `.env`-filen
+- Cloud Secrets = kun for edge functions/backend (f.eks. `HCAPTCHA_SECRET`)
+
+---
+
 <!--
 ADD NEW LESSONS BELOW
 
