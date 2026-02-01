@@ -20,6 +20,7 @@ interface EmailConfirmModalProps {
   includeFeedbackButton: boolean;
   onConfirm: () => void;
   loading: boolean;
+  cooldownSeconds?: number;
 }
 
 export function EmailConfirmModal({
@@ -31,6 +32,7 @@ export function EmailConfirmModal({
   includeFeedbackButton,
   onConfirm,
   loading,
+  cooldownSeconds = 0,
 }: EmailConfirmModalProps) {
   const customerCount = recipients.filter(r => r.type === 'customer').length;
   const externalCount = recipients.filter(r => r.type === 'external').length;
@@ -139,9 +141,11 @@ export function EmailConfirmModal({
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Avbryt
           </Button>
-          <Button onClick={onConfirm} disabled={loading}>
+          <Button onClick={onConfirm} disabled={loading || cooldownSeconds > 0}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Bekreft og send ({recipients.length})
+            {cooldownSeconds > 0
+              ? `Vent ${cooldownSeconds}s`
+              : `Bekreft og send (${recipients.length})`}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -16,7 +16,7 @@ export function useNotificationSound() {
       try {
         await Notification.requestPermission();
       } catch (error) {
-        console.log('Notification permission request failed:', error);
+        if (import.meta.env.DEV) console.log('Notification permission request failed:', error);
       }
     }
   }, []);
@@ -30,7 +30,7 @@ export function useNotificationSound() {
     
     audioRef.current.currentTime = 0;
     audioRef.current.play().catch((error) => {
-      console.log('Could not play notification sound:', error);
+      if (import.meta.env.DEV) console.log('Could not play notification sound:', error);
     });
   }, []);
 
@@ -44,7 +44,7 @@ export function useNotificationSound() {
           badge: '/favicon.ico',
         });
       } catch (error) {
-        console.log('Could not show notification:', error);
+        if (import.meta.env.DEV) console.log('Could not show notification:', error);
       }
     }
   }, []);

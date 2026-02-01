@@ -4,6 +4,39 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const FUNCTION_NAME = "send-manual-email";
 
+// Rate limiting - cooldown-based (1 request per 10 seconds per IP)
+const lastRequestTime = new Map<string, number>();
+const COOLDOWN_MS = 10000; // 10 seconds
+
+function checkRateLimit(ip: string): { allowed: boolean; retryAfterMs: number } {
+  const now = Date.now();
+  const lastTime = lastRequestTime.get(ip);
+
+  // Clean up old entries periodically
+  if (lastRequestTime.size > 10000) {
+    for (const [key, value] of lastRequestTime.entries()) {
+      if (now - value > COOLDOWN_MS) {
+        lastRequestTime.delete(key);
+      }
+    }
+  }
+
+  if (!lastTime || now - lastTime >= COOLDOWN_MS) {
+    lastRequestTime.set(ip, now);
+    return { allowed: true, retryAfterMs: 0 };
+  }
+
+  const retryAfterMs = COOLDOWN_MS - (now - lastTime);
+  return { allowed: false, retryAfterMs };
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown";
+}
+
 // Structured logging utility
 const log = {
   info: (message: string, data?: Record<string, unknown>) => {
@@ -219,13 +252,37 @@ function generateEmailHtml(
 
 const handler = async (req: Request): Promise<Response> => {
   const requestId = crypto.randomUUID();
+  const clientIP = getClientIP(req);
   
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  log.info("Request received", { requestId, method: req.method });
+  log.info("Request received", { requestId, method: req.method, clientIP });
+
+  // Rate limiting check (10s cooldown between requests)
+  const rateCheck = checkRateLimit(clientIP);
+  if (!rateCheck.allowed) {
+    const retryAfterSec = Math.ceil(rateCheck.retryAfterMs / 1000);
+    log.warn("Rate limit exceeded", { requestId, clientIP, retryAfterMs: rateCheck.retryAfterMs });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: `Vennligst vent ${retryAfterSec} sekunder før du sender igjen.`,
+        retryAfterMs: rateCheck.retryAfterMs,
+        timestamp: new Date().toISOString()
+      }),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          "Retry-After": String(retryAfterSec),
+          ...corsHeaders
+        }
+      }
+    );
+  }
 
   // Validate request method
   if (req.method !== "POST") {

@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,6 +48,8 @@ export const QuoteForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [createAccount, setCreateAccount] = useState(false);
   const [password, setPassword] = useState('');
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
   const [formData, setFormData] = useState<FormData>({
     type: null,
     name: "",
@@ -224,7 +227,7 @@ export const QuoteForm = () => {
       }
 
       // 2. Send til Web3Forms
-      const web3FormData = {
+      const web3FormData: Record<string, string> = {
         access_key: WEB3FORMS_ACCESS_KEY,
         subject: `Ny tilbudsforespørsel fra ${formData.name}`,
         from_name: "HandyHjelp Nettside",
@@ -595,10 +598,19 @@ export const QuoteForm = () => {
               Neste <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button 
+            <>
+            {import.meta.env.VITE_HCAPTCHA_SITE_KEY && (
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY}
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken(null)}
+              />
+            )}
+            <Button
               type="button"
               onClick={handleSubmit}
-              disabled={!isStepValid() || isSubmitting}
+              disabled={!isStepValid() || isSubmitting || (!captchaToken && !!import.meta.env.VITE_HCAPTCHA_SITE_KEY)}
               className="bg-success hover:bg-success-hover text-success-foreground"
             >
               {isSubmitting ? (
@@ -610,6 +622,7 @@ export const QuoteForm = () => {
                 'Send forespørsel'
               )}
             </Button>
+            </>
           )}
         </div>
       </div>

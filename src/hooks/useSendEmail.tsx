@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -37,7 +37,29 @@ interface SendEmailResponse {
 
 export function useSendEmail() {
   const [loading, setLoading] = useState(false);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { toast } = useToast();
+
+  const startCooldown = useCallback((seconds: number) => {
+    setCooldownSeconds(seconds);
+    if (cooldownRef.current) clearInterval(cooldownRef.current);
+    cooldownRef.current = setInterval(() => {
+      setCooldownSeconds(prev => {
+        if (prev <= 1) {
+          if (cooldownRef.current) clearInterval(cooldownRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (cooldownRef.current) clearInterval(cooldownRef.current);
+    };
+  }, []);
 
   const sendEmail = async (data: SendEmailData): Promise<SendEmailResponse | null> => {
     setLoading(true);
@@ -76,9 +98,23 @@ export function useSendEmail() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check for rate limit response
+        if (response?.retryAfterMs) {
+          const seconds = Math.ceil(response.retryAfterMs / 1000);
+          startCooldown(seconds);
+          toast({
+            title: 'Vent litt',
+            description: `Du kan sende igjen om ${seconds} sekunder.`,
+          });
+          return null;
+        }
+        throw error;
+      }
 
       const result = response as SendEmailResponse;
+      // Start 10s cooldown after successful send
+      startCooldown(10);
 
       if (result.summary.failed > 0) {
         toast({
@@ -110,5 +146,6 @@ export function useSendEmail() {
   return {
     sendEmail,
     loading,
+    cooldownSeconds,
   };
 }
