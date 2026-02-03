@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Pencil } from "lucide-react";
+import { CheckCircle2, Pencil, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -85,36 +85,52 @@ const EditableComparisonSection = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Card className="p-6 card-hover-lift">
-              <CardHeader>
-                <CardTitle className="text-2xl">{data.oneTimeTitle}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {data.oneTimeItems.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-primary" />
-                    <span className="text-base">{item}</span>
+            <Link to="/tilbud" className="block group">
+              <Card className="p-6 card-hover-lift h-full cursor-pointer transition-all hover:border-primary/50 hover:shadow-md">
+                <CardHeader>
+                  <CardTitle className="text-2xl">{data.oneTimeTitle}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {data.oneTimeItems.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <CheckCircle2 className="h-6 w-6 text-primary" />
+                      <span className="text-base">{item}</span>
+                    </div>
+                  ))}
+                  <div className="pt-4 text-center">
+                    <span className="text-sm text-primary font-medium group-hover:underline flex items-center justify-center gap-1">
+                      Send forespørsel
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
 
-            <Card className="border-primary border-2 shadow-lg p-6 card-hover-lift">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-2xl">{data.fixedTitle}</CardTitle>
-                  <Badge className="bg-primary text-primary-foreground px-3 py-1">Spar 10%</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {data.fixedItems.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-primary" />
-                    <span className="text-base">{item}</span>
+            <Link to="/fast-avtale" className="block group">
+              <Card className="border-primary border-2 shadow-lg p-6 card-hover-lift h-full cursor-pointer transition-all hover:shadow-xl">
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-2xl">{data.fixedTitle}</CardTitle>
+                    <Badge className="bg-primary text-primary-foreground px-3 py-1">Spar 10%</Badge>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {data.fixedItems.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <CheckCircle2 className="h-6 w-6 text-primary" />
+                      <span className="text-base">{item}</span>
+                    </div>
+                  ))}
+                  <div className="pt-4 text-center">
+                    <span className="text-sm text-primary font-medium group-hover:underline flex items-center justify-center gap-1">
+                      Be om fast avtale
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
 
           <div className="text-center mt-12">
