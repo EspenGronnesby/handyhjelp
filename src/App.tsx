@@ -44,7 +44,14 @@ import Vilkaar from "./pages/Vilkaar";
 import DashboardLoyalty from "./pages/DashboardLoyalty";
 import Feedback from "./pages/Feedback";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // Cache data i 5 minutter
+    },
+  },
+});
 
 // Marketing routes with page transitions
 const MarketingRoutes = () => {
