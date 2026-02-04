@@ -1,159 +1,81 @@
 
-
-# Implementeringsplan: Klikkbare kort + Google Reviews med bedriftsinformasjon
+# Plan: Fiks manglende favicons og lydfil med HandyHjelp-branding
 
 ## Oversikt
-Denne planen implementerer tre forbedringer:
-1. **Klikkbare kort** på /tjenester-siden
-2. **Manuell inntasting av Google-anmeldelser** uten API-kostnader
-3. **Bedriftsinformasjon på anmeldelser** via Brønnøysund-søk
+Flere filer som brukes i koden er slettet og må erstattes. Jeg vil bruke logoen du refererte til (`public/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png`) som basis for all favicon-branding.
 
 ---
 
-## Del 1: Klikkbare kort på /tjenester
+## Del 1: Favicons - Hva som mangler
 
-### Nåværende situasjon
-Kortene "Engangsjobb" og "Fast avtale" på bunnen av /tjenester er statiske. Kun CTA-knappen "Få tilbud på fast avtale" er klikkbar.
+### Referanser til slettede filer:
+| Fil | Hvor den brukes | Størrelse |
+|-----|-----------------|-----------|
+| `/apple-touch-icon.png` | index.html, site.webmanifest | 180x180 |
+| `/favicon-32x32.png` | index.html, site.webmanifest | 32x32 |
+| `/favicon-16x16.png` | index.html, site.webmanifest | 16x16 |
+| `/favicon-base.png` | site.webmanifest | 512x512 |
+| `/favicon.ico` | useNotificationSound.tsx | multi-size |
 
 ### Løsning
-Gjør hele kortene klikkbare:
-- **Engangsjobb-kortet** → `/tilbud`
-- **Fast avtale-kortet** → `/fast-avtale`
-
-### Endringer
-**`src/components/service-edit/EditableComparisonSection.tsx`**:
-- Wrap hvert kort i `<Link>`-komponent
-- Legg til visuell hover-effekt og "Klikk for å starte →" hint
-- Behold eksisterende redigeringsfunksjonalitet
+Forenkle favicon-oppsettet ved å bruke kun den eksisterende logoen direkte. Dette eliminerer behovet for flere filer og sikrer konsistent branding.
 
 ---
 
-## Del 2: Google Reviews uten API-kostnad
+## Del 2: Lydfil - Notification sound
 
-### Utfordring
-Du ønsker:
-- Kunder skal legge igjen anmeldelser på Google for synlighet
-- Disse anmeldelsene skal også vises på nettsiden
-- Ingen API-kostnader
+### Problem
+`/notification-sound.mp3` er slettet og brukes i `useNotificationSound.tsx` for å spille av lyd ved nye varsler.
 
-### Løsning: Admin legger inn Google-anmeldelser manuelt
+### Løsning
+Endre hooken til å håndtere manglende lydfil gracefully, eller fjerne lydavspilling helt. Alternativt kan vi bruke Web Audio API for en enkel systemlyd uten ekstern fil.
 
-Når du mottar en ny Google-anmeldelse, kan du legge den inn via admin-panelet med tydelig markering at den kommer fra en verifisert kunde. Dette er **ikke det samme som å lage falske anmeldelser** - du kopierer ekte anmeldelser fra Google og markerer dem som "Google-verifisert".
+---
 
-### Teknisk flyt
+## Del 3: Filer som endres
 
-```text
-┌─────────────────┐    ┌──────────────────┐    ┌──────────────────┐
-│   Google Maps   │    │   Admin-panel    │    │   Nettside       │
-│   (kunde gir    │───▶│   (admin kopierer│───▶│   (viser med     │
-│   anmeldelse)   │    │   anmeldelse)    │    │   Google-badge)  │
-└─────────────────┘    └──────────────────┘    └──────────────────┘
+| Fil | Endring |
+|-----|---------|
+| `index.html` | Forenkle til én favicon-referanse som peker til logoen |
+| `public/site.webmanifest` | Oppdater alle ikon-referanser til logoen |
+| `src/hooks/useNotificationSound.tsx` | Oppdater ikon-sti + håndter manglende lyd |
+
+---
+
+## Tekniske endringer
+
+### index.html
+```html
+<!-- Erstatt alle favicon-referanser med: -->
+<link rel="icon" type="image/png" href="/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png">
+<link rel="apple-touch-icon" href="/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png">
 ```
 
-### Database-endringer
-Legg til nye kolonner i `reviews`-tabellen:
-- `source` (text) - 'website', 'google', eller 'manual'
-- `company_name` (text) - bedriftsnavn (fra Brønnøysund eller manuelt)
-- `org_number` (text) - organisasjonsnummer for bedrifter
-- `is_verified_customer` (boolean) - om dette er en verifisert kunde
-
----
-
-## Del 3: Bedriftsinformasjon på anmeldelser
-
-### Konsept
-Når admin legger inn en anmeldelse (enten manuell eller fra Google), kan de søke opp bedriften via Brønnøysund-søket som allerede finnes i systemet. Dette gir:
-- Verifisert bedriftsnavn fra offentlig register
-- Organisasjonsnummer for troverdighet
-- Mulighet til å vise hvilke bedrifter dere har jobbet med
-
-### Admin-panel forbedringer
-Legg til ny "Legg til anmeldelse"-knapp i ReviewManagement:
-- Skjema for å legge inn kundenavn/kommentar/rating
-- Brønnøysund-søk (CompanySearch-komponenten) for bedrifter
-- Valg av kilde: "Nettside", "Google", "Manuell"
-- Checkbox: "Verifisert kunde" (for anmeldelser fra kunder dere har jobbet med)
-
----
-
-## Filer som endres/opprettes
-
-| Fil | Type | Beskrivelse |
-|-----|------|-------------|
-| `supabase/migrations/[timestamp]_add_review_source_and_company.sql` | Ny | Database-skjema for kilde og bedrift |
-| `src/components/service-edit/EditableComparisonSection.tsx` | Endres | Wrap kort i Link-komponenter |
-| `src/components/admin/ReviewManagement.tsx` | Endres | Legg til "Opprett anmeldelse"-funksjonalitet |
-| `src/components/admin/CreateReviewModal.tsx` | Ny | Modal for å legge inn nye anmeldelser |
-| `src/components/TestimonialsSection.tsx` | Endres | Vis Google-badge og bedriftsnavn |
-| `supabase/functions/send-feedback-request/index.ts` | Endres | Lenke kun til Google Reviews |
-| `supabase/functions/send-manual-email/index.ts` | Endres | Lenke kun til Google Reviews |
-
----
-
-## Detaljerte endringer
-
-### Database-migrering
-```sql
-ALTER TABLE public.reviews 
-ADD COLUMN source text DEFAULT 'website',
-ADD COLUMN company_name text,
-ADD COLUMN org_number text,
-ADD COLUMN is_verified_customer boolean DEFAULT false;
-
-COMMENT ON COLUMN public.reviews.source IS 'Kilde: website, google, manual';
-COMMENT ON COLUMN public.reviews.is_verified_customer IS 'Om kunden er verifisert (f.eks. fra jobb vi har utført)';
+### site.webmanifest
+```json
+"icons": [
+  {
+    "src": "/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png",
+    "sizes": "any",
+    "type": "image/png",
+    "purpose": "any maskable"
+  }
+]
 ```
 
-### CreateReviewModal (ny komponent)
-Admin-skjema med:
-- Kundenavn (tekst)
-- Rating (1-5 stjerner)
-- Kommentar (tekst)
-- Kilde (dropdown: Nettside / Google / Manuell)
-- Bedriftssøk (gjenbruk CompanySearch-komponenten)
-- "Verifisert kunde"-checkbox
-- E-post (valgfritt, for intern referanse)
-
-### TestimonialsSection visning
-Når anmeldelse vises:
-- Hvis `source === 'google'`: Vis Google-ikon/badge
-- Hvis `company_name` finnes: Vis bedriftsnavn med Building-ikon
-- Hvis `is_verified_customer`: Vis "Verifisert kunde"-badge
-
-### Email-endringer
-Endre tilbakemeldingslenken i emails til å gå direkte til Google:
-```
-URL: https://g.page/r/CW2GzzcrRsq5EAE/review
-Knappetekst: "Gi oss en Google-anmeldelse ⭐"
-```
+### useNotificationSound.tsx
+- Endre `/favicon.ico` til `/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png`
+- Fjerne lydavspilling (siden filen ikke finnes) eller bruke en enkel Web Audio beep
 
 ---
 
-## Arbeidsflyt for admin
-
-### Når en kunde gir Google-anmeldelse:
-1. Du får varsel om ny Google-anmeldelse (via Google-appen)
-2. Åpne admin-panel → Anmeldelser → "Legg til anmeldelse"
-3. Velg kilde: "Google"
-4. Kopier inn kundenavn, rating og kommentar
-5. Søk opp bedriften via Brønnøysund (hvis bedriftskunde)
-6. Merk "Verifisert kunde" (siden du har jobbet med dem)
-7. Lagre - anmeldelsen vises på nettsiden med Google-badge
-
-### Fordeler
-- Ingen API-kostnader
-- Full kontroll over hva som vises
-- Verifiserte kundeanmeldelser fra ekte kunder
-- Mulighet til å vise hvilke bedrifter dere har jobbet med
-- Profesjonelt utseende med Google-badge
+## Fordeler med denne løsningen
+- Konsistent branding med HandyHjelp-logoen overalt
+- Ingen avhengighet av eksterne lydfiler
+- Forenklet vedlikehold - én fil for alle favicons
+- Fungerer umiddelbart uten behov for bildegenerering
 
 ---
 
-## Testing etter implementering
-1. Gå til `/tjenester` og verifiser at kortene er klikkbare
-2. Test at Engangsjobb → `/tilbud` og Fast avtale → `/fast-avtale`
-3. Legg til en test-anmeldelse via admin-panelet
-4. Verifiser at anmeldelsen vises i testimonials med riktige badges
-5. Test bedriftssøk i anmeldelseskjemaet
-6. Send en test-email og verifiser at Google-lenken fungerer
-
+## Alternativ: Generere optimaliserte favicons
+Hvis du ønsker kan jeg også generere optimaliserte favicon-størrelser fra logoen din, men den enkleste løsningen er å bruke PNG-filen direkte - moderne nettlesere håndterer dette fint.
