@@ -2,10 +2,35 @@ import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
+// Simple beep using Web Audio API (no external file needed)
+function createBeep(): () => void {
+  return () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (error) {
+      if (import.meta.env.DEV) console.log('Could not play notification beep:', error);
+    }
+  };
+}
+
 export function useNotificationSound() {
   const { user } = useAuth();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const permissionRequested = useRef(false);
+  const playBeep = useRef(createBeep());
 
   // Request notification permission
   const requestPermission = useCallback(async () => {
@@ -21,17 +46,9 @@ export function useNotificationSound() {
     }
   }, []);
 
-  // Play notification sound
+  // Play notification sound using Web Audio API
   const playSound = useCallback(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio('/notification-sound.mp3');
-      audioRef.current.volume = 0.5;
-    }
-    
-    audioRef.current.currentTime = 0;
-    audioRef.current.play().catch((error) => {
-      if (import.meta.env.DEV) console.log('Could not play notification sound:', error);
-    });
+    playBeep.current();
   }, []);
 
   // Show browser notification
@@ -40,8 +57,8 @@ export function useNotificationSound() {
       try {
         new Notification(title, {
           body: message,
-          icon: '/favicon.ico',
-          badge: '/favicon.ico',
+          icon: '/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png',
+          badge: '/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png',
         });
       } catch (error) {
         if (import.meta.env.DEV) console.log('Could not show notification:', error);
