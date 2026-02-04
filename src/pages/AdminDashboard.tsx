@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAdmin } from '@/hooks/useAdmin';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2, Briefcase, CreditCard, FileText, Package, ChevronLeft, ChevronRight, Plus, Mail } from 'lucide-react';
@@ -43,12 +43,30 @@ import { EmailHistory } from '@/components/admin/EmailHistory';
 
 type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'mail';
 
+const VALID_CATEGORIES: CategoryKey[] = ['oppdrag', 'okonomi', 'innhold', 'mail'];
+
+const CATEGORY_DEFAULT_TABS: Record<CategoryKey, string> = {
+  oppdrag: 'single-jobs',
+  okonomi: 'invoices',
+  innhold: 'projects',
+  mail: 'templates',
+};
+
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { badges } = useNavigationBadges();
-  const [activeCategory, setActiveCategory] = useState<CategoryKey>('oppdrag');
-  const [activeTab, setActiveTab] = useState('single-jobs');
+  
+  // Read initial state from URL params
+  const urlCategory = searchParams.get('category') as CategoryKey | null;
+  const urlTab = searchParams.get('tab');
+  
+  const initialCategory = urlCategory && VALID_CATEGORIES.includes(urlCategory) ? urlCategory : 'oppdrag';
+  const initialTab = urlTab || CATEGORY_DEFAULT_TABS[initialCategory];
+  
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>(initialCategory);
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     type: 'start' | 'complete' | 'delete' | 'complete_directly' | null;
@@ -142,11 +160,19 @@ const AdminDashboard = () => {
     },
   };
 
-  // Set default tab when category changes
-  const handleCategoryChange = (category: CategoryKey) => {
+  // Set default tab when category changes and update URL
+  const handleCategoryChange = useCallback((category: CategoryKey) => {
+    const newTab = categories[category].tabs[0].key;
     setActiveCategory(category);
-    setActiveTab(categories[category].tabs[0].key);
-  };
+    setActiveTab(newTab);
+    setSearchParams({ category, tab: newTab }, { replace: true });
+  }, [setSearchParams]);
+
+  // Update URL when tab changes
+  const handleTabChange = useCallback((tab: string) => {
+    setActiveTab(tab);
+    setSearchParams({ category: activeCategory, tab }, { replace: true });
+  }, [activeCategory, setSearchParams]);
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
@@ -251,7 +277,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Sub-category Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
         <TabsList className="h-auto flex-wrap gap-2 p-2 bg-muted/50">
           {currentCategory.tabs.map((tab) => (
             <TabsTrigger 
