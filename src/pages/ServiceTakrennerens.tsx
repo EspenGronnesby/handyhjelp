@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
@@ -24,10 +24,7 @@ const ServiceTakrennerens = () => {
 
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Takrennerens - HandyHjelp</title>
-        <meta name="description" content="Profesjonell rensing og vedlikehold av takrenner. Fast pris for enebolig: 3 390 kr. Hold takrennene i topp stand og unngå vannskader." />
-      </Helmet>
+      <PageSEO path="/tjenester/takrennerens" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />
