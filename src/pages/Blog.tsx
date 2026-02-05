@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditableHero } from "@/components/EditableHero";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 
 interface BlogPost {
   id: string;
@@ -78,20 +78,7 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Råd og tips | HandyHjelp</title>
-        <meta name="description" content="Gode råd og tips for eiendomsvedlikehold fra våre erfarne fagfolk." />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Råd og tips | HandyHjelp" />
-        <meta property="og:description" content="Gode råd og tips for eiendomsvedlikehold fra våre erfarne fagfolk." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://handyhjelp.no/raad" />
-        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
-        <meta property="og:locale" content="nb_NO" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Råd og tips | HandyHjelp" />
-        <meta name="twitter:description" content="Gode råd og tips for eiendomsvedlikehold fra våre erfarne fagfolk." />
-      </Helmet>
+      <PageSEO path="/raad" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

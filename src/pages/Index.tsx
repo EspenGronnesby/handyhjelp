@@ -18,7 +18,7 @@ import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { ScrollProgress } from "@/components/ScrollProgress";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 import { useScrollGridReveal } from "@/hooks/useScrollAnimation";
 
 // Component for Services Section Heading
@@ -74,20 +74,7 @@ const Index = () => {
   
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>HandyHjelp | Profesjonelle håndverkstjenester i Kristiansand</title>
-        <meta name="description" content="HandyHjelp tilbyr profesjonelle vaktmester-, tømrer- og blikkenslagertjenester i Kristiansand. Få gratis tilbud i dag!" />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="HandyHjelp | Profesjonelle håndverkstjenester i Kristiansand" />
-        <meta property="og:description" content="HandyHjelp tilbyr profesjonelle vaktmester-, tømrer- og blikkenslagertjenester i Kristiansand. Få gratis tilbud i dag!" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://handyhjelp.no" />
-        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
-        <meta property="og:locale" content="nb_NO" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="HandyHjelp | Profesjonelle håndverkstjenester i Kristiansand" />
-        <meta name="twitter:description" content="HandyHjelp tilbyr profesjonelle vaktmester-, tømrer- og blikkenslagertjenester i Kristiansand. Få gratis tilbud i dag!" />
-      </Helmet>
+      <PageSEO path="/" />
       {/* Google Analytics */}
       <GoogleAnalytics />
       
