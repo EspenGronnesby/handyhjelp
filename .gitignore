@@ -27,3 +27,6 @@ vite.config.ts.timestamp-*
 *.sln
 *.sw?
 .env
+
+# Google OAuth secrets
+.google
