@@ -1,84 +1,54 @@
 
-# Plan: Hindre uønsket refresh ved tab-bytte
 
-## Problemet
-Når du bytter bort fra tabben og tilbake, re-fetches data fra serveren fordi React Query sin standardoppførsel er å refetche ved window focus. Dette kan føre til:
+# Plan: Oppdater security.txt med handyhjelp.no
 
-1. **Email-siden**: Mottakere, emne og innhold du har skrevet inn nullstilles hvis komponenten re-rendres
-2. **Admin-dashboard**: Tab-valg og filter-status resettes
-3. **Worker-dashboard**: Åpne modaler kan lukkes ved re-render
+## Endringer som gjøres
 
-## Løsningen
+### Fil: `public/security.txt`
 
-### Del 1: Global QueryClient-konfigurasjon
-Deaktivere `refetchOnWindowFocus` globalt i QueryClient slik at data ikke re-fetches automatisk ved focus.
+| Felt | Gammel verdi | Ny verdi |
+|------|--------------|----------|
+| Expires | 2025-12-31 (utløpt) | 2026-12-31 (1 år frem) |
+| Canonical | handyhjelp.no/.well-known/security.txt | handyhjelp.no/security.txt |
 
-```typescript
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutter
-    },
-  },
-});
+### Oppdatert innhold:
+```text
+Contact: team@handyhjelp.no
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: no, en
+Canonical: https://handyhjelp.no/security.txt
+
+# Security Policy
+# If you discover a security vulnerability, please report it to:
+# Email: team@handyhjelp.no
+# Please do not publicly disclose security issues until they have been addressed.
+
+# Scope
+# This security policy applies to:
+# - All web applications hosted on handyhjelp.no
+# - All associated subdomains and services
+
+# Out of Scope
+# - Social engineering attacks
+# - Physical attacks
+# - Third-party services not directly controlled by us
+
+# Hall of Fame
+# We maintain a hall of fame for security researchers who responsibly
+# disclose vulnerabilities to us.
+
+# Acknowledgments
+# We appreciate the security research community's efforts in keeping
+# our platform secure.
 ```
 
-### Del 2: Email Composer - Persistent state
-EmailComposer bruker kun lokal useState som forsvinner ved unmount. Vi legger til draft-persistens for:
-- Valgte mottakere
-- Emne
-- Innhold  
-- Valgt mal
-- Tilbakemeldingsknapp-toggle
-
-### Del 3: Admin Dashboard - Tab-persistens i URL
-Lagre aktiv kategori og aktiv tab i URL-parametre slik at navigasjonsstate beholdes ved refresh.
-
-### Del 4: Worker Dashboard - Allerede løst
-WorkerProjectForm og WorkerBlogForm har allerede `useFormDraft` hooks som lagrer utkast til localStorage. Disse fungerer som forventet.
-
 ---
 
-## Tekniske endringer
+## Hva endres
+1. **Expires-dato**: Oppdatert til 2026-12-31 (var utløpt)
+2. **Canonical URL**: Endret til `https://handyhjelp.no/security.txt`
+3. **Scope-seksjon**: Oppdatert til å referere til handyhjelp.no
 
-### Fil 1: `src/App.tsx`
-```typescript
-// Erstatt linje 47
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // Cache data i 5 minutter
-    },
-  },
-});
-```
-
-### Fil 2: `src/components/admin/EmailComposer.tsx`
-- Legge til `useFormDraft` hook for å persistere skjemadata
-- Lagre mottakere, emne, innhold, mal-valg og tilbakemeldingsknapp
-
-### Fil 3: `src/pages/AdminDashboard.tsx`
-- Bruke URL searchParams for `activeCategory` og `activeTab`
-- Ved refresh/tab-bytte beholdes navigasjonsstate
-
----
-
-## Filer som endres
-
-| Fil | Endring |
-|-----|---------|
-| `src/App.tsx` | QueryClient-konfigurasjon med refetchOnWindowFocus: false |
-| `src/components/admin/EmailComposer.tsx` | Draft-persistens for skjemadata |
-| `src/pages/AdminDashboard.tsx` | URL-basert tab-persistens |
-
----
-
-## Fordeler
-- Data re-fetches ikke automatisk ved tab-bytte
-- E-postutkast lagres automatisk
-- Admin navigasjonsstate beholdes i URL
-- Worker-skjemaer fungerer allerede med draft-persistens
-- Manuell refresh (F5) henter fersk data som forventet
+## Viktig merknad
+For at `https://handyhjelp.no/security.txt` skal fungere, må du ha koblet handyhjelp.no som eget domene til Lovable-prosjektet. Du kan gjøre dette i prosjektinnstillingene under "Domains".
 
