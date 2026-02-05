@@ -1,54 +1,147 @@
 
 
-# Plan: Oppdater security.txt med handyhjelp.no
+# Plan: Google-innlogging med automatisk kontokobling
 
-## Endringer som gjøres
+## Oppsummering av funn
 
-### Fil: `public/security.txt`
+### Nåværende brukere med roller
+Fra databasen ser jeg at disse brukerne har spesielle roller:
+- **essi1403@gmail.com** (Espen Grønnesby): platform_owner, admin, worker
+- **02larsen22@gmail.com** (Benjamin Larsen): worker
 
-| Felt | Gammel verdi | Ny verdi |
-|------|--------------|----------|
-| Expires | 2025-12-31 (utløpt) | 2026-12-31 (1 år frem) |
-| Canonical | handyhjelp.no/.well-known/security.txt | handyhjelp.no/security.txt |
+### Hvordan Lovable Cloud håndterer kontokobling
 
-### Oppdatert innhold:
-```text
-Contact: team@handyhjelp.no
-Expires: 2026-12-31T23:59:59.000Z
-Preferred-Languages: no, en
-Canonical: https://handyhjelp.no/security.txt
+Lovable Cloud har **automatisk kontokobling** basert på e-postadresse. Dette betyr:
 
-# Security Policy
-# If you discover a security vulnerability, please report it to:
-# Email: team@handyhjelp.no
-# Please do not publicly disclose security issues until they have been addressed.
+1. Hvis en eksisterende bruker (f.eks. essi1403@gmail.com) logger inn med Google med samme e-post, vil systemet automatisk koble Google-identiteten til den eksisterende kontoen
+2. Alle roller i `user_roles`-tabellen beholdes fordi de er knyttet til `user_id` (UUID)
+3. Profilen i `profiles`-tabellen forblir uendret
 
-# Scope
-# This security policy applies to:
-# - All web applications hosted on handyhjelp.no
-# - All associated subdomains and services
+### Teknisk forklaring
+- `profiles.id` = `auth.users.id` (samme UUID)
+- `user_roles.user_id` = `auth.users.id` (samme UUID)
+- Når Google-innlogging kobles til eksisterende konto, beholdes samme UUID
+- Derfor beholdes alle roller og profildata automatisk
 
-# Out of Scope
-# - Social engineering attacks
-# - Physical attacks
-# - Third-party services not directly controlled by us
+---
 
-# Hall of Fame
-# We maintain a hall of fame for security researchers who responsibly
-# disclose vulnerabilities to us.
+## Hva vi implementerer
 
-# Acknowledgments
-# We appreciate the security research community's efforts in keeping
-# our platform secure.
+### 1. Konfigurer Google OAuth
+Bruke Lovable Cloud sitt verktøy for å generere nødvendig integrasjonskode.
+
+### 2. Oppdater Auth.tsx
+
+#### Nye importer
+```typescript
+import { lovable } from "@/integrations/lovable/index";
+```
+
+#### Ny funksjon for Google-innlogging
+```typescript
+const handleGoogleSignIn = async () => {
+  setLoading(true);
+  try {
+    const { error } = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (error) throw error;
+  } catch (error: any) {
+    console.error('Google sign in error:', error);
+    toast({
+      title: 'Feil',
+      description: 'Kunne ikke logge inn med Google. Prøv igjen.',
+      variant: 'destructive'
+    });
+    setLoading(false);
+  }
+};
+```
+
+#### Google-knapp i UI
+Legges til på begge flyter (innlogging og registrering):
+
+```tsx
+{/* Divider */}
+<div className="relative my-4">
+  <div className="absolute inset-0 flex items-center">
+    <span className="w-full border-t" />
+  </div>
+  <div className="relative flex justify-center text-xs uppercase">
+    <span className="bg-card px-2 text-muted-foreground">
+      Eller fortsett med
+    </span>
+  </div>
+</div>
+
+{/* Google Button */}
+<Button
+  type="button"
+  variant="outline"
+  className="w-full"
+  onClick={handleGoogleSignIn}
+  disabled={loading}
+>
+  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+    <!-- Google logo -->
+  </svg>
+  Google
+</Button>
 ```
 
 ---
 
-## Hva endres
-1. **Expires-dato**: Oppdatert til 2026-12-31 (var utløpt)
-2. **Canonical URL**: Endret til `https://handyhjelp.no/security.txt`
-3. **Scope-seksjon**: Oppdatert til å referere til handyhjelp.no
+## Hva skjer med eksisterende brukere?
 
-## Viktig merknad
-For at `https://handyhjelp.no/security.txt` skal fungere, må du ha koblet handyhjelp.no som eget domene til Lovable-prosjektet. Du kan gjøre dette i prosjektinnstillingene under "Domains".
+| Scenario | Resultat |
+|----------|----------|
+| Espen logger inn med Google (essi1403@gmail.com) | Google kobles til eksisterende konto. Beholder platform_owner, admin, worker roller |
+| Benjamin logger inn med Google (02larsen22@gmail.com) | Google kobles til eksisterende konto. Beholder worker rolle |
+| Ny bruker logger inn med Google | Ny konto opprettes. Profil lages via `handle_new_user`-triggeren |
+
+### Viktig: Hva `handle_new_user`-triggeren gjør for Google-brukere
+
+Triggeren henter metadata fra `raw_user_meta_data`, som inkluderer:
+- `full_name` fra Google-profilen
+- `email` fra Google-kontoen
+
+For nye Google-brukere vil disse feltene settes automatisk:
+- `phone`: Tom (kan fylles ut senere i dashboard)
+- `customer_type`: NULL (kan settes senere)
+- `org_number` og `company_name`: NULL
+
+---
+
+## Filer som endres
+
+| Fil | Endring |
+|-----|---------|
+| `src/integrations/lovable/` | Ny mappe generert automatisk |
+| `src/pages/Auth.tsx` | Legge til Google-knapp og OAuth-funksjon |
+
+---
+
+## Brukeropplevelse
+
+### For eksisterende brukere (med roller)
+1. Klikker "Google"
+2. Velger sin Google-konto med samme e-post
+3. Logges direkte inn med alle eksisterende roller intakt
+4. Sendes til dashboard som vanlig
+
+### For nye brukere
+1. Klikker "Google"
+2. Velger sin Google-konto
+3. Ny konto opprettes automatisk
+4. Sendes til dashboard
+5. Kan oppdatere profil med telefon, kundetype etc. senere
+
+---
+
+## Sikkerhet
+
+- Roller er trygt lagret i separat `user_roles`-tabell
+- RLS-policyer beskytter mot uautorisert tilgang
+- `has_role`-funksjonen bruker SECURITY DEFINER for sikker rollesjekk
+- Ingen endringer i rollestrukturen
 
