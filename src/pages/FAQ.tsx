@@ -4,25 +4,12 @@ import { FAQSection } from "@/components/FAQ/FAQSection";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { EditableHero } from "@/components/EditableHero";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 
 const FAQ = () => {
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Ofte stilte spørsmål | HandyHjelp</title>
-        <meta name="description" content="Finn svar på vanlige spørsmål om våre håndverkstjenester, priser, responstid og serviceavtaler." />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Ofte stilte spørsmål | HandyHjelp" />
-        <meta property="og:description" content="Finn svar på vanlige spørsmål om våre håndverkstjenester, priser, responstid og serviceavtaler." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://handyhjelp.no/faq" />
-        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
-        <meta property="og:locale" content="nb_NO" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Ofte stilte spørsmål | HandyHjelp" />
-        <meta name="twitter:description" content="Finn svar på vanlige spørsmål om våre håndverkstjenester, priser, responstid og serviceavtaler." />
-      </Helmet>
+      <PageSEO path="/faq" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Helmet } from 'react-helmet';
+import { SEO_CONFIG, getCanonicalUrl } from '@/config/seo';
 import { Skeleton } from '@/components/ui/skeleton';
 import DOMPurify from 'dompurify';
 
@@ -110,11 +111,19 @@ const BlogDetail = () => {
       <Helmet>
         <title>{post.seo_title || post.title} | HandyHjelp</title>
         <meta name="description" content={post.seo_description || post.summary} />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.summary} />
-        <meta property="og:image" content={post.cover_image_url} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={getCanonicalUrl(`/raad/${post.slug}`)} />
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={getCanonicalUrl(`/raad/${post.slug}`)} />
+        <meta property="og:title" content={post.seo_title || post.title} />
+        <meta property="og:description" content={post.seo_description || post.summary} />
+        <meta property="og:image" content={post.cover_image_url} />
+        <meta property="og:locale" content={SEO_CONFIG.locale} />
         <meta property="article:published_time" content={post.published_at} />
+        <meta name="twitter:card" content={SEO_CONFIG.twitterCard} />
+        <meta name="twitter:title" content={post.seo_title || post.title} />
+        <meta name="twitter:description" content={post.seo_description || post.summary} />
+        <meta name="twitter:image" content={post.cover_image_url} />
       </Helmet>
       
       <GoogleAnalytics />

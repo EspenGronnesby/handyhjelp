@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, ArrowLeft } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { SEO_CONFIG, getCanonicalUrl, getOgImageUrl } from "@/config/seo";
 import { ServiceBadge } from "@/lib/serviceIcons";
 
 interface Project {
@@ -109,12 +110,20 @@ const ProjectDetail = () => {
   return (
     <div className="min-h-screen">
       <Helmet>
-        <title>{project.title} - HandyHjelp</title>
+        <title>{project.title} | Prosjekt - HandyHjelp</title>
         <meta name="description" content={project.description} />
-        <meta property="og:title" content={`${project.title} - HandyHjelp`} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={getCanonicalUrl(`/prosjekter/${project.id}`)} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={getCanonicalUrl(`/prosjekter/${project.id}`)} />
+        <meta property="og:title" content={`${project.title} | Prosjekt - HandyHjelp`} />
         <meta property="og:description" content={project.description} />
         <meta property="og:image" content={project.after_image_url} />
-        <meta property="og:type" content="article" />
+        <meta property="og:locale" content={SEO_CONFIG.locale} />
+        <meta name="twitter:card" content={SEO_CONFIG.twitterCard} />
+        <meta name="twitter:title" content={`${project.title} | Prosjekt - HandyHjelp`} />
+        <meta name="twitter:description" content={project.description} />
+        <meta name="twitter:image" content={project.after_image_url} />
       </Helmet>
       <GoogleAnalytics />
       <Header />

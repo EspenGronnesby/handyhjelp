@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
@@ -23,10 +23,7 @@ const ServiceTomrer = () => {
 
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Tømrertjenester - HandyHjelp</title>
-        <meta name="description" content="Kvalitetssnekring og konstruksjonsarbeid fra erfarne tømrere. Vi leverer solid håndverk som varer for privatpersoner, bedrifter og boligselskaper." />
-      </Helmet>
+      <PageSEO path="/tjenester/tomrer" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />
