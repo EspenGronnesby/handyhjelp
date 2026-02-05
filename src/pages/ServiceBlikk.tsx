@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
@@ -23,10 +23,7 @@ const ServiceBlikk = () => {
 
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Blikkenslagertjenester - HandyHjelp</title>
-        <meta name="description" content="Profesjonelle takteknings- og vannsikringsløsninger. Vi sikrer at taket ditt holder tett og at vannet ledes bort på riktig måte." />
-      </Helmet>
+      <PageSEO path="/tjenester/blikk" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

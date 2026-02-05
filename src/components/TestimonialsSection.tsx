@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Star, Quote, ChevronLeft, ChevronRight, Building2, User } from 'lucide-react';
+import { Star, Quote, ChevronLeft, ChevronRight, Building2, User, BadgeCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface Review {
   id: string;
@@ -11,8 +12,9 @@ interface Review {
   created_at: string;
   feedback_type: string | null;
   customer_name: string | null;
-  // Note: profiles removed - we use customer_name from the secure view instead
-  // This prevents exposing user_id which could be used to look up more data
+  source?: string;
+  company_name?: string;
+  is_verified_customer?: boolean;
   jobs?: {
     quotes?: {
       type: string;
@@ -37,7 +39,7 @@ const TestimonialsSection = () => {
         // The view only returns approved reviews with non-sensitive fields
         const { data, error } = await supabase
           .from('public_reviews' as any)
-          .select('id, rating, comment, created_at, feedback_type, customer_name, job_id')
+          .select('id, rating, comment, created_at, feedback_type, customer_name, job_id, source, company_name, is_verified_customer')
           .gte('rating', 4)
           .order('created_at', { ascending: false })
           .limit(10);
@@ -139,13 +141,25 @@ const TestimonialsSection = () => {
   const getCustomerDisplay = (review: Review) => {
     const quote = review.jobs?.quotes;
     
+    // Check if it has a company name from the review itself (from admin input)
+    if (review.company_name) {
+      return {
+        name: review.company_name,
+        isBusiness: true,
+        isGoogle: review.source === 'google',
+        isVerified: review.is_verified_customer
+      };
+    }
+    
     // Check if business customer based on quote data
     const isBusiness = !!quote?.company_name;
     
     if (isBusiness) {
       return {
         name: quote.company_name || quote?.name?.split(' ')[0] || 'Bedrift',
-        isBusiness: true
+        isBusiness: true,
+        isGoogle: review.source === 'google',
+        isVerified: review.is_verified_customer
       };
     }
     
@@ -154,7 +168,9 @@ const TestimonialsSection = () => {
     const displayName = review.customer_name || quote?.name || 'Kunde';
     return {
       name: displayName.split(' ')[0],
-      isBusiness: false
+      isBusiness: false,
+      isGoogle: review.source === 'google',
+      isVerified: review.is_verified_customer
     };
   };
 
@@ -228,58 +244,78 @@ const TestimonialsSection = () => {
                     "hover:border-primary/30",
                     index === currentIndex && "ring-2 ring-primary/20"
                   )}>
-                    {/* Quote Icon */}
-                    <div className="absolute -top-4 left-8">
-                      <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                        <Quote className="h-5 w-5 text-primary-foreground" />
-                      </div>
-                    </div>
-
-                    {/* Rating */}
-                    <div className="flex gap-1 mb-4 pt-4">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={cn(
-                            "h-5 w-5 transition-all duration-300",
-                            star <= review.rating
-                              ? "text-yellow-400 fill-yellow-400"
-                              : "text-muted-foreground/30"
+                      {/* Quote Icon - with Google badge if from Google */}
+                      <div className="absolute -top-4 left-8">
+                        <div className={cn(
+                          "w-10 h-10 rounded-full flex items-center justify-center shadow-lg",
+                          customerDisplay.isGoogle ? "bg-white" : "bg-primary"
+                        )}>
+                          {customerDisplay.isGoogle ? (
+                            <svg className="h-6 w-6" viewBox="0 0 24 24">
+                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                          ) : (
+                            <Quote className="h-5 w-5 text-primary-foreground" />
                           )}
-                        />
-                      ))}
-                    </div>
+                        </div>
+                      </div>
+
+                      {/* Rating */}
+                      <div className="flex gap-1 mb-4 pt-4">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={cn(
+                              "h-5 w-5 transition-all duration-300",
+                              star <= review.rating
+                                ? "text-yellow-400 fill-yellow-400"
+                                : "text-muted-foreground/30"
+                            )}
+                          />
+                        ))}
+                      </div>
 
                     {/* Comment */}
                     <blockquote className="text-foreground text-lg leading-relaxed mb-6 min-h-[80px]">
                       "{review.comment || 'Veldig fornøyd med arbeidet!'}"
                     </blockquote>
 
-                    {/* Customer Info */}
-                    <div className="flex items-center gap-4 pt-4 border-t border-border/50">
-                      <div className={cn(
-                        "w-12 h-12 rounded-full flex items-center justify-center",
-                        customerDisplay.isBusiness 
-                          ? "bg-blue-100 dark:bg-blue-900/30" 
-                          : "bg-primary/10"
-                      )}>
-                        {customerDisplay.isBusiness ? (
-                          <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                        ) : (
-                          <User className="h-6 w-6 text-primary" />
-                        )}
+                      {/* Customer Info */}
+                      <div className="flex items-center gap-4 pt-4 border-t border-border/50">
+                        <div className={cn(
+                          "w-12 h-12 rounded-full flex items-center justify-center",
+                          customerDisplay.isBusiness 
+                            ? "bg-blue-100 dark:bg-blue-900/30" 
+                            : "bg-primary/10"
+                        )}>
+                          {customerDisplay.isBusiness ? (
+                            <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                          ) : (
+                            <User className="h-6 w-6 text-primary" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-foreground">
+                              {customerDisplay.name}
+                            </p>
+                            {customerDisplay.isVerified && (
+                              <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 gap-1">
+                                <BadgeCheck className="h-3 w-3" />
+                                Verifisert
+                              </Badge>
+                            )}
+                          </div>
+                          {serviceType && (
+                            <p className="text-sm text-muted-foreground">
+                              {getServiceTypeName(serviceType)}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-foreground">
-                          {customerDisplay.name}
-                        </p>
-                        {serviceType && (
-                          <p className="text-sm text-muted-foreground">
-                            {getServiceTypeName(serviceType)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
 
                     {/* Decorative gradient */}
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />

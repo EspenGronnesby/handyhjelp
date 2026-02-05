@@ -2,25 +2,12 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 
 const Cookies = () => {
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Cookie-policy | HandyHjelp</title>
-        <meta name="description" content="Informasjon om hvordan HandyHjelp bruker cookies og lignende teknologier på våre nettsider." />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Cookie-policy | HandyHjelp" />
-        <meta property="og:description" content="Informasjon om hvordan HandyHjelp bruker cookies og lignende teknologier på våre nettsider." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://handyhjelp.no/cookies" />
-        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
-        <meta property="og:locale" content="nb_NO" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Cookie-policy | HandyHjelp" />
-        <meta name="twitter:description" content="Informasjon om hvordan HandyHjelp bruker cookies og lignende teknologier på våre nettsider." />
-      </Helmet>
+      <PageSEO path="/cookies" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

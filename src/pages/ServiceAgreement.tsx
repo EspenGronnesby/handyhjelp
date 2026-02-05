@@ -3,25 +3,12 @@ import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { ServiceAgreementForm } from "@/components/ServiceAgreementForm";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 
 const ServiceAgreement = () => {
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Forespør fast avtale | HandyHjelp</title>
-        <meta name="description" content="Bestill fast serviceavtale for regelmessig vedlikehold av din eiendom. Vi kontakter deg innen 1-2 virkedager." />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Forespør fast avtale | HandyHjelp" />
-        <meta property="og:description" content="Bestill fast serviceavtale for regelmessig vedlikehold av din eiendom. Vi kontakter deg innen 1-2 virkedager." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://handyhjelp.no/fast-avtale" />
-        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
-        <meta property="og:locale" content="nb_NO" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Forespør fast avtale | HandyHjelp" />
-        <meta name="twitter:description" content="Bestill fast serviceavtale for regelmessig vedlikehold av din eiendom. Vi kontakter deg innen 1-2 virkedager." />
-      </Helmet>
+      <PageSEO path="/fast-avtale" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

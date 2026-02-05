@@ -1086,13 +1086,17 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           comment: string | null
+          company_name: string | null
           created_at: string
           customer_email: string | null
           customer_name: string | null
           feedback_type: string | null
           id: string
+          is_verified_customer: boolean | null
           job_id: string | null
+          org_number: string | null
           rating: number
+          source: string | null
           status: string
           tenant_id: string | null
           updated_at: string
@@ -1102,13 +1106,17 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           comment?: string | null
+          company_name?: string | null
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
           feedback_type?: string | null
           id?: string
+          is_verified_customer?: boolean | null
           job_id?: string | null
+          org_number?: string | null
           rating: number
+          source?: string | null
           status?: string
           tenant_id?: string | null
           updated_at?: string
@@ -1118,13 +1126,17 @@ export type Database = {
           approved_at?: string | null
           approved_by?: string | null
           comment?: string | null
+          company_name?: string | null
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
           feedback_type?: string | null
           id?: string
+          is_verified_customer?: boolean | null
           job_id?: string | null
+          org_number?: string | null
           rating?: number
+          source?: string | null
           status?: string
           tenant_id?: string | null
           updated_at?: string
@@ -1488,32 +1500,41 @@ export type Database = {
       public_reviews: {
         Row: {
           comment: string | null
+          company_name: string | null
           created_at: string | null
           customer_name: string | null
           feedback_type: string | null
           id: string | null
+          is_verified_customer: boolean | null
           job_id: string | null
           rating: number | null
+          source: string | null
           status: string | null
         }
         Insert: {
           comment?: string | null
+          company_name?: string | null
           created_at?: string | null
           customer_name?: string | null
           feedback_type?: string | null
           id?: string | null
+          is_verified_customer?: boolean | null
           job_id?: string | null
           rating?: number | null
+          source?: string | null
           status?: string | null
         }
         Update: {
           comment?: string | null
+          company_name?: string | null
           created_at?: string | null
           customer_name?: string | null
           feedback_type?: string | null
           id?: string | null
+          is_verified_customer?: boolean | null
           job_id?: string | null
           rating?: number | null
+          source?: string | null
           status?: string | null
         }
         Relationships: [

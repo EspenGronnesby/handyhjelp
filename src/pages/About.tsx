@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { TeamMemberEditor } from "@/components/admin/TeamMemberEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import { supabase } from "@/integrations/supabase/client";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import heroAboutImg from "@/assets/hero-caretaker.jpg";
 import { EditableHero } from "@/components/EditableHero";
@@ -50,10 +50,7 @@ const About = () => {
 
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Om HandyHjelp - Din pålitelige partner for eiendomspleie</title>
-        <meta name="description" content="HandyHjelp har levert profesjonell eiendomspleie og håndverkstjenester i Kristiansand siden 2004. Møt teamet og les om vår erfaring." />
-      </Helmet>
+      <PageSEO path="/om-oss" />
 
       <Header />
       <BreadcrumbNavigation />

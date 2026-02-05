@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,13 +23,16 @@ import {
   Eye,
   Users,
   MessageSquare,
-  Loader2 
+  Loader2,
+  FileX
 } from 'lucide-react';
 import { useEmailTemplates, EmailTemplate } from '@/hooks/useEmailTemplates';
 import { useSendEmail, EmailRecipient, SendEmailData } from '@/hooks/useSendEmail';
 import { EmailConfirmModal } from './EmailConfirmModal';
 import { EmailPreviewModal } from './EmailPreviewModal';
 import { supabase } from '@/integrations/supabase/client';
+import { useFormDraft } from '@/hooks/useFormDraft';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Profile {
   id: string;
@@ -41,15 +44,43 @@ interface EmailComposerProps {
   profiles: Profile[];
 }
 
+interface EmailDraftData {
+  recipients: EmailRecipient[];
+  selectedTemplateId: string;
+  subject: string;
+  content: string;
+  includeFeedbackButton: boolean;
+}
+
+const initialDraftData: EmailDraftData = {
+  recipients: [],
+  selectedTemplateId: '',
+  subject: '',
+  content: '',
+  includeFeedbackButton: false,
+};
+
 export function EmailComposer({ profiles }: EmailComposerProps) {
+  const { user } = useAuth();
   const { templates, loading: templatesLoading } = useEmailTemplates();
   const { sendEmail, loading: sendLoading, cooldownSeconds } = useSendEmail();
   
-  const [recipients, setRecipients] = useState<EmailRecipient[]>([]);
-  const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
-  const [subject, setSubject] = useState('');
-  const [content, setContent] = useState('');
-  const [includeFeedbackButton, setIncludeFeedbackButton] = useState(false);
+  // Use form draft for persistence
+  const { data: draftData, setData: setDraftData, hasDraft, clearDraft } = useFormDraft<EmailDraftData>({
+    key: 'email_composer',
+    initialData: initialDraftData,
+    userId: user?.id,
+  });
+  
+  // Derive state from draft
+  const recipients = draftData.recipients;
+  const selectedTemplateId = draftData.selectedTemplateId;
+  const subject = draftData.subject;
+  const content = draftData.content;
+  const includeFeedbackButton = draftData.includeFeedbackButton;
+  
+  // Find current template from ID
+  const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || null;
   
   const [externalEmail, setExternalEmail] = useState('');
   const [externalName, setExternalName] = useState('');
@@ -57,16 +88,37 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
+  // Helper functions to update draft data
+  const setRecipients = useCallback((newRecipients: EmailRecipient[]) => {
+    setDraftData(prev => ({ ...prev, recipients: newRecipients }));
+  }, [setDraftData]);
+  
+  const setSubject = useCallback((newSubject: string) => {
+    setDraftData(prev => ({ ...prev, subject: newSubject }));
+  }, [setDraftData]);
+  
+  const setContent = useCallback((newContent: string) => {
+    setDraftData(prev => ({ ...prev, content: newContent }));
+  }, [setDraftData]);
+  
+  const setIncludeFeedbackButton = useCallback((include: boolean) => {
+    setDraftData(prev => ({ ...prev, includeFeedbackButton: include }));
+  }, [setDraftData]);
+  
+  const setSelectedTemplateId = useCallback((templateId: string) => {
+    setDraftData(prev => ({ ...prev, selectedTemplateId: templateId }));
+  }, [setDraftData]);
+
   // Handle template selection
   const handleTemplateChange = (templateId: string) => {
     if (templateId === 'none') {
-      setSelectedTemplate(null);
+      setSelectedTemplateId('');
       return;
     }
     
     const template = templates.find(t => t.id === templateId);
     if (template) {
-      setSelectedTemplate(template);
+      setSelectedTemplateId(template.id);
       setSubject(template.subject);
       setContent(template.content);
       setIncludeFeedbackButton(template.include_feedback_button);
@@ -134,12 +186,8 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
     const result = await sendEmail(data);
     
     if (result && result.summary.sent > 0) {
-      // Reset form on success
-      setRecipients([]);
-      setSelectedTemplate(null);
-      setSubject('');
-      setContent('');
-      setIncludeFeedbackButton(false);
+      // Reset form on success - clear draft
+      clearDraft();
       setConfirmModalOpen(false);
     }
   };
@@ -153,6 +201,19 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
 
   return (
     <div className="space-y-6">
+      {/* Draft indicator */}
+      {hasDraft && (
+        <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border">
+          <span className="text-sm text-muted-foreground">
+            Du har et lagret utkast
+          </span>
+          <Button variant="ghost" size="sm" onClick={clearDraft}>
+            <FileX className="h-4 w-4 mr-2" />
+            Forkast utkast
+          </Button>
+        </div>
+      )}
+      
       {/* Recipients Section */}
       <Card>
         <CardHeader className="pb-3">

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
@@ -23,10 +23,7 @@ const ServiceVaktmester = () => {
 
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Vaktmestertjenester - HandyHjelp</title>
-        <meta name="description" content="Profesjonell eiendomspleie for borettslag, sameier og næringseiendom. Vi sørger for at ditt bygg holder seg i topp stand gjennom året." />
-      </Helmet>
+      <PageSEO path="/tjenester/vaktmester" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

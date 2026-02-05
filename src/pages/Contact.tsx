@@ -17,7 +17,7 @@ import { EditableFAQItem } from "@/components/EditableFAQItem";
 import { Accordion } from "@/components/ui/accordion";
 import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { useWeb3Forms } from "@/hooks/useWeb3Forms";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -78,20 +78,7 @@ const Contact = () => {
     });
   };
   return <div className="min-h-screen">
-      <Helmet>
-        <title>Kontakt oss | HandyHjelp</title>
-        <meta name="description" content="Kontakt HandyHjelp for eiendomsvedlikehold. Ring oss eller send melding - vi svarer innen 1-3 virkedager." />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Kontakt oss | HandyHjelp" />
-        <meta property="og:description" content="Kontakt HandyHjelp for eiendomsvedlikehold. Ring oss eller send melding - vi svarer innen 1-3 virkedager." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://handyhjelp.no/kontakt" />
-        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
-        <meta property="og:locale" content="nb_NO" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Kontakt oss | HandyHjelp" />
-        <meta name="twitter:description" content="Kontakt HandyHjelp for eiendomsvedlikehold. Ring oss eller send melding - vi svarer innen 1-3 virkedager." />
-      </Helmet>
+      <PageSEO path="/kontakt" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

@@ -2,25 +2,12 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 
 const Vilkaar = () => {
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Vilkår og betingelser | HandyHjelp</title>
-        <meta name="description" content="Les våre generelle vilkår og betingelser for bruk av HandyHjelps tjenester." />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Vilkår og betingelser | HandyHjelp" />
-        <meta property="og:description" content="Les våre generelle vilkår og betingelser for bruk av HandyHjelps tjenester." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://handyhjelp.no/vilkaar" />
-        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
-        <meta property="og:locale" content="nb_NO" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Vilkår og betingelser | HandyHjelp" />
-        <meta name="twitter:description" content="Les våre generelle vilkår og betingelser for bruk av HandyHjelps tjenester." />
-      </Helmet>
+      <PageSEO path="/vilkaar" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

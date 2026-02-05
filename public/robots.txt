@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://procare-property-services.lovable.app/sitemap.xml
+Sitemap: https://handyhjelp.no/sitemap.xml
 
 # Allow all crawlers to access CSS and JS files
 User-agent: *

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin } from "lucide-react";
 import { EditableHero } from "@/components/EditableHero";
-import { Helmet } from "react-helmet";
+import { PageSEO } from "@/components/SEO/PageSEO";
 import { ServiceIcon, ServiceBadge, getCategoryLabel } from "@/lib/serviceIcons";
 
 interface Project {
@@ -92,20 +92,7 @@ const Projects = () => {
 
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>Våre prosjekter | HandyHjelp</title>
-        <meta name="description" content="Se før- og etterbilder fra våre prosjekter. Kvalitetsarbeid innen vaktmester, tømrer og blikkenslagerarbeid." />
-        <meta name="robots" content="index, follow" />
-        <meta property="og:title" content="Våre prosjekter | HandyHjelp" />
-        <meta property="og:description" content="Se før- og etterbilder fra våre prosjekter. Kvalitetsarbeid innen vaktmester, tømrer og blikkenslagerarbeid." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://handyhjelp.no/prosjekter" />
-        <meta property="og:image" content="https://handyhjelp.no/og-image.jpg" />
-        <meta property="og:locale" content="nb_NO" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Våre prosjekter | HandyHjelp" />
-        <meta name="twitter:description" content="Se før- og etterbilder fra våre prosjekter. Kvalitetsarbeid innen vaktmester, tømrer og blikkenslagerarbeid." />
-      </Helmet>
+      <PageSEO path="/prosjekter" />
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />

@@ -17,6 +17,7 @@ export default function Feedback() {
   const [submitted, setSubmitted] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [honeypot, setHoneypot] = useState(''); // Bot protection
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,6 +28,12 @@ export default function Feedback() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Bot protection: if honeypot is filled, silently reject
+    if (honeypot) {
+      setSubmitted(true);
+      return;
+    }
     
     if (rating === 0) {
       toast({
@@ -135,6 +142,17 @@ export default function Feedback() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Honeypot field - hidden from users, visible to bots */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="absolute -left-[9999px] opacity-0 pointer-events-none"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                />
                 {/* Star Rating */}
                 <div className="flex flex-col items-center gap-3">
                   <div className="flex gap-2">
