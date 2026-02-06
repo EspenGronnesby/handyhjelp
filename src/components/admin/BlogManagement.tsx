@@ -7,7 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useFormDraft, useImageDraft } from '@/hooks/useFormDraft';
+import { useAuth } from '@/hooks/useAuth';
 import { Plus, Pencil, Trash2, Loader2, Image as ImageIcon, Calendar } from 'lucide-react';
+import { ImageDropZone } from '@/components/ui/ImageDropZone';
 import {
   Dialog,
   DialogContent,
@@ -49,25 +52,69 @@ const categoryOptions = [
   { value: 'generelt', label: 'Generelt' },
 ];
 
+interface BlogFormData {
+  title: string;
+  summary: string;
+  content: string;
+  category: string;
+  status: string;
+  seo_title: string;
+  seo_description: string;
+}
+
+const initialFormData: BlogFormData = {
+  title: '',
+  summary: '',
+  content: '',
+  category: 'vaktmester',
+  status: 'published',
+  seo_title: '',
+  seo_description: '',
+};
+
 export const BlogManagement = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; postId: string | null }>({ open: false, postId: null });
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    summary: '',
-    content: '',
-    category: 'vaktmester',
-    status: 'published',
-    seo_title: '',
-    seo_description: '',
+
+  // Form draft persistence
+  const {
+    data: formData,
+    setData: setFormData,
+    hasDraft: hasFormDraft,
+    clearDraft: clearFormDraft,
+  } = useFormDraft<BlogFormData>({
+    key: 'admin-blog-form',
+    initialData: initialFormData,
+    userId: user?.id,
+    enabled: dialogOpen && !editingPost,
   });
+
+  // Image preview draft persistence
+  const {
+    previews,
+    setPreview,
+    clearPreview,
+    clearAllPreviews,
+    hasDraft: hasImageDraft,
+  } = useImageDraft({
+    key: 'admin-blog-images',
+    userId: user?.id,
+    enabled: dialogOpen && !editingPost,
+  });
+
   const [coverImage, setCoverImage] = useState<File | null>(null);
-  const [coverImagePreview, setCoverImagePreview] = useState<string>('');
+  const [editingCoverPreview, setEditingCoverPreview] = useState<string>('');
+
+  const hasDraft = (hasFormDraft || hasImageDraft) && !editingPost;
+  const effectiveCoverPreview = editingPost
+    ? (editingCoverPreview || editingPost.cover_image_url)
+    : (previews.cover || "");
 
   useEffect(() => {
     fetchPosts();
@@ -101,24 +148,18 @@ export const BlogManagement = () => {
     return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast({
-          title: "Feil",
-          description: "Bildet kan ikke være større enn 10 MB",
-          variant: "destructive",
-        });
-        return;
+  const handleImageSelect = (file: File) => {
+    setCoverImage(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      if (editingPost) {
+        setEditingCoverPreview(URL.createObjectURL(file));
+      } else {
+        setPreview('cover', base64);
       }
-      setCoverImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCoverImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
   const uploadImage = async (file: File): Promise<string> => {
@@ -191,10 +232,14 @@ export const BlogManagement = () => {
           title: "Opprettet",
           description: "Ny blogg-artikkel er opprettet.",
         });
+
+        // Clear drafts after successful new post creation
+        clearFormDraft();
+        clearAllPreviews();
       }
 
       await fetchPosts();
-      handleCloseDialog();
+      handleCloseDialog(false); // Don't clear drafts again, already handled
     } catch (error: any) {
       console.error('Error saving post:', error);
       toast({
@@ -218,7 +263,7 @@ export const BlogManagement = () => {
       seo_title: post.seo_title || '',
       seo_description: post.seo_description || '',
     });
-    setCoverImagePreview(post.cover_image_url);
+    setEditingCoverPreview(post.cover_image_url);
     setDialogOpen(true);
   };
 
@@ -248,20 +293,16 @@ export const BlogManagement = () => {
     }
   };
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = (clearDrafts = false) => {
     setDialogOpen(false);
     setEditingPost(null);
-    setFormData({
-      title: '',
-      summary: '',
-      content: '',
-      category: 'vaktmester',
-      status: 'published',
-      seo_title: '',
-      seo_description: '',
-    });
+    setFormData(initialFormData);
     setCoverImage(null);
-    setCoverImagePreview('');
+    setEditingCoverPreview('');
+    if (clearDrafts) {
+      clearFormDraft();
+      clearAllPreviews();
+    }
   };
 
   if (loading) {
@@ -279,7 +320,12 @@ export const BlogManagement = () => {
           <h2 className="text-2xl font-bold">Blogg-artikler</h2>
           <p className="text-muted-foreground">Administrer alle blogg-artikler</p>
         </div>
-        <Button onClick={() => setDialogOpen(true)} variant="cta">
+        <Button onClick={() => {
+          setEditingPost(null);
+          setCoverImage(null);
+          setEditingCoverPreview('');
+          setDialogOpen(true);
+        }} variant="cta">
           <Plus className="h-4 w-4 mr-2" />
           Skriv ny artikkel
         </Button>
@@ -357,7 +403,7 @@ export const BlogManagement = () => {
       )}
 
       {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={handleCloseDialog}>
+      <Dialog open={dialogOpen} onOpenChange={(open) => !open && handleCloseDialog(false)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
@@ -368,6 +414,22 @@ export const BlogManagement = () => {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Draft indicator */}
+            {hasDraft && (
+              <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between">
+                <span className="text-sm text-blue-800 dark:text-blue-200">Utkast lastet inn automatisk</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleCloseDialog(true)}
+                  className="text-blue-800 dark:text-blue-200 hover:text-blue-900"
+                >
+                  Slett utkast
+                </Button>
+              </div>
+            )}
+
             {/* Grunnleggende info */}
             <div className="space-y-4">
               <div>
@@ -416,19 +478,21 @@ export const BlogManagement = () => {
               <div>
                 <Label htmlFor="cover_image">Forsidebilde *</Label>
                 <div className="space-y-2">
-                  <Input
-                    id="cover_image"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={handleImageChange}
-                    required={!editingPost}
+                  <ImageDropZone
+                    onFileSelect={handleImageSelect}
+                    preview={effectiveCoverPreview}
+                    onRemove={() => {
+                      setCoverImage(null);
+                      if (editingPost) {
+                        setEditingCoverPreview('');
+                      } else {
+                        clearPreview('cover');
+                      }
+                    }}
+                    onError={(message) => toast({ title: "Feil", description: message, variant: "destructive" })}
+                    disabled={uploading}
+                    hint="Maks 10 MB. JPG, PNG eller WebP"
                   />
-                  {coverImagePreview && (
-                    <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
-                      <img src={coverImagePreview} alt="Preview" className="w-full h-full object-cover object-center" />
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">Maks 10 MB. JPG, PNG eller WebP</p>
                 </div>
               </div>
             </div>

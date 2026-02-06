@@ -142,6 +142,14 @@ const Projects = () => {
               >
                 Blikk ({projects.filter(p => p.category === "blikk").length})
               </Button>
+              <Button
+                variant={activeCategory === "takrennerens" ? "default" : "outline"}
+                onClick={() => handleCategoryFilter("takrennerens")}
+                aria-label="Filtrer etter takrennerens"
+                className="flex-shrink-0 px-4 md:px-6 min-h-[44px]"
+              >
+                Takrennerens ({projects.filter(p => p.category === "takrennerens").length})
+              </Button>
             </div>
           )}
 
