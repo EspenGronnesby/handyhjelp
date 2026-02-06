@@ -169,8 +169,9 @@ When adding backend functionality, prioritize:
 ## Contact
 
 For security-related questions or to report vulnerabilities:
-- Email: security@handyhjelp.no
+- Email: team@handyhjelp.no
 - Follow responsible disclosure practices
+- See our [security.txt](public/security.txt) for full policy
 
 ## Updates
 
