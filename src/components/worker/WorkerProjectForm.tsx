@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, X, FileText, Trash2 } from 'lucide-react';
 import { useFormDraft, useImageDraft } from '@/hooks/useFormDraft';
+import { ImageDropZone } from '@/components/ui/ImageDropZone';
 import {
   Dialog,
   DialogContent,
@@ -391,67 +392,37 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
             <div>
               <Label>Før-bilde *</Label>
               <div className="mt-2">
-                {beforePreview ? (
-                  <div className="relative">
-                    <img src={beforePreview} alt="Før" className="w-full h-40 object-cover rounded-lg" />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2"
-                      onClick={() => {
-                        setBeforeImage(null);
-                        clearPreview('before');
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                    <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                    <span className="text-sm text-muted-foreground">Last opp før-bilde</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleImageChange('before', e.target.files?.[0] || null)}
-                    />
-                  </label>
-                )}
+                <ImageDropZone
+                  onFileSelect={(file) => handleImageChange('before', file)}
+                  preview={beforePreview}
+                  onRemove={() => {
+                    setBeforeImage(null);
+                    clearPreview('before');
+                  }}
+                  onError={(message) => toast({ title: 'Feil', description: message, variant: 'destructive' })}
+                  disabled={uploading}
+                  className="h-40"
+                  previewClassName="h-40"
+                  label="Last opp før-bilde"
+                />
               </div>
             </div>
             <div>
               <Label>Etter-bilde *</Label>
               <div className="mt-2">
-                {afterPreview ? (
-                  <div className="relative">
-                    <img src={afterPreview} alt="Etter" className="w-full h-40 object-cover rounded-lg" />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2"
-                      onClick={() => {
-                        setAfterImage(null);
-                        clearPreview('after');
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                    <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                    <span className="text-sm text-muted-foreground">Last opp etter-bilde</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => handleImageChange('after', e.target.files?.[0] || null)}
-                    />
-                  </label>
-                )}
+                <ImageDropZone
+                  onFileSelect={(file) => handleImageChange('after', file)}
+                  preview={afterPreview}
+                  onRemove={() => {
+                    setAfterImage(null);
+                    clearPreview('after');
+                  }}
+                  onError={(message) => toast({ title: 'Feil', description: message, variant: 'destructive' })}
+                  disabled={uploading}
+                  className="h-40"
+                  previewClassName="h-40"
+                  label="Last opp etter-bilde"
+                />
               </div>
             </div>
           </div>

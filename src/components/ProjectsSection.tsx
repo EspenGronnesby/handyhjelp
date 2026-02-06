@@ -72,25 +72,25 @@ export const ProjectsSection = () => {
       setProjects([]);
     } else {
       
-      // Select 1 project from each category (vaktmester, tomrer, blikk)
+      // Select 1 project from each category
       const selectedProjects: Project[] = [];
-      const categories = ["vaktmester", "tomrer", "blikk"];
-      
+      const categories = ["vaktmester", "tomrer", "blikk", "takrennerens"];
+
       categories.forEach(category => {
         const categoryProject = data?.find(p => p.category === category && !selectedProjects.includes(p));
         if (categoryProject) {
           selectedProjects.push(categoryProject);
         }
       });
-      
-      // If we have less than 3 projects, fill with remaining projects
-      if (selectedProjects.length < 3 && data) {
+
+      // If we have less than 4 projects, fill with remaining projects
+      if (selectedProjects.length < 4 && data) {
         const remaining = data.filter(p => !selectedProjects.includes(p));
-        selectedProjects.push(...remaining.slice(0, 3 - selectedProjects.length));
+        selectedProjects.push(...remaining.slice(0, 4 - selectedProjects.length));
       }
-      
-      // On mobile, show only 2 projects for cleaner view
-      setProjects(selectedProjects.slice(0, 3));
+
+      // Show up to 4 projects
+      setProjects(selectedProjects.slice(0, 4));
     }
   };
 

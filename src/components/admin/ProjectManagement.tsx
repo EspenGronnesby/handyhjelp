@@ -19,8 +19,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ImageDropZone } from "@/components/ui/ImageDropZone";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Edit, Trash2, Upload, X, GripVertical, MapPin, Calendar, Wrench, Hammer, Droplet } from "lucide-react";
+import { useFormDraft, useImageDraft } from "@/hooks/useFormDraft";
+import { useAuth } from "@/hooks/useAuth";
+import { Plus, Edit, Trash2, Upload, X, GripVertical, MapPin, Calendar, Wrench, Hammer, Droplet, CloudRain, Package } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
@@ -53,30 +56,74 @@ interface ProjectFormData {
   location: string;
   completed_date: string;
   status: "published" | "draft";
-  category: "vaktmester" | "tomrer" | "blikk";
+  category: "vaktmester" | "tomrer" | "blikk" | "takrennerens" | "annet";
 }
 
+type CategoryType = "vaktmester" | "tomrer" | "blikk" | "takrennerens" | "annet";
+
+const initialFormData: ProjectFormData = {
+  title: "",
+  description: "",
+  location: "",
+  completed_date: new Date().toISOString().split("T")[0],
+  status: "published",
+  category: "vaktmester",
+};
+
 export const ProjectManagement = () => {
+  const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [formData, setFormData] = useState<ProjectFormData>({
-    title: "",
-    description: "",
-    location: "",
-    completed_date: new Date().toISOString().split("T")[0],
-    status: "published",
-    category: "vaktmester",
+
+  // Form draft persistence
+  const {
+    data: formData,
+    setData: setFormData,
+    hasDraft: hasFormDraft,
+    clearDraft: clearFormDraft,
+  } = useFormDraft<ProjectFormData>({
+    key: 'admin-project-form',
+    initialData: initialFormData,
+    userId: user?.id,
+    enabled: isDialogOpen && !editingProject, // Only persist drafts for new projects
   });
+
+  // Image preview draft persistence
+  const {
+    previews,
+    setPreview,
+    clearPreview,
+    clearAllPreviews,
+    hasDraft: hasImageDraft,
+  } = useImageDraft({
+    key: 'admin-project-images',
+    userId: user?.id,
+    enabled: isDialogOpen && !editingProject,
+  });
+
+  const beforePreview = editingProject ? editingProject.before_image_url : previews.before || "";
+  const afterPreview = editingProject ? editingProject.after_image_url : previews.after || "";
+
   const [beforeImage, setBeforeImage] = useState<File | null>(null);
   const [afterImage, setAfterImage] = useState<File | null>(null);
-  const [beforePreview, setBeforePreview] = useState<string>("");
-  const [afterPreview, setAfterPreview] = useState<string>("");
+  const [editingBeforePreview, setEditingBeforePreview] = useState<string>("");
+  const [editingAfterPreview, setEditingAfterPreview] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+
+  const hasDraft = (hasFormDraft || hasImageDraft) && !editingProject;
+
+  // Get effective preview (editing preview takes precedence)
+  const effectiveBeforePreview = editingProject
+    ? (editingBeforePreview || editingProject.before_image_url)
+    : (previews.before || "");
+  const effectiveAfterPreview = editingProject
+    ? (editingAfterPreview || editingProject.after_image_url)
+    : (previews.after || "");
 
   useEffect(() => {
     fetchProjects();
@@ -94,40 +141,28 @@ export const ProjectManagement = () => {
     }
   };
 
-  const handleImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: "before" | "after"
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast({
-        title: "Feil",
-        description: "Bildet kan ikke være større enn 10 MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate file type
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      toast({
-        title: "Feil",
-        description: "Kun JPG, PNG og WebP er tillatt",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (type === "before") {
-      setBeforeImage(file);
-      setBeforePreview(URL.createObjectURL(file));
-    } else {
-      setAfterImage(file);
-      setAfterPreview(URL.createObjectURL(file));
-    }
+  // Handle image selection with draft persistence
+  const handleImageSelect = (file: File, type: "before" | "after") => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      if (type === "before") {
+        setBeforeImage(file);
+        if (editingProject) {
+          setEditingBeforePreview(URL.createObjectURL(file));
+        } else {
+          setPreview('before', base64);
+        }
+      } else {
+        setAfterImage(file);
+        if (editingProject) {
+          setEditingAfterPreview(URL.createObjectURL(file));
+        } else {
+          setPreview('after', base64);
+        }
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const uploadImage = async (file: File, projectId: string, type: "before" | "after") => {
@@ -254,10 +289,14 @@ export const ProjectManagement = () => {
           title: "Suksess",
           description: "Prosjekt publisert!",
         });
+
+        // Clear drafts after successful new project creation
+        clearFormDraft();
+        clearAllPreviews();
       }
 
       setUploadProgress(100);
-      resetForm();
+      resetForm(false); // Don't clear drafts again, already handled above
       setIsDialogOpen(false);
       fetchProjects();
     } catch (error: any) {
@@ -281,10 +320,10 @@ export const ProjectManagement = () => {
       location: project.location,
       completed_date: project.completed_date,
       status: project.status,
-      category: (project.category || "vaktmester") as "vaktmester" | "tomrer" | "blikk",
+      category: (project.category || "vaktmester") as CategoryType,
     });
-    setBeforePreview(project.before_image_url);
-    setAfterPreview(project.after_image_url);
+    setEditingBeforePreview(project.before_image_url);
+    setEditingAfterPreview(project.after_image_url);
     setIsDialogOpen(true);
   };
 
@@ -311,20 +350,17 @@ export const ProjectManagement = () => {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      title: "",
-      description: "",
-      location: "",
-      completed_date: new Date().toISOString().split("T")[0],
-      status: "published",
-      category: "vaktmester",
-    });
+  const resetForm = (clearDrafts = false) => {
+    setFormData(initialFormData);
     setBeforeImage(null);
     setAfterImage(null);
-    setBeforePreview("");
-    setAfterPreview("");
+    setEditingBeforePreview("");
+    setEditingAfterPreview("");
     setEditingProject(null);
+    if (clearDrafts) {
+      clearFormDraft();
+      clearAllPreviews();
+    }
   };
 
   const filteredProjects = projects.filter(
@@ -344,7 +380,13 @@ export const ProjectManagement = () => {
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={resetForm} size="lg">
+            <Button onClick={() => {
+              setEditingProject(null);
+              setBeforeImage(null);
+              setAfterImage(null);
+              setEditingBeforePreview("");
+              setEditingAfterPreview("");
+            }} size="lg">
               <Plus className="w-4 h-4 mr-2" />
               Legg til nytt prosjekt
             </Button>
@@ -356,88 +398,60 @@ export const ProjectManagement = () => {
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Draft indicator */}
+              {hasDraft && (
+                <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between">
+                  <span className="text-sm text-blue-800 dark:text-blue-200">Utkast lastet inn automatisk</span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => resetForm(true)}
+                    className="text-blue-800 dark:text-blue-200 hover:text-blue-900"
+                  >
+                    Slett utkast
+                  </Button>
+                </div>
+              )}
+
               {/* Image Upload Section */}
               <div className="grid grid-cols-2 gap-4">
                 {/* Before Image */}
                 <div className="space-y-2">
                   <Label>FØR-bilde *</Label>
-                  <div className="border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors">
-                    {beforePreview ? (
-                      <div className="relative">
-                        <img
-                          src={beforePreview}
-                          alt="Før forhåndsvisning"
-                          className="w-full h-48 object-cover rounded"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2"
-                          onClick={() => {
-                            setBeforeImage(null);
-                            setBeforePreview("");
-                          }}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <label className="cursor-pointer block">
-                        <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">
-                          Klikk for å laste opp
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) => handleImageChange(e, "before")}
-                        />
-                      </label>
-                    )}
-                  </div>
+                  <ImageDropZone
+                    onFileSelect={(file) => handleImageSelect(file, "before")}
+                    preview={effectiveBeforePreview}
+                    onRemove={() => {
+                      setBeforeImage(null);
+                      if (editingProject) {
+                        setEditingBeforePreview("");
+                      } else {
+                        clearPreview('before');
+                      }
+                    }}
+                    onError={(message) => toast({ title: "Feil", description: message, variant: "destructive" })}
+                    disabled={isUploading}
+                  />
                 </div>
 
                 {/* After Image */}
                 <div className="space-y-2">
                   <Label>ETTER-bilde *</Label>
-                  <div className="border-2 border-dashed rounded-lg p-4 text-center hover:border-primary transition-colors">
-                    {afterPreview ? (
-                      <div className="relative">
-                        <img
-                          src={afterPreview}
-                          alt="Etter forhåndsvisning"
-                          className="w-full h-48 object-cover rounded"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2"
-                          onClick={() => {
-                            setAfterImage(null);
-                            setAfterPreview("");
-                          }}
-                        >
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <label className="cursor-pointer block">
-                        <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">
-                          Klikk for å laste opp
-                        </p>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={(e) => handleImageChange(e, "after")}
-                        />
-                      </label>
-                    )}
-                  </div>
+                  <ImageDropZone
+                    onFileSelect={(file) => handleImageSelect(file, "after")}
+                    preview={effectiveAfterPreview}
+                    onRemove={() => {
+                      setAfterImage(null);
+                      if (editingProject) {
+                        setEditingAfterPreview("");
+                      } else {
+                        clearPreview('after');
+                      }
+                    }}
+                    onError={(message) => toast({ title: "Feil", description: message, variant: "destructive" })}
+                    disabled={isUploading}
+                  />
                 </div>
               </div>
 
@@ -514,11 +528,13 @@ export const ProjectManagement = () => {
                     { value: "vaktmester", label: "Vaktmester", icon: "🔧" },
                     { value: "tomrer", label: "Tømrer", icon: "🔨" },
                     { value: "blikk", label: "Blikk", icon: "💧" },
+                    { value: "takrennerens", label: "Takrennerens", icon: "🌧️" },
+                    { value: "annet", label: "Annet", icon: "📦" },
                   ].map((cat) => (
                     <button
                       key={cat.value}
                       type="button"
-                      onClick={() => setFormData({ ...formData, category: cat.value as "vaktmester" | "tomrer" | "blikk" })}
+                      onClick={() => setFormData({ ...formData, category: cat.value as CategoryType })}
                       className={`p-4 rounded-lg border-2 transition-all ${
                         formData.category === cat.value
                           ? "border-primary bg-primary/10 text-primary"
@@ -578,7 +594,7 @@ export const ProjectManagement = () => {
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    resetForm();
+                    resetForm(false); // Keep draft when canceling
                     setIsDialogOpen(false);
                   }}
                   disabled={isUploading}
@@ -619,7 +635,7 @@ export const ProjectManagement = () => {
                 {project.status === "published" ? "Publisert" : "Utkast"}
               </Badge>
               {project.category && (
-                <Badge 
+                <Badge
                   variant="secondary"
                   className="absolute top-2 left-2 text-xs flex items-center gap-1"
                 >
@@ -633,10 +649,20 @@ export const ProjectManagement = () => {
                       <Hammer className="w-3 h-3" />
                       Tømrer
                     </>
-                  ) : (
+                  ) : project.category === "blikk" ? (
                     <>
                       <Droplet className="w-3 h-3" />
                       Blikk
+                    </>
+                  ) : project.category === "takrennerens" ? (
+                    <>
+                      <CloudRain className="w-3 h-3" />
+                      Takrennerens
+                    </>
+                  ) : (
+                    <>
+                      <Package className="w-3 h-3" />
+                      Annet
                     </>
                   )}
                 </Badge>
