@@ -13,9 +13,35 @@ This file provides guidance to Claude Code when working with this repository.
 #2 CLAUDE.MD (denne filen)
 #3 SKILLS (.claude/skills/)
 #4 RULES (.claude/rules/)
-#5 SECURITY.MD
-#6 LESSONS.MD
+#5 DOCS (.claude/docs/)
 ```
+
+---
+
+## .claude/ Structure
+
+```
+.claude/
+├── CLAUDE.md                      # ← DU ER HER. Global kontekst og kart.
+│
+├── rules/                         # Harde begrensninger
+│   ├── precedence.md              # Hva vinner ved konflikt
+│   └── severity.md                # Feilhåndtering (🔴🟡🔵)
+│
+├── skills/                        # Aktive atferder (hvordan tenke)
+│   ├── scope-guard.md             # Forhindre feature creep
+│   ├── security-review.md         # Sikkerhetstenkning
+│   └── verify.md                  # Dobbeltsjekk og kvalitet
+│
+├── docs/                          # Referansemateriale (fasit/historikk)
+│   ├── security.md                # Lang sikkerhetsreferanse
+│   └── lessons.md                 # Erfaringer og løsninger
+│
+└── architectural_patterns.md      # Prosjektspesifikke kodemønstre
+```
+
+**Skills** = korte filer som sier hvordan du skal tenke.
+**Docs** = lange filer du slår opp i når du trenger detaljer.
 
 ---
 
@@ -146,31 +172,84 @@ The owner is learning. Always explain simply what's happening and why. Give a br
 
 ---
 
-## Verification (IMPORTANT)
+## Automatic Behaviors
 
-**After changing code files, run verification.** See `.claude/skills/verify.md` for full details.
+### Before ANY code task
+1. **Scope guard** (`.claude/skills/scope-guard.md`):
+   - Kan du definere oppgaven i én setning? Hvis nei → spør bruker
+   - Løs nøyaktig det som ble spurt om, ikke mer
+   - Ikke legg til dependencies, refaktorer, eller endre filer uten å spørre
 
-### Quick reference:
+2. **Arbeidsmodus-vurdering:**
+   Vurder oppgavens størrelse og kompleksitet, og anbefal riktig modus:
 
-```
-WHEN TO VERIFY:
-✅ Changed .ts, .tsx, .js, .jsx files
-✅ Changed package.json
-✅ Changed config files (vite.config, tsconfig)
-❌ Only changed .md, .css, or comments
+   ```
+   VANLIG SESSION (standard):
+   → Oppgaven handler om én ting (fiks bug, legg til komponent, endre stil)
+   → Endringer i 1-3 filer
+   → Sekvensiell arbeid (steg A før steg B)
+   → Billigst og raskest
 
-VERIFICATION STEPS:
-1. npm run build     (maks 3 forsøk)
-2. npm run lint      (maks 2 forsøk, hvis tilgjengelig)
-3. npx tsc --noEmit  (maks 3 forsøk, hvis TypeScript)
+   SUBAGENTS:
+   → Oppgaven har 2-3 uavhengige deler som ikke påvirker hverandre
+   → Delene trenger ikke kommunisere
+   → Eksempel: "Oppdater 5 sider med ny footer" (samme jobb, mange filer)
+   → Raskere enn én og én, billigere enn team
 
-ON FAILURE:
-🔴 STOPP → RAPPORTER → VENT på bruker
-```
+   AGENT TEAMS:
+   → Oppgaven har flere ULIKE deler som berører ulike filer
+   → Delene må koordinere (frontend trenger å vite API-format fra backend)
+   → Eksempel: "Bygg nytt notifikasjonssystem" (UI + API + DB + tester)
+   → Kraftigst, men bruker 4-5x tokens
+   ```
 
-### Bruker kan alltid si:
-- "Hopp over verify" → Skip verification
-- "Ignorer feil" → Fortsett selv ved feil
+   **Hvis vanlig session:** Bare fortsett, ikke si noe.
+   **Hvis subagents eller team anbefales:**
+
+   ```
+   ┌─────────────────────────────────────────────────────────────────┐
+   │  🛠️ ARBEIDSMODUS                                                │
+   │                                                                 │
+   │  Denne oppgaven har [X] uavhengige deler:                       │
+   │  • [del 1]                                                      │
+   │  • [del 2]                                                      │
+   │  • [del 3]                                                      │
+   │                                                                 │
+   │  Anbefaling: [subagents/agent team]                              │
+   │  Hvorfor: [kort forklaring, f.eks. "delene berører ulike filer   │
+   │  og må koordinere API-format"]                                   │
+   │  Kostnad: ~[X]x token-bruk vs vanlig session                    │
+   │                                                                 │
+   │  Alternativ: Jeg kan også gjøre det som vanlig session,         │
+   │  men det tar lengre tid fordi [grunn].                           │
+   │                                                                 │
+   │  Hva foretrekker du?                                            │
+   └─────────────────────────────────────────────────────────────────┘
+   ```
+
+   **VENT** på brukers valg før du starter arbeidet.
+
+### Before solving a problem
+1. Check `.claude/docs/lessons.md` for similar issues
+2. If found, follow the documented solution
+3. If not found, solve and then document
+
+### When touching auth, RLS, input, or Edge Functions
+1. Aktiver **security review** (`.claude/skills/security-review.md`)
+2. Sjekk false positive-listen i `.claude/docs/security.md` FØR du flagger
+3. Kun flagg det du kan bevise
+
+### After changing code
+1. Run **verification** (`.claude/skills/verify.md`) unless bruker sier hopp over
+2. Report result using the formats in that file
+
+### After solving a problem
+1. Ask: "Skal jeg legge dette til i docs/lessons.md?"
+2. If yes, add using the format in that file
+
+### Before writing new hooks, forms, or components
+1. Check `.claude/architectural_patterns.md` for existing patterns
+2. Follow established patterns for consistency
 
 ---
 
@@ -183,31 +262,6 @@ See `.claude/rules/severity.md` for full details.
 | 🔴 CRITICAL | STOPP, rapporter, vent på bruker |
 | 🟡 WARNING | Rapporter, men fortsett |
 | 🔵 INFO | Nevn hvis relevant |
-
----
-
-## Automatic Behaviors
-
-### Before solving any problem
-1. Check `.claude/lessons.md` for similar issues
-2. If found, follow the documented solution
-3. If not found, solve and then document
-
-### After changing code
-1. Run verification (unless bruker sier hopp over)
-2. Report result using the formats in skills/verify.md
-
-### After solving a problem
-1. Ask: "Skal jeg legge dette til i lessons.md?"
-2. If yes, add using the format in that file
-
-### Before writing new hooks, forms, or components
-1. Check `.claude/architectural_patterns.md` for existing patterns
-2. Follow established patterns for consistency
-
-### Before security-related work
-1. Read `.claude/security.md`
-2. Follow the guidelines for RLS, secrets, etc.
 
 ---
 
@@ -239,26 +293,29 @@ Status:
 
 ---
 
-## Additional Documentation
+## Verification (Quick Reference)
 
-Check these files for detailed patterns and conventions:
+Full details in `.claude/skills/verify.md`.
 
-| Topic | File |
-|-------|------|
-| Architectural patterns | [.claude/architectural_patterns.md](.claude/architectural_patterns.md) |
+```
+WHEN TO VERIFY:
+✅ Changed .ts, .tsx, .js, .jsx files
+✅ Changed package.json
+✅ Changed config files (vite.config, tsconfig)
+❌ Only changed .md, .css, or comments
 
-When working on specific areas, consult the relevant documentation above.
+VERIFICATION STEPS:
+1. npm run build     (maks 3 forsøk)
+2. npm run lint      (maks 2 forsøk, hvis tilgjengelig)
+3. npx tsc --noEmit  (maks 3 forsøk, hvis TypeScript)
 
-## Instruction Files
+ON FAILURE:
+🔴 STOPP → RAPPORTER → VENT på bruker
+```
 
-| File | Purpose | When to read |
-|------|---------|--------------|
-| `.claude/rules/precedence.md` | Priority order | When rules conflict |
-| `.claude/rules/severity.md` | Error handling | When errors occur |
-| `.claude/skills/verify.md` | Code verification | After code changes |
-| `.claude/security.md` | Security guidelines | Before security work |
-| `.claude/lessons.md` | Past solutions | When encountering problems |
-| `.claude/architectural_patterns.md` | Code patterns | When writing new hooks, forms, or components |
+### Bruker kan alltid si:
+- "Hopp over verify" → Skip verification
+- "Ignorer feil" → Fortsett selv ved feil
 
 ---
 
