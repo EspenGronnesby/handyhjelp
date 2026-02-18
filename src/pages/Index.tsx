@@ -16,6 +16,7 @@ import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
 import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import ClientLogosSection from "@/components/ClientLogosSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { PageSEO } from "@/components/SEO/PageSEO";
@@ -97,6 +98,9 @@ const Index = () => {
 
         {/* Testimonials Section */}
         <TestimonialsSection />
+
+        {/* Client Logos Section */}
+        <ClientLogosSection />
 
         {/* Services Section - Compact Overview */}
         <section className="py-12 md:py-16 bg-background section-mobile" id="services" ref={servicesRef}>
