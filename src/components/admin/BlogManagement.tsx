@@ -555,7 +555,7 @@ export const BlogManagement = () => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCloseDialog}>
+              <Button type="button" variant="outline" onClick={() => handleCloseDialog(true)}>
                 Avbryt
               </Button>
               <Button type="submit" variant="cta" disabled={uploading}>
