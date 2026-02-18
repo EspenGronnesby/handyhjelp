@@ -1,147 +1,85 @@
 
+# Plan: Fiks byggfeil + Kundelogo-vegg
 
-# Plan: Google-innlogging med automatisk kontokobling
+## Del 1: Fiks byggfeil i BlogManagement.tsx
 
-## Oppsummering av funn
-
-### Nåværende brukere med roller
-Fra databasen ser jeg at disse brukerne har spesielle roller:
-- **essi1403@gmail.com** (Espen Grønnesby): platform_owner, admin, worker
-- **02larsen22@gmail.com** (Benjamin Larsen): worker
-
-### Hvordan Lovable Cloud håndterer kontokobling
-
-Lovable Cloud har **automatisk kontokobling** basert på e-postadresse. Dette betyr:
-
-1. Hvis en eksisterende bruker (f.eks. essi1403@gmail.com) logger inn med Google med samme e-post, vil systemet automatisk koble Google-identiteten til den eksisterende kontoen
-2. Alle roller i `user_roles`-tabellen beholdes fordi de er knyttet til `user_id` (UUID)
-3. Profilen i `profiles`-tabellen forblir uendret
-
-### Teknisk forklaring
-- `profiles.id` = `auth.users.id` (samme UUID)
-- `user_roles.user_id` = `auth.users.id` (samme UUID)
-- Når Google-innlogging kobles til eksisterende konto, beholdes samme UUID
-- Derfor beholdes alle roller og profildata automatisk
-
----
-
-## Hva vi implementerer
-
-### 1. Konfigurer Google OAuth
-Bruke Lovable Cloud sitt verktøy for å generere nødvendig integrasjonskode.
-
-### 2. Oppdater Auth.tsx
-
-#### Nye importer
-```typescript
-import { lovable } from "@/integrations/lovable/index";
-```
-
-#### Ny funksjon for Google-innlogging
-```typescript
-const handleGoogleSignIn = async () => {
-  setLoading(true);
-  try {
-    const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (error) throw error;
-  } catch (error: any) {
-    console.error('Google sign in error:', error);
-    toast({
-      title: 'Feil',
-      description: 'Kunne ikke logge inn med Google. Prøv igjen.',
-      variant: 'destructive'
-    });
-    setLoading(false);
-  }
-};
-```
-
-#### Google-knapp i UI
-Legges til på begge flyter (innlogging og registrering):
-
+### Problem
+På linje 558 brukes `handleCloseDialog` direkte som `onClick`-handler på en `<Button>`:
 ```tsx
-{/* Divider */}
-<div className="relative my-4">
-  <div className="absolute inset-0 flex items-center">
-    <span className="w-full border-t" />
-  </div>
-  <div className="relative flex justify-center text-xs uppercase">
-    <span className="bg-card px-2 text-muted-foreground">
-      Eller fortsett med
-    </span>
-  </div>
-</div>
+<Button type="button" variant="outline" onClick={handleCloseDialog}>
+```
+TypeScript klager fordi `handleCloseDialog` forventer `boolean | undefined`, men `onClick` sender `MouseEvent`. 
 
-{/* Google Button */}
-<Button
-  type="button"
-  variant="outline"
-  className="w-full"
-  onClick={handleGoogleSignIn}
-  disabled={loading}
->
-  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-    <!-- Google logo -->
-  </svg>
-  Google
-</Button>
+### Fix
+Pakk kallet i en arrow-funksjon slik at `clearDrafts` ikke mottar et mouse-event:
+```tsx
+onClick={() => handleCloseDialog(true)}
 ```
 
 ---
 
-## Hva skjer med eksisterende brukere?
+## Del 2: Kundelogo-vegg
 
-| Scenario | Resultat |
-|----------|----------|
-| Espen logger inn med Google (essi1403@gmail.com) | Google kobles til eksisterende konto. Beholder platform_owner, admin, worker roller |
-| Benjamin logger inn med Google (02larsen22@gmail.com) | Google kobles til eksisterende konto. Beholder worker rolle |
-| Ny bruker logger inn med Google | Ny konto opprettes. Profil lages via `handle_new_user`-triggeren |
+### Hva som bygges
+En ny seksjon på forsiden (mellom TestimonialsSection og Services) som viser logoer til bedrifter HandyHjelp har jobbet for. I redigeringsmodus kan owner legge til, redigere og fjerne logoer.
 
-### Viktig: Hva `handle_new_user`-triggeren gjør for Google-brukere
+### Database
+Ny tabell `client_logos` med følgende kolonner:
+- `id` (uuid, PK)
+- `name` (text) – bedriftsnavn
+- `logo_url` (text) – URL til logo i storage
+- `website_url` (text, nullable) – evt. lenke til bedriftens nettside
+- `display_order` (integer, default 0)
+- `is_active` (boolean, default true)
+- `created_at` (timestamp)
 
-Triggeren henter metadata fra `raw_user_meta_data`, som inkluderer:
-- `full_name` fra Google-profilen
-- `email` fra Google-kontoen
+RLS-regler:
+- Alle kan lese aktive logoer (`is_active = true`)
+- Kun `platform_owner` kan opprette, oppdatere og slette
 
-For nye Google-brukere vil disse feltene settes automatisk:
-- `phone`: Tom (kan fylles ut senere i dashboard)
-- `customer_type`: NULL (kan settes senere)
-- `org_number` og `company_name`: NULL
+Storage bucket `client-logos` (public) for logo-opplasting.
 
----
-
-## Filer som endres
+### Filer som opprettes/endres
 
 | Fil | Endring |
 |-----|---------|
-| `src/integrations/lovable/` | Ny mappe generert automatisk |
-| `src/pages/Auth.tsx` | Legge til Google-knapp og OAuth-funksjon |
+| `supabase/migrations/...` | Ny migrasjon for tabell + RLS + storage bucket |
+| `src/components/ClientLogosSection.tsx` | Ny seksjon som vises på forsiden |
+| `src/components/ClientLogosEditModal.tsx` | Modal for å legge til / redigere en logo |
+| `src/pages/Index.tsx` | Legg inn `<ClientLogosSection />` mellom Testimonials og Services |
 
----
+### Slik ser seksjonen ut
 
-## Brukeropplevelse
+```text
+┌──────────────────────────────────────────────────────┐
+│          Stolte samarbeidspartnere                    │
+│  ────────────────────────────────────────────────    │
+│  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]     │
+│                                                      │
+│  (I redigeringsmodus: blyant-ikon over hver logo,   │
+│   + "Legg til"-knapp til høyre)                     │
+└──────────────────────────────────────────────────────┘
+```
 
-### For eksisterende brukere (med roller)
-1. Klikker "Google"
-2. Velger sin Google-konto med samme e-post
-3. Logges direkte inn med alle eksisterende roller intakt
-4. Sendes til dashboard som vanlig
+### Redigeringsflyt (owner med edit mode på)
+1. Blyant-ikon vises øverst til høyre på seksjonen
+2. Klikk åpner en modal med liste over alle logoer
+3. I modalen kan owner:
+   - Laste opp ny logo (bilde-upload)
+   - Skrive inn bedriftsnavn
+   - Legge til valgfri nettside-URL
+   - Dra for å endre rekkefølge (display_order)
+   - Slette en logo
 
-### For nye brukere
-1. Klikker "Google"
-2. Velger sin Google-konto
-3. Ny konto opprettes automatisk
-4. Sendes til dashboard
-5. Kan oppdatere profil med telefon, kundetype etc. senere
+### Design
+- Logoer vises i en horisontal rad med `grayscale` filter → fargelagt ved hover
+- Responsiv: 3 kolonner mobil, 6 kolonner desktop
+- Subtil auto-scroll animasjon (marquee-stil) valgfritt
 
----
+### Teknisk arkitektur
 
-## Sikkerhet
-
-- Roller er trygt lagret i separat `user_roles`-tabell
-- RLS-policyer beskytter mot uautorisert tilgang
-- `has_role`-funksjonen bruker SECURITY DEFINER for sikker rollesjekk
-- Ingen endringer i rollestrukturen
-
+Følger eksisterende CMS-mønster fra `EditableServiceCard` og `TeamMemberEditor`:
+- Data hentes via `useQuery` / Supabase
+- Upload til `client-logos` storage bucket
+- Edit modal følger samme mønster som `TeamMemberEditor`
+- Seksjonen er usynlig hvis ingen aktive logoer finnes (og editMode er av)
