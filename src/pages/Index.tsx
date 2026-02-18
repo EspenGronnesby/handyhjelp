@@ -87,6 +87,9 @@ const Index = () => {
       {/* Hero Section with Integrated Quote Form */}
       <main id="main-content">
         <HeroSection />
+
+        {/* Client Logos Section */}
+        <ClientLogosSection />
         
         {/* How It Works Process Section */}
         <section id="process-section" aria-labelledby="process-heading">
@@ -98,9 +101,6 @@ const Index = () => {
 
         {/* Testimonials Section */}
         <TestimonialsSection />
-
-        {/* Client Logos Section */}
-        <ClientLogosSection />
 
         {/* Services Section - Compact Overview */}
         <section className="py-12 md:py-16 bg-background section-mobile" id="services" ref={servicesRef}>
