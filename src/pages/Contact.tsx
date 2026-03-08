@@ -172,11 +172,6 @@ const Contact = () => {
               </CardContent>
             </Card>
 
-              {/* Alternative Contact */}
-              <Card className="bg-accent/10 border-accent">
-                
-              </Card>
-
               {/* How We Work */}
               <Card className="subtle-hover">
                 <CardContent className="pt-6">
