@@ -62,7 +62,7 @@ export const HeroSection = () => {
               backgroundPosition: 'center 30%'
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 to-secondary/90 md:from-secondary md:to-secondary" style={{
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75" style={{
               opacity
             }}></div>
           </div>
@@ -78,7 +78,7 @@ export const HeroSection = () => {
               bottom: -20,
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/95 to-secondary/90 md:from-secondary md:to-secondary" style={{
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75" style={{
               opacity
             }}></div>
           </motion.div>

@@ -99,67 +99,69 @@ html, body {
   }
 
   .dark {
-    /* Dark Mode - Neutral Slate with hint of blue */
-    --background: 220 15% 11%;
-    --foreground: 210 20% 95%;
+    /* Dark Mode — 2026 breathable dark with clear layering */
+    --background: 220 14% 16%;
+    --foreground: 210 15% 90%;
 
-    --hero-bg: 220 15% 8%;
-    --hero-bg-secondary: 220 15% 10%;
-    --hero-text: 210 20% 98%;
-    --hero-text-muted: 215 15% 80%;
+    --hero-bg: 220 14% 10%;
+    --hero-bg-secondary: 220 14% 12%;
+    --hero-text: 210 15% 98%;
+    --hero-text-muted: 215 12% 78%;
 
-    /* Neutral card tones */
-    --card: 220 13% 15%;
-    --card-foreground: 210 20% 95%;
-    --card-elevated: 220 13% 19%;
+    /* Cards clearly separated from background (16% → 20% → 24%) */
+    --card: 220 12% 20%;
+    --card-foreground: 210 15% 90%;
+    --card-elevated: 220 12% 24%;
 
     /* Primary stays turquoise for visibility */
     --primary: 188 94% 45%;
     --primary-hover: 188 94% 55%;
-    --primary-foreground: 220 15% 8%;
+    --primary-foreground: 220 14% 8%;
 
     --success: 142 76% 45%;
     --success-hover: 142 76% 55%;
-    --success-foreground: 220 15% 8%;
+    --success-foreground: 220 14% 8%;
 
-    --secondary: 220 15% 20%;
-    --secondary-hover: 220 15% 24%;
-    --secondary-foreground: 210 20% 95%;
+    /* Secondary darker than bg for footer/header depth */
+    --secondary: 220 14% 12%;
+    --secondary-hover: 220 14% 16%;
+    --secondary-foreground: 210 15% 90%;
 
-    --muted: 220 10% 14%;
-    --muted-hover: 220 10% 18%;
-    --muted-foreground: 215 15% 72%;
+    /* Muted slightly darker than bg for alternating sections */
+    --muted: 220 12% 13%;
+    --muted-hover: 220 12% 17%;
+    --muted-foreground: 215 12% 65%;
 
     /* Keep orange accent for hover states */
     --accent: 24 95% 53%;
     --accent-hover: 24 95% 60%;
-    --accent-foreground: 220 15% 8%;
+    --accent-foreground: 220 14% 8%;
 
     --destructive: 0 72% 55%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive-foreground: 210 15% 98%;
 
-    /* Neutral borders */
-    --border: 220 10% 24%;
-    --border-input: 220 10% 30%;
-    --input: 220 13% 16%;
-    --input-foreground: 210 20% 95%;
+    /* More visible borders */
+    --border: 220 10% 28%;
+    --border-input: 220 10% 32%;
+    --input: 220 12% 18%;
+    --input-foreground: 210 15% 90%;
     --ring: 188 94% 45%;
 
-    /* Popover in dark mode */
-    --popover: 220 13% 15%;
-    --popover-foreground: 210 20% 95%;
+    /* Popover matches card */
+    --popover: 220 12% 20%;
+    --popover-foreground: 210 15% 90%;
     
     /* Softer shadows */
-    --shadow-card: 0 4px 12px -2px hsl(220 15% 5% / 0.4), 0 2px 6px -2px hsl(220 15% 5% / 0.2);
-    --shadow-elevated: 0 10px 25px -5px hsl(220 15% 5% / 0.5), 0 6px 10px -4px hsl(220 15% 5% / 0.3);
+    --shadow-card: 0 4px 12px -2px hsl(220 14% 5% / 0.4), 0 2px 6px -2px hsl(220 14% 5% / 0.2);
+    --shadow-elevated: 0 10px 25px -5px hsl(220 14% 5% / 0.5), 0 6px 10px -4px hsl(220 14% 5% / 0.3);
     
-    --sidebar-background: 220 15% 10%;
-    --sidebar-foreground: 210 20% 95%;
+    --sidebar-background: 220 14% 12%;
+    --sidebar-foreground: 210 15% 90%;
     --sidebar-primary: 188 94% 45%;
-    --sidebar-primary-foreground: 220 15% 8%;
-    --sidebar-accent: 220 15% 20%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 220 10% 22%;
+    --sidebar-primary-foreground: 220 14% 8%;
+    --sidebar-accent: 220 14% 20%;
+    --sidebar-accent-foreground: 210 15% 90%;
+    --sidebar-border: 220 10% 26%;
     --sidebar-ring: 188 94% 45%;
   }
 }
@@ -209,7 +211,7 @@ html, body {
   /* Professional Card Styles - Enhanced for dark mode visibility */
   .card-professional {
     @apply bg-card border border-border rounded-xl;
-    @apply dark:ring-1 dark:ring-white/5;
+    @apply dark:ring-1 dark:ring-white/10;
     box-shadow: var(--shadow-card);
     transition: box-shadow 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out;
     filter: brightness(1);
