@@ -1,85 +1,42 @@
 
-# Plan: Fiks byggfeil + Kundelogo-vegg
 
-## Del 1: Fiks byggfeil i BlogManagement.tsx
+# Analyse: Hvor du er og neste steg
 
-### Problem
-På linje 558 brukes `handleCloseDialog` direkte som `onClick`-handler på en `<Button>`:
-```tsx
-<Button type="button" variant="outline" onClick={handleCloseDialog}>
-```
-TypeScript klager fordi `handleCloseDialog` forventer `boolean | undefined`, men `onClick` sender `MouseEvent`. 
+## Hva som er gjort
+1. Kundelogo-vegg (ClientLogosSection) — ferdig
+2. E-postvarsling til admin ved worker-innleveringer — ferdig
+3. UI-overhaul: fjernet app-aktige kort-wrappere, ScrollProgress, fikset hover-bugs — ferdig
+4. Dark mode nøytralisert (fra mørkeblå til slate) + mer whitespace — ferdig
+5. "Populær"-badge synlighet fikset — ferdig
 
-### Fix
-Pakk kallet i en arrow-funksjon slik at `clearDrafts` ikke mottar et mouse-event:
-```tsx
-onClick={() => handleCloseDialog(true)}
-```
+## Hva som gjenstår fra utviklingsplanen
+
+Basert på `.lovable/plan.md` og konversasjonshistorikken, er dette de naturlige neste stegene:
+
+### Alternativ A: Fortsette visuell polish
+- **Header/Footer dark mode audit** — disse ble ikke rørt i forrige runde. Kan trenge fargejustering for å matche den nye nøytrale paletten.
+- **Undersider** (About, Services, FAQ, Contact) — de bruker sannsynligvis fortsatt de gamle stilene med app-aktige kort og aggressive hover-effekter.
+- **Light mode finpuss** — light mode ble stort sett beholdt, men kan ha lignende card-wrapper-problemer.
+
+### Alternativ B: Fase 2.3 fra utviklingsplanen
+- Flytte API-kall til service-filer (refaktorering som ble planlagt men aldri startet).
+
+### Alternativ C: Fase 3 — Performance/Optimization
+- Lazy loading av bilder, kode-splitting, lighthouse-optimalisering.
+
+### Alternativ D: Fase 4 — Premium Features
+- Nye brukervendte funksjoner (ikke spesifisert i detalj ennå).
 
 ---
 
-## Del 2: Kundelogo-vegg
+## Min anbefaling: Alternativ A — Fullføre visuell polish
 
-### Hva som bygges
-En ny seksjon på forsiden (mellom TestimonialsSection og Services) som viser logoer til bedrifter HandyHjelp har jobbet for. I redigeringsmodus kan owner legge til, redigere og fjerne logoer.
+Du har nettopp gjort forsiden mye bedre. Det naturlige neste steget er å **bringe den samme kvaliteten til resten av sidene**. Spesifikt:
 
-### Database
-Ny tabell `client_logos` med følgende kolonner:
-- `id` (uuid, PK)
-- `name` (text) – bedriftsnavn
-- `logo_url` (text) – URL til logo i storage
-- `website_url` (text, nullable) – evt. lenke til bedriftens nettside
-- `display_order` (integer, default 0)
-- `is_active` (boolean, default true)
-- `created_at` (timestamp)
+1. **Audit Header + Footer** i dark mode for å matche ny palett
+2. **Service-sidene** (Vaktmester, Takrennerens, Tømrer, Blikk) — fjerne app-aktige mønstre
+3. **About, FAQ, Contact** — samme behandling
+4. **Mobil-gjennomgang** av hele nettsiden for konsistens
 
-RLS-regler:
-- Alle kan lese aktive logoer (`is_active = true`)
-- Kun `platform_owner` kan opprette, oppdatere og slette
+Dette sikrer at hele opplevelsen er konsistent, ikke bare forsiden.
 
-Storage bucket `client-logos` (public) for logo-opplasting.
-
-### Filer som opprettes/endres
-
-| Fil | Endring |
-|-----|---------|
-| `supabase/migrations/...` | Ny migrasjon for tabell + RLS + storage bucket |
-| `src/components/ClientLogosSection.tsx` | Ny seksjon som vises på forsiden |
-| `src/components/ClientLogosEditModal.tsx` | Modal for å legge til / redigere en logo |
-| `src/pages/Index.tsx` | Legg inn `<ClientLogosSection />` mellom Testimonials og Services |
-
-### Slik ser seksjonen ut
-
-```text
-┌──────────────────────────────────────────────────────┐
-│          Stolte samarbeidspartnere                    │
-│  ────────────────────────────────────────────────    │
-│  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]     │
-│                                                      │
-│  (I redigeringsmodus: blyant-ikon over hver logo,   │
-│   + "Legg til"-knapp til høyre)                     │
-└──────────────────────────────────────────────────────┘
-```
-
-### Redigeringsflyt (owner med edit mode på)
-1. Blyant-ikon vises øverst til høyre på seksjonen
-2. Klikk åpner en modal med liste over alle logoer
-3. I modalen kan owner:
-   - Laste opp ny logo (bilde-upload)
-   - Skrive inn bedriftsnavn
-   - Legge til valgfri nettside-URL
-   - Dra for å endre rekkefølge (display_order)
-   - Slette en logo
-
-### Design
-- Logoer vises i en horisontal rad med `grayscale` filter → fargelagt ved hover
-- Responsiv: 3 kolonner mobil, 6 kolonner desktop
-- Subtil auto-scroll animasjon (marquee-stil) valgfritt
-
-### Teknisk arkitektur
-
-Følger eksisterende CMS-mønster fra `EditableServiceCard` og `TeamMemberEditor`:
-- Data hentes via `useQuery` / Supabase
-- Upload til `client-logos` storage bucket
-- Edit modal følger samme mønster som `TeamMemberEditor`
-- Seksjonen er usynlig hvis ingen aktive logoer finnes (og editMode er av)
