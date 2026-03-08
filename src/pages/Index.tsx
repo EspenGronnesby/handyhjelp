@@ -19,7 +19,7 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import ClientLogosSection from "@/components/ClientLogosSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { PageSEO } from "@/components/SEO/PageSEO";
-import { useScrollGridReveal } from "@/hooks/useScrollAnimation";
+import { useScrollProgressReveal } from "@/hooks/useScrollAnimation";
 
 // Component for Services Section Heading
 const ServicesHeading = () => {
@@ -70,7 +70,7 @@ const ServicesHeading = () => {
 
 const Index = () => {
   const { user } = useAuth();
-  const { ref: servicesRef, isInView: servicesVisible, getItemStyle } = useScrollGridReveal(4, 2);
+  const { ref: servicesRef, isInView: servicesVisible, getItemStyle } = useScrollProgressReveal(4);
   
   return (
     <div className="min-h-screen">
