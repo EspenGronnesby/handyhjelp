@@ -60,10 +60,10 @@ export const EditableServiceCard = ({
   return (
     <>
       <div 
-        className={`relative rounded-lg p-4 md:p-6 transition-all duration-300 border card-hover-lift icon-hover-bounce reveal-scale perf-contain ${colors.bg} ${
-          popular ? 'border-success border-2 shadow-lg' : `border ${colors.border}`
+        className={`relative rounded-lg p-4 md:p-6 transition-colors duration-200 border perf-contain ${colors.bg} ${
+          popular ? 'border-success border-2' : `border ${colors.border}`
         } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''} 
-        dark:ring-1 dark:ring-white/5`}
+        dark:ring-1 dark:ring-white/10`}
       >
         {isAdmin && editMode && (
           <button
@@ -83,7 +83,7 @@ export const EditableServiceCard = ({
         )}
 
         {popular && !editMode && !isHidden && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-success text-success-foreground text-xs font-semibold px-3 py-1 rounded-full animate-subtle-pulse z-10">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-success text-success-foreground text-xs font-semibold px-3 py-1 rounded-full z-10">
             Populær
           </div>
         )}
