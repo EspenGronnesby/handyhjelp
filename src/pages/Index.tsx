@@ -19,7 +19,7 @@ import TestimonialsSection from "@/components/TestimonialsSection";
 import ClientLogosSection from "@/components/ClientLogosSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
 import { PageSEO } from "@/components/SEO/PageSEO";
-import { useScrollProgressReveal } from "@/hooks/useScrollAnimation";
+import { useSequentialReveal } from "@/hooks/useScrollAnimation";
 
 // Component for Services Section Heading
 const ServicesHeading = () => {
