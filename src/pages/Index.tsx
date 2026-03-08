@@ -91,7 +91,7 @@ const Index = () => {
         <ClientLogosSection />
         
         {/* How It Works Process Section */}
-        <section id="process-section" aria-labelledby="process-heading">
+        <section id="process-section" aria-labelledby="process-heading" className="bg-muted/30">
           <ProcessSection />
         </section>
 
