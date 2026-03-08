@@ -182,7 +182,7 @@ const Contact = () => {
           </div>
 
           {/* FAQ Section */}
-          <section className="max-w-3xl mx-auto">
+          <section className="max-w-3xl mx-auto mt-8">
             <h2 className="text-3xl font-bold text-center mb-8">
               Ofte stilte spørsmål før du kontakter oss
             </h2>

@@ -50,7 +50,7 @@ const ServiceTomrer = () => {
       </div>
 
       {/* Main Content */}
-      <section className="py-16 bg-background">
+      <section className="py-16 md:py-24 bg-background">
         <div className="container mx-auto px-4 max-w-4xl">
           <EditableServiceAbout 
             section="service-tomrer"
