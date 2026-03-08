@@ -206,6 +206,11 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
         await supabase.from('notifications').insert(notifications);
       }
 
+      // Send email notification (fire-and-forget)
+      supabase.functions.invoke('send-content-notification', {
+        body: { type: 'blog', title: formData.title, submitterEmail: user?.email, isEdit: false },
+      }).catch(() => {});
+
       return blog;
     },
     onSuccess: () => {
