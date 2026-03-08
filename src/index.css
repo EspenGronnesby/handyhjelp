@@ -297,7 +297,6 @@ html, body {
   .card-hover-lift {
     position: relative;
     transition: transform 0.5s ease-out, box-shadow 0.5s ease-out;
-    overflow: hidden;
   }
   
   .card-hover-lift::before {
