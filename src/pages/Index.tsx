@@ -18,7 +18,6 @@ import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ClientLogosSection from "@/components/ClientLogosSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
-import { ScrollProgress } from "@/components/ScrollProgress";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { useScrollGridReveal } from "@/hooks/useScrollAnimation";
 
