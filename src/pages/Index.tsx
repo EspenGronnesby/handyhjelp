@@ -70,7 +70,7 @@ const ServicesHeading = () => {
 
 const Index = () => {
   const { user } = useAuth();
-  const { ref: servicesRef, isInView: servicesVisible, getItemStyle } = useScrollGridReveal(4, 2);
+  const { ref: servicesRef, isInView: servicesVisible, getItemStyle } = useScrollProgressReveal(4);
   
   return (
     <div className="min-h-screen">
