@@ -179,7 +179,7 @@ const TestimonialsSection = () => {
   }
 
   return (
-    <section id="testimonials" className="py-12 md:py-20 bg-gradient-to-b from-muted/30 to-background section-mobile">
+    <section id="testimonials" className="py-16 md:py-24 bg-muted/20">
       <div className="container mx-auto px-4">
         {/* Section Header - Compact on mobile */}
         <div className="text-center mb-8 md:mb-12">
