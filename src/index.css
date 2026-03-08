@@ -326,9 +326,7 @@ html, body {
   }
   
   .dark .card-hover-lift:hover {
-    box-shadow: 
-      0 25px 50px -12px rgba(0,0,0,0.4),
-      0 0 0 1px hsl(var(--primary) / 0.25);
+    box-shadow: 0 12px 24px -8px rgba(0,0,0,0.35);
   }
   
   .dark .card-hover-lift:hover::before {
