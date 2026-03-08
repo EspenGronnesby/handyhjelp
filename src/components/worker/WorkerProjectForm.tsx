@@ -206,6 +206,11 @@ export const WorkerProjectForm = ({ open, onClose }: WorkerProjectFormProps) => 
         await supabase.from('notifications').insert(notifications);
       }
 
+      // Send email notification (fire-and-forget)
+      supabase.functions.invoke('send-content-notification', {
+        body: { type: 'project', title: formData.title, submitterEmail: user?.email, isEdit: false },
+      }).catch(() => {});
+
       return project;
     },
     onSuccess: () => {

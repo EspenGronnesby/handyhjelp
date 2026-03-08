@@ -239,6 +239,11 @@ export const WorkerProjectEditForm = ({ project, open, onClose }: WorkerProjectE
 
         await supabase.from('notifications').insert(notifications);
       }
+
+      // Send email notification (fire-and-forget)
+      supabase.functions.invoke('send-content-notification', {
+        body: { type: 'project', title: formData.title, submitterEmail: user?.email, isEdit: true },
+      }).catch(() => {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['worker-projects'] });
