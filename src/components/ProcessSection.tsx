@@ -90,7 +90,7 @@ export const ProcessSection = () => {
   const displayHeading = heading || 'Slik fungerer det';
   
   return (
-    <section className="py-12 md:py-16 section-mobile" ref={ref}>
+    <section className="py-16 md:py-24" ref={ref}>
       <div className="container mx-auto px-4">
         <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="relative text-center mb-8 md:mb-12">
