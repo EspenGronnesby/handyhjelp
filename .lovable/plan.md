@@ -1,85 +1,58 @@
 
-# Plan: Fiks byggfeil + Kundelogo-vegg
 
-## Del 1: Fiks byggfeil i BlogManagement.tsx
+# Plan: Lysere, skarpere nettside-design med mer whitespace
 
-### Problem
-På linje 558 brukes `handleCloseDialog` direkte som `onClick`-handler på en `<Button>`:
-```tsx
-<Button type="button" variant="outline" onClick={handleCloseDialog}>
-```
-TypeScript klager fordi `handleCloseDialog` forventer `boolean | undefined`, men `onClick` sender `MouseEvent`. 
+## Problemet
+Dark mode bruker ekstremt mørke, mettede blåtoner (`background: 222 47% 8%`, `card: 222 47% 14%`) som gjør alt tungt og "mørkeblått". Seksjonene har lite visuell separasjon — alt smelter sammen. Light mode er OK men kan også forbedres med mer whitespace.
 
-### Fix
-Pakk kallet i en arrow-funksjon slik at `clearDrafts` ikke mottar et mouse-event:
-```tsx
-onClick={() => handleCloseDialog(true)}
-```
+## Referanse-stil
+Profesjonelle håndverker-nettsider (Mitsubishi Electric, Caverion, ISS) bruker:
+- Nøytrale grå-toner i dark mode (ikke mettede blåfarger)
+- Tydelig seksjonsseparasjon med alternerende bakgrunner
+- Mer generøs padding mellom seksjoner
+- Hint av merkefarge (blå) som aksent, ikke som bakgrunnstone
 
----
+## Endringer
 
-## Del 2: Kundelogo-vegg
+### Steg 1: Justere dark mode fargepalett (`src/index.css`)
+Gjøre dark mode mindre "blåsvart" og mer nøytral-mørk med hint av blå:
 
-### Hva som bygges
-En ny seksjon på forsiden (mellom TestimonialsSection og Services) som viser logoer til bedrifter HandyHjelp har jobbet for. I redigeringsmodus kan owner legge til, redigere og fjerne logoer.
+| Variabel | Nå | Ny |
+|----------|-----|-----|
+| `--background` | `222 47% 8%` | `220 15% 11%` (nøytral mørk) |
+| `--card` | `222 47% 14%` | `220 13% 15%` (lettere, mindre blå) |
+| `--card-elevated` | `222 47% 18%` | `220 13% 19%` |
+| `--muted` | `222 47% 16%` | `220 10% 14%` |
+| `--secondary` | `222 47% 20%` | `220 15% 20%` |
+| `--border` | `222 47% 28%` | `220 10% 24%` |
 
-### Database
-Ny tabell `client_logos` med følgende kolonner:
-- `id` (uuid, PK)
-- `name` (text) – bedriftsnavn
-- `logo_url` (text) – URL til logo i storage
-- `website_url` (text, nullable) – evt. lenke til bedriftens nettside
-- `display_order` (integer, default 0)
-- `is_active` (boolean, default true)
-- `created_at` (timestamp)
+Saturasjonen reduseres fra ~47% til ~10-15%, noe som gir en mer nøytral, profesjonell "slate"-tone med bare et hint av blå.
 
-RLS-regler:
-- Alle kan lese aktive logoer (`is_active = true`)
-- Kun `platform_owner` kan opprette, oppdatere og slette
+### Steg 2: Øke seksjonsseparasjon i `Index.tsx`
+- Legge til alternerende bakgrunner: `bg-background` → `bg-muted/30` → `bg-background` osv.
+- Øke padding fra `py-12 md:py-16` til `py-16 md:py-24` på hovedseksjoner for mer pusterom
 
-Storage bucket `client-logos` (public) for logo-opplasting.
+### Steg 3: Forbedre seksjonsbakgrunner i komponentene
+- `ProcessSection`: Legg til `bg-muted/30` bakgrunn for visuell separasjon
+- `TestimonialsSection`: Behold gradient men gjøre den subtilere
+- `EditableBottomCTA`: Beholde som den er (CTA-seksjon med farge er OK)
+- Services-seksjonen: Legg til `bg-muted/20` for kontrast
 
-### Filer som opprettes/endres
+### Steg 4: Fjerne `hover:bg-warning` fra BottomCTA-knappen
+Linje 54 i `EditableBottomCTA.tsx` — "Ring oss"-knappen har `hover:bg-warning hover:text-warning-foreground` som skaper dårlig kontrast. Erstatt med subtilere hover.
 
+### Filer som endres
 | Fil | Endring |
 |-----|---------|
-| `supabase/migrations/...` | Ny migrasjon for tabell + RLS + storage bucket |
-| `src/components/ClientLogosSection.tsx` | Ny seksjon som vises på forsiden |
-| `src/components/ClientLogosEditModal.tsx` | Modal for å legge til / redigere en logo |
-| `src/pages/Index.tsx` | Legg inn `<ClientLogosSection />` mellom Testimonials og Services |
+| `src/index.css` | Dark mode fargepalett (redusere saturasjon) |
+| `src/pages/Index.tsx` | Øke seksjonpadding, alternerende bakgrunner |
+| `src/components/ProcessSection.tsx` | Bakgrunnsfarge + padding |
+| `src/components/TestimonialsSection.tsx` | Justere gradient |
+| `src/components/EditableBottomCTA.tsx` | Fiks warning-hover på knapp |
 
-### Slik ser seksjonen ut
+### Hva som IKKE endres
+- Ingen funksjonalitet
+- Light mode beholdes (bare minor whitespace-økning)
+- Fargepalett for primary/accent/success beholdes
+- Mobil-layout beholdes
 
-```text
-┌──────────────────────────────────────────────────────┐
-│          Stolte samarbeidspartnere                    │
-│  ────────────────────────────────────────────────    │
-│  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]     │
-│                                                      │
-│  (I redigeringsmodus: blyant-ikon over hver logo,   │
-│   + "Legg til"-knapp til høyre)                     │
-└──────────────────────────────────────────────────────┘
-```
-
-### Redigeringsflyt (owner med edit mode på)
-1. Blyant-ikon vises øverst til høyre på seksjonen
-2. Klikk åpner en modal med liste over alle logoer
-3. I modalen kan owner:
-   - Laste opp ny logo (bilde-upload)
-   - Skrive inn bedriftsnavn
-   - Legge til valgfri nettside-URL
-   - Dra for å endre rekkefølge (display_order)
-   - Slette en logo
-
-### Design
-- Logoer vises i en horisontal rad med `grayscale` filter → fargelagt ved hover
-- Responsiv: 3 kolonner mobil, 6 kolonner desktop
-- Subtil auto-scroll animasjon (marquee-stil) valgfritt
-
-### Teknisk arkitektur
-
-Følger eksisterende CMS-mønster fra `EditableServiceCard` og `TeamMemberEditor`:
-- Data hentes via `useQuery` / Supabase
-- Upload til `client-logos` storage bucket
-- Edit modal følger samme mønster som `TeamMemberEditor`
-- Seksjonen er usynlig hvis ingen aktive logoer finnes (og editMode er av)
