@@ -211,7 +211,7 @@ html, body {
   /* Professional Card Styles - Enhanced for dark mode visibility */
   .card-professional {
     @apply bg-card border border-border rounded-xl;
-    @apply dark:ring-1 dark:ring-white/5;
+    @apply dark:ring-1 dark:ring-white/10;
     box-shadow: var(--shadow-card);
     transition: box-shadow 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out;
     filter: brightness(1);
