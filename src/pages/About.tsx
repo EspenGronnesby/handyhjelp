@@ -79,7 +79,7 @@ const About = () => {
         </div>
 
         {/* Main Content */}
-        <section className="container mx-auto px-4 py-20">
+        <section className="container mx-auto px-4 py-16 md:py-24">
           {/* Timeline Section */}
           <EditableTimeline />
 
