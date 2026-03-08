@@ -240,9 +240,9 @@ const TestimonialsSection = () => {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className={cn(
-                    "relative h-full bg-card rounded-2xl p-6 md:p-8 shadow-lg border border-border/50 card-hover-lift",
-                    "hover:border-primary/30",
-                    index === currentIndex && "ring-2 ring-primary/20"
+                    "relative h-full bg-card rounded-xl p-6 md:p-8 shadow-md border border-border/50",
+                    "hover:shadow-lg hover:border-border transition-shadow duration-300",
+                    index === currentIndex && "border-primary/20"
                   )}>
                       {/* Quote Icon - with Google badge if from Google */}
                       <div className="absolute -top-4 left-8">
@@ -317,8 +317,7 @@ const TestimonialsSection = () => {
                         </div>
                       </div>
 
-                    {/* Decorative gradient */}
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                    {/* Subtle bottom accent */}
                   </div>
                 </div>
               );

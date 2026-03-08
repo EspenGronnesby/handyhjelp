@@ -129,9 +129,9 @@ export const HeroSection = () => {
               </div>
 
               {/* 24/7 Contact */}
-              <div className="backdrop-blur-sm rounded-lg p-4 md:p-6 inline-block bg-secondary dark:bg-card border border-border/30 hover:bg-warning hover:border-warning transition-colors group">
-                <p className="text-white/80 dark:text-muted-foreground text-xs md:text-sm mb-1 md:mb-2 group-hover:text-warning-foreground">24/7 Service</p>
-                <a href="tel:+4741250553" className="text-white dark:text-foreground text-2xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 md:gap-3 group-hover:text-warning-foreground transition-colors">
+              <div className="backdrop-blur-sm rounded-lg p-4 md:p-6 inline-block bg-secondary dark:bg-card border border-white/20 hover:bg-white/15 hover:border-white/40 transition-colors group">
+                <p className="text-white/80 dark:text-muted-foreground text-xs md:text-sm mb-1 md:mb-2">24/7 Service</p>
+                <a href="tel:+4741250553" className="text-white dark:text-foreground text-2xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 md:gap-3 transition-colors">
                   <Phone className="h-6 w-6 md:h-7 md:w-7" />
                   <span>+47 41250553</span>
                 </a>
