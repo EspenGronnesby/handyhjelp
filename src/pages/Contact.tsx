@@ -93,7 +93,7 @@ const Contact = () => {
         </section>
 
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 mb-20">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
             {/* Contact Form */}
             <div>
               <Card className="subtle-hover">
