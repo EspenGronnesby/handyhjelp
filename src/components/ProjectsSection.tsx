@@ -105,7 +105,7 @@ export const ProjectsSection = () => {
   return (
     <section id="projects" className="py-12 md:py-16 bg-muted/30 section-mobile" ref={ref}>
       <div className="container mx-auto px-4">
-        <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-6 md:p-12 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="relative text-center mb-8 md:mb-12">
           {isAdmin && editMode && (
             <button

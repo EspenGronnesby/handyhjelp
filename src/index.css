@@ -534,9 +534,7 @@ html, body {
   
   /* Full-height mobile sections */
   .section-mobile {
-    @apply min-h-[100svh] flex flex-col justify-center;
-    @apply py-8 md:py-16 md:min-h-0;
-    contain: layout;
+    @apply py-10 md:py-16;
   }
 
   /* Cinematic reveal animation */

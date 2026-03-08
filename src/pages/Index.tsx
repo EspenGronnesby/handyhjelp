@@ -207,9 +207,6 @@ const Index = () => {
 
       <Footer />
       
-      {/* Scroll Progress Indicator - Mobile only */}
-      <ScrollProgress />
-      
       {/* Sticky Mobile CTA */}
       <StickyMobileCTA />
     </div>
