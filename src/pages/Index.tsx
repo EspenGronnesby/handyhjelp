@@ -105,7 +105,7 @@ const Index = () => {
         {/* Services Section - Compact Overview */}
         <section className="py-12 md:py-16 bg-background section-mobile" id="services" ref={servicesRef}>
           <div className="container mx-auto px-4">
-            <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-6 md:p-12 transition-all duration-700 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className={`transition-all duration-700 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <ServicesHeading />
 
             
