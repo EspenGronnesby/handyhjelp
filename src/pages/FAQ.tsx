@@ -14,7 +14,7 @@ const FAQ = () => {
       <Header />
       <BreadcrumbNavigation />
       
-      <main id="main-content" className="pt-32 pb-16">
+      <main id="main-content" className="pt-32 pb-16 md:pb-24">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <EditableHero

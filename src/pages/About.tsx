@@ -79,7 +79,7 @@ const About = () => {
         </div>
 
         {/* Main Content */}
-        <section className="container mx-auto px-4 py-20">
+        <section className="container mx-auto px-4 py-16 md:py-24">
           {/* Timeline Section */}
           <EditableTimeline />
 
@@ -89,7 +89,7 @@ const About = () => {
           </div>
 
           {/* Team Section with Admin Editing */}
-          <div id="team" className="bg-muted rounded-2xl p-12 mb-20 scroll-mt-24" ref={teamRef}>
+          <div id="team" className="bg-muted/40 rounded-2xl p-8 md:p-12 mb-20 scroll-mt-24" ref={teamRef}>
             <h2 className={`text-3xl font-bold text-center mb-4 transition-all duration-700 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>Møt teamet</h2>
             <p className={`text-center text-muted-foreground mb-12 max-w-2xl mx-auto transition-all duration-700 delay-100 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               Våre erfarne fagfolk er klar til å hjelpe deg med alle dine eiendomsbehov

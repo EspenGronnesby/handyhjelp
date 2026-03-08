@@ -85,7 +85,7 @@ const Contact = () => {
       
       <main id="main-content" className="pt-32 pb-16">
         {/* Hero Section */}
-        <section className="container mx-auto px-4 mb-16">
+        <section className="container mx-auto px-4 mb-16 md:mb-20">
           <EditableHero section="hero-kontakt" defaultHeading="Ta kontakt i dag" defaultSubtext="Vi er her for å hjelpe deg med alle dine eiendomsbehov. Kontakt oss for en uforpliktende samtale." className="max-w-3xl mx-auto" />
           <p className="text-lg font-semibold text-primary text-center mt-4">
             ⏱️ Vi svarer innen 1-3 virkedager
@@ -93,7 +93,7 @@ const Contact = () => {
         </section>
 
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 mb-20">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
             {/* Contact Form */}
             <div>
               <Card className="subtle-hover">
@@ -172,11 +172,6 @@ const Contact = () => {
               </CardContent>
             </Card>
 
-              {/* Alternative Contact */}
-              <Card className="bg-accent/10 border-accent">
-                
-              </Card>
-
               {/* How We Work */}
               <Card className="subtle-hover">
                 <CardContent className="pt-6">
@@ -187,7 +182,7 @@ const Contact = () => {
           </div>
 
           {/* FAQ Section */}
-          <section className="max-w-3xl mx-auto">
+          <section className="max-w-3xl mx-auto mt-8">
             <h2 className="text-3xl font-bold text-center mb-8">
               Ofte stilte spørsmål før du kontakter oss
             </h2>
