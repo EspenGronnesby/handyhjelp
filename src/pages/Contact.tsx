@@ -85,7 +85,7 @@ const Contact = () => {
       
       <main id="main-content" className="pt-32 pb-16">
         {/* Hero Section */}
-        <section className="container mx-auto px-4 mb-16">
+        <section className="container mx-auto px-4 mb-16 md:mb-20">
           <EditableHero section="hero-kontakt" defaultHeading="Ta kontakt i dag" defaultSubtext="Vi er her for å hjelpe deg med alle dine eiendomsbehov. Kontakt oss for en uforpliktende samtale." className="max-w-3xl mx-auto" />
           <p className="text-lg font-semibold text-primary text-center mt-4">
             ⏱️ Vi svarer innen 1-3 virkedager
