@@ -281,7 +281,7 @@ html, body {
     filter: brightness(1.03);
   }
 
-  .dark .card-professional:hover {
+  :is(.dark, .blue) .card-professional:hover {
     filter: brightness(1.08);
   }
 
