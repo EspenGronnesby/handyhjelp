@@ -59,7 +59,7 @@ export const EditableBottomCTA = () => {
             {/* Bottom: Fixed agreements as primary CTA */}
             <Link to="/fast-avtale">
               <Button variant="cta" size="lg" className="text-lg px-12 py-4 shadow-lg hover:shadow-xl transition-all font-semibold">
-                ⭐ Faste oppdrag – Bli prioritert kunde
+                Faste oppdrag – Bli prioritert kunde
               </Button>
             </Link>
           </div>
