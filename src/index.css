@@ -98,6 +98,65 @@ html, body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
+  /* Blue Mode — Original Marine Blue palette */
+  .blue {
+    --background: 213 51% 18%;
+    --foreground: 210 20% 95%;
+
+    --hero-bg: 213 51% 14%;
+    --hero-bg-secondary: 213 51% 16%;
+    --hero-text: 0 0% 98%;
+    --hero-text-muted: 210 20% 80%;
+
+    --card: 213 45% 22%;
+    --card-foreground: 210 20% 95%;
+    --card-elevated: 213 40% 26%;
+
+    --primary: 188 94% 37%;
+    --primary-hover: 188 94% 45%;
+    --primary-foreground: 0 0% 98%;
+
+    --success: 188 94% 37%;
+    --success-hover: 188 94% 45%;
+    --success-foreground: 0 0% 98%;
+
+    --secondary: 210 29% 14%;
+    --secondary-hover: 210 29% 18%;
+    --secondary-foreground: 210 20% 95%;
+
+    --muted: 213 45% 15%;
+    --muted-hover: 213 45% 19%;
+    --muted-foreground: 210 20% 70%;
+
+    --accent: 24 95% 53%;
+    --accent-hover: 24 95% 60%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 20% 98%;
+
+    --border: 213 35% 28%;
+    --border-input: 213 35% 32%;
+    --input: 213 45% 20%;
+    --input-foreground: 210 20% 95%;
+    --ring: 188 94% 37%;
+
+    --popover: 213 45% 22%;
+    --popover-foreground: 210 20% 95%;
+
+    --shadow-card: 0 4px 12px -2px hsl(213 51% 8% / 0.4), 0 2px 6px -2px hsl(213 51% 8% / 0.2);
+    --shadow-elevated: 0 10px 25px -5px hsl(213 51% 8% / 0.5), 0 6px 10px -4px hsl(213 51% 8% / 0.3);
+
+    --sidebar-background: 213 51% 14%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 188 94% 37%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 213 45% 22%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 213 35% 26%;
+    --sidebar-ring: 188 94% 37%;
+  }
+
   .dark {
     /* Dark Mode — 2026 breathable dark with clear layering */
     --background: 220 14% 16%;
@@ -222,7 +281,7 @@ html, body {
     filter: brightness(1.03);
   }
 
-  .dark .card-professional:hover {
+  :is(.dark, .blue) .card-professional:hover {
     filter: brightness(1.08);
   }
 
@@ -247,7 +306,7 @@ html, body {
     filter: brightness(1.03);
   }
 
-  .dark .card-enhanced:hover {
+  :is(.dark, .blue) .card-enhanced:hover {
     filter: brightness(1.08);
   }
 
@@ -322,15 +381,15 @@ html, body {
     opacity: 1;
   }
 
-  .dark .card-hover-lift::before {
+  :is(.dark, .blue) .card-hover-lift::before {
     background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 100%);
   }
   
-  .dark .card-hover-lift:hover {
+  :is(.dark, .blue) .card-hover-lift:hover {
     box-shadow: 0 12px 24px -8px rgba(0,0,0,0.35);
   }
   
-  .dark .card-hover-lift:hover::before {
+  :is(.dark, .blue) .card-hover-lift:hover::before {
     opacity: 1;
   }
 
@@ -400,15 +459,15 @@ html, body {
     opacity: 1;
   }
 
-  .dark .interactive-card::before {
+  :is(.dark, .blue) .interactive-card::before {
     background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%);
   }
 
-  .dark .interactive-card:hover {
+  :is(.dark, .blue) .interactive-card:hover {
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
   }
 
-  .dark .interactive-card:hover::before {
+  :is(.dark, .blue) .interactive-card:hover::before {
     opacity: 1;
   }
 
@@ -435,11 +494,11 @@ html, body {
     opacity: 1;
   }
 
-  .dark .subtle-hover::before {
+  :is(.dark, .blue) .subtle-hover::before {
     background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%);
   }
 
-  .dark .subtle-hover:hover::before {
+  :is(.dark, .blue) .subtle-hover:hover::before {
     opacity: 1;
   }
 

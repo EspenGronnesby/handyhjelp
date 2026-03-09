@@ -146,7 +146,7 @@ const AppRouter = () => {
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} themes={['light', 'dark', 'blue']}>
         <TooltipProvider>
           <EditModeProvider>
             <Toaster />

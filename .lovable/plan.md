@@ -1,40 +1,85 @@
 
+# Plan: Fiks byggfeil + Kundelogo-vegg
 
-# Plan: Tre tema-valg — Hvit, Blå og Svart
+## Del 1: Fiks byggfeil i BlogManagement.tsx
 
-## Oversikt
-Legge til et tredje "blå" tema som gjenspeiler den originale mørkeblå fargepaletten (marine blue). Brukeren kan velge mellom tre temaer via en oppdatert theme-toggle.
+### Problem
+På linje 558 brukes `handleCloseDialog` direkte som `onClick`-handler på en `<Button>`:
+```tsx
+<Button type="button" variant="outline" onClick={handleCloseDialog}>
+```
+TypeScript klager fordi `handleCloseDialog` forventer `boolean | undefined`, men `onClick` sender `MouseEvent`. 
 
-## Hvordan det fungerer
+### Fix
+Pakk kallet i en arrow-funksjon slik at `clearDrafts` ikke mottar et mouse-event:
+```tsx
+onClick={() => handleCloseDialog(true)}
+```
 
-`next-themes` støtter egendefinerte tema-verdier. Vi legger til `"blue"` som et tredje alternativ ved siden av `"light"` og `"dark"`.
+---
 
-**Fargelagdeling:**
-- **Hvit (light)** = nåværende `:root` — uendret
-- **Blå (blue)** = den originale mørkeblå paletten med marine blue bakgrunn (~`213 51% 24%`), deep blue kort, turkis CTA
-- **Svart (dark)** = nåværende `.dark` — uendret (den nye 2026-paletten)
+## Del 2: Kundelogo-vegg
 
-## Endringer
+### Hva som bygges
+En ny seksjon på forsiden (mellom TestimonialsSection og Services) som viser logoer til bedrifter HandyHjelp har jobbet for. I redigeringsmodus kan owner legge til, redigere og fjerne logoer.
 
-### 1. `src/index.css` — Legg til `.blue` tema-klasse
-Ny CSS-blokk `.blue { ... }` med den originale blå paletten:
-- Background: `213 51% 18%` (dyp marine)
-- Card: `213 45% 22%`
-- Card-elevated: `213 40% 26%`
-- Secondary: `210 29% 14%` (mørkere for footer)
-- Primary: turkis som i dag
-- Foreground: off-white
+### Database
+Ny tabell `client_logos` med følgende kolonner:
+- `id` (uuid, PK)
+- `name` (text) – bedriftsnavn
+- `logo_url` (text) – URL til logo i storage
+- `website_url` (text, nullable) – evt. lenke til bedriftens nettside
+- `display_order` (integer, default 0)
+- `is_active` (boolean, default true)
+- `created_at` (timestamp)
 
-### 2. `src/App.tsx` — Oppdater ThemeProvider
-Endre `themes` prop til å inkludere `['light', 'dark', 'blue']`.
+RLS-regler:
+- Alle kan lese aktive logoer (`is_active = true`)
+- Kun `platform_owner` kan opprette, oppdatere og slette
 
-### 3. `src/components/ThemeToggle.tsx` — Tre-valgs toggle
-Erstatte Switch/Button med en 3-knapp gruppe (Sun/Waves/Moon ikoner) som setter `light`, `blue`, eller `dark`. Brukes både i header og profilside.
+Storage bucket `client-logos` (public) for logo-opplasting.
 
-### Filer som endres
+### Filer som opprettes/endres
+
 | Fil | Endring |
 |-----|---------|
-| `src/index.css` | Ny `.blue` fargepalett |
-| `src/App.tsx` | Legg til `themes={['light', 'dark', 'blue']}` |
-| `src/components/ThemeToggle.tsx` | Tre-knapp toggle med ikoner |
+| `supabase/migrations/...` | Ny migrasjon for tabell + RLS + storage bucket |
+| `src/components/ClientLogosSection.tsx` | Ny seksjon som vises på forsiden |
+| `src/components/ClientLogosEditModal.tsx` | Modal for å legge til / redigere en logo |
+| `src/pages/Index.tsx` | Legg inn `<ClientLogosSection />` mellom Testimonials og Services |
 
+### Slik ser seksjonen ut
+
+```text
+┌──────────────────────────────────────────────────────┐
+│          Stolte samarbeidspartnere                    │
+│  ────────────────────────────────────────────────    │
+│  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]     │
+│                                                      │
+│  (I redigeringsmodus: blyant-ikon over hver logo,   │
+│   + "Legg til"-knapp til høyre)                     │
+└──────────────────────────────────────────────────────┘
+```
+
+### Redigeringsflyt (owner med edit mode på)
+1. Blyant-ikon vises øverst til høyre på seksjonen
+2. Klikk åpner en modal med liste over alle logoer
+3. I modalen kan owner:
+   - Laste opp ny logo (bilde-upload)
+   - Skrive inn bedriftsnavn
+   - Legge til valgfri nettside-URL
+   - Dra for å endre rekkefølge (display_order)
+   - Slette en logo
+
+### Design
+- Logoer vises i en horisontal rad med `grayscale` filter → fargelagt ved hover
+- Responsiv: 3 kolonner mobil, 6 kolonner desktop
+- Subtil auto-scroll animasjon (marquee-stil) valgfritt
+
+### Teknisk arkitektur
+
+Følger eksisterende CMS-mønster fra `EditableServiceCard` og `TeamMemberEditor`:
+- Data hentes via `useQuery` / Supabase
+- Upload til `client-logos` storage bucket
+- Edit modal følger samme mønster som `TeamMemberEditor`
+- Seksjonen er usynlig hvis ingen aktive logoer finnes (og editMode er av)
