@@ -498,7 +498,7 @@ html, body {
     background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%);
   }
 
-  .dark .subtle-hover:hover::before {
+  :is(.dark, .blue) .subtle-hover:hover::before {
     opacity: 1;
   }
 
