@@ -306,7 +306,7 @@ html, body {
     filter: brightness(1.03);
   }
 
-  .dark .card-enhanced:hover {
+  :is(.dark, .blue) .card-enhanced:hover {
     filter: brightness(1.08);
   }
 
