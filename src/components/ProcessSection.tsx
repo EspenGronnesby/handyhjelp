@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Phone, Calculator, CheckCircle } from "lucide-react";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
@@ -29,8 +28,8 @@ const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, 
   return (
     <>
       <div style={style}>
-        <Card 
-          className="card-professional p-5 md:p-6 text-center card-hover-lift relative bg-primary/5 dark:bg-primary/10 perf-contain h-full"
+        <div
+          className="glass-surface p-5 md:p-6 text-center card-hover-lift relative perf-contain h-full"
         >
           {isAdmin && editMode && (
             <button
@@ -64,7 +63,7 @@ const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, 
               {displayDescription}
             </p>
           </div>
-        </Card>
+        </div>
       </div>
       
       <ProcessStepEditModal
