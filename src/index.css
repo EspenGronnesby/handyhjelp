@@ -98,63 +98,63 @@ html, body {
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-  /* Blue Mode — Original HandyHjelp marine blue (matches handyhjelp.no) */
+  /* Blue Mode — Original HandyHjelp marine blue (#0f172a base) */
   .blue {
-    --background: 216 28% 15%;
-    --foreground: 210 15% 93%;
+    --background: 222 47% 11%;
+    --foreground: 0 0% 100%;
 
-    --hero-bg: 216 28% 12%;
-    --hero-bg-secondary: 216 28% 13%;
+    --hero-bg: 222 47% 8%;
+    --hero-bg-secondary: 222 47% 10%;
     --hero-text: 0 0% 98%;
-    --hero-text-muted: 210 15% 78%;
+    --hero-text-muted: 220 20% 78%;
 
-    --card: 216 25% 19%;
-    --card-foreground: 210 15% 93%;
-    --card-elevated: 216 22% 23%;
+    --card: 222 40% 15%;
+    --card-foreground: 0 0% 100%;
+    --card-elevated: 222 35% 19%;
 
-    --primary: 188 94% 37%;
-    --primary-hover: 188 94% 45%;
+    --primary: 188 96% 43%;
+    --primary-hover: 188 96% 50%;
     --primary-foreground: 0 0% 98%;
 
-    --success: 142 76% 45%;
-    --success-hover: 142 76% 55%;
+    --success: 142 71% 45%;
+    --success-hover: 142 71% 55%;
     --success-foreground: 0 0% 98%;
 
-    --secondary: 216 28% 10%;
-    --secondary-hover: 216 28% 14%;
-    --secondary-foreground: 210 15% 93%;
+    --secondary: 222 47% 8%;
+    --secondary-hover: 222 47% 12%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 216 25% 13%;
-    --muted-hover: 216 25% 17%;
-    --muted-foreground: 215 12% 65%;
+    --muted: 222 40% 13%;
+    --muted-hover: 222 40% 17%;
+    --muted-foreground: 220 15% 65%;
 
     --accent: 24 95% 53%;
     --accent-hover: 24 95% 60%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 72% 55%;
-    --destructive-foreground: 210 15% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 216 20% 25%;
-    --border-input: 216 20% 30%;
-    --input: 216 25% 17%;
-    --input-foreground: 210 15% 93%;
-    --ring: 188 94% 37%;
+    --border: 222 30% 20%;
+    --border-input: 222 30% 25%;
+    --input: 222 40% 17%;
+    --input-foreground: 0 0% 100%;
+    --ring: 188 96% 43%;
 
-    --popover: 216 25% 19%;
-    --popover-foreground: 210 15% 93%;
+    --popover: 222 40% 15%;
+    --popover-foreground: 0 0% 100%;
 
-    --shadow-card: 0 4px 12px -2px hsl(216 28% 5% / 0.4), 0 2px 6px -2px hsl(216 28% 5% / 0.2);
-    --shadow-elevated: 0 10px 25px -5px hsl(216 28% 5% / 0.5), 0 6px 10px -4px hsl(216 28% 5% / 0.3);
+    --shadow-card: 0 4px 12px -2px hsl(222 47% 5% / 0.4), 0 2px 6px -2px hsl(222 47% 5% / 0.2);
+    --shadow-elevated: 0 10px 25px -5px hsl(222 47% 5% / 0.5), 0 6px 10px -4px hsl(222 47% 5% / 0.3);
 
-    --sidebar-background: 216 28% 10%;
-    --sidebar-foreground: 210 15% 93%;
-    --sidebar-primary: 188 94% 37%;
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 188 96% 43%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 216 25% 19%;
-    --sidebar-accent-foreground: 210 15% 93%;
-    --sidebar-border: 216 20% 23%;
-    --sidebar-ring: 188 94% 37%;
+    --sidebar-accent: 222 40% 15%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 30% 18%;
+    --sidebar-ring: 188 96% 43%;
   }
 
   .dark {
