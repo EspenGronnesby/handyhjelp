@@ -60,10 +60,9 @@ export const EditableServiceCard = ({
   return (
     <>
       <div 
-        className={`relative rounded-lg p-4 md:p-6 transition-colors duration-200 border perf-contain ${colors.bg} ${
-          popular ? 'border-success border-2' : `border ${colors.border}`
-        } ${isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''} 
-        dark:ring-1 dark:ring-white/10`}
+        className={`glass-card relative p-4 md:p-6 perf-contain !overflow-visible ${
+          popular ? '!border-success !border-2' : ''
+        } ${isHidden && isAdmin && editMode ? 'opacity-50 !border-dashed !border-muted-foreground' : ''}`}
       >
         {isAdmin && editMode && (
           <button

@@ -923,3 +923,167 @@ html, body {
   left: 0;
   top: 0;
 }
+
+/* ── Liquid Glass Design System ── */
+
+.glass-surface {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--card) / 0.9) 0%,
+    hsl(var(--card) / 0.7) 100%
+  );
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid hsl(var(--border));
+  box-shadow:
+    0 2px 16px hsl(0 0% 0% / 0.08),
+    0 0 1px hsl(var(--foreground) / 0.05),
+    inset 0 0.5px 0 hsl(var(--foreground) / 0.04);
+  border-radius: 1.25rem;
+  transition: box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.glass-surface:hover {
+  box-shadow:
+    0 4px 24px hsl(0 0% 0% / 0.12),
+    0 0 1px hsl(var(--foreground) / 0.08),
+    inset 0 0.5px 0 hsl(var(--foreground) / 0.06);
+}
+
+/* Elevated variant — hero phone bar, featured cards */
+.glass-surface-elevated {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.06) 0%,
+    hsl(var(--card) / 0.85) 40%,
+    hsl(var(--card) / 0.7) 100%
+  );
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 0.5px solid hsl(var(--foreground) / 0.08);
+  box-shadow:
+    0 8px 32px hsl(0 0% 0% / 0.12),
+    0 0 1px hsl(var(--foreground) / 0.08),
+    inset 0 1px 0 hsl(var(--foreground) / 0.06);
+  border-radius: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1),
+              transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.glass-surface-elevated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    hsl(var(--primary) / 0.2),
+    transparent);
+  z-index: 1;
+}
+
+.glass-surface-elevated:hover {
+  box-shadow:
+    0 12px 40px hsl(0 0% 0% / 0.16),
+    0 0 1px hsl(var(--foreground) / 0.1),
+    inset 0 1px 0 hsl(var(--foreground) / 0.08);
+  transform: translateY(-2px);
+}
+
+/* Service card glass — subtle primary tint */
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.08) 0%,
+    hsl(var(--primary) / 0.04) 50%,
+    transparent 100%
+  );
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  border-radius: 1rem;
+  border: 1px solid hsl(var(--primary) / 0.15);
+  box-shadow:
+    0 0 20px hsl(var(--primary) / 0.05),
+    inset 0 1px 0 hsl(var(--primary) / 0.1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    hsl(var(--primary) / 0.15),
+    transparent);
+  z-index: 1;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--primary) / 0.25);
+  box-shadow:
+    0 4px 30px hsl(var(--primary) / 0.1),
+    inset 0 1px 0 hsl(var(--primary) / 0.12);
+}
+
+.glass-card:active {
+  transform: scale(0.99);
+}
+
+/* Light mode adjustments — higher opacity for readability */
+:root:not(.dark):not(.blue) .glass-surface {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--card) / 0.95) 0%,
+    hsl(var(--card) / 0.85) 100%
+  );
+  border-color: hsl(var(--foreground) / 0.06);
+}
+
+:root:not(.dark):not(.blue) .glass-surface-elevated {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.04) 0%,
+    hsl(var(--card) / 0.92) 40%,
+    hsl(var(--card) / 0.82) 100%
+  );
+  border-color: hsl(var(--foreground) / 0.06);
+}
+
+:root:not(.dark):not(.blue) .glass-card {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.06) 0%,
+    hsl(var(--primary) / 0.02) 50%,
+    transparent 100%
+  );
+  border-color: hsl(var(--primary) / 0.12);
+}
+
+/* Blue mode — deeper transparency for marine blue bg */
+.blue .glass-surface {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--card) / 0.85) 0%,
+    hsl(var(--card) / 0.6) 100%
+  );
+  border-color: hsl(var(--foreground) / 0.1);
+}
+
+.blue .glass-surface-elevated {
+  border-color: hsl(var(--foreground) / 0.12);
+}
+
+.blue .glass-card {
+  border-color: hsl(var(--primary) / 0.2);
+}
