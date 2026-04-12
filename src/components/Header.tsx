@@ -90,7 +90,7 @@ export const Header = () => {
               className="flex items-center"
             >
               <img 
-                src={resolvedTheme === 'dark' ? handyhjelpLogoWhite : handyhjelpLogo} 
+                src={resolvedTheme === 'dark' || resolvedTheme === 'blue' ? handyhjelpLogoWhite : handyhjelpLogo} 
                 alt="HandyHjelp - Levert med kvalitet" 
                 className="w-auto object-contain transition-all duration-200"
                 id="header-logo"
