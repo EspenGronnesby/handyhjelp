@@ -76,7 +76,7 @@ export const Footer = () => {
               <img 
                 alt="HandyHjelp - Levert med kvalitet" 
                 className="h-16 md:h-20 w-auto object-contain mb-4" 
-                src={resolvedTheme === 'dark' ? handyhjelpLogoFooter : handyhjelpLogo} 
+                src={resolvedTheme === 'dark' || resolvedTheme === 'blue' ? handyhjelpLogoFooter : handyhjelpLogo} 
               />
               <p className="text-sm mb-4 opacity-90">
                 {footerData.description}
