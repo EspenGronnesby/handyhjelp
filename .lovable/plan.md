@@ -1,85 +1,33 @@
 
-# Plan: Fiks byggfeil + Kundelogo-vegg
 
-## Del 1: Fiks byggfeil i BlogManagement.tsx
+# Plan: Oppdater blå tema til originale HandyHjelp-farger
 
-### Problem
-På linje 558 brukes `handleCloseDialog` direkte som `onClick`-handler på en `<Button>`:
-```tsx
-<Button type="button" variant="outline" onClick={handleCloseDialog}>
-```
-TypeScript klager fordi `handleCloseDialog` forventer `boolean | undefined`, men `onClick` sender `MouseEvent`. 
+## Farger fra bildet
+| Hex | Bruk |
+|-----|------|
+| `#0f172a` (HSL 222 47% 11%) | Bakgrunn (deep navy) |
+| `#22c55e` (HSL 142 71% 45%) | Success/CTA-knapper (grønn) |
+| `#ffffff` (HSL 0 0% 100%) | Tekst/foreground |
+| `#06b6d4` (HSL 188 96% 43%) | Primary accent (cyan) |
 
-### Fix
-Pakk kallet i en arrow-funksjon slik at `clearDrafts` ikke mottar et mouse-event:
-```tsx
-onClick={() => handleCloseDialog(true)}
-```
+## Endringer
 
----
+### `src/index.css` — Oppdater `.blue` blokken
+Justere alle tokens basert på `#0f172a` som ankerfarge:
 
-## Del 2: Kundelogo-vegg
+- **Background**: `222 47% 11%` (var 216 28% 15%)
+- **Card**: `222 40% 15%` (litt lysere enn bg)
+- **Card-elevated**: `222 35% 19%`
+- **Secondary/footer**: `222 47% 8%` (mørkere)
+- **Muted**: `222 40% 13%`
+- **Primary**: `188 96% 43%` (#06b6d4)
+- **Success**: `142 71% 45%` (#22c55e)
+- **Foreground**: `0 0% 100%` (#ffffff)
+- **Border**: `222 30% 20%`
+- Oppdatere shadows, sidebar, hero, popover tilsvarende
 
-### Hva som bygges
-En ny seksjon på forsiden (mellom TestimonialsSection og Services) som viser logoer til bedrifter HandyHjelp har jobbet for. I redigeringsmodus kan owner legge til, redigere og fjerne logoer.
-
-### Database
-Ny tabell `client_logos` med følgende kolonner:
-- `id` (uuid, PK)
-- `name` (text) – bedriftsnavn
-- `logo_url` (text) – URL til logo i storage
-- `website_url` (text, nullable) – evt. lenke til bedriftens nettside
-- `display_order` (integer, default 0)
-- `is_active` (boolean, default true)
-- `created_at` (timestamp)
-
-RLS-regler:
-- Alle kan lese aktive logoer (`is_active = true`)
-- Kun `platform_owner` kan opprette, oppdatere og slette
-
-Storage bucket `client-logos` (public) for logo-opplasting.
-
-### Filer som opprettes/endres
-
+### Filer som endres
 | Fil | Endring |
 |-----|---------|
-| `supabase/migrations/...` | Ny migrasjon for tabell + RLS + storage bucket |
-| `src/components/ClientLogosSection.tsx` | Ny seksjon som vises på forsiden |
-| `src/components/ClientLogosEditModal.tsx` | Modal for å legge til / redigere en logo |
-| `src/pages/Index.tsx` | Legg inn `<ClientLogosSection />` mellom Testimonials og Services |
+| `src/index.css` | Oppdatert `.blue` tema-tokens |
 
-### Slik ser seksjonen ut
-
-```text
-┌──────────────────────────────────────────────────────┐
-│          Stolte samarbeidspartnere                    │
-│  ────────────────────────────────────────────────    │
-│  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]  [Logo]     │
-│                                                      │
-│  (I redigeringsmodus: blyant-ikon over hver logo,   │
-│   + "Legg til"-knapp til høyre)                     │
-└──────────────────────────────────────────────────────┘
-```
-
-### Redigeringsflyt (owner med edit mode på)
-1. Blyant-ikon vises øverst til høyre på seksjonen
-2. Klikk åpner en modal med liste over alle logoer
-3. I modalen kan owner:
-   - Laste opp ny logo (bilde-upload)
-   - Skrive inn bedriftsnavn
-   - Legge til valgfri nettside-URL
-   - Dra for å endre rekkefølge (display_order)
-   - Slette en logo
-
-### Design
-- Logoer vises i en horisontal rad med `grayscale` filter → fargelagt ved hover
-- Responsiv: 3 kolonner mobil, 6 kolonner desktop
-- Subtil auto-scroll animasjon (marquee-stil) valgfritt
-
-### Teknisk arkitektur
-
-Følger eksisterende CMS-mønster fra `EditableServiceCard` og `TeamMemberEditor`:
-- Data hentes via `useQuery` / Supabase
-- Upload til `client-logos` storage bucket
-- Edit modal følger samme mønster som `TeamMemberEditor`
-- Seksjonen er usynlig hvis ingen aktive logoer finnes (og editMode er av)
