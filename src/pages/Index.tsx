@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { EditableServiceCard } from "@/components/EditableServiceCard";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
-import { Pencil } from "lucide-react";
+import { EditButton } from "@/components/ui/EditButton";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
 import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
@@ -36,13 +36,10 @@ const ServicesHeading = () => {
     <>
       <div className="relative text-center mb-12">
         {isAdmin && editMode && (
-          <button
+          <EditButton
             onClick={() => setIsModalOpen(true)}
-            className="absolute top-0 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-            aria-label="Rediger Våre tjenester overskrift"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+            ariaLabel="Rediger Våre tjenester overskrift"
+          />
         )}
         
         <h2 className="heading-section font-heading">

@@ -67,7 +67,7 @@ export const PAGE_SEO_DATA: Record<string, PageSEOData> = {
   },
   '/kontakt': {
     path: '/kontakt',
-    title: 'Kontakt HandyHjelp | Ring +47 41250553 | Kristiansand',
+    title: 'Kontakt HandyHjelp | Ring +47 48122206 | Kristiansand',
     description: 'Kontakt HandyHjelp for eiendomsvedlikehold. Ring oss eller send melding - vi svarer innen 1-3 virkedager.',
     priority: 0.7,
     changefreq: 'monthly',

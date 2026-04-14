@@ -17,11 +17,21 @@ import { EditableCertifications } from "@/components/EditableCertifications";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useFadeInUp, useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { useEditableContent } from "@/hooks/useEditableContent";
+import { EditButton } from "@/components/ui/EditButton";
+import { SectionEditModal } from "@/components/SectionEditModal";
 
 const About = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('about', heroAboutImg);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { editMode, isAdmin } = useEditMode();
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const { content: teamHeading } = useEditableContent('about-team', 'heading');
+  const { content: teamSubtext } = useEditableContent('about-team', 'subtext');
+  const displayTeamHeading = teamHeading || 'Møt teamet';
+  const displayTeamSubtext = teamSubtext || 'Våre erfarne fagfolk er klar til å hjelpe deg med alle dine eiendomsbehov';
 
   // Scroll animations
   const { ref: whyUsRef, style: whyUsStyle } = useFadeInUp({ threshold: 0.1 });
@@ -89,10 +99,16 @@ const About = () => {
           </div>
 
           {/* Team Section with Admin Editing */}
-          <div id="team" className="bg-muted/40 rounded-2xl p-8 md:p-12 mb-20 scroll-mt-24" ref={teamRef}>
-            <h2 className={`text-3xl font-bold text-center mb-4 transition-all duration-700 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>Møt teamet</h2>
+          <div id="team" className="bg-muted/40 rounded-2xl p-8 md:p-12 mb-20 scroll-mt-24 relative" ref={teamRef}>
+            {isAdmin && editMode && (
+              <EditButton
+                onClick={() => setIsTeamModalOpen(true)}
+                ariaLabel="Rediger team-overskrift"
+              />
+            )}
+            <h2 className={`text-3xl font-bold text-center mb-4 transition-all duration-700 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>{displayTeamHeading}</h2>
             <p className={`text-center text-muted-foreground mb-12 max-w-2xl mx-auto transition-all duration-700 delay-100 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-              Våre erfarne fagfolk er klar til å hjelpe deg med alle dine eiendomsbehov
+              {displayTeamSubtext}
             </p>
             
             {loading ? (
@@ -135,6 +151,31 @@ const About = () => {
       </main>
 
       <Footer />
+
+      <SectionEditModal
+        isOpen={isTeamModalOpen}
+        onClose={() => setIsTeamModalOpen(false)}
+        title="Rediger team-seksjon"
+        fields={[
+          {
+            section: 'about-team',
+            contentKey: 'heading',
+            label: 'Overskrift',
+            value: displayTeamHeading,
+            maxLength: 60,
+            placeholder: 'Møt teamet',
+          },
+          {
+            section: 'about-team',
+            contentKey: 'subtext',
+            label: 'Undertekst',
+            value: displayTeamSubtext,
+            multiline: true,
+            maxLength: 200,
+            placeholder: 'Våre erfarne fagfolk...',
+          },
+        ]}
+      />
     </div>
   );
 };

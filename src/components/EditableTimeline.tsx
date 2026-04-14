@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
-import { Pencil, EyeOff } from "lucide-react";
+import { EyeOff } from 'lucide-react';
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { TimelineEditModal } from "./TimelineEditModal";
 import { RoadmapTimeline, type RoadmapMilestone } from "@/components/timeline/RoadmapTimeline";
+import { EditButton } from './ui/EditButton';
 
 export const EditableTimeline = () => {
   const { editMode, isAdmin } = useEditMode();
@@ -196,15 +197,9 @@ export const EditableTimeline = () => {
 
   return (
     <>
-      <div className="bg-muted rounded-2xl p-6 md:p-12 mb-20 relative overflow-hidden">
+      <div className="bg-muted rounded-2xl p-6 md:p-12 mb-20 relative">
         {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-            aria-label="Rediger Vår reise"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger Vår reise" />
         )}
 
         {isAdmin && editMode && milestones.some((m) => m.hidden) && (

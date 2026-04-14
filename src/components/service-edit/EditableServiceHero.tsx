@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Pencil, Wrench, Hammer, Droplets, CloudRain, LucideIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Wrench, Hammer, Droplets, CloudRain, LucideIcon } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { EditButton } from '@/components/ui/EditButton';
 
 // Map of icon names to Lucide components
 const iconMap: Record<string, LucideIcon> = {
@@ -56,6 +57,17 @@ export const EditableServiceHero = ({
 
   const [formData, setFormData] = useState(displayData);
 
+  // Sync formData når modalen åpnes med ferske verdier fra Supabase
+  useEffect(() => {
+    if (isModalOpen) {
+      setFormData({
+        title: title || defaultTitle,
+        subtitle: subtitle || defaultSubtitle,
+        buttonText: buttonText || defaultButtonText,
+      });
+    }
+  }, [isModalOpen, title, subtitle, buttonText, defaultTitle, defaultSubtitle, defaultButtonText]);
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -99,12 +111,11 @@ export const EditableServiceHero = ({
     <>
       <div className="h-[500px] flex items-center justify-center relative">
         {isAdmin && editMode && (
-          <button
+          <EditButton
             onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+            ariaLabel="Rediger hero-tekst"
+            className="bottom-4 right-20 top-auto z-30"
+          />
         )}
         
         {showBadge && (
@@ -117,7 +128,7 @@ export const EditableServiceHero = ({
         
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-heading font-bold mb-4 md:mb-6 text-white drop-shadow-lg">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold mb-4 md:mb-6 text-white drop-shadow-lg">
               {displayData.title}
             </h1>
             <p className="text-lg md:text-xl text-white/90 mb-6 md:mb-8 drop-shadow-md max-w-2xl mx-auto">

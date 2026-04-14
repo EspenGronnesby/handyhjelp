@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { HeroEditModal } from './HeroEditModal';
+import { EditButton } from './ui/EditButton';
 
 interface EditableHeroProps {
   section: string;
@@ -35,14 +35,13 @@ export const EditableHero = ({
   return (
     <>
       <section className={`relative flex justify-center text-center ${contentPosition === 'lower' ? 'items-end pb-16' : 'items-center'} ${className}`}>
-        {/* Edit icon - always visible in edit mode */}
+        {/* Edit icon - plassert nederst til høyre ved siden av bilde-knappen */}
         {isAdmin && editMode && (
-          <button
+          <EditButton
             onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+            ariaLabel="Rediger hero-tekst"
+            className="bottom-4 right-20 top-auto z-30"
+          />
         )}
 
         {backgroundImage && (

@@ -17,8 +17,20 @@ import { EditableFAQItem } from "@/components/EditableFAQItem";
 import { Accordion } from "@/components/ui/accordion";
 import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { useWeb3Forms } from "@/hooks/useWeb3Forms";
+import { useContactInfo } from "@/hooks/useContactInfo";
 import { PageSEO } from "@/components/SEO/PageSEO";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { useEditableContent } from "@/hooks/useEditableContent";
+import { EditButton } from "@/components/ui/EditButton";
+import { SectionEditModal } from "@/components/SectionEditModal";
 const Contact = () => {
+  const { phone: contactPhone } = useContactInfo();
+  const { editMode, isAdmin } = useEditMode();
+  const [isSectionModalOpen, setIsSectionModalOpen] = useState(false);
+  const { content: formHeadingRaw } = useEditableContent('contact-page', 'form_heading');
+  const { content: infoHeadingRaw } = useEditableContent('contact-page', 'info_heading');
+  const formHeading = formHeadingRaw || 'Send oss en melding';
+  const infoHeading = infoHeadingRaw || 'Kontaktinformasjon';
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -55,7 +67,7 @@ const Contact = () => {
         message: formData.message,
       });
       if (!success) {
-        throw new Error("Kan ikke sende melding. Ring oss på +47 41250553");
+        throw new Error(`Kan ikke sende melding. Ring oss på ${contactPhone}`);
       }
 
       // Send confirmation email (non-blocking)
@@ -96,9 +108,15 @@ const Contact = () => {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
             {/* Contact Form */}
             <div>
-              <Card className="subtle-hover">
+              <Card className="subtle-hover relative">
+                {isAdmin && editMode && (
+                  <EditButton
+                    onClick={() => setIsSectionModalOpen(true)}
+                    ariaLabel="Rediger seksjon-overskrifter"
+                  />
+                )}
                 <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-6">Send oss en melding</h2>
+                  <h2 className="text-2xl font-bold mb-6">{formHeading}</h2>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                       <Label htmlFor="name" required>Navn</Label>
@@ -157,7 +175,7 @@ const Contact = () => {
             <div className="space-y-6">
               <Card className="subtle-hover">
                 <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-6">Kontaktinformasjon</h2>
+                  <h2 className="text-2xl font-bold mb-6">{infoHeading}</h2>
                   <EditableContactInfo />
                 </CardContent>
               </Card>
@@ -197,6 +215,30 @@ const Contact = () => {
       </main>
 
       <Footer />
+
+      <SectionEditModal
+        isOpen={isSectionModalOpen}
+        onClose={() => setIsSectionModalOpen(false)}
+        title="Rediger kontaktside-overskrifter"
+        fields={[
+          {
+            section: 'contact-page',
+            contentKey: 'form_heading',
+            label: 'Skjema-overskrift',
+            value: formHeading,
+            maxLength: 60,
+            placeholder: 'Send oss en melding',
+          },
+          {
+            section: 'contact-page',
+            contentKey: 'info_heading',
+            label: 'Kontaktinfo-overskrift',
+            value: infoHeading,
+            maxLength: 60,
+            placeholder: 'Kontaktinformasjon',
+          },
+        ]}
+      />
     </div>;
 };
 export default Contact;

@@ -12,8 +12,13 @@ import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building
 import { CompanySearch } from "./CompanySearch";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useContactInfo } from "@/hooks/useContactInfo";
 import { supabase } from "@/integrations/supabase/client";
 import { LinearProgress } from "@/components/ui/form-progress";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { useEditableContent } from "@/hooks/useEditableContent";
+import { EditButton } from "@/components/ui/EditButton";
+import { QuoteFormEditModal } from "@/components/QuoteFormEditModal";
 
 interface Company {
   orgNumber: string;
@@ -40,6 +45,15 @@ const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
 
 export const QuoteForm = () => {
   const { toast } = useToast();
+  const { phone: contactPhone } = useContactInfo();
+  const { editMode, isAdmin } = useEditMode();
+  const { content: heading } = useEditableContent('quote-form', 'heading');
+  const { content: descriptionLabel } = useEditableContent('quote-form', 'description_label');
+  const { content: descriptionIntro } = useEditableContent('quote-form', 'description_intro');
+  const [isHeadingModalOpen, setIsHeadingModalOpen] = useState(false);
+  const displayHeading = heading || 'Få gratis tilbud';
+  const displayDescriptionLabel = descriptionLabel || 'Beskriv oppdraget';
+  const displayDescriptionIntro = descriptionIntro || 'Vi har allerede dine kontaktopplysninger. Fortell oss hva du ønsker hjelp til.';
   const { user } = useAuth();
   const { profile } = useUserProfile();
   const navigate = useNavigate();
@@ -288,7 +302,7 @@ export const QuoteForm = () => {
       console.error('Form submission error:', error);
       toast({
         title: "Feil ved sending",
-        description: "Prøv igjen eller ring oss direkte på +47 41250553.",
+        description: `Prøv igjen eller ring oss direkte på ${contactPhone}.`,
         variant: "destructive",
       });
     } finally {
@@ -331,6 +345,7 @@ export const QuoteForm = () => {
   };
 
   return (
+    <>
     <Card className="form-professional">
       {/* Progress indicator */}
       {!(user && profile?.customer_type) && (
@@ -341,8 +356,15 @@ export const QuoteForm = () => {
         />
       )}
       
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-bold text-foreground">Få gratis tilbud</h3>
+      <div className="flex items-center justify-between mb-6 relative">
+        <h3 className="text-xl font-bold text-foreground">{displayHeading}</h3>
+        {isAdmin && editMode && (
+          <EditButton
+            onClick={() => setIsHeadingModalOpen(true)}
+            ariaLabel="Rediger skjema-overskrift"
+            position="inline"
+          />
+        )}
       </div>
 
       {step === 1 && (
@@ -547,13 +569,13 @@ export const QuoteForm = () => {
         <div className="space-y-4 animate-fade-in-up">
           {user && profile?.customer_type ? (
             <div>
-              <Label className="text-base font-medium" required>Beskriv oppdraget</Label>
+              <Label className="text-base font-medium" required>{displayDescriptionLabel}</Label>
               <p className="text-sm text-muted-foreground mt-1 mb-3">
-                Vi har allerede dine kontaktopplysninger. Fortell oss hva du ønsker hjelp til.
+                {displayDescriptionIntro}
               </p>
             </div>
           ) : (
-            <Label className="text-base font-medium" required>Beskriv oppdraget</Label>
+            <Label className="text-base font-medium" required>{displayDescriptionLabel}</Label>
           )}
           <Textarea
             placeholder="Fortell oss om jobben som skal gjøres..."
@@ -627,5 +649,15 @@ export const QuoteForm = () => {
         </div>
       </div>
     </Card>
+    <QuoteFormEditModal
+      isOpen={isHeadingModalOpen}
+      onClose={() => setIsHeadingModalOpen(false)}
+      currentData={{
+        heading: displayHeading,
+        descriptionLabel: displayDescriptionLabel,
+        descriptionIntro: displayDescriptionIntro,
+      }}
+    />
+    </>
   );
 };

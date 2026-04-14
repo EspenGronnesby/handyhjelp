@@ -4,6 +4,10 @@ import { Star, Quote, ChevronLeft, ChevronRight, Building2, User, BadgeCheck } f
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useEditMode } from '@/contexts/EditModeContext';
+import { useEditableContent } from '@/hooks/useEditableContent';
+import { EditButton } from '@/components/ui/EditButton';
+import { SectionEditModal } from '@/components/SectionEditModal';
 
 interface Review {
   id: string;
@@ -31,6 +35,14 @@ const TestimonialsSection = () => {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+  const { editMode, isAdmin } = useEditMode();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { content: badgeRaw } = useEditableContent('testimonials', 'badge');
+  const { content: headingRaw } = useEditableContent('testimonials', 'heading');
+  const { content: subheadingRaw } = useEditableContent('testimonials', 'subheading');
+  const badge = badgeRaw || 'Kundeanmeldelser';
+  const heading = headingRaw || 'Hva kundene sier';
+  const subheading = subheadingRaw || 'Les hva våre fornøyde kunder mener';
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -182,16 +194,22 @@ const TestimonialsSection = () => {
     <section id="testimonials" className="py-16 md:py-24 bg-muted/20">
       <div className="container mx-auto px-4">
         {/* Section Header - Compact on mobile */}
-        <div className="text-center mb-8 md:mb-12">
+        <div className="text-center mb-8 md:mb-12 relative">
+          {isAdmin && editMode && (
+            <EditButton
+              onClick={() => setIsModalOpen(true)}
+              ariaLabel="Rediger kundeanmeldelser-overskrift"
+            />
+          )}
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium mb-3 md:mb-4 reveal-up">
             <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary" />
-            <span>Kundeanmeldelser</span>
+            <span>{badge}</span>
           </div>
           <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4 reveal-up reveal-stagger-2">
-            Hva kundene sier
+            {heading}
           </h2>
           <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto reveal-up reveal-stagger-3">
-            Les hva våre fornøyde kunder mener
+            {subheading}
           </p>
         </div>
 
@@ -364,6 +382,17 @@ const TestimonialsSection = () => {
           </div>
         </div>
       </div>
+
+      <SectionEditModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Rediger kundeanmeldelser-seksjon"
+        fields={[
+          { section: 'testimonials', contentKey: 'badge', label: 'Badge-tekst', value: badge, maxLength: 40, placeholder: 'Kundeanmeldelser' },
+          { section: 'testimonials', contentKey: 'heading', label: 'Overskrift', value: heading, maxLength: 60, placeholder: 'Hva kundene sier' },
+          { section: 'testimonials', contentKey: 'subheading', label: 'Undertekst', value: subheading, multiline: true, maxLength: 200, placeholder: 'Les hva våre fornøyde...' },
+        ]}
+      />
     </section>
   );
 };

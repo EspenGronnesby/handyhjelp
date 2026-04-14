@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CheckCircle2, ArrowRight, Pencil } from "lucide-react";
+import { CheckCircle2, ArrowRight } from "lucide-react";
+import { EditButton } from "@/components/ui/EditButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
@@ -60,13 +61,10 @@ const EditablePricingDetails = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 relative">
           {editMode && (
-            <button
+            <EditButton
               onClick={() => setIsEditing(true)}
-              className="absolute top-2 right-2 z-10 p-2 bg-primary/10 hover:bg-primary/20 rounded-full border-2 border-primary transition-all hover:scale-110"
-              aria-label="Rediger prisdetaljer"
-            >
-              <Pencil className="h-5 w-5 text-primary" />
-            </button>
+              ariaLabel="Rediger prisdetaljer"
+            />
           )}
 
           <div className="max-w-5xl mx-auto">

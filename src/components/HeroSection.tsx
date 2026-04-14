@@ -4,8 +4,9 @@ import { Phone } from "lucide-react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import { useEditableContent } from "@/hooks/useEditableContent";
+import { useContactInfo } from "@/hooks/useContactInfo";
 import { useEditMode } from "@/contexts/EditModeContext";
-import { Pencil } from "lucide-react";
+import { EditButton } from "@/components/ui/EditButton";
 import { HeroSectionEditModal } from "./HeroSectionEditModal";
 import heroDefaultImage from "@/assets/hero-building-maintenance.jpg";
 import { MotionButton } from "@/components/motion";
@@ -25,6 +26,7 @@ export const HeroSection = () => {
     editMode,
     isAdmin
   } = useEditMode();
+  const { phone, phoneHref } = useContactInfo();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     content: title
@@ -35,9 +37,13 @@ export const HeroSection = () => {
   const {
     content: ctaText
   } = useEditableContent('hero-home', 'cta-button');
+  const {
+    content: servicesButtonText
+  } = useEditableContent('hero-home', 'services-button');
   const displayTitle = title || 'Vi tar vare på dine bygg';
   const displaySubtitle = subtitle || 'Vaktmester • Tømrer • Blikk';
   const displayCtaText = ctaText || 'Få tilbud';
+  const displayServicesButtonText = servicesButtonText || 'Se tjenester';
 
   // Parallax effect for background
   const { scrollYProgress } = useScroll({
@@ -85,11 +91,16 @@ export const HeroSection = () => {
         )}
         
         <HeroImageEditor page="home" currentImageUrl={heroImage} onImageUpdate={refetch} />
-        
-        {isAdmin && editMode && <button onClick={() => setIsModalOpen(true)} className="absolute top-28 md:top-32 right-4 md:right-8 z-20 bg-background rounded-full p-2 md:p-3 shadow-lg border-2 border-primary hover:scale-110 transition-transform" aria-label="Rediger hero-seksjon">
-            <Pencil className="h-5 w-5 md:h-6 md:w-6 text-primary" />
-          </button>}
-        
+
+        {/* Edit hero content (title/subtitle/CTA) — placed next to image-edit camera button */}
+        {isAdmin && editMode && (
+          <EditButton
+            onClick={() => setIsModalOpen(true)}
+            ariaLabel="Rediger hero-tekst (overskrift, undertekst, knapp)"
+            className="bottom-4 right-20 top-auto z-30"
+          />
+        )}
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid lg:grid-cols-2 gap-6 md:gap-12 items-center min-h-[calc(100svh-5rem)] md:min-h-[calc(100vh-8rem)] py-4 md:py-20">
             {/* Left Content - Mobile optimized */}
@@ -98,7 +109,7 @@ export const HeroSection = () => {
               <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-8 font-heading text-white leading-[1.1]">
                 {displayTitle}
               </h1>
-              
+
               {/* Short Tagline */}
               <p className="text-white/90 text-xl sm:text-2xl md:text-2xl mb-8 md:mb-12">
                 {displaySubtitle}
@@ -106,10 +117,10 @@ export const HeroSection = () => {
 
               {/* CTA Buttons - With motion */}
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-12">
-                <MotionButton 
-                  size="lg" 
-                  variant="cta" 
-                  className="text-lg md:text-lg px-8 md:px-8 py-5 md:py-6 font-semibold" 
+                <MotionButton
+                  size="lg"
+                  variant="cta"
+                  className="text-lg md:text-lg px-8 md:px-8 py-5 md:py-6 font-semibold"
                   onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({
                     behavior: 'smooth'
                   })}
@@ -124,16 +135,16 @@ export const HeroSection = () => {
                     behavior: 'smooth'
                   })}
                 >
-                  Se tjenester
+                  {displayServicesButtonText}
                 </MotionButton>
               </div>
 
               {/* 24/7 Contact */}
               <div className="backdrop-blur-md rounded-xl p-4 md:p-6 inline-block bg-white/10 border border-white/30 shadow-lg hover:bg-white/20 hover:border-white/50 hover:backdrop-blur-xl hover:shadow-[0_8px_32px_hsl(0_0%_100%/0.1),inset_0_1px_0_hsl(0_0%_100%/0.15)] transition-all duration-300 group">
                 <p className="text-white/80 dark:text-muted-foreground text-xs md:text-sm mb-1 md:mb-2">24/7 Service</p>
-                <a href="tel:+4741250553" className="text-white dark:text-foreground text-2xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 md:gap-3 transition-colors">
+                <a href={phoneHref} className="text-white dark:text-foreground text-2xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 md:gap-3 transition-colors">
                   <Phone className="h-6 w-6 md:h-7 md:w-7" />
-                  <span>+47 41250553</span>
+                  <span>{phone}</span>
                 </a>
               </div>
             </div>
@@ -149,7 +160,9 @@ export const HeroSection = () => {
       <HeroSectionEditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} currentData={{
       title: displayTitle,
       subtitle: displaySubtitle,
-      ctaButton: displayCtaText
+      ctaButton: displayCtaText,
+      servicesButton: displayServicesButtonText,
+      phone: phone
     }} />
     </>;
 };

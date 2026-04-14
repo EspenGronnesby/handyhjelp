@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Pencil, EyeOff } from "lucide-react";
+import { CheckCircle2, EyeOff } from "lucide-react";
+import { EditButton } from "@/components/ui/EditButton";
 import { Link } from "react-router-dom";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
@@ -152,13 +153,10 @@ const EditableServiceCardGrid = () => {
         <div className="container mx-auto px-4 max-w-7xl relative">
           <div className={`bg-card rounded-2xl shadow-lg border border-border/50 p-8 md:p-12 dark:ring-1 dark:ring-white/5 transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {isAdmin && editMode && (
-              <button
+              <EditButton
                 onClick={() => setIsEditing(true)}
-                className="absolute top-6 right-6 z-10 p-2 bg-primary/10 hover:bg-primary/20 rounded-full border-2 border-primary transition-all hover:scale-110"
-                aria-label="Rediger tjenestekort"
-              >
-                <Pencil className="h-5 w-5 text-primary" />
-              </button>
+                ariaLabel="Rediger tjenestekort"
+              />
             )}
 
             <div className={getGridClass()}>

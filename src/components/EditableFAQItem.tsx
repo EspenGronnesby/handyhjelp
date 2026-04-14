@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { FAQEditModal } from './FAQEditModal';
 import { AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { EditButton } from './ui/EditButton';
 
 interface EditableFAQItemProps {
   section: string;
@@ -32,12 +32,7 @@ export const EditableFAQItem = ({
       <AccordionItem value={`item-${index}`} className="card-professional px-6 relative">
         {/* Edit icon */}
         {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
 
         <AccordionTrigger className="text-left py-6 hover:no-underline">

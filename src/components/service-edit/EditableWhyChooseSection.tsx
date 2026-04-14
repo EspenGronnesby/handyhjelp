@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CheckCircle2, Pencil, EyeOff } from "lucide-react";
+import { CheckCircle2, EyeOff } from "lucide-react";
+import { EditButton } from "@/components/ui/EditButton";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -80,13 +81,10 @@ const EditableWhyChooseSection = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4 relative">
           {isAdmin && editMode && (
-            <button
+            <EditButton
               onClick={() => setIsEditing(true)}
-              className="absolute top-2 right-2 z-10 p-2 bg-primary/10 hover:bg-primary/20 rounded-full border-2 border-primary transition-all hover:scale-110"
-              aria-label="Rediger hvorfor-seksjon"
-            >
-              <Pencil className="h-5 w-5 text-primary" />
-            </button>
+              ariaLabel="Rediger hvorfor-seksjon"
+            />
           )}
 
           <h2 className="text-3xl md:text-4xl font-heading font-bold text-center mb-16">

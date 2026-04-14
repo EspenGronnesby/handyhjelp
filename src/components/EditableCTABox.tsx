@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
+import { useContactInfo } from '@/hooks/useContactInfo';
 import { CTABoxEditModal } from './CTABoxEditModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EditButton } from './ui/EditButton';
 
 export const EditableCTABox = () => {
   const { editMode, isAdmin } = useEditMode();
+  const { phone } = useContactInfo();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { content: heading } = useEditableContent('cta-box-services', 'heading');
@@ -19,7 +21,7 @@ export const EditableCTABox = () => {
     heading: heading || 'Trenger du et pristilbud?',
     description: description || 'Kontakt oss for et skreddersydd pristilbud basert på dine behov.',
     button1: button1 || 'Få gratis tilbud',
-    button2: button2 || 'Ring oss: +47 41250553'
+    button2: button2 || `Ring oss: ${phone}`
   };
 
   return (
@@ -27,12 +29,7 @@ export const EditableCTABox = () => {
       <Card className="max-w-2xl mx-auto text-center shadow-xl border-primary/20 animate-fade-in relative">
         {/* Edit icon - always visible in edit mode */}
         {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
 
         <CardHeader>

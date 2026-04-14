@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, EyeOff } from 'lucide-react';
+import { EyeOff } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { EditButton } from '@/components/ui/EditButton';
 
 interface HowWeWorkStep {
   title: string;
@@ -120,12 +121,7 @@ export const EditableHowWeWork = () => {
     <>
       <div className="relative">
         {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
 
         <h2 className="text-2xl font-bold mb-6">{defaultData.heading}</h2>

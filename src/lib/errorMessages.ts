@@ -38,7 +38,7 @@ export const ERROR_MESSAGES = {
   // Generic
   UNKNOWN: 'Noe gikk galt. Prøv igjen senere.',
   TRY_AGAIN: 'Prøv igjen',
-  CONTACT_SUPPORT: 'Kontakt oss på +47 41250553 hvis problemet vedvarer.',
+  CONTACT_SUPPORT: 'Kontakt oss på +47 48122206 hvis problemet vedvarer.',
 } as const;
 
 // Map Supabase error codes to user-friendly messages

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Pencil, Award, Shield, AlertCircle } from 'lucide-react';
+import { Award, Shield, AlertCircle } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { CertificationsEditModal } from './CertificationsEditModal';
 import { Card, CardContent } from '@/components/ui/card';
+import { EditButton } from './ui/EditButton';
 
 export const EditableCertifications = () => {
   const { editMode, isAdmin } = useEditMode();
@@ -80,12 +81,7 @@ export const EditableCertifications = () => {
     <>
       <div className="mb-20 relative">
         {isEditModeActive && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-0 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
 
         <h2 className="text-3xl font-bold text-center mb-12">{displayHeading}</h2>

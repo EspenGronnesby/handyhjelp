@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Phone, Calculator, CheckCircle } from "lucide-react";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
-import { Pencil } from "lucide-react";
+import { EditButton } from "@/components/ui/EditButton";
 import { ProcessStepEditModal } from "@/components/ProcessStepEditModal";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
 import { useScrollProgressReveal } from "@/hooks/useScrollAnimation";
@@ -32,13 +32,10 @@ const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, 
           className="glass-surface p-5 md:p-6 text-center card-hover-lift relative perf-contain h-full"
         >
           {isAdmin && editMode && (
-            <button
+            <EditButton
               onClick={() => setIsModalOpen(true)}
-              className="absolute top-3 right-3 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-              aria-label={`Rediger steg ${number}`}
-            >
-              <Pencil className="h-4 w-4 text-primary" />
-            </button>
+              ariaLabel={`Rediger steg ${number}`}
+            />
           )}
           
           {/* Large step number for mobile */}
@@ -94,13 +91,7 @@ export const ProcessSection = () => {
         <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="relative text-center mb-8 md:mb-12">
           {isAdmin && editMode && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="absolute top-0 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-              aria-label="Rediger Slik fungerer det overskrift"
-            >
-              <Pencil className="h-5 w-5 text-primary" />
-            </button>
+            <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger Slik fungerer det overskrift" />
           )}
           
           <h2 id="process-heading" className="heading-section text-2xl md:text-3xl lg:text-4xl">

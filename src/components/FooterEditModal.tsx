@@ -55,10 +55,10 @@ export const FooterEditModal = ({
 
       const updates = [
         { section: 'footer', content_key: 'description', content_value: formData.description, content_type: 'text', updated_by: user.id },
-        { section: 'footer', content_key: 'address', content_value: formData.address, content_type: 'text', updated_by: user.id },
-        { section: 'footer', content_key: 'phone', content_value: formData.phone, content_type: 'text', updated_by: user.id },
-        { section: 'footer', content_key: 'email', content_value: formData.email, content_type: 'text', updated_by: user.id },
-        { section: 'footer', content_key: 'hours', content_value: formData.hours, content_type: 'text', updated_by: user.id },
+        { section: 'kontakt-info', content_key: 'address', content_value: formData.address, content_type: 'text', updated_by: user.id },
+        { section: 'kontakt-info', content_key: 'phone', content_value: formData.phone, content_type: 'text', updated_by: user.id },
+        { section: 'kontakt-info', content_key: 'email', content_value: formData.email, content_type: 'text', updated_by: user.id },
+        { section: 'kontakt-info', content_key: 'hours', content_value: formData.hours, content_type: 'text', updated_by: user.id },
         { section: 'footer', content_key: 'facebook_url', content_value: formData.facebookUrl, content_type: 'text', updated_by: user.id },
         { section: 'footer', content_key: 'instagram_url', content_value: formData.instagramUrl, content_type: 'text', updated_by: user.id },
         { section: 'footer', content_key: 'linkedin_url', content_value: formData.linkedinUrl, content_type: 'text', updated_by: user.id },
@@ -76,6 +76,7 @@ export const FooterEditModal = ({
       }
 
       queryClient.invalidateQueries({ queryKey: ['site-content', 'footer'] });
+      queryClient.invalidateQueries({ queryKey: ['site-content', 'kontakt-info'] });
 
       toast({
         title: "✅ Lagret",
