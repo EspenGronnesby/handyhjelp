@@ -1,13 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Menu, Phone, Mail, User, LogOut, Settings } from "lucide-react";
+import { Menu, Phone, Mail, User, LogOut, Settings, Pencil } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
 import { useEditMode } from "@/contexts/EditModeContext";
+import { useContactInfo } from "@/hooks/useContactInfo";
 import { useLogoSettings } from "@/hooks/useLogoSettings";
 import { LogoSettingsModal } from "@/components/LogoSettingsModal";
+import { ContactInfoEditModal } from "@/components/ContactInfoEditModal";
 import { ThemeToggleButton } from "@/components/ThemeToggle";
 import { useHeaderVisibility } from "@/hooks/useHeaderVisibility";
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
@@ -16,12 +18,14 @@ import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const { resolvedTheme } = useTheme();
   const { editMode, isAdmin } = useEditMode();
+  const { phone, email, phoneHref, emailHref, address, hours, responseTime } = useContactInfo();
   const { settings: logoSettings, updateSettings: updateLogoSettings } = useLogoSettings();
   const { isVisible, isAtTop } = useHeaderVisibility();
 
@@ -49,21 +53,31 @@ export const Header = () => {
         <div className="container mx-auto px-4">
         {/* Top Contact Bar - Hidden on mobile/tablet */}
         <div className="hidden lg:block bg-secondary text-secondary-foreground py-1.5">
-          <div className="container mx-auto px-4 flex justify-end space-x-6 text-sm">
-            <a 
-              href="tel:+4741250553" 
+          <div className="container mx-auto px-4 flex justify-end items-center space-x-6 text-sm">
+            <a
+              href={phoneHref}
               className="flex items-center space-x-2 hover:text-primary transition-colors"
             >
               <Phone className="h-4 w-4" />
-              <span>+47 41250553</span>
+              <span>{phone}</span>
             </a>
-            <a 
-              href="mailto:Team@handyhjelp.no" 
+            <a
+              href={emailHref}
               className="flex items-center space-x-2 hover:text-primary transition-colors"
             >
               <Mail className="h-4 w-4" />
-              <span>Team@handyhjelp.no</span>
+              <span>{email}</span>
             </a>
+            {isAdmin && editMode && (
+              <button
+                onClick={() => setIsContactModalOpen(true)}
+                className="flex items-center justify-center rounded-full p-1 bg-background border border-primary text-primary hover:scale-110 transition-transform"
+                aria-label="Rediger kontaktinformasjon"
+                title="Rediger kontaktinformasjon"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -120,14 +134,15 @@ export const Header = () => {
               `}</style>
             </Link>
             
-            {/* Edit button for logo */}
+            {/* Edit button for logo - always visible in edit mode */}
             {isAdmin && editMode && (
               <button
                 onClick={() => setIsLogoModalOpen(true)}
-                className="absolute -top-1 -right-1 p-1.5 bg-primary text-primary-foreground rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-30"
+                className="absolute -top-2 -right-2 min-h-[40px] min-w-[40px] flex items-center justify-center bg-primary text-primary-foreground rounded-full shadow-lg z-30 hover:scale-110 active:scale-95 transition-transform touch-manipulation"
                 aria-label="Rediger logo-innstillinger"
+                title="Rediger logo-innstillinger"
               >
-                <Settings className="h-3 w-3" />
+                <Settings className="h-4 w-4" />
               </button>
             )}
           </div>
@@ -263,20 +278,32 @@ export const Header = () => {
                 
                 {/* Mobile Contact Info - Improved touch targets */}
                 <div className="pt-4 mt-2 border-t border-border space-y-1">
-                  <a 
-                    href="tel:+4741250553" 
+                  <a
+                    href={phoneHref}
                     className="flex items-center space-x-3 py-3 min-h-[44px] text-foreground hover:text-primary active:text-primary transition-colors touch-manipulation"
                   >
                     <Phone className="h-5 w-5" />
-                    <span>+47 41250553</span>
+                    <span>{phone}</span>
                   </a>
-                  <a 
-                    href="mailto:Team@handyhjelp.no" 
+                  <a
+                    href={emailHref}
                     className="flex items-center space-x-3 py-3 min-h-[44px] text-foreground hover:text-primary active:text-primary transition-colors touch-manipulation"
                   >
                     <Mail className="h-5 w-5" />
-                    <span>Team@handyhjelp.no</span>
+                    <span>{email}</span>
                   </a>
+                  {isAdmin && editMode && (
+                    <button
+                      onClick={() => {
+                        setIsContactModalOpen(true);
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center space-x-3 py-3 min-h-[44px] text-primary hover:underline touch-manipulation"
+                    >
+                      <Pencil className="h-5 w-5" />
+                      <span>Rediger kontaktinfo</span>
+                    </button>
+                  )}
                 </div>
                 
                 {/* Auth buttons - Improved touch targets */}
@@ -337,6 +364,12 @@ export const Header = () => {
         onClose={() => setIsLogoModalOpen(false)}
         settings={logoSettings}
         onSave={updateLogoSettings}
+      />
+
+      <ContactInfoEditModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+        currentData={{ address, phone, email, hours, responseTime }}
       />
     </>
   );

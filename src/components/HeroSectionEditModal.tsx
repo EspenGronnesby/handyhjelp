@@ -22,6 +22,8 @@ interface HeroSectionEditModalProps {
     title: string;
     subtitle: string;
     ctaButton: string;
+    servicesButton: string;
+    phone: string;
   };
 }
 
@@ -54,7 +56,9 @@ export const HeroSectionEditModal = ({
       const updates = [
         { section: 'hero-home', content_key: 'title', content_value: formData.title, content_type: 'text', updated_by: user.id },
         { section: 'hero-home', content_key: 'subtitle', content_value: formData.subtitle, content_type: 'text', updated_by: user.id },
-        { section: 'hero-home', content_key: 'cta-button', content_value: formData.ctaButton, content_type: 'text', updated_by: user.id }
+        { section: 'hero-home', content_key: 'cta-button', content_value: formData.ctaButton, content_type: 'text', updated_by: user.id },
+        { section: 'hero-home', content_key: 'services-button', content_value: formData.servicesButton, content_type: 'text', updated_by: user.id },
+        { section: 'kontakt-info', content_key: 'phone', content_value: formData.phone, content_type: 'text', updated_by: user.id },
       ];
 
       for (const update of updates) {
@@ -66,6 +70,7 @@ export const HeroSectionEditModal = ({
       }
 
       queryClient.invalidateQueries({ queryKey: ['site-content', 'hero-home'] });
+      queryClient.invalidateQueries({ queryKey: ['site-content', 'kontakt-info'] });
 
       toast({
         title: "✅ Lagret",
@@ -124,7 +129,7 @@ export const HeroSectionEditModal = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="ctaButton">Knapp-tekst</Label>
+            <Label htmlFor="ctaButton">Knapp-tekst (hoved-CTA)</Label>
             <Input
               id="ctaButton"
               value={formData.ctaButton}
@@ -135,6 +140,31 @@ export const HeroSectionEditModal = ({
             <div className="text-sm text-muted-foreground text-right">
               {formData.ctaButton.length} / 30 tegn
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="servicesButton">Knapp-tekst (sekundær)</Label>
+            <Input
+              id="servicesButton"
+              value={formData.servicesButton}
+              onChange={(e) => setFormData({ ...formData, servicesButton: e.target.value })}
+              maxLength={30}
+              placeholder="F.eks. Se tjenester"
+            />
+            <div className="text-sm text-muted-foreground text-right">
+              {formData.servicesButton.length} / 30 tegn
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">Telefonnummer (vises også i footer, header, kontakt)</Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              maxLength={20}
+              placeholder="+47 48122206"
+            />
           </div>
         </div>
 

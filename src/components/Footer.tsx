@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, Clock, MapPin, Facebook, Instagram, Linkedin, Pencil } from 'lucide-react';
+import { Phone, Mail, Clock, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
 import handyhjelpLogoFooter from '@/assets/handyhjelp-logo-footer.png';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
+import { useContactInfo } from '@/hooks/useContactInfo';
 import { FooterEditModal } from './FooterEditModal';
+import { EditButton } from './ui/EditButton';
 
 // TikTok icon component (not available in lucide-react)
 const TikTok = ({ className }: { className?: string }) => (
@@ -27,12 +29,11 @@ export const Footer = () => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch editable content
+  // Shared contact info (single source of truth)
+  const { phone, email, address, hours, phoneHref, emailHref } = useContactInfo();
+
+  // Fetch editable content (footer-specific)
   const { content: description } = useEditableContent('footer', 'description');
-  const { content: address } = useEditableContent('footer', 'address');
-  const { content: phone } = useEditableContent('footer', 'phone');
-  const { content: email } = useEditableContent('footer', 'email');
-  const { content: hours } = useEditableContent('footer', 'hours');
   const { content: facebookUrl } = useEditableContent('footer', 'facebook_url');
   const { content: instagramUrl } = useEditableContent('footer', 'instagram_url');
   const { content: linkedinUrl } = useEditableContent('footer', 'linkedin_url');
@@ -43,10 +44,10 @@ export const Footer = () => {
   // Default values - empty for social URLs means they won't show
   const footerData = {
     description: description || 'Din pålitelige partner for vaktmester-, tømrer- og blikkenslagertjenester. Med over 20 års erfaring leverer vi kvalitet og trygghet til kunder i Kristiansand og omegn.',
-    address: address || 'Kristiansand, Norge',
-    phone: phone || '+47 41250553',
-    email: email || 'Team@handyhjelp.no',
-    hours: hours || 'Man-Fre 09:00-17:00',
+    address,
+    phone,
+    email,
+    hours,
     facebookUrl: facebookUrl || '',
     instagramUrl: instagramUrl || '',
     linkedinUrl: linkedinUrl || '',
@@ -60,13 +61,7 @@ export const Footer = () => {
       <footer className="bg-secondary text-secondary-foreground relative">
         {/* Edit button */}
         {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-            title="Rediger footer"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger footer" />
         )}
 
         <div className="container mx-auto px-4 py-8 md:py-12">
@@ -197,15 +192,15 @@ export const Footer = () => {
                   <span>{footerData.address}</span>
                 </li>
                 <li>
-                  <a href={`tel:${footerData.phone.replace(/\s/g, '')}`} className="flex items-center gap-2 py-2 min-h-[44px] hover:text-primary transition-colors active:text-primary/80">
+                  <a href={phoneHref} className="flex items-center gap-2 py-2 min-h-[44px] hover:text-primary transition-colors active:text-primary/80">
                     <Phone className="h-4 w-4 flex-shrink-0 text-primary" />
-                    {footerData.phone}
+                    {phone}
                   </a>
                 </li>
                 <li>
-                  <a href={`mailto:${footerData.email}`} className="flex items-center gap-2 py-2 min-h-[44px] hover:text-primary transition-colors active:text-primary/80">
+                  <a href={emailHref} className="flex items-center gap-2 py-2 min-h-[44px] hover:text-primary transition-colors active:text-primary/80">
                     <Mail className="h-4 w-4 flex-shrink-0 text-primary" />
-                    {footerData.email}
+                    {email}
                   </a>
                 </li>
                 <li>

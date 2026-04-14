@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEditMode } from "@/contexts/EditModeContext";
-import { Pencil } from "lucide-react";
+import { useEditableContent } from "@/hooks/useEditableContent";
+import { EditButton } from "@/components/ui/EditButton";
+import { SectionEditModal } from "@/components/SectionEditModal";
 import { ClientLogosEditModal } from "./ClientLogosEditModal";
 
 interface ClientLogo {
@@ -50,6 +52,9 @@ const LogoItem = ({ logo }: { logo: ClientLogo }) => {
 const ClientLogosSection = () => {
   const { editMode, isOwner } = useEditMode();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isHeadingModalOpen, setIsHeadingModalOpen] = useState(false);
+  const { content: headingRaw } = useEditableContent('client-logos', 'heading');
+  const heading = headingRaw || 'Stolte samarbeidspartnere';
 
   const { data: logos = [], refetch } = useQuery({
     queryKey: ["client-logos"],
@@ -75,19 +80,23 @@ const ClientLogosSection = () => {
       <div className="relative">
         {/* Edit button */}
         {isOwner && editMode && (
-          <button
+          <EditButton
             onClick={() => setIsEditModalOpen(true)}
-            className="absolute top-0 right-4 z-20 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-            aria-label="Rediger samarbeidspartnere"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+            ariaLabel="Rediger samarbeidspartnere"
+          />
         )}
 
         {/* Heading */}
-        <div className="text-center mb-8 px-4">
+        <div className="text-center mb-8 px-4 relative">
+          {isOwner && editMode && (
+            <EditButton
+              onClick={() => setIsHeadingModalOpen(true)}
+              ariaLabel="Rediger overskrift"
+              className="top-0 right-4"
+            />
+          )}
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Stolte samarbeidspartnere
+            {heading}
           </p>
         </div>
 
@@ -133,6 +142,15 @@ const ClientLogosSection = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         onSaved={refetch}
+      />
+
+      <SectionEditModal
+        isOpen={isHeadingModalOpen}
+        onClose={() => setIsHeadingModalOpen(false)}
+        title="Rediger samarbeidspartnere-overskrift"
+        fields={[
+          { section: 'client-logos', contentKey: 'heading', label: 'Overskrift', value: heading, maxLength: 60, placeholder: 'Stolte samarbeidspartnere' },
+        ]}
       />
     </section>
   );

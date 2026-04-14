@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Pencil, Clock, Shield, Award, Users, CheckCircle2, Star, EyeOff } from 'lucide-react';
+import { Clock, Shield, Award, Users, CheckCircle2, Star, EyeOff } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { WhyUsEditModal } from './WhyUsEditModal';
 import { Card, CardContent } from '@/components/ui/card';
 import { getDisplayValue } from '@/lib/gridUtils';
 import { useStaggeredGridReveal } from '@/hooks/useScrollAnimation';
+import { EditButton } from './ui/EditButton';
 
 const iconMap = {
   Clock, Shield, Award, Users, CheckCircle2, Star
@@ -78,12 +79,7 @@ export const EditableWhyUs = () => {
     <>
       <div className="mb-20 relative" ref={ref}>
         {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-0 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
 
         <h2 className="text-3xl font-bold text-center mb-12">{getDisplayValue(heading, headingEdited, 'Hvorfor velge oss?')}</h2>

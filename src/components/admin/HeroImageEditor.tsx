@@ -7,6 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAdmin } from '@/hooks/useAdmin';
+import { useEditMode } from '@/contexts/EditModeContext';
 
 interface HeroImageEditorProps {
   page: string;
@@ -16,12 +17,13 @@ interface HeroImageEditorProps {
 
 export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroImageEditorProps) => {
   const { isAdmin } = useAdmin();
+  const { editMode } = useEditMode();
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [opacity, setOpacity] = useState<number>(85);
 
-  if (!isAdmin) return null;
+  if (!isAdmin || !editMode) return null;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -101,10 +103,11 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="absolute bottom-4 right-4 z-[100] p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-all border border-border shadow-sm hover:shadow-md"
+        className="absolute bottom-4 right-4 z-30 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full bg-background/90 backdrop-blur-sm hover:bg-background hover:scale-110 active:scale-95 transition-all border-2 border-primary shadow-lg touch-manipulation"
         title="Rediger hero-bilde"
+        aria-label="Rediger hero-bilde"
       >
-        <Camera className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors" />
+        <Camera className="w-5 h-5 text-primary" />
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

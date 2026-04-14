@@ -67,7 +67,7 @@ export function EmailPreviewModal({
             <a href="https://handyhjelp.no" style="color: #0891B2; text-decoration: none;">www.handyhjelp.no</a>
           </p>
           <p style="margin: 10px 0 0 0; font-size: 12px; color: #9ca3af;">
-            Telefon: +47 412 50 553 | E-post: team@handyhjelp.no
+            Telefon: +47 48122206 | E-post: team@handyhjelp.no
           </p>
         </div>
       </div>

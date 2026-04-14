@@ -3,8 +3,10 @@ import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { PageSEO } from "@/components/SEO/PageSEO";
+import { useContactInfo } from "@/hooks/useContactInfo";
 
 const Personvern = () => {
+  const { phone, email } = useContactInfo();
   return (
     <div className="min-h-screen">
       <PageSEO path="/personvern" />
@@ -29,8 +31,8 @@ const Personvern = () => {
               <ul className="list-disc pl-6 space-y-2">
                 <li>Bedrift: HandyHjelp</li>
                 <li>Adresse: Kristiansand, Norge</li>
-                <li>E-post: team@handyhjelp.no</li>
-                <li>Telefon: +47 412 50 553</li>
+                <li>E-post: {email}</li>
+                <li>Telefon: {phone}</li>
               </ul>
             </section>
 

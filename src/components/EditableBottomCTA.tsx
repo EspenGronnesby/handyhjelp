@@ -1,16 +1,18 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
+import { useContactInfo } from '@/hooks/useContactInfo';
 import { BottomCTAEditModal } from './BottomCTAEditModal';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { EditButton } from './ui/EditButton';
 export const EditableBottomCTA = () => {
   const {
     editMode,
     isAdmin
   } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { phone, phoneHref } = useContactInfo();
   const {
     content: heading
   } = useEditableContent('bottom-cta', 'heading');
@@ -27,14 +29,12 @@ export const EditableBottomCTA = () => {
     heading: heading || 'Klar til å komme i gang?',
     description: description || 'Få et uforpliktende tilbud på dine håndverksbehov i dag',
     button1: button1 || 'Få tilbud',
-    button2: button2 || 'Ring oss: +47 412 50 553'
+    button2: button2 || `Ring oss: ${phone}`
   };
   return <>
       <section className="relative py-20 bg-gradient-to-r from-primary/90 to-primary text-primary-foreground">
         {/* Edit icon - always visible in edit mode */}
-        {isAdmin && editMode && <button onClick={() => setIsModalOpen(true)} className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform">
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>}
+        {isAdmin && editMode && <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />}
 
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-heading font-bold mb-6">
@@ -51,7 +51,7 @@ export const EditableBottomCTA = () => {
                   {defaultData.button1}
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" onClick={() => window.location.href = 'tel:+4741250553'} className="bg-background text-primary hover:bg-primary/10 hover:border-primary text-lg px-10 border-primary-foreground transition-colors">
+              <Button variant="outline" size="lg" onClick={() => window.location.href = phoneHref} className="bg-background text-primary hover:bg-primary/10 hover:border-primary text-lg px-10 border-primary-foreground transition-colors">
                 {defaultData.button2}
               </Button>
             </div>

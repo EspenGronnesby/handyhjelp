@@ -4,12 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, Pencil } from "lucide-react";
+import { Calendar, MapPin } from 'lucide-react';
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { SectionHeadingEditModal } from "./SectionHeadingEditModal";
 import { ServiceBadge } from "@/lib/serviceIcons";
 import { useScrollGridReveal } from "@/hooks/useScrollAnimation";
+import { EditButton } from './ui/EditButton';
 
 interface Project {
   id: string;
@@ -108,13 +109,7 @@ export const ProjectsSection = () => {
         <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="relative text-center mb-8 md:mb-12">
           {isAdmin && editMode && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="absolute top-0 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-              aria-label="Rediger Våre prosjekter overskrift"
-            >
-              <Pencil className="h-5 w-5 text-primary" />
-            </button>
+            <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger Våre prosjekter overskrift" />
           )}
           
           <h2 className="heading-section font-heading text-2xl md:text-3xl lg:text-4xl mb-3 md:mb-4">

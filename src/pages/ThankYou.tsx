@@ -8,8 +8,10 @@ import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Helmet } from "react-helmet";
+import { useContactInfo } from "@/hooks/useContactInfo";
 
 const ThankYou = () => {
+  const { phone: contactPhone, email: contactEmail, phoneHref, emailHref } = useContactInfo();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
@@ -166,8 +168,8 @@ const ThankYou = () => {
                 <Phone className="w-5 h-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Ring oss på</p>
-                  <a href="tel:+4741250553" className="text-lg font-semibold text-foreground hover:text-primary">
-                    +47 412 50 553
+                  <a href={phoneHref} className="text-lg font-semibold text-foreground hover:text-primary">
+                    {contactPhone}
                   </a>
                 </div>
               </div>
@@ -175,8 +177,8 @@ const ThankYou = () => {
                 <Mail className="w-5 h-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Send e-post til</p>
-                  <a href="mailto:team@handyhjelp.no" className="text-lg font-semibold text-foreground hover:text-primary">
-                    team@handyhjelp.no
+                  <a href={emailHref} className="text-lg font-semibold text-foreground hover:text-primary">
+                    {contactEmail}
                   </a>
                 </div>
               </div>

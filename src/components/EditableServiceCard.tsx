@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, EyeOff, Check } from 'lucide-react';
+import { EyeOff, Check } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { ServiceCardEditModal } from './ServiceCardEditModal';
 import { getDisplayValue } from '@/lib/gridUtils';
 import { ServiceIcon, getServiceColors, popularColors, getServiceConfig } from '@/lib/serviceIcons';
+import { EditButton } from './ui/EditButton';
 
 interface EditableServiceCardProps {
   section: string;
@@ -65,13 +66,7 @@ export const EditableServiceCard = ({
         } ${isHidden && isAdmin && editMode ? 'opacity-50 !border-dashed !border-muted-foreground' : ''}`}
       >
         {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-            aria-label="Rediger tjenestekort"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger tjenestekort" />
         )}
 
         {isHidden && isAdmin && editMode && (

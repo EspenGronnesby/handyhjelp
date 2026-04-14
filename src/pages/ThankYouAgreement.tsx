@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import { useContactInfo } from "@/hooks/useContactInfo";
 
 const ThankYouAgreement = () => {
+  const { phone, email, phoneHref, emailHref } = useContactInfo();
   return (
     <div className="min-h-screen">
       <Helmet>
@@ -45,11 +47,11 @@ const ThankYouAgreement = () => {
                 <p className="font-semibold text-lg mb-4">Har dere spørsmål i mellomtiden?</p>
                 <p className="flex items-center gap-2">
                   <span className="text-2xl">📞</span>
-                  <span>Ring oss: <a href="tel:+4741250553" className="text-primary hover:underline font-medium">+47 412 50 553</a></span>
+                  <span>Ring oss: <a href={phoneHref} className="text-primary hover:underline font-medium">{phone}</a></span>
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="text-2xl">📧</span>
-                  <span>E-post: <a href="mailto:team@handyhjelp.no" className="text-primary hover:underline font-medium">team@handyhjelp.no</a></span>
+                  <span>E-post: <a href={emailHref} className="text-primary hover:underline font-medium">{email}</a></span>
                 </p>
               </div>
             </div>

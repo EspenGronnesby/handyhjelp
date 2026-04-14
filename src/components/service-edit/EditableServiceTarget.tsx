@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -11,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { EditButton } from '@/components/ui/EditButton';
 
 interface EditableServiceTargetProps {
   section: string;
@@ -80,12 +80,7 @@ export const EditableServiceTarget = ({
     <>
       <div className="mb-12 relative">
         {isAdmin && editMode && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="absolute top-4 right-4 z-10 bg-background rounded-full p-2 shadow-lg border-2 border-primary hover:scale-110 transition-transform"
-          >
-            <Pencil className="h-5 w-5 text-primary" />
-          </button>
+          <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
         
         <h2 className="text-3xl font-heading font-bold mb-6">Hvem er dette for?</h2>

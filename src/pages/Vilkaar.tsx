@@ -3,8 +3,10 @@ import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { PageSEO } from "@/components/SEO/PageSEO";
+import { useContactInfo } from "@/hooks/useContactInfo";
 
 const Vilkaar = () => {
+  const { phone, email, phoneHref, emailHref } = useContactInfo();
   return (
     <div className="min-h-screen">
       <PageSEO path="/vilkaar" />
@@ -133,8 +135,8 @@ const Vilkaar = () => {
                 For spørsmål om disse vilkårene, kontakt oss:
               </p>
               <ul className="list-disc pl-6 space-y-2">
-                <li>E-post: <a href="mailto:team@handyhjelp.no" className="text-primary hover:underline">team@handyhjelp.no</a></li>
-                <li>Telefon: <a href="tel:+4741250553" className="text-primary hover:underline">+47 412 50 553</a></li>
+                <li>E-post: <a href={emailHref} className="text-primary hover:underline">{email}</a></li>
+                <li>Telefon: <a href={phoneHref} className="text-primary hover:underline">{phone}</a></li>
               </ul>
             </section>
           </div>
