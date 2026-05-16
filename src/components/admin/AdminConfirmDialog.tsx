@@ -12,7 +12,7 @@ import { Quote, Job } from '@/types/admin';
 
 interface ConfirmDialogState {
   open: boolean;
-  type: 'start' | 'complete' | 'delete' | 'complete_directly' | null;
+  type: 'start' | 'complete' | 'delete' | 'delete_quote' | 'complete_directly' | null;
   item: Quote | Job | null;
 }
 
@@ -22,15 +22,17 @@ interface AdminConfirmDialogProps {
   onStartJob: (quote: Quote) => void;
   onCompleteJob: (job: Job) => void;
   onDeleteJob: (job: Job) => void;
+  onDeleteQuote?: (quote: Quote) => void;
   onCompleteJobDirectly?: (quote: Quote) => void;
 }
 
-export const AdminConfirmDialog = ({ 
-  dialog, 
-  onClose, 
-  onStartJob, 
-  onCompleteJob, 
+export const AdminConfirmDialog = ({
+  dialog,
+  onClose,
+  onStartJob,
+  onCompleteJob,
   onDeleteJob,
+  onDeleteQuote,
   onCompleteJobDirectly
 }: AdminConfirmDialogProps) => {
   const handleConfirm = () => {
@@ -40,6 +42,8 @@ export const AdminConfirmDialog = ({
       onCompleteJob(dialog.item as Job);
     } else if (dialog.type === 'delete' && dialog.item) {
       onDeleteJob(dialog.item as Job);
+    } else if (dialog.type === 'delete_quote' && dialog.item && onDeleteQuote) {
+      onDeleteQuote(dialog.item as Quote);
     } else if (dialog.type === 'complete_directly' && dialog.item && onCompleteJobDirectly) {
       onCompleteJobDirectly(dialog.item as Quote);
     }
@@ -53,12 +57,14 @@ export const AdminConfirmDialog = ({
             {dialog.type === 'start' && 'Start jobb?'}
             {dialog.type === 'complete' && 'Fullfør jobb?'}
             {dialog.type === 'delete' && 'Slett jobb?'}
+            {dialog.type === 'delete_quote' && 'Slett forespørsel?'}
             {dialog.type === 'complete_directly' && 'Avslutt oppdrag direkte?'}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {dialog.type === 'start' && 'Dette vil starte jobben og sende en e-post til kunden om at arbeidet har begynt.'}
             {dialog.type === 'complete' && 'Dette vil markere jobben som fullført og sende en takkemelding til kunden.'}
             {dialog.type === 'delete' && 'Dette vil permanent slette jobben. Denne handlingen kan ikke angres.'}
+            {dialog.type === 'delete_quote' && 'Dette vil permanent slette forespørselen uten å sende e-post til kunden. Denne handlingen kan ikke angres.'}
             {dialog.type === 'complete_directly' && 'Dette vil markere oppdraget som fullført uten å starte det først. Kunden vil kun motta avslutningsbekreftelse på e-post.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -68,6 +74,7 @@ export const AdminConfirmDialog = ({
             {dialog.type === 'start' && 'Start jobb'}
             {dialog.type === 'complete' && 'Fullfør'}
             {dialog.type === 'delete' && 'Slett'}
+            {dialog.type === 'delete_quote' && 'Slett forespørsel'}
             {dialog.type === 'complete_directly' && 'Avslutt direkte'}
           </AlertDialogAction>
         </AlertDialogFooter>

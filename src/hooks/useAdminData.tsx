@@ -215,6 +215,39 @@ export const useAdminData = (isAdmin: boolean) => {
     }
   };
 
+  const handleDeleteQuote = async (quote: Quote) => {
+    setActionLoading(quote.id);
+
+    try {
+      const { error } = await supabase.from('quotes').delete().eq('id', quote.id);
+
+      if (error) throw error;
+
+      setQuotes(prev => prev.filter(q => q.id !== quote.id));
+
+      await logActivity(
+        'quote_deleted',
+        'job_management',
+        `Slettet forespørsel: "${quote.description.substring(0, 50)}..."`,
+        { quote_id: quote.id }
+      );
+
+      toast({
+        title: "Slettet",
+        description: "Forespørselen er slettet.",
+      });
+    } catch (error: any) {
+      console.error('Error deleting quote:', error);
+      toast({
+        title: "Feil",
+        description: `Kunne ikke slette forespørselen: ${error?.message || 'Ukjent feil'}`,
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   // New function: Create job manually for an existing customer
   const handleCreateJob = async (
     profile: Profile,
@@ -633,6 +666,7 @@ export const useAdminData = (isAdmin: boolean) => {
     handleStartJob,
     handleCompleteJob,
     handleDeleteJob,
+    handleDeleteQuote,
     handleCreateJob,
     handleCompleteJobWithoutStart,
     handleUpdateAgreementStatus,
