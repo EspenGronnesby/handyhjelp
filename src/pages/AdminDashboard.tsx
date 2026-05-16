@@ -69,7 +69,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
-    type: 'start' | 'complete' | 'delete' | 'complete_directly' | null;
+    type: 'start' | 'complete' | 'delete' | 'delete_quote' | 'complete_directly' | null;
     item: Quote | Job | null;
   }>({ open: false, type: null, item: null });
   const [selectedCustomer, setSelectedCustomer] = useState<Profile | null>(null);
@@ -101,6 +101,7 @@ const AdminDashboard = () => {
     handleStartJob,
     handleCompleteJob,
     handleDeleteJob,
+    handleDeleteQuote,
     handleCreateJob,
     handleCompleteJobWithoutStart,
     handleUpdateAgreementStatus,
@@ -204,6 +205,11 @@ const AdminDashboard = () => {
 
   const handleConfirmedDeleteJob = async (job: Job) => {
     await handleDeleteJob(job);
+    setConfirmDialog({ open: false, type: null, item: null });
+  };
+
+  const handleConfirmedDeleteQuote = async (quote: Quote) => {
+    await handleDeleteQuote(quote);
     setConfirmDialog({ open: false, type: null, item: null });
   };
 
@@ -337,6 +343,7 @@ const AdminDashboard = () => {
                   actionLoading={actionLoading}
                   onStartJob={(q) => setConfirmDialog({ open: true, type: 'start', item: q })}
                   onCompleteDirectly={(q) => setConfirmDialog({ open: true, type: 'complete_directly', item: q })}
+                  onDelete={(q) => setConfirmDialog({ open: true, type: 'delete_quote', item: q })}
                 />
               ))}
             </>
@@ -588,6 +595,7 @@ const AdminDashboard = () => {
         onStartJob={handleConfirmedStartJob}
         onCompleteJob={handleConfirmedCompleteJob}
         onDeleteJob={handleConfirmedDeleteJob}
+        onDeleteQuote={handleConfirmedDeleteQuote}
         onCompleteJobDirectly={handleConfirmedCompleteJobDirectly}
       />
 
