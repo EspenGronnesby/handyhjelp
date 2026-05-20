@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin } from 'lucide-react';
+import { Calendar, MapPin, Briefcase } from 'lucide-react';
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { SectionHeadingEditModal } from "./SectionHeadingEditModal";
 import { ServiceBadge } from "@/lib/serviceIcons";
 import { useScrollGridReveal } from "@/hooks/useScrollAnimation";
 import { EditButton } from './ui/EditButton';
+import { SectionHeading } from "@/components/ui/SectionHeading";
 
 interface Project {
   id: string;
@@ -107,18 +108,18 @@ export const ProjectsSection = () => {
     <section id="projects" className="py-12 md:py-16 bg-muted/30 section-mobile" ref={ref}>
       <div className="container mx-auto px-4">
         <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="relative text-center mb-8 md:mb-12">
+        <div className="relative mb-8 md:mb-12">
           {isAdmin && editMode && (
             <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger Våre prosjekter overskrift" />
           )}
-          
-          <h2 className="heading-section font-heading text-2xl md:text-3xl lg:text-4xl mb-3 md:mb-4">
-            {displayHeading}
-          </h2>
-          
-          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-            {displaySubheading}
-          </p>
+
+          <SectionHeading
+            icon={Briefcase}
+            gradient="from-amber-500 via-orange-500 to-rose-600"
+            title={displayHeading}
+            subtitle={displaySubheading}
+            align="center"
+          />
         </div>
 
         {projects.length === 0 ? (

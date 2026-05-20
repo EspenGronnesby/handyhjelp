@@ -59,6 +59,12 @@ export const Footer = () => {
   return (
     <>
       <footer className="bg-secondary text-secondary-foreground relative">
+        {/* Tynn gradient-stripe på toppen — visuell signatur */}
+        <div
+          className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 pointer-events-none"
+          aria-hidden="true"
+        />
+
         {/* Edit button */}
         {isAdmin && editMode && (
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger footer" />
@@ -82,7 +88,7 @@ export const Footer = () => {
                     href={footerData.facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-all active:scale-95" 
                     aria-label="Facebook"
                   >
                     <Facebook className="h-5 w-5" />
@@ -93,7 +99,7 @@ export const Footer = () => {
                     href={footerData.instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-all active:scale-95" 
                     aria-label="Instagram"
                   >
                     <Instagram className="h-5 w-5" />
@@ -104,7 +110,7 @@ export const Footer = () => {
                     href={footerData.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-all active:scale-95" 
                     aria-label="LinkedIn"
                   >
                     <Linkedin className="h-5 w-5" />
@@ -115,7 +121,7 @@ export const Footer = () => {
                     href={footerData.tiktokUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-primary hover:text-primary-foreground transition-colors active:scale-95" 
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-all active:scale-95" 
                     aria-label="TikTok"
                   >
                     <TikTok className="h-5 w-5" />
@@ -126,7 +132,7 @@ export const Footer = () => {
 
             {/* Kolonne 2: Tjenester */}
             <div>
-              <h4 className="font-semibold mb-3 md:mb-4 text-base md:text-lg">Tjenester</h4>
+              <h4 className="font-semibold mb-3 md:mb-4 text-base md:text-lg relative inline-block after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-8 after:h-0.5 after:bg-gradient-to-r after:from-cyan-500 after:to-blue-500 after:rounded-full">Tjenester</h4>
               <ul className="space-y-1">
               <li>
                   <Link to="/tjenester/vaktmester" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
@@ -153,7 +159,7 @@ export const Footer = () => {
 
             {/* Kolonne 3: Selskap */}
             <div>
-              <h4 className="font-semibold mb-3 md:mb-4 text-base md:text-lg">Selskap</h4>
+              <h4 className="font-semibold mb-3 md:mb-4 text-base md:text-lg relative inline-block after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-8 after:h-0.5 after:bg-gradient-to-r after:from-emerald-500 after:to-teal-500 after:rounded-full">Selskap</h4>
               <ul className="space-y-1">
                 <li>
                   <Link to="/om-oss" className="block py-2 min-h-[44px] flex items-center text-sm hover:text-primary transition-colors active:text-primary/80">
@@ -185,7 +191,7 @@ export const Footer = () => {
 
             {/* Kolonne 4: Kontakt */}
             <div className="col-span-2 md:col-span-1">
-              <h4 className="font-semibold mb-3 md:mb-4 text-base md:text-lg">Kontakt</h4>
+              <h4 className="font-semibold mb-3 md:mb-4 text-base md:text-lg relative inline-block after:content-[''] after:absolute after:left-0 after:-bottom-1.5 after:w-8 after:h-0.5 after:bg-gradient-to-r after:from-amber-500 after:to-orange-500 after:rounded-full">Kontakt</h4>
               <ul className="space-y-1 text-sm">
                 <li className="flex items-start gap-2 py-1">
                   <MapPin className="h-4 w-4 mt-1 flex-shrink-0 text-primary" />

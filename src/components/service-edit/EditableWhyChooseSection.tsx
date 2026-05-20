@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CheckCircle2, EyeOff } from "lucide-react";
+import { Award, MapPin, Shield, EyeOff, type LucideIcon } from "lucide-react";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { EditButton } from "@/components/ui/EditButton";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
@@ -9,11 +10,21 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { isItemEmpty } from "@/lib/gridUtils";
+import { GradientHeaderCard } from "@/components/ui/GradientHeaderCard";
+import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 
 interface WhyChooseItem {
   title: string;
   description: string;
 }
+
+// Visual identity per slot — kept stable across renders so each card has the
+// same look every time the user visits. Title/description are still editable.
+const slotVisuals: { icon: LucideIcon; gradient: string }[] = [
+  { icon: Award, gradient: "from-cyan-500 via-blue-500 to-indigo-600" },
+  { icon: MapPin, gradient: "from-emerald-500 via-teal-500 to-cyan-600" },
+  { icon: Shield, gradient: "from-amber-500 via-orange-500 to-rose-600" },
+];
 
 const EditableWhyChooseSection = () => {
   const { editMode, isAdmin } = useEditMode();
@@ -40,25 +51,9 @@ const EditableWhyChooseSection = () => {
   const [heading, setHeading] = useState("Hvorfor velge HandyHjelp?");
 
   // Filter visible items (non-empty title and description)
-  const visibleItems = items.filter(item => 
+  const visibleItems = items.filter(item =>
     isAdmin && editMode ? true : !isItemEmpty(item.title, item.description)
   );
-
-  // Dynamic grid class based on visible count
-  const getGridClass = () => {
-    const count = visibleItems.length;
-    if (count === 1) return 'flex justify-center';
-    if (count === 2) return 'flex flex-wrap justify-center gap-8';
-    return 'flex flex-wrap justify-center gap-8';
-  };
-
-  // Dynamic card width class
-  const getCardWidthClass = () => {
-    const count = visibleItems.length;
-    if (count === 1) return 'w-full max-w-sm';
-    if (count === 2) return 'w-full md:w-[calc(50%-1rem)] max-w-sm';
-    return 'w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm';
-  };
 
   const handleSave = async () => {
     await updateContent(JSON.stringify(editedItems));
@@ -71,14 +66,16 @@ const EditableWhyChooseSection = () => {
     setEditedItems(updated);
   };
 
-  // Don't render section if no visible items
+  // Reveal-once fade-in via IntersectionObserver
+  const { ref, getItemStyle } = useStaggeredGridReveal(visibleItems.length, 3, { threshold: 0.15 });
+
   if (visibleItems.length === 0 && !(isAdmin && editMode)) {
     return null;
   }
 
   return (
     <>
-      <section className="py-20 bg-muted/30">
+      <section className="py-16 md:py-20 bg-muted/30">
         <div className="container mx-auto px-4 relative">
           {isAdmin && editMode && (
             <EditButton
@@ -87,38 +84,43 @@ const EditableWhyChooseSection = () => {
             />
           )}
 
-          <h2 className="text-3xl md:text-4xl font-heading font-bold text-center mb-16">
-            {heading}
-          </h2>
-          
-          <div className={`${getGridClass()} max-w-5xl mx-auto`}>
+          <SectionHeading
+            icon={Award}
+            gradient="from-cyan-500 via-blue-500 to-indigo-600"
+            title={heading}
+            align="center"
+            className="mb-10 md:mb-14"
+          />
+
+          <div
+            ref={ref}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto"
+          >
             {visibleItems.map((item, index) => {
               const isHidden = isItemEmpty(item.title, item.description);
-              
+              const visual = slotVisuals[index % slotVisuals.length];
+
               return (
-                <div 
-                  key={index} 
-                  className={`text-center p-6 rounded-xl card-hover-lift ${getCardWidthClass()}
-                    bg-cyan-50/60 dark:bg-cyan-950/30 
-                    border border-cyan-200/60 dark:border-cyan-800/40
-                    dark:ring-1 dark:ring-white/5
-                    ${isHidden && isAdmin && editMode ? 'opacity-50 border-2 border-dashed border-muted-foreground' : ''}`}
+                <div
+                  key={index}
+                  style={getItemStyle(index)}
+                  className={isHidden && isAdmin && editMode ? "opacity-50" : ""}
                 >
-                  {/* Hidden indicator for admin */}
-                  {isHidden && isAdmin && editMode && (
-                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-2">
-                      <EyeOff className="h-3 w-3" />
-                      <span>Skjult</span>
-                    </div>
-                  )}
-                  
-                  <div className="w-16 h-16 rounded-full bg-cyan-500 dark:bg-cyan-600 flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground">
-                    {item.description}
-                  </p>
+                  <GradientHeaderCard
+                    icon={visual.icon}
+                    gradient={visual.gradient}
+                    title={item.title}
+                  >
+                    {isHidden && isAdmin && editMode && (
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
+                        <EyeOff className="h-3 w-3" />
+                        <span>Skjult</span>
+                      </div>
+                    )}
+                    <p className="text-sm md:text-base text-muted-foreground">
+                      {item.description}
+                    </p>
+                  </GradientHeaderCard>
                 </div>
               );
             })}

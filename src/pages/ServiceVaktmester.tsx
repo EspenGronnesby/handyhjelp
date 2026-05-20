@@ -2,10 +2,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, Phone } from "lucide-react";
-import { Link } from "react-router-dom";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
@@ -27,19 +23,17 @@ const ServiceVaktmester = () => {
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />
-      
-      {/* Hero Section with Background - fade in when loaded */}
-      <div 
+
+      {/* Hero — bilde + tittel */}
+      <div
         className={`relative h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div 
-          className="absolute inset-0 bg-black/60"
-        ></div>
+        <div className="absolute inset-0 bg-black/60"></div>
         <HeroImageEditor page="services-vaktmester" currentImageUrl={heroImage} onImageUpdate={refetch} />
-        
+
         <div className="relative z-10">
-          <EditableServiceHero 
+          <EditableServiceHero
             section="service-vaktmester-hero"
             iconName="wrench"
             defaultTitle="Vaktmestertjenester"
@@ -49,17 +43,22 @@ const ServiceVaktmester = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <section className="py-16 md:py-24 bg-background">
+      {/* Om tjenesten */}
+      <section className="py-10 md:py-14 bg-background">
         <div className="container mx-auto px-4 max-w-4xl">
-          <EditableServiceAbout 
+          <EditableServiceAbout
             section="service-vaktmester"
             defaultParagraph1="Profesjonell eiendomspleie for borettslag, sameier og næringseiendom. Vi sørger for at ditt bygg holder seg i topp stand gjennom året med jevnlig tilsyn, vedlikehold og rask respons på akutte behov."
             defaultParagraph2="Våre erfarne vaktmestere har lang erfaring med alle typer eiendommer og sørger for at bygget ditt får den oppmerksomheten det fortjener. Vi tilbyr skreddersydde løsninger tilpasset dine behov, enten det er daglig, ukentlig eller månedlig service."
             defaultParagraph3="Med oss får du trygghet og forutsigbarhet. Vi følger opp, dokumenterer og sørger for at alle oppgaver blir utført til avtalt tid. Din eiendom er i trygge hender."
           />
+        </div>
+      </section>
 
-          <EditableServiceIncluded 
+      {/* Hva er inkludert */}
+      <section className="py-10 md:py-14 bg-muted/30">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceIncluded
             section="service-vaktmester"
             defaultItems={[
               "Daglig, ukentlig eller månedlig tilsyn av bygg",
@@ -71,22 +70,37 @@ const ServiceVaktmester = () => {
               "Akutt utrykning ved behov"
             ]}
           />
+        </div>
+      </section>
 
-          <EditableServiceTarget 
+      {/* Hvem er dette for */}
+      <section className="py-10 md:py-14 bg-background">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceTarget
             section="service-vaktmester"
             defaultTarget="Borettslag, sameier, næringseiendom"
             defaultDescription="Våre vaktmestertjenester er spesielt tilpasset for større eiendommer med behov for jevnlig tilsyn og vedlikehold. Vi jobber tett med styrer, eiendomsforvaltere og ansvarlige for å sikre best mulig eiendomspleie."
           />
+        </div>
+      </section>
 
-          <EditableServicePricing 
+      {/* Priser */}
+      <section className="py-10 md:py-14 bg-muted/30">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServicePricing
             section="service-vaktmester"
             hasFixedPrice={false}
             defaultPrice="Kontakt oss for et skreddersydd tilbud"
             defaultPriceIncludes={[]}
             defaultDescription="Priser varierer basert på størrelse, frekvens og omfang av tjenestene. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett."
           />
+        </div>
+      </section>
 
-          <EditableServiceBenefits 
+      {/* Hvorfor velge oss */}
+      <section className="py-10 md:py-14 bg-background">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceBenefits
             section="service-vaktmester"
             defaultBenefits={[
               "Erfarne fagfolk med mange års erfaring",

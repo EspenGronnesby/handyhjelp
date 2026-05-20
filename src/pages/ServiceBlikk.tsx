@@ -2,10 +2,6 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, Phone } from "lucide-react";
-import { Link } from "react-router-dom";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
@@ -27,19 +23,17 @@ const ServiceBlikk = () => {
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />
-      
-      {/* Hero Section with Background - fade in when loaded */}
-      <div 
+
+      {/* Hero */}
+      <div
         className={`relative h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div 
-          className="absolute inset-0 bg-black/60"
-        ></div>
+        <div className="absolute inset-0 bg-black/60"></div>
         <HeroImageEditor page="services-blikk" currentImageUrl={heroImage} onImageUpdate={refetch} />
-        
+
         <div className="relative z-10">
-          <EditableServiceHero 
+          <EditableServiceHero
             section="service-blikk-hero"
             iconName="droplets"
             defaultTitle="Blikkenslagertjenester"
@@ -49,17 +43,20 @@ const ServiceBlikk = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <section className="py-16 md:py-24 bg-background">
+      <section className="py-10 md:py-14 bg-background">
         <div className="container mx-auto px-4 max-w-4xl">
-          <EditableServiceAbout 
+          <EditableServiceAbout
             section="service-blikk"
             defaultParagraph1="Profesjonelle takteknings- og vannsikringsløsninger. Vi sikrer at taket ditt holder tett og at vannet ledes bort på riktig måte."
             defaultParagraph2="Våre erfarne blikkenslagere har lang erfaring med alle typer tak og vannsystemer. Vi jobber med presisjon og kvalitet for å sikre at eiendommen din er beskyttet mot vær og vind."
             defaultParagraph3="Fra takrenner og nedløp til tetting og vannsikring – vi tar oss av alt som har med blikk og taktekking å gjøre. Du kan stole på at jobben blir gjort riktig første gang."
           />
+        </div>
+      </section>
 
-          <EditableServiceIncluded 
+      <section className="py-10 md:py-14 bg-muted/30">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceIncluded
             section="service-blikk"
             defaultItems={[
               "Montering og vedlikehold av takrenner",
@@ -71,22 +68,34 @@ const ServiceBlikk = () => {
               "Kvalitetskontroll og garantier"
             ]}
           />
+        </div>
+      </section>
 
-          <EditableServiceTarget 
+      <section className="py-10 md:py-14 bg-background">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceTarget
             section="service-blikk"
             defaultTarget="Eiendomsselskaper, borettslag, privatpersoner"
             defaultDescription="Våre blikkenslagertjenester passer for alle som ønsker profesjonell vannsikring og taktekking, enten det er for bolig, næringseiendom eller offentlige bygg. Vi har erfaring med både store og små prosjekter."
           />
+        </div>
+      </section>
 
-          <EditableServicePricing 
+      <section className="py-10 md:py-14 bg-muted/30">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServicePricing
             section="service-blikk"
             hasFixedPrice={false}
             defaultPrice="Kontakt oss for et skreddersydd tilbud"
             defaultPriceIncludes={[]}
             defaultDescription="Priser varierer basert på størrelse, kompleksitet og materialvalg. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett."
           />
+        </div>
+      </section>
 
-          <EditableServiceBenefits 
+      <section className="py-10 md:py-14 bg-background">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceBenefits
             section="service-blikk"
             defaultBenefits={[
               "Erfarne fagfolk med mange års erfaring",

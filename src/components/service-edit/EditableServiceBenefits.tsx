@@ -1,22 +1,32 @@
 import { useState } from 'react';
-import { CheckCircle2, EyeOff } from 'lucide-react';
+import { EyeOff, ShieldCheck, Zap, Heart, Sparkles, Star, type LucideIcon } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { isStringEmpty, getDisplayValue } from '@/lib/gridUtils';
 import { EditButton } from '@/components/ui/EditButton';
+import { SectionHeading } from '@/components/ui/SectionHeading';
+import { useStaggeredGridReveal } from '@/hooks/useScrollAnimation';
+import { cn } from '@/lib/utils';
 
 interface EditableServiceBenefitsProps {
   section: string;
   defaultBenefits: string[];
 }
+
+// Stable per-slot visual identity for the four benefit tiles.
+const slotVisuals: { icon: LucideIcon; gradient: string }[] = [
+  { icon: ShieldCheck, gradient: "from-cyan-500 via-blue-500 to-indigo-600" },
+  { icon: Zap, gradient: "from-amber-500 via-orange-500 to-rose-600" },
+  { icon: Heart, gradient: "from-emerald-500 via-teal-500 to-cyan-600" },
+  { icon: Sparkles, gradient: "from-fuchsia-500 via-purple-500 to-indigo-600" },
+];
 
 export const EditableServiceBenefits = ({
   section,
@@ -32,7 +42,6 @@ export const EditableServiceBenefits = ({
   const { content: benefit3, hasBeenEdited: benefit3Edited } = useEditableContent(section, 'benefit_3');
   const { content: benefit4, hasBeenEdited: benefit4Edited } = useEditableContent(section, 'benefit_4');
 
-  // Use DB value if edited (even if empty), otherwise use default
   const allBenefits = [
     getDisplayValue(benefit1, benefit1Edited, defaultBenefits[0] || ''),
     getDisplayValue(benefit2, benefit2Edited, defaultBenefits[1] || ''),
@@ -40,36 +49,13 @@ export const EditableServiceBenefits = ({
     getDisplayValue(benefit4, benefit4Edited, defaultBenefits[3] || ''),
   ];
 
-  // Filter visible benefits (non-empty)
-  const visibleBenefits = allBenefits.filter((benefit, index) => 
-    isAdmin && editMode ? true : !isStringEmpty(benefit)
-  );
-
-  // For display - filter truly visible (non-empty) benefits for non-admin
-  const displayBenefits = isAdmin && editMode 
-    ? allBenefits 
+  const displayBenefits = isAdmin && editMode
+    ? allBenefits
     : allBenefits.filter(benefit => !isStringEmpty(benefit));
 
   const [formData, setFormData] = useState({
     benefits: allBenefits.some(b => b.trim() !== '') ? allBenefits : defaultBenefits
   });
-
-  // Dynamic grid class based on visible count
-  const getGridClass = () => {
-    const count = displayBenefits.filter(b => !isStringEmpty(b)).length;
-    if (count === 1) return 'flex justify-center';
-    if (count === 2) return 'flex flex-wrap justify-center gap-6';
-    if (count === 3) return 'flex flex-wrap justify-center gap-6';
-    return 'flex flex-wrap justify-center gap-6';
-  };
-
-  // Dynamic card width class
-  const getCardWidthClass = () => {
-    const count = displayBenefits.filter(b => !isStringEmpty(b)).length;
-    if (count === 1) return 'w-full max-w-md';
-    if (count === 2) return 'w-full md:w-[calc(50%-0.75rem)] max-w-md';
-    return 'w-full md:w-[calc(50%-0.75rem)] max-w-md';
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -94,7 +80,7 @@ export const EditableServiceBenefits = ({
           }, {
             onConflict: 'section,content_key'
           });
-        
+
         if (error) throw error;
       }
 
@@ -109,7 +95,8 @@ export const EditableServiceBenefits = ({
     }
   };
 
-  // Don't render section if no visible benefits
+  const { ref, getItemStyle } = useStaggeredGridReveal(displayBenefits.length, 4, { threshold: 0.15 });
+
   const visibleCount = displayBenefits.filter(b => !isStringEmpty(b)).length;
   if (visibleCount === 0 && !(isAdmin && editMode)) {
     return null;
@@ -117,43 +104,58 @@ export const EditableServiceBenefits = ({
 
   return (
     <>
-      <div className="mb-12 relative">
+      <div className="relative">
         {isAdmin && editMode && (
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
-        
-        <h2 className="text-3xl font-heading font-bold mb-6">Hvorfor velge oss?</h2>
-        <div className={getGridClass()}>
+
+        <SectionHeading
+          icon={Star}
+          gradient="from-amber-500 via-orange-500 to-rose-600"
+          title="Hvorfor velge oss?"
+        />
+
+        <div
+          ref={ref}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5"
+        >
           {displayBenefits.map((benefit, idx) => {
             const isHidden = isStringEmpty(benefit);
-            
-            // Skip rendering empty benefits for non-admin
             if (isHidden && !(isAdmin && editMode)) {
               return null;
             }
-            
+            const visual = slotVisuals[idx % slotVisuals.length];
+            const Icon = visual.icon;
+
             return (
-              <Card 
-                key={idx} 
-                className={`subtle-hover ${getCardWidthClass()} ${
-                  isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''
-                }`}
+              <div
+                key={idx}
+                style={getItemStyle(idx)}
+                className={cn(
+                  "flex flex-col items-center text-center gap-3 p-4 rounded-lg",
+                  "bg-card/50 hover:bg-card transition-colors duration-200",
+                  isHidden && isAdmin && editMode ? "opacity-50" : ""
+                )}
               >
-                <CardContent className="pt-6 relative">
-                  {/* Hidden indicator for admin */}
-                  {isHidden && isAdmin && editMode && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-muted-foreground">
-                      <EyeOff className="h-3 w-3" />
-                      <span>Skjult</span>
-                    </div>
+                <div
+                  className={cn(
+                    "w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br shadow-sm",
+                    visual.gradient
                   )}
-                  
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-success shrink-0 mt-0.5" />
-                    <span className="text-lg">{benefit || 'Tom fordel'}</span>
+                >
+                  <Icon className="w-6 h-6 text-white drop-shadow" strokeWidth={2} />
+                </div>
+                {isHidden && isAdmin && editMode ? (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <EyeOff className="h-3 w-3" />
+                    <span>Skjult</span>
                   </div>
-                </CardContent>
-              </Card>
+                ) : (
+                  <span className="text-sm md:text-base text-foreground font-medium leading-snug">
+                    {benefit || 'Tom fordel'}
+                  </span>
+                )}
+              </div>
             );
           })}
         </div>

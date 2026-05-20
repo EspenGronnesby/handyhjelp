@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowUp } from 'lucide-react';
@@ -41,10 +41,11 @@ export const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
   const [showButton, setShowButton] = useState(false);
 
-  // Scroll to top on route change
-  // Use instant scroll for marketing routes (page transitions handle smoothness)
-  // Use smooth scroll for dashboard routes (no page transitions)
-  useEffect(() => {
+  // Scroll to top on route change.
+  // useLayoutEffect runs synchronously before paint, ensuring window.scrollY = 0
+  // before child components (e.g. HeroSection's useScroll) initialise their
+  // scroll-derived state. Prevents glitchy parallax on back-to-home navigation.
+  useLayoutEffect(() => {
     if (!hash) {
       const behavior = isMarketingRoute(pathname) ? 'auto' : 'smooth';
       window.scrollTo({ top: 0, behavior });

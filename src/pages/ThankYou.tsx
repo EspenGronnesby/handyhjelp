@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle, Clock, Mail, Phone, ArrowRight, Home, UserPlus, LogIn } from "lucide-react";
+import { CheckCircle, Clock, Mail, Phone, ArrowRight, Home, UserPlus, LogIn, HelpCircle } from "lucide-react";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Header } from "@/components/Header";
@@ -53,7 +54,7 @@ const ThankYou = () => {
 
           {/* Account Created Card */}
           {accountCreated && (
-            <Card className="p-6 mb-8 bg-success/10 border-success/20 shadow-lg">
+            <Card className="glass-card p-6 mb-8 !bg-success/10 !border-success/20">
               <div className="flex items-start gap-4">
                 <UserPlus className="w-6 h-6 text-success flex-shrink-0 mt-1" />
                 <div>
@@ -76,7 +77,7 @@ const ThankYou = () => {
           )}
 
           {/* Confirmation Card */}
-          <Card className="p-8 mb-8 shadow-lg">
+          <Card className="glass-card p-8 mb-8">
             <div className="space-y-6">
               <div className="flex items-start gap-4 p-4 bg-primary/10 rounded-lg">
                 <Mail className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
@@ -107,8 +108,12 @@ const ThankYou = () => {
           </Card>
 
           {/* Next Steps */}
-          <Card className="p-8 mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Hva skjer nå?</h2>
+          <Card className="glass-card p-8 mb-8">
+            <SectionHeading
+              icon={Clock}
+              gradient="from-cyan-500 via-blue-500 to-indigo-600"
+              title="Hva skjer nå?"
+            />
             <div className="space-y-6">
               <div className="flex gap-4">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
@@ -161,8 +166,12 @@ const ThankYou = () => {
           </Card>
 
           {/* Contact Info */}
-          <Card className="p-8 mb-8 bg-gradient-to-br from-muted/50 to-muted/30">
-            <h2 className="text-xl font-bold text-foreground mb-4">Har du spørsmål i mellomtiden?</h2>
+          <Card className="glass-card p-8 mb-8 !bg-gradient-to-br !from-muted/50 !to-muted/30">
+            <SectionHeading
+              icon={HelpCircle}
+              gradient="from-emerald-500 via-teal-500 to-cyan-600"
+              title="Har du spørsmål i mellomtiden?"
+            />
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary" />

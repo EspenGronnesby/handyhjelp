@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { QuoteForm } from "@/components/QuoteForm";
+import { useState } from "react";
+import { QuickCallbackForm } from "@/components/QuickCallbackForm";
 import { Phone } from "lucide-react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
@@ -8,14 +8,14 @@ import { useContactInfo } from "@/hooks/useContactInfo";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { EditButton } from "@/components/ui/EditButton";
 import { HeroSectionEditModal } from "./HeroSectionEditModal";
-import heroDefaultImage from "@/assets/hero-building-maintenance.jpg";
+import heroDefaultImage from "@/assets/hero-building-maintenance.webp";
 import { MotionButton } from "@/components/motion";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
+import { Spotlight } from "@/components/ui/aceternity/Spotlight";
 
 export const HeroSection = () => {
-  const containerRef = useRef<HTMLElement>(null);
   const shouldReduceMotion = useReducedMotion();
-  
+
   const {
     heroImage,
     opacity,
@@ -45,51 +45,33 @@ export const HeroSection = () => {
   const displayCtaText = ctaText || 'Få tilbud';
   const displayServicesButtonText = servicesButtonText || 'Se tjenester';
 
-  // Parallax effect for background
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"],
-  });
-  
-  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
-
   return <>
-      <section 
-        ref={containerRef}
-        id="hero" 
+      <section
+        id="hero"
         className="min-h-[100svh] md:min-h-screen relative flex items-center pt-20 md:pt-20 section-mobile overflow-hidden"
       >
-        {/* Background Image - with subtle parallax */}
-        {shouldReduceMotion ? (
-          <div 
-            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}
-            style={{
-              backgroundImage: `url(${heroImage})`,
-              backgroundPosition: 'center 30%'
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75" style={{
-              opacity
-            }}></div>
-          </div>
-        ) : (
-          <motion.div 
-            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 will-change-transform ${loading ? 'opacity-0' : 'opacity-100'}`}
-            style={{
-              backgroundImage: `url(${heroImage})`,
-              backgroundPosition: 'center 30%',
-              y: backgroundY,
-              // Extend the background slightly to prevent gaps during parallax
-              top: -20,
-              bottom: -20,
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75" style={{
-              opacity
-            }}></div>
-          </motion.div>
+        {/* Static background image — no parallax. */}
+        <div
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}
+          style={{
+            backgroundImage: `url(${heroImage})`,
+            backgroundPosition: 'center 30%'
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75" style={{
+            opacity
+          }}></div>
+        </div>
+
+        {/* Aceternity Spotlight — subtle static light effect. Skipped when
+            user prefers reduced motion. */}
+        {!shouldReduceMotion && (
+          <Spotlight
+            className="-top-40 left-0 md:left-60 md:-top-20"
+            fill="white"
+          />
         )}
-        
+
         <HeroImageEditor page="home" currentImageUrl={heroImage} onImageUpdate={refetch} />
 
         {/* Edit hero content (title/subtitle/CTA) — placed next to image-edit camera button */}
@@ -105,7 +87,7 @@ export const HeroSection = () => {
           <div className="grid lg:grid-cols-2 gap-6 md:gap-12 items-center min-h-[calc(100svh-5rem)] md:min-h-[calc(100vh-8rem)] py-4 md:py-20">
             {/* Left Content - Mobile optimized */}
             <div className="text-left flex flex-col justify-center">
-              {/* Main Heading - Larger and more impactful on mobile */}
+              {/* Main Heading - plain white text */}
               <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-8 font-heading text-white leading-[1.1]">
                 {displayTitle}
               </h1>
@@ -127,10 +109,10 @@ export const HeroSection = () => {
                 >
                   {displayCtaText}
                 </MotionButton>
-                <MotionButton 
-                  variant="cta-outline" 
-                  size="lg" 
-                  className="text-base md:text-lg px-6 md:px-6 py-4 md:py-6 bg-white/10 text-white border-white/30 hover:bg-white/20" 
+                <MotionButton
+                  variant="cta-outline"
+                  size="lg"
+                  className="text-base md:text-lg px-6 md:px-6 py-4 md:py-6 bg-white/10 text-white border-white/30 hover:bg-white/20"
                   onClick={() => document.getElementById('services')?.scrollIntoView({
                     behavior: 'smooth'
                   })}
@@ -149,9 +131,9 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            {/* Right Content - Quote Form (hidden on mobile) */}
+            {/* Right Content — kort lead-capture (hidden on mobile) */}
             <div className="hidden md:block lg:block">
-              <QuoteForm />
+              <QuickCallbackForm />
             </div>
           </div>
         </div>

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MessageSquare, Loader2 } from "lucide-react";
+import { MessageSquare, Loader2, Info, HelpCircle } from "lucide-react";
 import { EditableHero } from "@/components/EditableHero";
 import { EditableContactInfo } from "@/components/EditableContactInfo";
 import { EditableHowWeWork } from "@/components/EditableHowWeWork";
@@ -23,6 +23,8 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { EditButton } from "@/components/ui/EditButton";
 import { SectionEditModal } from "@/components/SectionEditModal";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { TrustStripe } from "@/components/TrustStripe";
 const Contact = () => {
   const { phone: contactPhone } = useContactInfo();
   const { editMode, isAdmin } = useEditMode();
@@ -97,26 +99,35 @@ const Contact = () => {
       
       <main id="main-content" className="pt-32 pb-16">
         {/* Hero Section */}
-        <section className="container mx-auto px-4 mb-16 md:mb-20">
+        <section className="container mx-auto px-4 mb-8 md:mb-10">
           <EditableHero section="hero-kontakt" defaultHeading="Ta kontakt i dag" defaultSubtext="Vi er her for å hjelpe deg med alle dine eiendomsbehov. Kontakt oss for en uforpliktende samtale." className="max-w-3xl mx-auto" />
           <p className="text-lg font-semibold text-primary text-center mt-4">
             ⏱️ Vi svarer innen 1-3 virkedager
           </p>
         </section>
 
+        {/* Trust-stripe rett under hero (Mr. Handyman-mønster) */}
+        <div className="mb-12 md:mb-16">
+          <TrustStripe />
+        </div>
+
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
             {/* Contact Form */}
             <div>
-              <Card className="subtle-hover relative">
+              <div className="glass-card p-6 relative">
                 {isAdmin && editMode && (
                   <EditButton
                     onClick={() => setIsSectionModalOpen(true)}
                     ariaLabel="Rediger seksjon-overskrifter"
                   />
                 )}
-                <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-6">{formHeading}</h2>
+                <div>
+                  <SectionHeading
+                    icon={MessageSquare}
+                    gradient="from-cyan-500 via-blue-500 to-indigo-600"
+                    title={formHeading}
+                  />
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                       <Label htmlFor="name" required>Navn</Label>
@@ -167,43 +178,43 @@ const Contact = () => {
                         </> : 'Send melding'}
                     </Button>
                   </form>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
 
             {/* Contact Info */}
             <div className="space-y-6">
-              <Card className="subtle-hover">
-                <CardContent className="pt-6">
-                  <h2 className="text-2xl font-bold mb-6">{infoHeading}</h2>
-                  <EditableContactInfo />
-                </CardContent>
-              </Card>
+              <div className="glass-card p-6">
+                <SectionHeading
+                  icon={Info}
+                  gradient="from-emerald-500 via-teal-500 to-cyan-600"
+                  title={infoHeading}
+                />
+                <EditableContactInfo />
+              </div>
 
-            {/* Map Section with Google Maps Embed */}
-            <Card>
-              <CardContent className="pt-4 md:pt-6 p-0">
+              {/* Map Section with Google Maps Embed */}
+              <div className="glass-card !p-0 overflow-hidden">
                 <iframe width="100%" height="300" className="md:h-[450px]" style={{
                   border: 0,
-                  borderRadius: '0.5rem'
                 }} loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Ægirsvei+3,+Kristiansand&zoom=15" title="HandyHjelp lokasjon - Ægirsvei 3, Kristiansand"></iframe>
-              </CardContent>
-            </Card>
+              </div>
 
               {/* How We Work */}
-              <Card className="subtle-hover">
-                <CardContent className="pt-6">
-                  <EditableHowWeWork />
-                </CardContent>
-              </Card>
+              <div className="glass-card p-6">
+                <EditableHowWeWork />
+              </div>
             </div>
           </div>
 
           {/* FAQ Section */}
           <section className="max-w-3xl mx-auto mt-8">
-            <h2 className="text-3xl font-bold text-center mb-8">
-              Ofte stilte spørsmål før du kontakter oss
-            </h2>
+            <SectionHeading
+              icon={HelpCircle}
+              gradient="from-fuchsia-500 via-purple-500 to-indigo-600"
+              title="Ofte stilte spørsmål"
+              subtitle="før du kontakter oss"
+            />
             <Accordion type="single" collapsible className="space-y-4">
               <EditableFAQItem section="faq-contact" defaultQuestion="Hvor raskt kan dere komme?" defaultAnswer="For akutte henvendelser kan vi ofte være på stedet samme dag. Planlagte oppdrag avtales etter dine ønsker." index={1} />
               <EditableFAQItem section="faq-contact" defaultQuestion="Tar dere oppdrag på kveldstid?" defaultAnswer="Ja, vi tilbyr både kveldstjenester og helgetjenester mot et lite tillegg." index={2} />

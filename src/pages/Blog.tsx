@@ -5,13 +5,16 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, Search } from "lucide-react";
+import { Calendar, Clock, Search, Tag } from "lucide-react";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditableHero } from "@/components/EditableHero";
 import { PageSEO } from "@/components/SEO/PageSEO";
+import { TrustStripe } from "@/components/TrustStripe";
 
 interface BlogPost {
   id: string;
@@ -84,7 +87,7 @@ const Blog = () => {
       <BreadcrumbNavigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-12 bg-gradient-to-b from-background to-muted/30">
+      <section className="pt-32 pb-8 bg-gradient-to-b from-background to-muted/30">
         <div className="container mx-auto px-4">
           <EditableHero
             section="hero-rad"
@@ -95,6 +98,8 @@ const Blog = () => {
         </div>
       </section>
 
+      <TrustStripe />
+
       {/* Main Content */}
       <main id="main-content" className="py-8 md:py-12">
         <div className="container mx-auto px-4">
@@ -102,31 +107,34 @@ const Blog = () => {
             {/* Sidebar - Shows first on mobile for better UX */}
             <aside className="order-first lg:order-none lg:col-span-1 space-y-4 lg:space-y-6">
               {/* Search */}
-              <Card>
-                <CardHeader className="pb-2 lg:pb-4">
-                  <CardTitle className="text-base lg:text-lg">Søk</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Søk i artikler..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 h-12 text-base"
-                      aria-label="Søk i bloggartikler"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="glass-card p-4 lg:p-5">
+                <SectionHeading
+                  icon={Search}
+                  gradient="from-cyan-500 via-blue-500 to-indigo-600"
+                  title="Søk"
+                  className="!mb-4"
+                />
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Søk i artikler..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 h-12 text-base"
+                    aria-label="Søk i bloggartikler"
+                  />
+                </div>
+              </div>
 
               {/* Categories - Horizontal scroll on mobile */}
-              <Card>
-                <CardHeader className="pb-2 lg:pb-4">
-                  <CardTitle className="text-base lg:text-lg">Kategorier</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0">
+              <div className="glass-card p-4 lg:p-5">
+                <SectionHeading
+                  icon={Tag}
+                  gradient="from-emerald-500 via-teal-500 to-cyan-600"
+                  title="Kategorier"
+                  className="!mb-4"
+                />
+                <div className="flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0">
                     {categories.map((category) => (
                       <button
                         key={category.id}
@@ -147,8 +155,7 @@ const Blog = () => {
                       </button>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+              </div>
             </aside>
 
             {/* Blog Posts Grid */}
@@ -231,35 +238,8 @@ const Blog = () => {
         </div>
       </main>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <Card className="max-w-3xl mx-auto text-center p-8">
-            <CardHeader>
-              <CardTitle className="text-3xl mb-4">
-                Trenger du profesjonell hjelp?
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Våre erfarne fagfolk står klare til å hjelpe deg med alle typer eiendomsvedlikehold
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Link to="/tilbud">
-                  <button className="bg-success hover:bg-success-hover text-success-foreground px-6 py-3 rounded-lg font-medium transition-colors">
-                    Få gratis tilbud
-                  </button>
-                </Link>
-                <Link to="/kontakt">
-                  <button className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors">
-                    Kontakt oss
-                  </button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      {/* CTA Section — same as resten av sidene */}
+      <EditableBottomCTA />
 
       <Footer />
     </div>

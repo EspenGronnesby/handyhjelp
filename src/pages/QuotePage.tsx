@@ -87,14 +87,14 @@ const QuotePage = () => {
             <QuoteForm />
 
             {/* Fast avtale promo section */}
-            <Card id="fast-avtale-section" className="mt-12 border-primary/20 bg-gradient-to-br from-primary/5 to-transparent scroll-mt-32 relative">
+            <div id="fast-avtale-section" className="glass-card mt-12 p-6 text-center scroll-mt-32 relative !bg-gradient-to-br !from-primary/5 !to-transparent">
               {isAdmin && editMode && (
                 <EditButton
                   onClick={() => setIsPromoModalOpen(true)}
                   ariaLabel="Rediger fast-avtale-promo"
                 />
               )}
-              <CardContent className="p-6 text-center">
+              <div>
                 <div className="flex justify-center mb-4">
                   <div className="p-3 rounded-full bg-primary/10">
                     <CalendarCheck className="h-8 w-8 text-primary" />
@@ -112,8 +112,8 @@ const QuotePage = () => {
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </main>
