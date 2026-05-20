@@ -11,7 +11,7 @@ import { HeroSectionEditModal } from "./HeroSectionEditModal";
 import heroDefaultImage from "@/assets/hero-building-maintenance.webp";
 import { MotionButton } from "@/components/motion";
 import { useReducedMotion } from "framer-motion";
-import { Spotlight } from "@/components/ui/aceternity/Spotlight";
+import { Spotlight } from "@/components/ui/Spotlight";
 
 export const HeroSection = () => {
   const shouldReduceMotion = useReducedMotion();
