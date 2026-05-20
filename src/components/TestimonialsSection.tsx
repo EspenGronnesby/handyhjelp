@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Star, Quote, ChevronLeft, ChevronRight, Building2, User, BadgeCheck } from 'lucide-react';
+import { Star, Quote, ChevronLeft, ChevronRight, Building2, User, BadgeCheck, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,7 @@ import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { EditButton } from '@/components/ui/EditButton';
 import { SectionEditModal } from '@/components/SectionEditModal';
+import { SectionHeading } from '@/components/ui/SectionHeading';
 
 interface Review {
   id: string;
@@ -194,23 +195,26 @@ const TestimonialsSection = () => {
     <section id="testimonials" className="py-16 md:py-24 bg-muted/20">
       <div className="container mx-auto px-4">
         {/* Section Header - Compact on mobile */}
-        <div className="text-center mb-8 md:mb-12 relative">
+        <div className="mb-8 md:mb-12 relative">
           {isAdmin && editMode && (
             <EditButton
               onClick={() => setIsModalOpen(true)}
               ariaLabel="Rediger kundeanmeldelser-overskrift"
             />
           )}
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium mb-3 md:mb-4 reveal-up">
-            <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary" />
-            <span>{badge}</span>
+          <div className="text-center mb-3 md:mb-4 reveal-up">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium">
+              <Star className="h-3 w-3 md:h-4 md:w-4 fill-primary" />
+              <span>{badge}</span>
+            </div>
           </div>
-          <h2 className="text-2xl md:text-4xl font-bold text-foreground mb-3 md:mb-4 reveal-up reveal-stagger-2">
-            {heading}
-          </h2>
-          <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto reveal-up reveal-stagger-3">
-            {subheading}
-          </p>
+          <SectionHeading
+            icon={MessageCircle}
+            gradient="from-fuchsia-500 via-purple-500 to-indigo-600"
+            title={heading}
+            subtitle={subheading}
+            align="center"
+          />
         </div>
 
         {/* Testimonials Carousel */}

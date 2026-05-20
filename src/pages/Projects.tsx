@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin } from "lucide-react";
 import { EditableHero } from "@/components/EditableHero";
+import { TrustStripe } from "@/components/TrustStripe";
+import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { ServiceIcon, ServiceBadge, getCategoryLabel } from "@/lib/serviceIcons";
 
@@ -104,8 +106,13 @@ const Projects = () => {
             section="hero-prosjekter"
             defaultHeading="Våre prosjekter"
             defaultSubtext="Se hvordan vi transformerer eiendom med kvalitetsarbeid – før og etter bilder fra våre beste prosjekter"
-            className="mb-12"
+            className="mb-8"
           />
+        </div>
+
+        <TrustStripe />
+
+        <div className="container mx-auto px-4 mt-8">
 
           {/* Category Filter */}
           {projects.length > 0 && (
@@ -263,6 +270,8 @@ const Projects = () => {
           )}
         </div>
       </main>
+
+      <EditableBottomCTA />
 
       <Footer />
     </div>

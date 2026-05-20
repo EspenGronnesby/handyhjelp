@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Tag } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -7,12 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditButton } from '@/components/ui/EditButton';
+import { SectionHeading } from '@/components/ui/SectionHeading';
+import { useFadeInUp } from '@/hooks/useScrollAnimation';
+import { cn } from '@/lib/utils';
 
 interface EditableServicePricingProps {
   section: string;
@@ -81,7 +83,7 @@ export const EditableServicePricing = ({
           }, {
             onConflict: 'section,content_key'
           });
-        
+
         if (error) throw error;
       }
 
@@ -96,52 +98,63 @@ export const EditableServicePricing = ({
     }
   };
 
+  const isFixedPrice = hasFixedPrice && displayData.price;
+  const { ref, style } = useFadeInUp({ threshold: 0.15 });
+
   return (
     <>
-      <div className="mb-12 relative">
+      <div ref={ref} style={style} className="relative">
         {isAdmin && editMode && (
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
-        
-        <h2 className="text-3xl font-heading font-bold mb-6">Priser</h2>
-        {hasFixedPrice && displayData.price ? (
-          <Card className="border-success border-2">
-            <CardContent className="pt-6">
-              <div className="text-center mb-6">
-                <p className="text-sm text-muted-foreground mb-2">Fast pris for enebolig</p>
-                <p className="text-5xl font-bold text-success mb-4">{displayData.price}</p>
-                <p className="text-muted-foreground">Ingen skjulte kostnader</p>
-              </div>
-              {displayData.includes.length > 0 && (
-                <div className="space-y-3">
-                  <p className="font-semibold mb-3">Prisen inkluderer:</p>
-                  {displayData.includes.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="mt-6 text-center">
-                <Button asChild variant="cta" size="lg">
-                  <Link to="/tilbud">Få tilbud</Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+
+        <SectionHeading
+          icon={Tag}
+          gradient={
+            isFixedPrice
+              ? "from-amber-500 via-orange-500 to-rose-600"
+              : "from-cyan-500 via-blue-500 to-indigo-600"
+          }
+          title="Priser"
+        />
+
+        {isFixedPrice ? (
+          <div className={cn(
+            "glass-card max-w-xl mx-auto p-6 md:p-8 text-center !border-success !border-2"
+          )}>
+            <p className="text-xs md:text-sm text-muted-foreground mb-1 uppercase tracking-wide">
+              Fast pris for enebolig
+            </p>
+            <p className="text-4xl md:text-5xl font-bold text-success mb-2">
+              {displayData.price}
+            </p>
+            <p className="text-sm text-muted-foreground mb-5">Ingen skjulte kostnader</p>
+
+            {displayData.includes.length > 0 && (
+              <ul className="space-y-2 text-left max-w-sm mx-auto mb-6">
+                {displayData.includes.map((item, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base text-foreground">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <Button asChild variant="cta" size="lg">
+              <Link to="/tilbud">Få tilbud</Link>
+            </Button>
+          </div>
         ) : (
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <p className="text-lg mb-4">{displayData.description}</p>
-              <p className="text-muted-foreground mb-6">
-                Priser varierer basert på størrelse, kompleksitet og materialvalg. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett.
-              </p>
-              <Button asChild variant="cta" size="lg">
-                <Link to="/tilbud">Få tilbud</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="max-w-2xl">
+            <p className="text-base md:text-lg text-foreground mb-2">{displayData.description}</p>
+            <p className="text-sm md:text-base text-muted-foreground mb-5">
+              Priser varierer basert på størrelse, kompleksitet og materialvalg. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett.
+            </p>
+            <Button asChild variant="cta" size="lg">
+              <Link to="/tilbud">Få tilbud</Link>
+            </Button>
+          </div>
         )}
       </div>
 

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Award, Shield, AlertCircle } from 'lucide-react';
+import { Award, Shield, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { CertificationsEditModal } from './CertificationsEditModal';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditButton } from './ui/EditButton';
+import { SectionHeading } from './ui/SectionHeading';
 
 export const EditableCertifications = () => {
   const { editMode, isAdmin } = useEditMode();
@@ -84,61 +85,63 @@ export const EditableCertifications = () => {
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
 
-        <h2 className="text-3xl font-bold text-center mb-12">{displayHeading}</h2>
+        <div className="max-w-4xl mx-auto mb-10 md:mb-12">
+          <SectionHeading
+            icon={ShieldCheck}
+            gradient="from-emerald-500 via-teal-500 to-cyan-600"
+            title={displayHeading}
+          />
+        </div>
         
         <div className={`${gridClass} max-w-4xl mx-auto`}>
           {/* Card 1 - Show if has content OR in edit mode */}
           {(card1HasContent || isEditModeActive) && (
-            <Card className={`card-hover-lift ${!card1HasContent ? 'opacity-50 border-dashed border-2' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
-              <CardContent className="pt-6">
-                {!card1HasContent && isEditModeActive && (
-                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                    <AlertCircle className="h-4 w-4" />
-                    <span className="text-sm">Tom - skjult for besøkende</span>
-                  </div>
-                )}
-                <Award className="h-10 w-10 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-3">
-                  {card1Title || (isEditModeActive ? 'Legg til tittel...' : '')}
-                </h3>
-                {card1Items.length > 0 ? (
-                  <ul className="space-y-2 text-muted-foreground">
-                    {card1Items.map((item, index) => (
-                      <li key={index}>✓ {item}</li>
-                    ))}
-                  </ul>
-                ) : isEditModeActive ? (
-                  <p className="text-muted-foreground text-sm italic">Ingen punkter lagt til</p>
-                ) : null}
-              </CardContent>
-            </Card>
+            <div className={`glass-card p-6 ${!card1HasContent ? 'opacity-50 !border-dashed' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
+              {!card1HasContent && isEditModeActive && (
+                <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm">Tom - skjult for besøkende</span>
+                </div>
+              )}
+              <Award className="h-10 w-10 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-3">
+                {card1Title || (isEditModeActive ? 'Legg til tittel...' : '')}
+              </h3>
+              {card1Items.length > 0 ? (
+                <ul className="space-y-2 text-muted-foreground">
+                  {card1Items.map((item, index) => (
+                    <li key={index}>✓ {item}</li>
+                  ))}
+                </ul>
+              ) : isEditModeActive ? (
+                <p className="text-muted-foreground text-sm italic">Ingen punkter lagt til</p>
+              ) : null}
+            </div>
           )}
 
           {/* Card 2 - Show if has content OR in edit mode */}
           {(card2HasContent || isEditModeActive) && (
-            <Card className={`card-hover-lift ${!card2HasContent ? 'opacity-50 border-dashed border-2' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
-              <CardContent className="pt-6">
-                {!card2HasContent && isEditModeActive && (
-                  <div className="flex items-center gap-2 text-muted-foreground mb-4">
-                    <AlertCircle className="h-4 w-4" />
-                    <span className="text-sm">Tom - skjult for besøkende</span>
-                  </div>
-                )}
-                <Shield className="h-10 w-10 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-3">
-                  {card2Title || (isEditModeActive ? 'Legg til tittel...' : '')}
-                </h3>
-                {card2Items.length > 0 ? (
-                  <ul className="space-y-2 text-muted-foreground">
-                    {card2Items.map((item, index) => (
-                      <li key={index}>✓ {item}</li>
-                    ))}
-                  </ul>
-                ) : isEditModeActive ? (
-                  <p className="text-muted-foreground text-sm italic">Ingen punkter lagt til</p>
-                ) : null}
-              </CardContent>
-            </Card>
+            <div className={`glass-card p-6 ${!card2HasContent ? 'opacity-50 !border-dashed' : ''} ${visibleCardCount === 1 ? 'max-w-md w-full' : ''}`}>
+              {!card2HasContent && isEditModeActive && (
+                <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm">Tom - skjult for besøkende</span>
+                </div>
+              )}
+              <Shield className="h-10 w-10 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-3">
+                {card2Title || (isEditModeActive ? 'Legg til tittel...' : '')}
+              </h3>
+              {card2Items.length > 0 ? (
+                <ul className="space-y-2 text-muted-foreground">
+                  {card2Items.map((item, index) => (
+                    <li key={index}>✓ {item}</li>
+                  ))}
+                </ul>
+              ) : isEditModeActive ? (
+                <p className="text-muted-foreground text-sm italic">Ingen punkter lagt til</p>
+              ) : null}
+            </div>
           )}
         </div>
       </div>

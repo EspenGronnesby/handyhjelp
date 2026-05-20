@@ -1,16 +1,28 @@
 import { useState } from 'react';
-import { Clock, Shield, Award, Users, CheckCircle2, Star, EyeOff } from 'lucide-react';
+import { Clock, Shield, Award, Users, CheckCircle2, Star, EyeOff, type LucideIcon } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { WhyUsEditModal } from './WhyUsEditModal';
-import { Card, CardContent } from '@/components/ui/card';
 import { getDisplayValue } from '@/lib/gridUtils';
 import { useStaggeredGridReveal } from '@/hooks/useScrollAnimation';
 import { EditButton } from './ui/EditButton';
+import { SectionHeading } from './ui/SectionHeading';
+import { cn } from '@/lib/utils';
 
-const iconMap = {
+const iconMap: Record<string, LucideIcon> = {
   Clock, Shield, Award, Users, CheckCircle2, Star
 };
+
+// Distinct gradient per slot so the 6 cards each have their own visual ID
+// without depending on what icon-name the admin picked.
+const slotGradients = [
+  "from-cyan-500 via-blue-500 to-indigo-600",
+  "from-emerald-500 via-teal-500 to-cyan-600",
+  "from-amber-500 via-orange-500 to-rose-600",
+  "from-fuchsia-500 via-purple-500 to-indigo-600",
+  "from-rose-500 via-pink-500 to-fuchsia-600",
+  "from-yellow-500 via-amber-500 to-orange-600",
+];
 
 export const EditableWhyUs = () => {
   const { editMode, isAdmin } = useEditMode();
@@ -39,7 +51,6 @@ export const EditableWhyUs = () => {
     { icon: 'Star', defaultTitle: 'Høy kundetilfredshet', defaultDesc: '4.8/5 stjerner basert på 200+ kundeanmeldelser' },
   ];
 
-  // Use DB value if edited (even if empty), otherwise use default
   const items = [
     { icon: 'Clock', title: getDisplayValue(title1, title1Edited, defaultItems[0].defaultTitle), description: getDisplayValue(desc1, desc1Edited, defaultItems[0].defaultDesc) },
     { icon: 'Shield', title: getDisplayValue(title2, title2Edited, defaultItems[1].defaultTitle), description: getDisplayValue(desc2, desc2Edited, defaultItems[1].defaultDesc) },
@@ -49,57 +60,57 @@ export const EditableWhyUs = () => {
     { icon: 'Star', title: getDisplayValue(title6, title6Edited, defaultItems[5].defaultTitle), description: getDisplayValue(desc6, desc6Edited, defaultItems[5].defaultDesc) },
   ];
 
-  // Sjekk om et item er tomt (både tittel og beskrivelse er tomme strenger)
-  const isItemHidden = (item: typeof items[0]) => {
-    return item.title.trim() === '' && item.description.trim() === '';
-  };
+  const isItemHidden = (item: typeof items[0]) =>
+    item.title.trim() === '' && item.description.trim() === '';
 
-  // Filtrer ut skjulte items når ikke i edit mode
-  const visibleItems = isAdmin && editMode 
-    ? items 
+  const visibleItems = isAdmin && editMode
+    ? items
     : items.filter(item => !isItemHidden(item));
 
-  // Use staggered grid animation
   const { ref, getItemStyle } = useStaggeredGridReveal(visibleItems.length, 3, { threshold: 0.1 });
 
-  // Hvis alle items er skjult og ikke i edit mode, skjul hele seksjonen
   if (visibleItems.length === 0 && (!isAdmin || !editMode)) {
     return null;
   }
 
-  // Dynamic grid class based on number of visible cards
-  const getCardWidthClass = () => {
-    const count = visibleItems.filter(item => !isItemHidden(item) || (isAdmin && editMode)).length;
-    if (count === 1) return 'w-full max-w-sm';
-    if (count === 2) return 'w-full md:w-[calc(50%-1rem)] max-w-sm';
-    return 'w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] max-w-sm';
-  };
-
   return (
     <>
-      <div className="mb-20 relative" ref={ref}>
+      <div className="mb-20 relative">
         {isAdmin && editMode && (
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
 
-        <h2 className="text-3xl font-bold text-center mb-12">{getDisplayValue(heading, headingEdited, 'Hvorfor velge oss?')}</h2>
-        <div className="flex flex-wrap justify-center gap-8">
+        <div className="max-w-4xl mx-auto mb-10 md:mb-12">
+          <SectionHeading
+            icon={Award}
+            gradient="from-cyan-500 via-blue-500 to-indigo-600"
+            title={getDisplayValue(heading, headingEdited, 'Hvorfor velge oss?')}
+          />
+        </div>
+
+        <div
+          ref={ref}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto"
+        >
           {items.map((item, index) => {
-            const IconComponent = iconMap[item.icon as keyof typeof iconMap];
+            const Icon = iconMap[item.icon as keyof typeof iconMap] || Award;
             const isHidden = isItemHidden(item);
-            
-            // I edit mode: vis alle, men marker skjulte
+            const gradient = slotGradients[index % slotGradients.length];
+
             if (!isAdmin || !editMode) {
               if (isHidden) return null;
             }
 
             return (
-              <Card 
-                key={index} 
-                className={`border-2 card-hover-lift relative ${getCardWidthClass()} ${
-                  isHidden && isAdmin && editMode ? 'opacity-50 border-dashed border-muted-foreground' : ''
-                }`}
+              <div
+                key={index}
                 style={getItemStyle(index)}
+                className={cn(
+                  "relative flex flex-col gap-3 p-5 md:p-6 rounded-xl",
+                  "bg-card/50 hover:bg-card transition-colors duration-200",
+                  "border border-border/40",
+                  isHidden && isAdmin && editMode ? "opacity-50 border-dashed" : ""
+                )}
               >
                 {isHidden && isAdmin && editMode && (
                   <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
@@ -107,12 +118,25 @@ export const EditableWhyUs = () => {
                     <span>Skjult</span>
                   </div>
                 )}
-                <CardContent className="pt-6">
-                  <IconComponent className="h-12 w-12 text-primary mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">{item.title || 'Tom tittel'}</h3>
-                  <p className="text-muted-foreground">{item.description || 'Tom beskrivelse'}</p>
-                </CardContent>
-              </Card>
+
+                <div
+                  className={cn(
+                    "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm shrink-0",
+                    gradient
+                  )}
+                >
+                  <Icon className="w-6 h-6 text-white drop-shadow" strokeWidth={2} />
+                </div>
+
+                <div>
+                  <h3 className="text-base md:text-lg font-bold text-foreground mb-1 font-heading">
+                    {item.title || 'Tom tittel'}
+                  </h3>
+                  <p className="text-sm md:text-base text-muted-foreground leading-snug">
+                    {item.description || 'Tom beskrivelse'}
+                  </p>
+                </div>
+              </div>
             );
           })}
         </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Users } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -6,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditButton } from '@/components/ui/EditButton';
+import { SectionHeading } from '@/components/ui/SectionHeading';
+import { useFadeInUp } from '@/hooks/useScrollAnimation';
 
 interface EditableServiceTargetProps {
   section: string;
@@ -61,7 +63,7 @@ export const EditableServiceTarget = ({
           }, {
             onConflict: 'section,content_key'
           });
-        
+
         if (error) throw error;
       }
 
@@ -76,24 +78,29 @@ export const EditableServiceTarget = ({
     }
   };
 
+  const { ref, style } = useFadeInUp({ threshold: 0.15 });
+
   return (
     <>
-      <div className="mb-12 relative">
+      <div ref={ref} style={style} className="relative">
         {isAdmin && editMode && (
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
-        
-        <h2 className="text-3xl font-heading font-bold mb-6">Hvem er dette for?</h2>
-        <Card className="subtle-hover">
-          <CardContent className="pt-6">
-            <p className="text-lg">
-              <strong>Passer for:</strong> {displayData.target}
-            </p>
-            <p className="text-muted-foreground mt-4">
-              {displayData.description}
-            </p>
-          </CardContent>
-        </Card>
+
+        <SectionHeading
+          icon={Users}
+          gradient="from-cyan-500 via-blue-500 to-indigo-600"
+          title="Hvem er dette for?"
+        />
+
+        <div>
+          <p className="text-base md:text-lg text-foreground mb-2">
+            <span className="font-semibold">Passer for:</span> {displayData.target}
+          </p>
+          <p className="text-sm md:text-base text-muted-foreground">
+            {displayData.description}
+          </p>
+        </div>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

@@ -7,7 +7,8 @@ import { GoogleAnalytics } from '@/components/SEO/GoogleAnalytics';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, ArrowLeft } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Newspaper } from 'lucide-react';
+import { SectionHeading } from '@/components/ui/SectionHeading';
 import { supabase } from '@/integrations/supabase/client';
 import { Helmet } from 'react-helmet';
 import { SEO_CONFIG, getCanonicalUrl } from '@/config/seo';
@@ -174,33 +175,33 @@ const BlogDetail = () => {
             />
 
             {/* CTA Card */}
-            <Card className="bg-primary/5 border-primary/20 mb-12">
-              <CardHeader>
-                <CardTitle className="text-2xl">Trenger du hjelp med dette?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-6">
-                  Våre fagfolk kan hjelpe deg med alt fra små reparasjoner til store prosjekter.
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  <Link to="/tilbud">
-                    <Button variant="cta" size="lg">
-                      Få gratis tilbud
-                    </Button>
-                  </Link>
-                  <Link to="/kontakt">
-                    <Button variant="cta-outline" size="lg">
-                      Kontakt oss
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="glass-card p-6 mb-12 !bg-primary/5 !border-primary/20">
+              <h3 className="text-2xl font-bold text-foreground mb-3">Trenger du hjelp med dette?</h3>
+              <p className="text-muted-foreground mb-6">
+                Våre fagfolk kan hjelpe deg med alt fra små reparasjoner til store prosjekter.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Link to="/tilbud">
+                  <Button variant="cta" size="lg">
+                    Få gratis tilbud
+                  </Button>
+                </Link>
+                <Link to="/kontakt">
+                  <Button variant="cta-outline" size="lg">
+                    Kontakt oss
+                  </Button>
+                </Link>
+              </div>
+            </div>
 
             {/* Related Articles */}
             {relatedPosts.length > 0 && (
               <div>
-                <h2 className="text-2xl font-heading font-bold mb-6">Lignende artikler</h2>
+                <SectionHeading
+                  icon={Newspaper}
+                  gradient="from-amber-500 via-orange-500 to-rose-600"
+                  title="Lignende artikler"
+                />
                 <div className="grid md:grid-cols-3 gap-6">
                   {relatedPosts.map((related) => (
                     <Link key={related.id} to={`/raad/${related.slug}`}>

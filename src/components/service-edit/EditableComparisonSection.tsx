@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Calendar, Sparkles } from "lucide-react";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { EditButton } from "@/components/ui/EditButton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useEditMode } from "@/contexts/EditModeContext";
@@ -10,7 +9,8 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { GradientHeaderCard } from "@/components/ui/GradientHeaderCard";
+import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 
 interface ComparisonData {
   mainHeading: string;
@@ -62,9 +62,11 @@ const EditableComparisonSection = () => {
     setEditedData(updated);
   };
 
+  const { ref, getItemStyle } = useStaggeredGridReveal(2, 2, { threshold: 0.15 });
+
   return (
     <>
-      <section className="py-20 bg-background">
+      <section className="py-16 md:py-20 bg-background">
         <div className="container mx-auto px-4 relative">
           {editMode && (
             <EditButton
@@ -73,68 +75,70 @@ const EditableComparisonSection = () => {
             />
           )}
 
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
-              {data.mainHeading}
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              {data.subheading}
-            </p>
-          </div>
+          <SectionHeading
+            icon={Sparkles}
+            gradient="from-amber-500 via-orange-500 to-rose-600"
+            title={data.mainHeading}
+            subtitle={data.subheading}
+            align="center"
+            className="mb-10 md:mb-14"
+          />
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Link to="/tilbud" className="block group">
-              <Card className="p-6 card-hover-lift h-full cursor-pointer transition-all hover:border-primary/50 hover:shadow-md">
-                <CardHeader>
-                  <CardTitle className="text-2xl">{data.oneTimeTitle}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+          <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
+            <Link to="/tilbud" style={getItemStyle(0)} className="block group/link">
+              <GradientHeaderCard
+                icon={Calendar}
+                gradient="from-slate-500 via-zinc-600 to-gray-700"
+                title={data.oneTimeTitle}
+              >
+                <ul className="space-y-3 mt-1 flex-1">
                   {data.oneTimeItems.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-primary" />
-                      <span className="text-base">{item}</span>
-                    </div>
+                    item && (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                        <span className="text-sm md:text-base text-muted-foreground">{item}</span>
+                      </li>
+                    )
                   ))}
-                  <div className="pt-4 text-center">
-                    <span className="text-sm text-primary font-medium group-hover:underline flex items-center justify-center gap-1">
-                      Send forespørsel
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+                </ul>
+                <div className="pt-4 mt-auto text-center text-sm text-primary font-medium flex items-center justify-center gap-1 group-hover/link:underline">
+                  Send forespørsel
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
+                </div>
+              </GradientHeaderCard>
             </Link>
 
-            <Link to="/fast-avtale" className="block group">
-              <Card className="border-primary border-2 shadow-lg p-6 card-hover-lift h-full cursor-pointer transition-all hover:shadow-xl">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-2xl">{data.fixedTitle}</CardTitle>
-                    <Badge className="bg-primary text-primary-foreground px-3 py-1">Spar 10%</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
+            <Link to="/fast-avtale" style={getItemStyle(1)} className="block group/link">
+              <GradientHeaderCard
+                icon={Sparkles}
+                gradient="from-emerald-500 via-teal-500 to-cyan-600"
+                title={data.fixedTitle}
+                badge="Anbefalt"
+                highlight
+              >
+                <ul className="space-y-3 mt-1 flex-1">
                   {data.fixedItems.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-primary" />
-                      <span className="text-base">{item}</span>
-                    </div>
+                    item && (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                        <span className="text-sm md:text-base text-muted-foreground">{item}</span>
+                      </li>
+                    )
                   ))}
-                  <div className="pt-4 text-center">
-                    <span className="text-sm text-primary font-medium group-hover:underline flex items-center justify-center gap-1">
-                      Be om fast avtale
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+                </ul>
+                <div className="pt-4 mt-auto text-center text-sm text-success font-medium flex items-center justify-center gap-1 group-hover/link:underline">
+                  Be om fast avtale
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover/link:translate-x-1" />
+                </div>
+              </GradientHeaderCard>
             </Link>
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-10 md:mt-12">
             <Link to="/fast-avtale">
-              <Button variant="cta" size="lg" className="text-lg px-10">
+              <Button variant="cta" size="lg" className="text-base md:text-lg px-10 group/btn">
                 {data.ctaButtonText}
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
               </Button>
             </Link>
           </div>

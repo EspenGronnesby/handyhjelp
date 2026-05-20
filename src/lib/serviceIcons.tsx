@@ -60,6 +60,20 @@ export const getServiceColors = (serviceId: string): ServiceColors => {
   return serviceColors[serviceId] || defaultColors;
 };
 
+// Gradient palette per service — used as the visual header for service cards
+// across the site (Index, /tjenester, future service detail pages). Keeps
+// every card visually distinct without needing external image assets.
+export const serviceGradients: Record<string, string> = {
+  vaktmester: 'from-cyan-500 via-blue-500 to-indigo-600',
+  takrennerens: 'from-emerald-500 via-teal-500 to-cyan-600',
+  tomrer: 'from-amber-500 via-orange-500 to-rose-600',
+  blikk: 'from-slate-500 via-zinc-600 to-gray-700',
+};
+
+export const getServiceGradient = (serviceId: string): string => {
+  return serviceGradients[serviceId] || serviceGradients.vaktmester;
+};
+
 // Reusable ServiceIcon component with consistent styling
 interface ServiceIconProps {
   serviceId: string;

@@ -9,6 +9,9 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditButton } from '@/components/ui/EditButton';
+import { SectionHeading } from '@/components/ui/SectionHeading';
+import { BookOpen } from 'lucide-react';
+import { useFadeInUp } from '@/hooks/useScrollAnimation';
 
 interface EditableServiceAboutProps {
   section: string;
@@ -79,15 +82,22 @@ export const EditableServiceAbout = ({
     }
   };
 
+  const { ref, style } = useFadeInUp({ threshold: 0.15 });
+
   return (
     <>
-      <div className="mb-12 relative">
+      <div ref={ref} style={style} className="relative">
         {isAdmin && editMode && (
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
-        
-        <h2 className="text-3xl font-heading font-bold mb-6">Om tjenesten</h2>
-        <div className="space-y-4 text-muted-foreground">
+
+        <SectionHeading
+          icon={BookOpen}
+          gradient="from-slate-500 via-zinc-600 to-gray-700"
+          title="Om tjenesten"
+        />
+
+        <div className="space-y-4 text-sm md:text-base text-muted-foreground max-w-3xl">
           <p>{displayData.paragraph1}</p>
           <p>{displayData.paragraph2}</p>
           <p>{displayData.paragraph3}</p>

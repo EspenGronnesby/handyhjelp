@@ -15,12 +15,16 @@ import { EditableTimeline } from "@/components/EditableTimeline";
 import { EditableWhyUs } from "@/components/EditableWhyUs";
 import { EditableCertifications } from "@/components/EditableCertifications";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
+import { TrustStripe } from "@/components/TrustStripe";
+import { GuaranteeSection } from "@/components/GuaranteeSection";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useFadeInUp, useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { EditButton } from "@/components/ui/EditButton";
 import { SectionEditModal } from "@/components/SectionEditModal";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Users } from "lucide-react";
 
 const About = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('about', heroAboutImg);
@@ -88,6 +92,9 @@ const About = () => {
           </EditableHero>
         </div>
 
+        {/* Trust-stripe rett under hero (Mr. Handyman-mønster) */}
+        <TrustStripe />
+
         {/* Main Content */}
         <section className="container mx-auto px-4 py-16 md:py-24">
           {/* Timeline Section */}
@@ -106,10 +113,14 @@ const About = () => {
                 ariaLabel="Rediger team-overskrift"
               />
             )}
-            <h2 className={`text-3xl font-bold text-center mb-4 transition-all duration-700 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>{displayTeamHeading}</h2>
-            <p className={`text-center text-muted-foreground mb-12 max-w-2xl mx-auto transition-all duration-700 delay-100 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-              {displayTeamSubtext}
-            </p>
+            <div className={`max-w-4xl mx-auto mb-10 md:mb-12 transition-all duration-700 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+              <SectionHeading
+                icon={Users}
+                gradient="from-amber-500 via-orange-500 to-rose-600"
+                title={displayTeamHeading}
+                subtitle={displayTeamSubtext}
+              />
+            </div>
             
             {loading ? (
               <div className="text-center py-12">
@@ -118,26 +129,29 @@ const About = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
                 {teamMembers.map((member, index) => (
-                  <Card key={member.id} className="relative group" style={getTeamItemStyle(index)}>
+                  <div key={member.id} className="glass-card relative group p-6 text-center" style={getTeamItemStyle(index)}>
                     <TeamMemberEditor member={member} onUpdate={fetchTeamMembers} />
-                    <CardContent className="pt-6 text-center">
-                      <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
-                        <img 
-                          src={member.image_url} 
-                          alt={member.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
-                      <p className="text-sm text-muted-foreground">{member.position}</p>
-                    </CardContent>
-                  </Card>
+                    <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
+                      <img
+                        src={member.image_url}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
+                    <p className="text-sm text-muted-foreground">{member.position}</p>
+                  </div>
                 ))}
-                
+
                 {/* Add New Team Member Card (Admin only) */}
                 <TeamMemberEditor isNewMember onUpdate={fetchTeamMembers} />
               </div>
             )}
+          </div>
+
+          {/* Vår garanti — Mr. Handyman-stil "Done Right Promise" */}
+          <div className="-mx-4 mb-16">
+            <GuaranteeSection />
           </div>
 
           {/* Certifications Section */}

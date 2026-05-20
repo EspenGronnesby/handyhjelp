@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, Receipt } from "lucide-react";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { EditButton } from "@/components/ui/EditButton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { GradientHeaderCard } from "@/components/ui/GradientHeaderCard";
+import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 
 interface PricingData {
   heading: string;
@@ -56,9 +58,11 @@ const EditablePricingDetails = () => {
     setEditedData(updated);
   };
 
+  const { ref, getItemStyle } = useStaggeredGridReveal(2, 2, { threshold: 0.15 });
+
   return (
     <>
-      <section className="py-20 bg-muted/30">
+      <section className="py-16 md:py-20 bg-muted/30">
         <div className="container mx-auto px-4 relative">
           {editMode && (
             <EditButton
@@ -68,38 +72,52 @@ const EditablePricingDetails = () => {
           )}
 
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-center mb-16">
-              {data.heading}
-            </h2>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="p-6 subtle-hover">
-                <CardHeader>
-                  <CardTitle className="text-xl">{data.includedTitle}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {data.includedItems.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
-                      <span className="text-base leading-relaxed">{item}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+            <SectionHeading
+              icon={Receipt}
+              gradient="from-emerald-500 via-teal-500 to-cyan-600"
+              title={data.heading}
+              align="center"
+              className="mb-10 md:mb-14"
+            />
 
-              <Card className="p-6 subtle-hover">
-                <CardHeader>
-                  <CardTitle className="text-xl">{data.separateTitle}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {data.separateItems.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-3">
-                      <ArrowRight className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                      <span className="text-base leading-relaxed">{item}</span>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+            <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div style={getItemStyle(0)}>
+                <GradientHeaderCard
+                  icon={CheckCircle2}
+                  gradient="from-emerald-500 via-teal-500 to-cyan-600"
+                  title={data.includedTitle}
+                >
+                  <ul className="space-y-3 mt-1">
+                    {data.includedItems.map((item, idx) => (
+                      item && (
+                        <li key={idx} className="flex items-start gap-2">
+                          <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                          <span className="text-sm md:text-base leading-snug text-muted-foreground">{item}</span>
+                        </li>
+                      )
+                    ))}
+                  </ul>
+                </GradientHeaderCard>
+              </div>
+
+              <div style={getItemStyle(1)}>
+                <GradientHeaderCard
+                  icon={Receipt}
+                  gradient="from-amber-500 via-orange-500 to-rose-600"
+                  title={data.separateTitle}
+                >
+                  <ul className="space-y-3 mt-1">
+                    {data.separateItems.map((item, idx) => (
+                      item && (
+                        <li key={idx} className="flex items-start gap-2">
+                          <Receipt className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                          <span className="text-sm md:text-base leading-snug text-muted-foreground">{item}</span>
+                        </li>
+                      )
+                    ))}
+                  </ul>
+                </GradientHeaderCard>
+              </div>
             </div>
           </div>
         </div>

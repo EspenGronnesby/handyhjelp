@@ -13,11 +13,14 @@ import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { EditButton } from "@/components/ui/EditButton";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
-import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import ClientLogosSection from "@/components/ClientLogosSection";
 import { StickyMobileCTA } from "@/components/StickyMobileCTA";
+import { TrustStripe } from "@/components/TrustStripe";
+import { GuaranteeSection } from "@/components/GuaranteeSection";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Wrench } from "lucide-react";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { useSequentialReveal } from "@/hooks/useScrollAnimation";
 
@@ -34,21 +37,21 @@ const ServicesHeading = () => {
   
   return (
     <>
-      <div className="relative text-center mb-12">
+      <div className="relative mb-12">
         {isAdmin && editMode && (
           <EditButton
             onClick={() => setIsModalOpen(true)}
             ariaLabel="Rediger Våre tjenester overskrift"
           />
         )}
-        
-        <h2 className="heading-section font-heading">
-          {displayHeading}
-        </h2>
-        
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          {displaySubheading}
-        </p>
+
+        <SectionHeading
+          icon={Wrench}
+          gradient="from-cyan-500 via-blue-500 to-indigo-600"
+          title={displayHeading}
+          subtitle={displaySubheading}
+          align="center"
+        />
       </div>
 
       <SectionHeadingEditModal
@@ -84,13 +87,19 @@ const Index = () => {
       <main id="main-content">
         <HeroSection />
 
+        {/* Trust-stripe rett under hero (Mr. Handyman-mønster) */}
+        <TrustStripe />
+
         {/* Client Logos Section */}
         <ClientLogosSection />
-        
+
         {/* How It Works Process Section */}
         <section id="process-section" aria-labelledby="process-heading" className="bg-muted/40">
           <ProcessSection />
         </section>
+
+        {/* Vår garanti — etablerer tillit før prosjekter og testimonials */}
+        <GuaranteeSection />
 
         {/* Projects Section */}
         <ProjectsSection />
@@ -168,9 +177,6 @@ const Index = () => {
               </div>
             </div>
 
-            <div className="text-center">
-              <EditableCTABox />
-            </div>
             </div>
           </div>
         </section>

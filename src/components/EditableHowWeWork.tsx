@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { EyeOff } from 'lucide-react';
+import { EyeOff, Workflow } from 'lucide-react';
+import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -124,7 +125,11 @@ export const EditableHowWeWork = () => {
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
 
-        <h2 className="text-2xl font-bold mb-6">{defaultData.heading}</h2>
+        <SectionHeading
+          icon={Workflow}
+          gradient="from-amber-500 via-orange-500 to-rose-600"
+          title={defaultData.heading}
+        />
         <div className="space-y-4">
           {steps.map((step, index) => {
             const isHidden = isStepHidden(step);

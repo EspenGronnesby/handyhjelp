@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { CheckCircle2, EyeOff } from 'lucide-react';
+import { CheckCircle2, EyeOff, ClipboardCheck } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { isStringEmpty, getDisplayValue } from '@/lib/gridUtils';
 import { EditButton } from '@/components/ui/EditButton';
+import { SectionHeading } from '@/components/ui/SectionHeading';
+import { useFadeInUp } from '@/hooks/useScrollAnimation';
 
 interface EditableServiceIncludedProps {
   section: string;
@@ -36,7 +37,6 @@ export const EditableServiceIncluded = ({
   const { content: item7, hasBeenEdited: item7Edited } = useEditableContent(section, 'included_7');
   const { content: item8, hasBeenEdited: item8Edited } = useEditableContent(section, 'included_8');
 
-  // Use DB value if edited (even if empty), otherwise use default
   const allItems = [
     getDisplayValue(item1, item1Edited, defaultItems[0] || ''),
     getDisplayValue(item2, item2Edited, defaultItems[1] || ''),
@@ -48,22 +48,13 @@ export const EditableServiceIncluded = ({
     getDisplayValue(item8, item8Edited, defaultItems[7] || ''),
   ];
 
-  // For display - filter truly visible (non-empty) items for non-admin
-  const displayItems = isAdmin && editMode 
-    ? allItems 
+  const displayItems = isAdmin && editMode
+    ? allItems
     : allItems.filter(item => !isStringEmpty(item));
 
   const [formData, setFormData] = useState({
     items: allItems.some(i => i.trim() !== '') ? allItems : defaultItems
   });
-
-  // Dynamic grid class based on visible count
-  const getGridClass = () => {
-    const count = displayItems.filter(i => !isStringEmpty(i)).length;
-    if (count <= 2) return 'flex flex-wrap justify-center gap-4';
-    if (count <= 4) return 'grid md:grid-cols-2 gap-4';
-    return 'grid md:grid-cols-2 gap-4';
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -88,7 +79,7 @@ export const EditableServiceIncluded = ({
           }, {
             onConflict: 'section,content_key'
           });
-        
+
         if (error) throw error;
       }
 
@@ -103,7 +94,8 @@ export const EditableServiceIncluded = ({
     }
   };
 
-  // Don't render section if no visible items
+  const { ref, style } = useFadeInUp({ threshold: 0.15 });
+
   const visibleCount = displayItems.filter(i => !isStringEmpty(i)).length;
   if (visibleCount === 0 && !(isAdmin && editMode)) {
     return null;
@@ -111,47 +103,43 @@ export const EditableServiceIncluded = ({
 
   return (
     <>
-      <div className="mb-12 relative">
+      <div ref={ref} style={style} className="relative">
         {isAdmin && editMode && (
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger" />
         )}
-        
-        <h2 className="text-3xl font-heading font-bold mb-6">Hva er inkludert?</h2>
-        <Card className="subtle-hover">
-          <CardContent className="pt-6">
-            <div className={getGridClass()}>
-              {displayItems.map((item, idx) => {
-                const isHidden = isStringEmpty(item);
-                
-                // Skip rendering empty items for non-admin
-                if (isHidden && !(isAdmin && editMode)) {
-                  return null;
-                }
-                
-                return (
-                  <div 
-                    key={idx} 
-                    className={`flex items-start gap-3 ${
-                      isHidden && isAdmin && editMode ? 'opacity-50' : ''
-                    }`}
-                  >
-                    {isHidden && isAdmin && editMode ? (
-                      <>
-                        <EyeOff className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-                        <span className="text-muted-foreground italic">Tom (skjult)</span>
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                        <span>{item}</span>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+
+        <SectionHeading
+          icon={ClipboardCheck}
+          gradient="from-emerald-500 via-teal-500 to-cyan-600"
+          title="Hva er inkludert?"
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+          {displayItems.map((item, idx) => {
+            const isHidden = isStringEmpty(item);
+            if (isHidden && !(isAdmin && editMode)) {
+              return null;
+            }
+            return (
+              <div
+                key={idx}
+                className={`flex items-start gap-2 ${isHidden && isAdmin && editMode ? 'opacity-50' : ''}`}
+              >
+                {isHidden && isAdmin && editMode ? (
+                  <>
+                    <EyeOff className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+                    <span className="text-muted-foreground italic text-sm">Tom (skjult)</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                    <span className="text-sm md:text-base text-foreground">{item}</span>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

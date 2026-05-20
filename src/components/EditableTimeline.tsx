@@ -197,7 +197,17 @@ export const EditableTimeline = () => {
 
   return (
     <>
-      <div className="bg-muted rounded-2xl p-6 md:p-12 mb-20 relative">
+      <div className="relative rounded-2xl p-6 md:p-12 mb-20 overflow-hidden bg-gradient-to-br from-cyan-50/60 via-indigo-50/40 to-fuchsia-50/40 dark:bg-muted dark:bg-none [.blue_&]:bg-muted [.blue_&]:bg-none">
+        {/* Subtil dot-pattern på lys tema, gjemt på dark/blue der bg-muted holder */}
+        <div
+          className="absolute inset-0 opacity-30 pointer-events-none dark:opacity-0 [.blue_&]:opacity-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle, hsl(var(--primary) / 0.25) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+          }}
+          aria-hidden="true"
+        />
+
         {isAdmin && editMode && (
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger Vår reise" />
         )}

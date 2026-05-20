@@ -1,77 +1,95 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Phone, Calculator, CheckCircle } from "lucide-react";
+import { Phone, Calculator, CheckCircle, type LucideIcon } from "lucide-react";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { EditButton } from "@/components/ui/EditButton";
 import { ProcessStepEditModal } from "@/components/ProcessStepEditModal";
 import { SectionHeadingEditModal } from "@/components/SectionHeadingEditModal";
-import { useScrollProgressReveal } from "@/hooks/useScrollAnimation";
-// Component for each process step
-const ProcessStep = ({ number, section, defaultTitle, defaultDescription, icon, style }: {
-  number: number;
+import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
+import { cn } from "@/lib/utils";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { Workflow } from "lucide-react";
+
+// Per-step card — gradient header with large icon + step number, followed
+// by title and description. Fully static; no continuous scroll-driven motion.
+const ProcessStepCard = ({
+  stepNumber,
+  section,
+  title,
+  description,
+  icon: Icon,
+  gradient,
+  style,
+}: {
+  stepNumber: number;
   section: string;
-  defaultTitle: string;
-  defaultDescription: string;
-  icon: any;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  gradient: string;
   style: React.CSSProperties;
 }) => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { content: title } = useEditableContent(section, 'title');
-  const { content: description } = useEditableContent(section, 'description');
-  const IconComponent = icon;
-  
-  const displayTitle = title || defaultTitle;
-  const displayDescription = description || defaultDescription;
-  
+
   return (
     <>
-      <div style={style}>
-        <div
-          className="glass-surface p-5 md:p-6 text-center card-hover-lift relative perf-contain h-full"
-        >
+      <div style={style} className="h-full">
+        <div className="glass-card relative h-full !overflow-visible group flex flex-col">
           {isAdmin && editMode && (
             <EditButton
               onClick={() => setIsModalOpen(true)}
-              ariaLabel={`Rediger steg ${number}`}
+              ariaLabel={`Rediger steg ${stepNumber}`}
             />
           )}
-          
-          {/* Large step number for mobile */}
-          <div className="flex justify-center mb-3 md:mb-4">
-            <div className="w-14 h-14 md:w-16 md:h-16 bg-primary rounded-full flex items-center justify-center relative">
-              <IconComponent className="h-7 w-7 md:h-8 md:w-8 text-primary-foreground" />
-              <span className="absolute -top-1 -right-1 w-6 h-6 bg-secondary text-white text-xs font-bold rounded-full flex items-center justify-center md:hidden">
-                {number}
-              </span>
+
+          {/* Gradient header with icon and step indicator */}
+          <div
+            className={cn(
+              "relative w-full aspect-[5/3] rounded-xl overflow-hidden mb-4 bg-gradient-to-br",
+              gradient
+            )}
+          >
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, white 1px, transparent 1px)",
+                backgroundSize: "16px 16px",
+              }}
+            />
+            <div className="absolute top-4 left-4 text-white/80 text-sm font-semibold tracking-widest">
+              0{stepNumber}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Icon
+                className="text-white/95 drop-shadow-lg w-16 h-16 md:w-20 md:h-20 transition-transform duration-300 group-hover:scale-110"
+                strokeWidth={1.5}
+              />
             </div>
           </div>
-          
-          <div className="mb-3 md:mb-4">
-            <div className="text-sm font-medium text-primary mb-1 md:mb-2 hidden md:block">
-              Steg {number}
+
+          <div className="p-4 md:p-6 pt-0 flex-1 flex flex-col">
+            <div className="text-xs font-semibold text-primary mb-1">
+              Steg {stepNumber}
             </div>
-            <h3 className="text-lg md:text-xl font-bold text-foreground mb-1 md:mb-2">
-              {displayTitle}
+            <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 font-heading">
+              {title}
             </h3>
-            
-            <p className="text-sm md:text-base text-muted-foreground font-medium">
-              {displayDescription}
+            <p className="text-sm md:text-base text-muted-foreground">
+              {description}
             </p>
           </div>
         </div>
       </div>
-      
+
       <ProcessStepEditModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         section={section}
-        currentData={{
-          title: displayTitle,
-          description: displayDescription
-        }}
-        stepNumber={number}
+        currentData={{ title, description }}
+        stepNumber={stepNumber}
       />
     </>
   );
@@ -81,69 +99,89 @@ export const ProcessSection = () => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { content: heading } = useEditableContent('home-sections', 'how-it-works-heading');
-  const { ref, isInView: isVisible, getItemStyle } = useScrollProgressReveal(4);
-  
+
+  const { content: step1Title } = useEditableContent('how-it-works-step-1', 'title');
+  const { content: step1Desc } = useEditableContent('how-it-works-step-1', 'description');
+  const { content: step2Title } = useEditableContent('how-it-works-step-2', 'title');
+  const { content: step2Desc } = useEditableContent('how-it-works-step-2', 'description');
+  const { content: step3Title } = useEditableContent('how-it-works-step-3', 'title');
+  const { content: step3Desc } = useEditableContent('how-it-works-step-3', 'description');
+
   const displayHeading = heading || 'Slik fungerer det';
-  
+
+  const steps = [
+    {
+      section: 'how-it-works-step-1',
+      title: step1Title || 'Ta kontakt',
+      description: step1Desc || 'Ring oss eller send inn skjema — vi svarer raskt og hjelper deg med å beskrive jobben.',
+      icon: Phone,
+      gradient: 'from-cyan-500 via-blue-500 to-indigo-600',
+    },
+    {
+      section: 'how-it-works-step-2',
+      title: step2Title || 'Få tilbud',
+      description: step2Desc || 'Du får et tydelig tilbud tilpasset ditt behov — ingen skjulte gebyrer eller overraskelser.',
+      icon: Calculator,
+      gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
+    },
+    {
+      section: 'how-it-works-step-3',
+      title: step3Title || 'Vi løser det',
+      description: step3Desc || 'Erfarne fagfolk kommer på avtalt tid og utfører jobben profesjonelt — du slipper bekymringene.',
+      icon: CheckCircle,
+      gradient: 'from-amber-500 via-orange-500 to-rose-600',
+    },
+  ];
+
+  // One-time fade-in + glide-up when the grid enters view.
+  const { ref, getItemStyle } = useStaggeredGridReveal(steps.length, 3, { threshold: 0.15 });
+
   return (
-    <section className="py-16 md:py-24" ref={ref}>
+    <section className="py-16 md:py-24">
       <div className="container mx-auto px-4">
-        <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="relative text-center mb-8 md:mb-12">
+        <div className="relative mb-8 md:mb-12">
           {isAdmin && editMode && (
             <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger Slik fungerer det overskrift" />
           )}
-          
-          <h2 id="process-heading" className="heading-section text-2xl md:text-3xl lg:text-4xl">
-            {displayHeading}
-          </h2>
-          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
-            Enkelt, trygt og forutsigbart
-          </p>
-        </div>
 
-        {/* Mobile: Vertical stack, Desktop: Grid */}
-        <div className="flex flex-col gap-6 md:grid md:grid-cols-3 md:gap-8 mb-8 md:mb-12">
-          <ProcessStep
-            number={1}
-            section="how-it-works-step-1"
-            defaultTitle="Ta kontakt"
-            defaultDescription="Ring oss eller send inn skjema"
-            icon={Phone}
-            style={getItemStyle(0)}
-          />
-          
-          <ProcessStep
-            number={2}
-            section="how-it-works-step-2"
-            defaultTitle="Få tilbud"
-            defaultDescription="Tilbud tilpasset ditt behov"
-            icon={Calculator}
-            style={getItemStyle(1)}
-          />
-          
-          <ProcessStep
-            number={3}
-            section="how-it-works-step-3"
-            defaultTitle="Vi løser det"
-            defaultDescription="Profesjonell utførelse"
-            icon={CheckCircle}
-            style={getItemStyle(2)}
+          <SectionHeading
+            icon={Workflow}
+            gradient="from-emerald-500 via-teal-500 to-cyan-600"
+            title={displayHeading}
+            subtitle="Enkelt, trygt og forutsigbart"
+            align="center"
           />
         </div>
 
-        <div className="text-center" style={getItemStyle(3)}>
-          <Button 
-            size="lg" 
+        <div
+          ref={ref}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto"
+        >
+          {steps.map((step, idx) => (
+            <ProcessStepCard
+              key={step.section}
+              stepNumber={idx + 1}
+              section={step.section}
+              title={step.title}
+              description={step.description}
+              icon={step.icon}
+              gradient={step.gradient}
+              style={getItemStyle(idx)}
+            />
+          ))}
+        </div>
+
+        <div className="text-center mt-12 md:mt-16">
+          <Button
+            size="lg"
             className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4"
             onClick={() => window.location.href = '/tilbud'}
           >
             Kom i gang nå
           </Button>
         </div>
-        </div>
       </div>
-      
+
       <SectionHeadingEditModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

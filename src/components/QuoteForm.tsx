@@ -611,11 +611,11 @@ export const QuoteForm = () => {
         )}
         <div className="ml-auto">
           {step < 3 ? (
-            <Button 
+            <Button
               type="button"
-              onClick={handleNext} 
+              variant="cta"
+              onClick={handleNext}
               disabled={!isStepValid()}
-              className="bg-success hover:bg-success-hover text-success-foreground"
             >
               Neste <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
@@ -631,9 +631,9 @@ export const QuoteForm = () => {
             )}
             <Button
               type="button"
+              variant="cta"
               onClick={handleSubmit}
               disabled={!isStepValid() || isSubmitting || (!captchaToken && !!import.meta.env.VITE_HCAPTCHA_SITE_KEY)}
-              className="bg-success hover:bg-success-hover text-success-foreground"
             >
               {isSubmitting ? (
                 <>

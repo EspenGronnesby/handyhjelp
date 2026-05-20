@@ -7,7 +7,8 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, ArrowLeft, BookOpen } from "lucide-react";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Helmet } from "react-helmet";
 import { SEO_CONFIG, getCanonicalUrl, getOgImageUrl } from "@/config/seo";
 import { ServiceBadge } from "@/lib/serviceIcons";
@@ -170,19 +171,26 @@ const ProjectDetail = () => {
             </div>
           </div>
 
-          {/* Before/After Images */}
+          {/* Before/After Images — dark-glass-stil som matcher hero-bakgrunnen */}
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             {/* Before Image */}
             <div className="relative">
-              <div 
-                className="relative rounded-2xl p-8 border border-white/40 h-[500px] md:h-[600px] w-full"
-                style={{ 
-                  background: 'linear-gradient(135deg, rgba(224, 242, 254, 0.8) 0%, rgba(240, 249, 255, 0.6) 50%, rgba(229, 246, 253, 0.7) 100%)',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
-                }}
-              >
+              <div className="relative rounded-2xl p-6 md:p-8 h-[500px] md:h-[600px] w-full overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent backdrop-blur-2xl backdrop-saturate-150 border border-white/25 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)]">
+                {/* Top gradient-stripe — visuell signatur */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 pointer-events-none"
+                  aria-hidden="true"
+                />
+                {/* Dot-pattern overlay */}
+                <div
+                  className="absolute inset-0 opacity-10 pointer-events-none"
+                  style={{
+                    backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+                    backgroundSize: '18px 18px',
+                  }}
+                  aria-hidden="true"
+                />
+
                 <div className="relative flex items-center justify-center h-full w-full">
                   <img
                     src={project.before_image_url}
@@ -192,7 +200,7 @@ const ProjectDetail = () => {
                 </div>
                 <Badge
                   variant="secondary"
-                  className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm text-foreground font-semibold"
+                  className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm text-foreground font-semibold z-10"
                 >
                   FØR
                 </Badge>
@@ -201,15 +209,20 @@ const ProjectDetail = () => {
 
             {/* After Image */}
             <div className="relative">
-              <div 
-                className="relative rounded-2xl p-8 border border-white/40 h-[500px] md:h-[600px] w-full"
-                style={{ 
-                  background: 'linear-gradient(135deg, rgba(224, 242, 254, 0.8) 0%, rgba(240, 249, 255, 0.6) 50%, rgba(229, 246, 253, 0.7) 100%)',
-                  backdropFilter: 'blur(20px) saturate(180%)',
-                  WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
-                }}
-              >
+              <div className="relative rounded-2xl p-6 md:p-8 h-[500px] md:h-[600px] w-full overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent backdrop-blur-2xl backdrop-saturate-150 border border-white/25 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)]">
+                <div
+                  className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 pointer-events-none"
+                  aria-hidden="true"
+                />
+                <div
+                  className="absolute inset-0 opacity-10 pointer-events-none"
+                  style={{
+                    backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+                    backgroundSize: '18px 18px',
+                  }}
+                  aria-hidden="true"
+                />
+
                 <div className="relative flex items-center justify-center h-full w-full">
                   <img
                     src={project.after_image_url}
@@ -219,7 +232,7 @@ const ProjectDetail = () => {
                 </div>
                 <Badge
                   variant="secondary"
-                  className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm text-foreground font-semibold"
+                  className="absolute top-4 right-4 bg-background/90 backdrop-blur-sm text-foreground font-semibold z-10"
                 >
                   ETTER
                 </Badge>
@@ -229,9 +242,11 @@ const ProjectDetail = () => {
 
           {/* Description */}
           <div className="max-w-3xl mb-12">
-            <h2 className="text-2xl font-bold mb-4 font-heading">
-              Om prosjektet
-            </h2>
+            <SectionHeading
+              icon={BookOpen}
+              gradient="from-slate-500 via-zinc-600 to-gray-700"
+              title="Om prosjektet"
+            />
             <p className="text-lg leading-relaxed text-foreground/90">
               {project.description}
             </p>

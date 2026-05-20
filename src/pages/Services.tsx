@@ -2,7 +2,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
@@ -14,22 +14,14 @@ import EditableWhyChooseSection from "@/components/service-edit/EditableWhyChoos
 import EditablePricingDetails from "@/components/service-edit/EditablePricingDetails";
 import EditableComparisonSection from "@/components/service-edit/EditableComparisonSection";
 import { Helmet } from "react-helmet";
-import { useScrollProgressReveal } from "@/hooks/useScrollAnimation";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 const Services = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('services', servicesBackground);
-  const { ref: sectionsRef, getItemStyle } = useScrollProgressReveal(4);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const shouldReduceMotion = useReducedMotion();
 
-  // Parallax for hero background
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  
-  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 40]);
+  // Hver av de 4 seksjonene under har sin egen interne reveal-hook
+  // (useStaggeredGridReveal). En ytre wrapper-reveal skjulte alt fordi
+  // children fikk opacity:0 før observer fyrte — og IntersectionObserver
+  // ble ikke pålitelig trigget. Vi lar derfor seksjonene rendre direkte.
 
   // Handle smooth scroll to anchor on load
   useEffect(() => {
@@ -64,39 +56,22 @@ const Services = () => {
       <GoogleAnalytics />
       <Header />
       <BreadcrumbNavigation />
-      
-      {/* Hero Section - Enhanced with gradient overlay and parallax */}
-      <div 
-        ref={heroRef}
-        className="relative min-h-[600px] flex items-center overflow-hidden"
-      >
-        {/* Background with parallax */}
-        {shouldReduceMotion ? (
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${heroImage})` }}
-          />
-        ) : (
-          <motion.div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-transform"
-            style={{ 
-              backgroundImage: `url(${heroImage})`,
-              y: backgroundY,
-              // Extend slightly to prevent gaps
-              top: -15,
-              bottom: -15,
-            }}
-          />
-        )}
-        
-        {/* Enhanced gradient overlay for better readability */}
-        <div 
+
+      {/* Hero Section — static background (no parallax) */}
+      <div className="relative min-h-[600px] flex items-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        />
+
+        {/* Gradient overlay for readability */}
+        <div
           className="absolute inset-0 bg-gradient-to-b from-background via-background to-background backdrop-blur-[3px]"
           style={{ opacity }}
         ></div>
-        
+
         <HeroImageEditor page="services" currentImageUrl={heroImage} onImageUpdate={refetchHero} />
-        
+
         {/* Content over background */}
         <main id="main-content" className="relative z-10 w-full py-20">
           <div className="container mx-auto px-4">
@@ -113,23 +88,10 @@ const Services = () => {
         </main>
       </div>
 
-      <div ref={sectionsRef}>
-        <div style={getItemStyle(0)}>
-          <EditableServiceCardGrid />
-        </div>
-
-        <div style={getItemStyle(1)}>
-          <EditableWhyChooseSection />
-        </div>
-
-        <div style={getItemStyle(2)}>
-          <EditablePricingDetails />
-        </div>
-
-        <div style={getItemStyle(3)}>
-          <EditableComparisonSection />
-        </div>
-      </div>
+      <EditableServiceCardGrid />
+      <EditableWhyChooseSection />
+      <EditablePricingDetails />
+      <EditableComparisonSection />
 
       {/* Editable Bottom CTA Section */}
       <EditableBottomCTA />
