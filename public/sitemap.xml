@@ -1,98 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Hjemmeside -->
-  <url>
-    <loc>https://handyhjelp.no/</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  <!-- Tjenestesider -->
-  <url>
-    <loc>https://handyhjelp.no/tjenester/vaktmester</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://handyhjelp.no/tjenester/tomrer</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://handyhjelp.no/tjenester/blikk</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://handyhjelp.no/tjenester/takrennerens</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Fast avtale -->
-  <url>
-    <loc>https://handyhjelp.no/fast-avtale</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Om oss, Kontakt, FAQ -->
-  <url>
-    <loc>https://handyhjelp.no/om-oss</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://handyhjelp.no/kontakt</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://handyhjelp.no/faq</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Prosjekter og Blogg -->
-  <url>
-    <loc>https://handyhjelp.no/prosjekter</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://handyhjelp.no/raad</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <!-- Juridiske sider -->
-  <url>
-    <loc>https://handyhjelp.no/personvern</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://handyhjelp.no/cookies</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://handyhjelp.no/vilkaar</loc>
-    <lastmod>2025-01-01</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
+  <url><loc>https://handyhjelp.no/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://handyhjelp.no/tjenester</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://handyhjelp.no/tjenester/vaktmester</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://handyhjelp.no/tjenester/tomrer</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://handyhjelp.no/tjenester/blikk</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://handyhjelp.no/tjenester/takrennerens</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://handyhjelp.no/fast-avtale</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://handyhjelp.no/tilbud</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://handyhjelp.no/takk-avtale</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://handyhjelp.no/om-oss</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://handyhjelp.no/kontakt</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://handyhjelp.no/faq</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://handyhjelp.no/prosjekter</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://handyhjelp.no/prosjekter/dee3e84e-7bff-4f37-b51c-72a1a6c01776</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://handyhjelp.no/prosjekter/5b2a42eb-bb4f-47a8-9885-cd8339a087f7</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://handyhjelp.no/prosjekter/d7fc7358-eea7-48ea-84a3-fd733cf1ec01</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://handyhjelp.no/prosjekter/579d2a71-b1bb-4401-a1ee-81593837b298</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://handyhjelp.no/raad</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://handyhjelp.no/blog</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://handyhjelp.no/raad/nar-og-hvorfor-takrennene-ma-sjekkes-og-hva-som-skjer-hvis-du-lar-vaere</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://handyhjelp.no/raad/5-klare-tegn-pa-at-borettslaget-ditt-trenger-en-fast-vaktmester</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://handyhjelp.no/raad/3-enkle-vedlikeholdstiltak-som-sparer-deg-for-tid-penger-og-stress</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://handyhjelp.no/raad/nar-er-det-smartere-a-bestille-profesjonell-hjelp-enn-a-gjore-det-selv</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://handyhjelp.no/personvern</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://handyhjelp.no/cookies</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://handyhjelp.no/vilkaar</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
