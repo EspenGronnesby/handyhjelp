@@ -1,0 +1,27 @@
+# HandyHjelp
+
+> Profesjonell vaktmester, tømrer og blikkenslager i Kristiansand. Faste avtaler for borettslag, sameier og bedrifter.
+
+HandyHjelp leverer eiendomspleie og håndverkstjenester i Kristiansand-området (Kristiansand, Søgne, Vennesla). Vi tilbyr både engangsoppdrag og faste serviceavtaler.
+
+## Pages
+
+- [Forside](/): Oversikt over tjenester og fordeler.
+- [Tjenester](/tjenester): Alle våre håndverkstjenester.
+- [Vaktmester](/tjenester/vaktmester): Eiendomspleie og vedlikehold.
+- [Tømrer](/tjenester/tomrer): Terrasser, dører og vinduer.
+- [Blikkenslager](/tjenester/blikk): Takrenner og taktekking.
+- [Takrennerens](/tjenester/takrennerens): Rensing av takrenner – fast pris.
+- [Fast avtale](/fast-avtale): Serviceavtale for regelmessig vedlikehold.
+- [Be om tilbud](/tilbud): Skjema for prisforespørsel.
+- [Prosjekter](/prosjekter): Før- og etterbilder fra utførte oppdrag.
+- [Råd & blogg](/raad): Tips om eiendomsvedlikehold.
+- [Om oss](/om-oss): Selskapet og teamet.
+- [Kontakt](/kontakt): Telefon, e-post og kontaktskjema.
+- [FAQ](/faq): Ofte stilte spørsmål.
+
+## Optional
+
+- [Personvern](/personvern)
+- [Cookies](/cookies)
+- [Vilkår](/vilkaar)
