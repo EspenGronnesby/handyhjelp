@@ -1,14 +1,12 @@
-import { Moon, Sun, Waves } from 'lucide-react';
+import { Sun, Waves } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-type ThemeValue = 'light' | 'blue' | 'dark';
+type ThemeValue = 'light' | 'blue';
 
 const themes: { value: ThemeValue; icon: typeof Sun; label: string }[] = [
   { value: 'light', icon: Sun, label: 'Lys modus' },
   { value: 'blue', icon: Waves, label: 'Blå modus' },
-  { value: 'dark', icon: Moon, label: 'Mørk modus' },
 ];
 
 // Full toggle with labels (for profile page)
@@ -37,28 +35,47 @@ export const ThemeToggle = () => {
   );
 };
 
-// Compact icon button (for header) — cycles through themes
+// iOS-style switch — the thumb carries the active icon, the inactive icon
+// sits on the opposite side as a hint of what the toggle leads to.
 export const ThemeToggleButton = () => {
   const { theme, setTheme } = useTheme();
-
-  const cycle = () => {
-    const order: ThemeValue[] = ['light', 'blue', 'dark'];
-    const idx = order.indexOf(theme as ThemeValue);
-    setTheme(order[(idx + 1) % 3]);
-  };
-
-  const current = themes.find((t) => t.value === theme) ?? themes[0];
-  const Icon = current.icon;
+  const isBlue = theme === 'blue';
+  const ActiveIcon = isBlue ? Waves : Sun;
+  const InactiveIcon = isBlue ? Sun : Waves;
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={cycle}
-      aria-label={current.label}
-      className="min-h-[44px] min-w-[44px] text-foreground hover:text-primary"
+    <button
+      type="button"
+      role="switch"
+      aria-checked={isBlue}
+      aria-label={isBlue ? 'Bytt til lys modus' : 'Bytt til blå modus'}
+      onClick={() => setTheme(isBlue ? 'light' : 'blue')}
+      className={cn(
+        'relative inline-flex h-9 w-16 shrink-0 items-center rounded-full border border-border/60 transition-colors',
+        'bg-muted hover:bg-muted/80 active:scale-95',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
+      )}
     >
-      <Icon className="h-5 w-5" />
-    </Button>
+      <InactiveIcon
+        className={cn(
+          'absolute h-4 w-4 text-muted-foreground/60 transition-all',
+          isBlue ? 'left-2.5' : 'right-2.5'
+        )}
+      />
+      <span
+        aria-hidden="true"
+        className={cn(
+          'absolute top-1 flex h-6 w-6 items-center justify-center rounded-full bg-background shadow-md transition-transform',
+          isBlue ? 'translate-x-9' : 'translate-x-1'
+        )}
+      >
+        <ActiveIcon
+          className={cn(
+            'h-3.5 w-3.5',
+            isBlue ? 'text-blue-500' : 'text-amber-500'
+          )}
+        />
+      </span>
+    </button>
   );
 };

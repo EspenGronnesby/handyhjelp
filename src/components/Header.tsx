@@ -104,7 +104,7 @@ export const Header = () => {
               className="flex items-center"
             >
               <img 
-                src={resolvedTheme === 'dark' || resolvedTheme === 'blue' ? handyhjelpLogoWhite : handyhjelpLogo} 
+                src={resolvedTheme === 'blue' ? handyhjelpLogoWhite : handyhjelpLogo}
                 alt="HandyHjelp - Levert med kvalitet" 
                 className="w-auto object-contain transition-all duration-200"
                 id="header-logo"
@@ -147,16 +147,8 @@ export const Header = () => {
             )}
           </div>
 
-          {/* Mobile/Tablet Right side - Phone, Theme toggle, Profile */}
+          {/* Mobile/Tablet Right side - Theme toggle, Profile */}
           <div className="lg:hidden flex items-center gap-1 z-10">
-            <a
-              href={phoneHref}
-              className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground transition-colors touch-manipulation"
-              aria-label={`Ring oss på ${phone}`}
-              title={`Ring oss: ${phone}`}
-            >
-              <Phone className="h-5 w-5" />
-            </a>
             <ThemeToggleButton />
             <Link
               to={user ? "/dashboard" : "/auth"}

@@ -75,7 +75,7 @@ const EditableWhyChooseSection = () => {
 
   return (
     <>
-      <section className="py-16 md:py-20 bg-muted/30">
+      <section className="py-10 md:py-20 bg-muted/30">
         <div className="container mx-auto px-4 relative">
           {isAdmin && editMode && (
             <EditButton
@@ -94,7 +94,7 @@ const EditableWhyChooseSection = () => {
 
           <div
             ref={ref}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto"
+            className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8 max-w-6xl mx-auto"
           >
             {visibleItems.map((item, index) => {
               const isHidden = isItemEmpty(item.title, item.description);

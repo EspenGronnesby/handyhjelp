@@ -108,7 +108,7 @@ const Index = () => {
         <TestimonialsSection />
 
         {/* Services Section - Compact Overview */}
-        <section className="py-16 md:py-24 bg-background" id="services" ref={servicesRef}>
+        <section className="py-10 md:py-24 bg-background" id="services" ref={servicesRef}>
           <div className="container mx-auto px-4">
             <div className={`transition-all duration-700 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <ServicesHeading />

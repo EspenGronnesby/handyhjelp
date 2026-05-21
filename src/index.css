@@ -157,72 +157,6 @@ html, body {
     --sidebar-ring: 188 96% 43%;
   }
 
-  .dark {
-    /* Dark Mode — 2026 breathable dark with clear layering */
-    --background: 220 14% 16%;
-    --foreground: 210 15% 90%;
-
-    --hero-bg: 220 14% 10%;
-    --hero-bg-secondary: 220 14% 12%;
-    --hero-text: 210 15% 98%;
-    --hero-text-muted: 215 12% 78%;
-
-    /* Cards clearly separated from background (16% → 20% → 24%) */
-    --card: 220 12% 20%;
-    --card-foreground: 210 15% 90%;
-    --card-elevated: 220 12% 24%;
-
-    /* Primary stays turquoise for visibility */
-    --primary: 188 94% 45%;
-    --primary-hover: 188 94% 55%;
-    --primary-foreground: 220 14% 8%;
-
-    --success: 142 76% 45%;
-    --success-hover: 142 76% 55%;
-    --success-foreground: 220 14% 8%;
-
-    /* Secondary darker than bg for footer/header depth */
-    --secondary: 220 14% 12%;
-    --secondary-hover: 220 14% 16%;
-    --secondary-foreground: 210 15% 90%;
-
-    /* Muted slightly darker than bg for alternating sections */
-    --muted: 220 12% 13%;
-    --muted-hover: 220 12% 17%;
-    --muted-foreground: 215 12% 65%;
-
-    /* Keep orange accent for hover states */
-    --accent: 24 95% 53%;
-    --accent-hover: 24 95% 60%;
-    --accent-foreground: 220 14% 8%;
-
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 210 15% 98%;
-
-    /* More visible borders */
-    --border: 220 10% 28%;
-    --border-input: 220 10% 32%;
-    --input: 220 12% 18%;
-    --input-foreground: 210 15% 90%;
-    --ring: 188 94% 45%;
-
-    /* Popover matches card */
-    --popover: 220 12% 20%;
-    --popover-foreground: 210 15% 90%;
-    
-    /* Softer shadows */
-    --shadow-card: 0 4px 12px -2px hsl(220 14% 5% / 0.4), 0 2px 6px -2px hsl(220 14% 5% / 0.2);
-    --shadow-elevated: 0 10px 25px -5px hsl(220 14% 5% / 0.5), 0 6px 10px -4px hsl(220 14% 5% / 0.3);
-    
-    --sidebar-background: 220 14% 12%;
-    --sidebar-foreground: 210 15% 90%;
-    --sidebar-primary: 188 94% 45%;
-    --sidebar-primary-foreground: 220 14% 8%;
-    --sidebar-accent: 220 14% 20%;
-    --sidebar-accent-foreground: 210 15% 90%;
-    --sidebar-border: 220 10% 26%;
-    --sidebar-ring: 188 94% 45%;
-  }
 }
 
 @layer base {
@@ -642,6 +576,72 @@ html, body {
     contain: layout style;
     will-change: opacity, transform;
   }
+
+  /* Hide scrollbar but keep scroll functionality (used by swim lanes) */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Mobile horizontal swim lane — App Store / Spotify pattern.
+     Children get snap-start, shrink-0, and a peek-width so the next card is
+     visible. On md+ this class is ignored; pair with md:grid for desktop. */
+  .swim-lane {
+    @apply flex gap-3 overflow-x-auto snap-x snap-mandatory -mx-4 px-4 pb-4 scrollbar-hide;
+  }
+  .swim-lane > * {
+    @apply snap-start shrink-0 w-[78%];
+  }
+
+  /* Horizontal marquee — duplicate children 2× for a seamless loop. Set
+     --marquee-duration to control speed (default 30s). Pauses on hover and
+     when the user has prefers-reduced-motion. */
+  .marquee {
+    @apply overflow-hidden relative;
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll var(--marquee-duration, 30s) linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Edge fade-masks for marquee — match the surrounding bg-card so the
+     ends fade out instead of cutting off mid-word. */
+  .marquee-fade::before,
+  .marquee-fade::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2rem;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .marquee-fade::before {
+    left: 0;
+    background: linear-gradient(to right, hsl(var(--card)) 0%, transparent 100%);
+  }
+  .marquee-fade::after {
+    right: 0;
+    background: linear-gradient(to left, hsl(var(--card)) 0%, transparent 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    transform: translateX(0);
+  }
 }
 
 @keyframes fadeInUp {
@@ -853,17 +853,26 @@ html, body {
   .blog-content {
     font-size: 16px;
   }
-  
+
   .blog-content h1 {
     font-size: 2rem;
   }
-  
+
   .blog-content h2 {
     font-size: 1.5rem;
   }
-  
+
   .blog-content h3 {
     font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 374px) {
+  .blog-content {
+    font-size: 15px;
+  }
+  .blog-content h1 {
+    font-size: 1.75rem;
   }
 }
 

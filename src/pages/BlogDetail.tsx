@@ -132,10 +132,10 @@ const BlogDetail = () => {
       <BreadcrumbNavigation />
       
       {/* Hero Image with Overlay */}
-      <div className="relative h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${post.cover_image_url})`, backgroundPosition: 'center center' }}>
+      <div className="relative h-[240px] md:h-[500px] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${post.cover_image_url})`, backgroundPosition: 'center center' }}>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
         <div className="absolute inset-0 flex items-end">
-          <div className="container mx-auto px-4 py-12">
+          <div className="container mx-auto px-4 py-6 md:py-12">
             <Badge className="mb-4 bg-primary text-primary-foreground">
               {categoryLabels[post.category]}
             </Badge>
@@ -157,12 +157,12 @@ const BlogDetail = () => {
       </div>
 
       {/* Main Content */}
-      <article className="py-12 bg-background">
+      <article className="py-8 md:py-12 bg-background">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             {/* Back Button */}
             <Link to="/raad">
-              <Button variant="outline" className="mb-8">
+              <Button variant="outline" className="mb-6 md:mb-8 min-h-11">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Tilbake til råd
               </Button>

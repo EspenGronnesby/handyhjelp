@@ -29,7 +29,7 @@ export const EditableBottomCTA = () => {
 
   return (
     <>
-      <section className="relative py-16 md:py-20 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+      <section className="relative py-10 md:py-20 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
         {/* Dot-pattern overlay som matcher gradient-headere ellers på siden */}
         <div
           className="absolute inset-0 opacity-10 pointer-events-none"

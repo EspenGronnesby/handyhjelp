@@ -30,7 +30,7 @@ export const GuaranteeSection = () => {
   const { ref, style } = useFadeInUp({ threshold: 0.15 });
 
   return (
-    <section className="py-16 md:py-20 bg-muted/30">
+    <section className="py-10 md:py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div
           ref={ref}

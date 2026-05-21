@@ -137,7 +137,7 @@ export const ProcessSection = () => {
   const { ref, getItemStyle } = useStaggeredGridReveal(steps.length, 3, { threshold: 0.15 });
 
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-10 md:py-24">
       <div className="container mx-auto px-4">
         <div className="relative mb-8 md:mb-12">
           {isAdmin && editMode && (
@@ -155,7 +155,7 @@ export const ProcessSection = () => {
 
         <div
           ref={ref}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto"
+          className="swim-lane md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0 md:pb-0 md:[&>*]:w-auto max-w-6xl md:mx-auto"
         >
           {steps.map((step, idx) => (
             <ProcessStepCard
@@ -171,10 +171,10 @@ export const ProcessSection = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12 md:mt-16">
+        <div className="text-center mt-8 md:mt-16">
           <Button
             size="lg"
-            className="bg-success hover:bg-success-hover text-success-foreground px-8 py-4"
+            className="bg-success hover:bg-success-hover text-success-foreground min-h-11 px-8 py-4"
             onClick={() => window.location.href = '/tilbud'}
           >
             Kom i gang nå

@@ -26,7 +26,7 @@ const ServiceVaktmester = () => {
 
       {/* Hero — bilde + tittel */}
       <div
-        className={`relative h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
+        className={`relative h-[280px] md:h-[500px] bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
         style={{ backgroundImage: `url(${heroImage})` }}
       >
         <div className="absolute inset-0 bg-black/60"></div>

@@ -108,9 +108,9 @@ const EditableServiceCardGrid = () => {
   const getGridClass = () => {
     const count = visibleServices.length;
     if (count === 1) return 'flex justify-center';
-    if (count === 2) return 'grid md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto';
-    if (count === 3) return 'grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8';
-    return 'grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8';
+    if (count === 2) return 'grid grid-cols-2 gap-3 md:gap-6 lg:gap-8 max-w-4xl mx-auto';
+    if (count === 3) return 'grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 lg:gap-8';
+    return 'grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 lg:gap-8';
   };
 
   const handleSave = async () => {
@@ -140,9 +140,9 @@ const EditableServiceCardGrid = () => {
 
   return (
     <>
-      <section className="py-16 md:py-20 bg-muted" ref={ref}>
+      <section className="py-10 md:py-20 bg-muted" ref={ref}>
         <div className="container mx-auto px-4 max-w-7xl relative">
-          <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-6 md:p-10 dark:ring-1 dark:ring-white/5">
+          <div className="bg-card rounded-2xl shadow-lg border border-border/50 p-4 md:p-10 dark:ring-1 dark:ring-white/5">
             {isAdmin && editMode && (
               <EditButton
                 onClick={() => setIsEditing(true)}

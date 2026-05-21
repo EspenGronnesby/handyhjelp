@@ -192,7 +192,7 @@ const TestimonialsSection = () => {
   }
 
   return (
-    <section id="testimonials" className="py-16 md:py-24 bg-muted/20">
+    <section id="testimonials" className="py-10 md:py-24 bg-muted/20">
       <div className="container mx-auto px-4">
         {/* Section Header - Compact on mobile */}
         <div className="mb-8 md:mb-12 relative">
@@ -246,7 +246,6 @@ const TestimonialsSection = () => {
             ref={scrollContainerRef}
             onScroll={handleScroll}
             className="flex gap-6 overflow-x-auto overflow-y-visible snap-x snap-mandatory scrollbar-hide pb-8 pt-6 px-4 md:px-12 carousel-fade-edges"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {reviews.map((review, index) => {
               const customerDisplay = getCustomerDisplay(review);
@@ -256,7 +255,7 @@ const TestimonialsSection = () => {
                 <div
                   key={review.id}
                   className={cn(
-                    "flex-shrink-0 w-[88vw] md:w-[450px] snap-center",
+                    "flex-shrink-0 w-[82vw] md:w-[450px] snap-center",
                     "group reveal-scale perf-contain"
                   )}
                   style={{ animationDelay: `${index * 100}ms` }}

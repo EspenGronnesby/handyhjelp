@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { QuickCallbackForm } from "@/components/QuickCallbackForm";
+import { QuickCallbackDialog } from "@/components/QuickCallbackDialog";
 import { Phone } from "lucide-react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
@@ -35,20 +36,17 @@ export const HeroSection = () => {
     content: subtitle
   } = useEditableContent('hero-home', 'subtitle');
   const {
-    content: ctaText
-  } = useEditableContent('hero-home', 'cta-button');
-  const {
     content: servicesButtonText
   } = useEditableContent('hero-home', 'services-button');
   const displayTitle = title || 'Vi tar vare på dine bygg';
   const displaySubtitle = subtitle || 'Vaktmester • Tømrer • Blikk';
-  const displayCtaText = ctaText || 'Få tilbud';
+  const displayCtaText = 'Vi ringer deg →';
   const displayServicesButtonText = servicesButtonText || 'Se tjenester';
 
   return <>
       <section
         id="hero"
-        className="min-h-[100svh] md:min-h-screen relative flex items-center pt-20 md:pt-20 section-mobile overflow-hidden"
+        className="min-h-[75svh] md:min-h-screen relative flex items-center pt-20 md:pt-20 section-mobile overflow-hidden"
       >
         {/* Static background image — no parallax. */}
         <div
@@ -84,7 +82,7 @@ export const HeroSection = () => {
         )}
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-6 md:gap-12 items-center min-h-[calc(100svh-5rem)] md:min-h-[calc(100vh-8rem)] py-4 md:py-20">
+          <div className="grid lg:grid-cols-2 gap-6 md:gap-12 items-center min-h-[calc(75svh-5rem)] md:min-h-[calc(100vh-8rem)] py-4 md:py-20">
             {/* Left Content - Mobile optimized */}
             <div className="text-left flex flex-col justify-center">
               {/* Main Heading - plain white text */}
@@ -99,16 +97,15 @@ export const HeroSection = () => {
 
               {/* CTA Buttons - With motion */}
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-12">
-                <MotionButton
-                  size="lg"
-                  variant="cta"
-                  className="text-lg md:text-lg px-8 md:px-8 py-5 md:py-6 font-semibold"
-                  onClick={() => document.getElementById('quote-standalone')?.scrollIntoView({
-                    behavior: 'smooth'
-                  })}
-                >
-                  {displayCtaText}
-                </MotionButton>
+                <QuickCallbackDialog>
+                  <MotionButton
+                    size="lg"
+                    variant="cta"
+                    className="text-lg md:text-lg px-8 md:px-8 py-5 md:py-6 font-semibold"
+                  >
+                    {displayCtaText}
+                  </MotionButton>
+                </QuickCallbackDialog>
                 <MotionButton
                   variant="cta-outline"
                   size="lg"
@@ -131,8 +128,8 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            {/* Right Content — kort lead-capture (hidden on mobile) */}
-            <div className="hidden md:block lg:block">
+            {/* Right Content — kort lead-capture (kun synlig på desktop, mobil/iPad bruker dialog-knappen) */}
+            <div className="hidden lg:block">
               <QuickCallbackForm />
             </div>
           </div>
@@ -142,7 +139,6 @@ export const HeroSection = () => {
       <HeroSectionEditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} currentData={{
       title: displayTitle,
       subtitle: displaySubtitle,
-      ctaButton: displayCtaText,
       servicesButton: displayServicesButtonText,
       phone: phone
     }} />

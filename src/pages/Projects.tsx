@@ -188,7 +188,7 @@ const Projects = () => {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                   {filteredProjects.map((project) => (
                     <Link
                       key={project.id}
@@ -221,14 +221,15 @@ const Projects = () => {
                         />
 
                         {/* Badges */}
-                        <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start">
-                          <ServiceBadge 
+                        <div className="absolute top-2 left-2 right-2 md:top-4 md:left-4 md:right-4 z-10 flex justify-between items-start gap-1">
+                          <ServiceBadge
                             serviceId={project.category}
-                            className="bg-background/90 backdrop-blur-sm"
+                            className="bg-background/90 backdrop-blur-sm text-[10px] md:text-xs"
+                            showIcon={false}
                           />
                           <Badge
                             variant="secondary"
-                            className="bg-background/90 backdrop-blur-sm text-foreground font-semibold"
+                            className="bg-background/90 backdrop-blur-sm text-foreground font-semibold text-[10px] md:text-xs"
                           >
                             {isShowingAfter(project.id) ? "ETTER" : "FØR"}
                           </Badge>
@@ -239,19 +240,19 @@ const Projects = () => {
                       </div>
 
                       {/* Content */}
-                      <div className="p-4 bg-card">
-                        <h3 className="font-heading font-bold text-lg mb-2 text-foreground">
+                      <div className="p-3 md:p-4 bg-card">
+                        <h3 className="font-heading font-bold text-sm md:text-lg mb-1 md:mb-2 text-foreground line-clamp-1">
                           {project.title}
                         </h3>
-                        <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                        <p className="text-muted-foreground text-xs md:text-sm mb-2 md:mb-3 line-clamp-1 md:line-clamp-2">
                           {project.description}
                         </p>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            <span>{project.location}</span>
+                        <div className="flex items-center gap-2 md:gap-4 text-[10px] md:text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1 min-w-0">
+                            <MapPin className="w-3 h-3 shrink-0" />
+                            <span className="truncate">{project.location}</span>
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div className="hidden md:flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             <span>
                               {new Date(project.completed_date).toLocaleDateString("nb-NO", {

@@ -70,14 +70,14 @@ export const Footer = () => {
           <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger footer" />
         )}
 
-        <div className="container mx-auto px-4 py-8 md:py-12">
+        <div className="container mx-auto px-4 py-6 md:py-12">
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
             {/* Kolonne 1: HandyHjelp Info */}
             <div className="col-span-2 md:col-span-1">
               <img 
                 alt="HandyHjelp - Levert med kvalitet" 
                 className="h-16 md:h-20 w-auto object-contain mb-4" 
-                src={resolvedTheme === 'dark' || resolvedTheme === 'blue' ? handyhjelpLogoFooter : handyhjelpLogo} 
+                src={resolvedTheme === 'blue' ? handyhjelpLogoFooter : handyhjelpLogo}
               />
               <p className="text-sm mb-4 opacity-90">
                 {footerData.description}
