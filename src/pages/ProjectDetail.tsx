@@ -172,10 +172,10 @@ const ProjectDetail = () => {
           </div>
 
           {/* Before/After Images — dark-glass-stil som matcher hero-bakgrunnen */}
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-8 md:mb-12">
             {/* Before Image */}
             <div className="relative">
-              <div className="relative rounded-2xl p-6 md:p-8 h-[500px] md:h-[600px] w-full overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent backdrop-blur-2xl backdrop-saturate-150 border border-white/25 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)]">
+              <div className="relative rounded-2xl p-3 md:p-8 h-[320px] md:h-[600px] w-full overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent backdrop-blur-2xl backdrop-saturate-150 border border-white/25 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)]">
                 {/* Top gradient-stripe — visuell signatur */}
                 <div
                   className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 pointer-events-none"
@@ -209,7 +209,7 @@ const ProjectDetail = () => {
 
             {/* After Image */}
             <div className="relative">
-              <div className="relative rounded-2xl p-6 md:p-8 h-[500px] md:h-[600px] w-full overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent backdrop-blur-2xl backdrop-saturate-150 border border-white/25 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)]">
+              <div className="relative rounded-2xl p-3 md:p-8 h-[320px] md:h-[600px] w-full overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent backdrop-blur-2xl backdrop-saturate-150 border border-white/25 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)]">
                 <div
                   className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 pointer-events-none"
                   aria-hidden="true"

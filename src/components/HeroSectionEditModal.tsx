@@ -21,7 +21,6 @@ interface HeroSectionEditModalProps {
   currentData: {
     title: string;
     subtitle: string;
-    ctaButton: string;
     servicesButton: string;
     phone: string;
   };
@@ -56,7 +55,6 @@ export const HeroSectionEditModal = ({
       const updates = [
         { section: 'hero-home', content_key: 'title', content_value: formData.title, content_type: 'text', updated_by: user.id },
         { section: 'hero-home', content_key: 'subtitle', content_value: formData.subtitle, content_type: 'text', updated_by: user.id },
-        { section: 'hero-home', content_key: 'cta-button', content_value: formData.ctaButton, content_type: 'text', updated_by: user.id },
         { section: 'hero-home', content_key: 'services-button', content_value: formData.servicesButton, content_type: 'text', updated_by: user.id },
         { section: 'kontakt-info', content_key: 'phone', content_value: formData.phone, content_type: 'text', updated_by: user.id },
       ];
@@ -125,20 +123,6 @@ export const HeroSectionEditModal = ({
             />
             <div className="text-sm text-muted-foreground text-right">
               {formData.subtitle.length} / 200 tegn
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="ctaButton">Knapp-tekst (hoved-CTA)</Label>
-            <Input
-              id="ctaButton"
-              value={formData.ctaButton}
-              onChange={(e) => setFormData({ ...formData, ctaButton: e.target.value })}
-              maxLength={30}
-              placeholder="F.eks. Få tilbud"
-            />
-            <div className="text-sm text-muted-foreground text-right">
-              {formData.ctaButton.length} / 30 tegn
             </div>
           </div>
 

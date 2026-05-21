@@ -90,7 +90,7 @@ export const EditableWhyUs = () => {
 
         <div
           ref={ref}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto"
+          className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6 max-w-6xl mx-auto"
         >
           {items.map((item, index) => {
             const Icon = iconMap[item.icon as keyof typeof iconMap] || Award;
@@ -106,7 +106,7 @@ export const EditableWhyUs = () => {
                 key={index}
                 style={getItemStyle(index)}
                 className={cn(
-                  "relative flex flex-col gap-3 p-5 md:p-6 rounded-xl",
+                  "relative flex flex-col gap-2 md:gap-3 p-3 md:p-6 rounded-xl",
                   "bg-card/50 hover:bg-card transition-colors duration-200",
                   "border border-border/40",
                   isHidden && isAdmin && editMode ? "opacity-50 border-dashed" : ""

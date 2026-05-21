@@ -130,9 +130,9 @@ export const ProjectsSection = () => {
           </div>
         ) : (
           <>
-            {/* Mobile: Show 2 projects in larger cards, Desktop: 3 in grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
-              {projects.slice(0, typeof window !== 'undefined' && window.innerWidth < 768 ? 2 : 3).map((project, index) => (
+            {/* Mobile: horizontal swim lane (App Store-stil). Desktop: 3-kol grid. */}
+            <div className="swim-lane mb-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible md:mx-0 md:px-0 md:pb-0 md:mb-12 md:[&>*]:w-auto">
+              {projects.slice(0, 4).map((project, index) => (
               <Link
                 key={project.id}
                 to={`/prosjekter/${project.id}`}

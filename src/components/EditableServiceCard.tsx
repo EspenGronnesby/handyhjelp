@@ -102,13 +102,13 @@ export const EditableServiceCard = ({
           </div>
         </div>
 
-        <div className="p-4 md:p-6 pt-0">
+        <div className="p-3 md:p-6 pt-0">
           <h3 className="text-base md:text-xl font-bold text-foreground mb-1 font-heading">
             <span className="md:hidden">{config.labelShort}</span>
             <span className="hidden md:inline">{displayTitle}</span>
           </h3>
 
-          <p className="hidden md:block text-sm text-muted-foreground mb-4">
+          <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4 line-clamp-2 md:line-clamp-none">
             {displaySubtitle}
           </p>
 
@@ -128,12 +128,10 @@ export const EditableServiceCard = ({
             )}
           </ul>
 
-          <div className="md:hidden mb-3" />
-
           <Link to={`/tjenester/${id}`}>
             <Button
               variant="outline"
-              className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground group/btn"
+              className="w-full min-h-11 border-primary text-primary hover:bg-primary hover:text-primary-foreground group/btn"
             >
               Les mer
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />

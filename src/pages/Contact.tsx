@@ -97,7 +97,7 @@ const Contact = () => {
       <Header />
       <BreadcrumbNavigation />
       
-      <main id="main-content" className="pt-32 pb-16">
+      <main id="main-content" className="pt-24 md:pt-32 pb-10 md:pb-16">
         {/* Hero Section */}
         <section className="container mx-auto px-4 mb-8 md:mb-10">
           <EditableHero section="hero-kontakt" defaultHeading="Ta kontakt i dag" defaultSubtext="Vi er her for å hjelpe deg med alle dine eiendomsbehov. Kontakt oss for en uforpliktende samtale." className="max-w-3xl mx-auto" />
@@ -107,12 +107,12 @@ const Contact = () => {
         </section>
 
         {/* Trust-stripe rett under hero (Mr. Handyman-mønster) */}
-        <div className="mb-12 md:mb-16">
+        <div className="mb-8 md:mb-16">
           <TrustStripe />
         </div>
 
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 mb-10 md:mb-20">
             {/* Contact Form */}
             <div>
               <div className="glass-card p-6 relative">

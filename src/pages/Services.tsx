@@ -58,7 +58,7 @@ const Services = () => {
       <BreadcrumbNavigation />
 
       {/* Hero Section — static background (no parallax) */}
-      <div className="relative min-h-[600px] flex items-center overflow-hidden">
+      <div className="relative min-h-[75svh] md:min-h-[600px] flex items-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${heroImage})` }}
@@ -73,13 +73,13 @@ const Services = () => {
         <HeroImageEditor page="services" currentImageUrl={heroImage} onImageUpdate={refetchHero} />
 
         {/* Content over background */}
-        <main id="main-content" className="relative z-10 w-full py-20">
+        <main id="main-content" className="relative z-10 w-full py-10 md:py-20">
           <div className="container mx-auto px-4">
             <EditableHero
               section="hero-tjenester"
               defaultHeading="Våre tjenester"
               defaultSubtext="Fra vaktmester til tømrer – vi har ekspertisen du trenger. Profesjonelle håndverkstjenester til konkurransedyktige priser"
-              className="max-w-4xl mx-auto mb-12"
+              className="max-w-4xl mx-auto mb-8 md:mb-12"
             />
 
             {/* Editable CTA Box */}

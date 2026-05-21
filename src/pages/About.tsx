@@ -78,7 +78,7 @@ const About = () => {
             defaultHeading="Om HandyHjelp"
             defaultSubtext="Din pålitelige partner for eiendomspleie og håndverksarbeid"
             backgroundImage={heroImage}
-            className="h-[500px]"
+            className="h-[320px] md:h-[500px]"
             contentPosition="lower"
           >
             <div className="flex gap-4 justify-center">
@@ -96,7 +96,7 @@ const About = () => {
         <TrustStripe />
 
         {/* Main Content */}
-        <section className="container mx-auto px-4 py-16 md:py-24">
+        <section className="container mx-auto px-4 py-10 md:py-24">
           {/* Timeline Section */}
           <EditableTimeline />
 
@@ -106,7 +106,7 @@ const About = () => {
           </div>
 
           {/* Team Section with Admin Editing */}
-          <div id="team" className="bg-muted/40 rounded-2xl p-8 md:p-12 mb-20 scroll-mt-24 relative" ref={teamRef}>
+          <div id="team" className="bg-muted/40 rounded-2xl p-4 md:p-12 mb-12 md:mb-20 scroll-mt-24 relative" ref={teamRef}>
             {isAdmin && editMode && (
               <EditButton
                 onClick={() => setIsTeamModalOpen(true)}
@@ -127,19 +127,19 @@ const About = () => {
                 <p className="text-muted-foreground">Laster teammedlemmer...</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 max-w-6xl mx-auto">
                 {teamMembers.map((member, index) => (
-                  <div key={member.id} className="glass-card relative group p-6 text-center" style={getTeamItemStyle(index)}>
+                  <div key={member.id} className="glass-card relative group p-3 md:p-6 text-center" style={getTeamItemStyle(index)}>
                     <TeamMemberEditor member={member} onUpdate={fetchTeamMembers} />
-                    <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mx-auto mb-3 md:mb-4">
                       <img
                         src={member.image_url}
                         alt={member.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <h3 className="font-semibold text-lg mb-1">{member.name}</h3>
-                    <p className="text-sm text-muted-foreground">{member.position}</p>
+                    <h3 className="font-semibold text-sm md:text-lg mb-1 line-clamp-1">{member.name}</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 md:line-clamp-none">{member.position}</p>
                   </div>
                 ))}
 
@@ -150,7 +150,7 @@ const About = () => {
           </div>
 
           {/* Vår garanti — Mr. Handyman-stil "Done Right Promise" */}
-          <div className="-mx-4 mb-16">
+          <div className="-mx-4 mb-10 md:mb-16">
             <GuaranteeSection />
           </div>
 

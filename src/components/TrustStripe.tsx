@@ -48,18 +48,50 @@ export const TrustStripe = () => {
             ariaLabel="Rediger trust-stripe"
           />
         )}
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+
+        {/* Mobile: marquee. Desktop: 1×4 grid (uendret fra dagens). */}
+        <div
+          className="md:hidden marquee marquee-fade"
+          style={{ '--marquee-duration': '25s' } as React.CSSProperties}
+        >
+          {/* Hidden, non-animated copy for screen readers — keeps the actual
+              content accessible without reading the duplicated marquee. */}
+          <ul className="sr-only">
+            {items.map(({ text }, idx) => (
+              <li key={idx}>{text}</li>
+            ))}
+          </ul>
+          <div className="marquee-track" aria-hidden="true">
+            {[...items, ...items].map(({ icon: Icon, text }, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-2 shrink-0 px-4"
+              >
+                <Icon
+                  className="h-5 w-5 text-primary shrink-0"
+                  strokeWidth={2}
+                />
+                <span className="text-sm font-medium text-foreground whitespace-nowrap">
+                  {text}
+                </span>
+                <span className="text-muted-foreground/40 ml-4">•</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden md:block container mx-auto px-4">
+          <div className="grid grid-cols-4 gap-6">
             {items.map(({ icon: Icon, text }, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 md:gap-3 justify-center md:justify-start"
+                className="flex items-center gap-3 justify-start"
               >
                 <Icon
-                  className="h-5 w-5 md:h-6 md:w-6 text-primary shrink-0"
+                  className="h-6 w-6 text-primary shrink-0"
                   strokeWidth={2}
                 />
-                <span className="text-xs md:text-sm font-medium text-foreground">
+                <span className="text-sm font-medium text-foreground">
                   {text}
                 </span>
               </div>
