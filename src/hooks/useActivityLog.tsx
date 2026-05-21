@@ -8,6 +8,7 @@ export type ActionType =
   | 'job_started'
   | 'job_completed'
   | 'job_deleted'
+  | 'quote_deleted'
   | 'agreement_approved'
   | 'agreement_rejected'
   | 'agreement_updated'
@@ -53,6 +54,7 @@ export const actionTypeLabels: Record<ActionType, string> = {
   job_started: 'Startet oppdrag',
   job_completed: 'Fullførte oppdrag',
   job_deleted: 'Slettet oppdrag',
+  quote_deleted: 'Slettet tilbud',
   agreement_approved: 'Godkjente avtale',
   agreement_rejected: 'Avslått avtale',
   agreement_updated: 'Oppdaterte avtale',
@@ -94,6 +96,7 @@ export const actionTypeColors: Record<ActionType, string> = {
   job_started: 'bg-cyan-500',
   job_completed: 'bg-green-500',
   job_deleted: 'bg-red-500',
+  quote_deleted: 'bg-red-500',
   agreement_approved: 'bg-emerald-500',
   agreement_rejected: 'bg-red-500',
   agreement_updated: 'bg-blue-500',
