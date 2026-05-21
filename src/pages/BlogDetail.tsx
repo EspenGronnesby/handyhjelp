@@ -125,6 +125,21 @@ const BlogDetail = () => {
         <meta name="twitter:title" content={post.seo_title || post.title} />
         <meta name="twitter:description" content={post.seo_description || post.summary} />
         <meta name="twitter:image" content={post.cover_image_url} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: post.seo_title || post.title,
+          description: post.seo_description || post.summary,
+          image: post.cover_image_url,
+          datePublished: post.published_at,
+          author: { "@type": "Organization", name: "HandyHjelp" },
+          publisher: {
+            "@type": "Organization",
+            name: "HandyHjelp",
+            logo: { "@type": "ImageObject", url: `${SEO_CONFIG.domain}/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png` }
+          },
+          mainEntityOfPage: getCanonicalUrl(`/raad/${post.slug}`)
+        })}</script>
       </Helmet>
       
       <GoogleAnalytics />

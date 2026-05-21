@@ -33,6 +33,26 @@ export const PageSEO = ({
   const ogImage = getOgImageUrl(customImage);
   const robots = noindex ? 'noindex, nofollow' : SEO_CONFIG.defaultRobots;
 
+  const serviceSchema = path.startsWith('/tjenester/') ? {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: title,
+    description,
+    url: canonicalUrl,
+    areaServed: { "@type": "City", name: "Kristiansand" },
+    provider: {
+      "@type": "LocalBusiness",
+      name: SEO_CONFIG.siteName,
+      url: SEO_CONFIG.domain,
+      telephone: "+47 41250553",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Kristiansand",
+        addressCountry: "NO"
+      }
+    }
+  } : null;
+
   return (
     <Helmet>
       {/* Grunnleggende */}
@@ -55,6 +75,10 @@ export const PageSEO = ({
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
+
+      {serviceSchema && (
+        <script type="application/ld+json">{JSON.stringify(serviceSchema)}</script>
+      )}
     </Helmet>
   );
 };
