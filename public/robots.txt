@@ -1,10 +1,18 @@
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /owner
+Disallow: /worker
+Disallow: /auth
+Disallow: /anmeldelse
+Disallow: /takk
+Disallow: /takk-avtale
+Disallow: /tilbakemelding
+Disallow: /lovable
 
 Sitemap: https://handyhjelp.no/sitemap.xml
 
 # Allow all crawlers to access CSS and JS files
-User-agent: *
 Allow: /assets/
 Allow: /_app/
 Allow: /favicon
