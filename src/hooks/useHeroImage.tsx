@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useHeroImage = (page: string, defaultImage: string) => {
-  // Start med null - ikke vis noe før vi vet svaret fra databasen
-  const [heroImage, setHeroImage] = useState<string | null>(null);
+  // Start with the bundled default image immediately so the hero paints on
+  // first render (preloaded by index.html). Override later only if the
+  // database has a custom image for this page.
+  const [heroImage, setHeroImage] = useState<string>(defaultImage);
   const [opacity, setOpacity] = useState(0.85);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchHeroImage = async () => {
     try {
@@ -17,12 +19,10 @@ export const useHeroImage = (page: string, defaultImage: string) => {
 
       if (error) throw error;
 
-      // Bruk databasebildet eller fall tilbake til default
-      setHeroImage(data?.image_url || defaultImage);
-      setOpacity(data?.opacity ?? 0.85);
+      if (data?.image_url) setHeroImage(data.image_url);
+      if (data?.opacity !== undefined && data?.opacity !== null) setOpacity(data.opacity);
     } catch (error) {
       console.error('Error fetching hero image:', error);
-      setHeroImage(defaultImage); // Fallback ved feil
     } finally {
       setLoading(false);
     }
