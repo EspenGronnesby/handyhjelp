@@ -17,13 +17,15 @@ import { PageSEO } from "@/components/SEO/PageSEO";
 import { useSequentialReveal } from "@/hooks/useScrollAnimation";
 import { LazySection } from "@/components/LazySection";
 
-// Below-the-fold sections — split into separate chunks so they don't block
-// the initial paint of the hero.
-const ProcessSection = lazy(() => import("@/components/ProcessSection").then(m => ({ default: m.ProcessSection })));
+// Sections above the services overview — mounted eagerly to avoid CLS as
+// they appear in the same viewport on first scroll.
+import ClientLogosSection from "@/components/ClientLogosSection";
+import { ProcessSection } from "@/components/ProcessSection";
+import { GuaranteeSection } from "@/components/GuaranteeSection";
+
+// Sections far below the fold — split off the initial bundle.
 const ProjectsSection = lazy(() => import("@/components/ProjectsSection").then(m => ({ default: m.ProjectsSection })));
 const TestimonialsSection = lazy(() => import("@/components/TestimonialsSection"));
-const ClientLogosSection = lazy(() => import("@/components/ClientLogosSection"));
-const GuaranteeSection = lazy(() => import("@/components/GuaranteeSection").then(m => ({ default: m.GuaranteeSection })));
 const EditableBottomCTA = lazy(() => import("@/components/EditableBottomCTA").then(m => ({ default: m.EditableBottomCTA })));
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA").then(m => ({ default: m.StickyMobileCTA })));
