@@ -72,7 +72,11 @@ export const HeroSection = () => {
           />
         )}
 
-        <HeroImageEditor page="home" currentImageUrl={heroImage} onImageUpdate={refetch} />
+        {isAdmin && (
+          <Suspense fallback={null}>
+            <HeroImageEditor page="home" currentImageUrl={heroImage} onImageUpdate={refetch} />
+          </Suspense>
+        )}
 
         {/* Edit hero content (title/subtitle/CTA) — placed next to image-edit camera button */}
         {isAdmin && editMode && (
