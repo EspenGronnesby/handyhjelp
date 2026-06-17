@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { QuickCallbackForm } from "@/components/QuickCallbackForm";
 import { QuickCallbackDialog } from "@/components/QuickCallbackDialog";
 import { Phone } from "lucide-react";
-import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
 import { useEditableContent } from "@/hooks/useEditableContent";
 import { useContactInfo } from "@/hooks/useContactInfo";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { EditButton } from "@/components/ui/EditButton";
-import { HeroSectionEditModal } from "./HeroSectionEditModal";
 import heroDefaultImage from "@/assets/hero-building-maintenance.webp";
 import { MotionButton } from "@/components/motion";
 import { useReducedMotion } from "framer-motion";
 import { Spotlight } from "@/components/ui/Spotlight";
+
+// Admin-only chunks — never shipped to anonymous visitors
+const HeroImageEditor = lazy(() => import("@/components/admin/HeroImageEditor").then(m => ({ default: m.HeroImageEditor })));
+const HeroSectionEditModal = lazy(() => import("./HeroSectionEditModal").then(m => ({ default: m.HeroSectionEditModal })));
 
 export const HeroSection = () => {
   const shouldReduceMotion = useReducedMotion();
