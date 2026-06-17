@@ -142,11 +142,15 @@ export const HeroSection = () => {
         </div>
       </section>
 
-      <HeroSectionEditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} currentData={{
-      title: displayTitle,
-      subtitle: displaySubtitle,
-      servicesButton: displayServicesButtonText,
-      phone: phone
-    }} />
+      {isAdmin && isModalOpen && (
+        <Suspense fallback={null}>
+          <HeroSectionEditModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} currentData={{
+            title: displayTitle,
+            subtitle: displaySubtitle,
+            servicesButton: displayServicesButtonText,
+            phone: phone,
+          }} />
+        </Suspense>
+      )}
     </>;
 };
