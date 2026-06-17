@@ -1,50 +1,33 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
+/**
+ * Reads a single editable text from the shared site_content cache (one query
+ * for the whole site instead of one per field). Falls back to '' until the
+ * cache loads.
+ */
 export const useEditableContent = (section: string, contentKey: string) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { data: contentMap, isLoading } = useSiteContent();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['site-content', section, contentKey],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_content')
-        .select('content_value')
-        .eq('section', section)
-        .eq('content_key', contentKey)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-      
-      // Return both the value and whether the row exists in DB
-      return {
-        value: data?.content_value ?? '',
-        hasBeenEdited: data !== null
-      };
-    },
-    staleTime: 1000 * 60 * 5, // Cache i 5 minutter
-  });
-
-  const content = data?.value ?? '';
-  const hasBeenEdited = data?.hasBeenEdited ?? false;
+  const key = `${section}::${contentKey}`;
+  const content = contentMap?.get(key) ?? '';
+  const hasBeenEdited = contentMap?.has(key) ?? false;
 
   const updateContent = async (newValue: string) => {
-    // Optimistic update
-    queryClient.setQueryData(
-      ['site-content', section, contentKey],
-      newValue
-    );
+    // Optimistic update on the shared map
+    queryClient.setQueryData<Map<string, string>>(['site-content-all'], (prev) => {
+      const next = new Map(prev ?? []);
+      next.set(key, newValue);
+      return next;
+    });
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('Not authenticated');
-      }
+      if (!user) throw new Error('Not authenticated');
 
       const { error } = await supabase
         .from('site_content')
@@ -53,35 +36,21 @@ export const useEditableContent = (section: string, contentKey: string) => {
           content_key: contentKey,
           content_value: newValue,
           content_type: 'text',
-          updated_by: user.id
-        }, {
-          onConflict: 'section,content_key'
-        });
+          updated_by: user.id,
+        }, { onConflict: 'section,content_key' });
 
       if (error) throw error;
 
-      // Invalider queries for å sikre synkronisering
-      queryClient.invalidateQueries({ 
-        queryKey: ['site-content', section] 
-      });
-      
-      toast({
-        title: "✅ Lagret",
-        description: "Endringen er lagret",
-      });
-
+      queryClient.invalidateQueries({ queryKey: ['site-content-all'] });
+      toast({ title: '✅ Lagret', description: 'Endringen er lagret' });
       return true;
     } catch (error) {
-      // Revert optimistic update ved feil
-      queryClient.invalidateQueries({ 
-        queryKey: ['site-content', section, contentKey] 
-      });
-
+      queryClient.invalidateQueries({ queryKey: ['site-content-all'] });
       console.error('Update error:', error);
       toast({
-        title: "❌ Feil ved lagring",
-        description: "Prøv igjen",
-        variant: "destructive"
+        title: '❌ Feil ved lagring',
+        description: 'Prøv igjen',
+        variant: 'destructive',
       });
       return false;
     }
