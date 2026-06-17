@@ -94,20 +94,14 @@ const Index = () => {
         <HeroSection />
         <TrustStripe />
 
-        {/* Below the fold — mounted only when scrolled near */}
-        <LazySection minHeight="240px">
-          <ClientLogosSection />
-        </LazySection>
+        {/* Above-the-fold companions — eager */}
+        <ClientLogosSection />
 
-        <LazySection minHeight="600px">
-          <section id="process-section" aria-labelledby="process-heading" className="bg-muted/40">
-            <ProcessSection />
-          </section>
-        </LazySection>
+        <section id="process-section" aria-labelledby="process-heading" className="bg-muted/40">
+          <ProcessSection />
+        </section>
 
-        <LazySection minHeight="500px">
-          <GuaranteeSection />
-        </LazySection>
+        <GuaranteeSection />
 
         <LazySection minHeight="700px">
           <ProjectsSection />
