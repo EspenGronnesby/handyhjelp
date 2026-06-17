@@ -62,8 +62,10 @@
     }
     </script>
     
-    <!-- Preload critical images (WebP, ~75% smaller than JPG) -->
-    <link rel="preload" as="image" href="/src/assets/hero-building-maintenance.webp" type="image/webp" />
+    <!-- Preload responsive hero image — mobile gets 32KB, tablet 75KB, desktop full -->
+    <link rel="preload" as="image" href="/src/assets/hero-building-maintenance-768.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/src/assets/hero-building-maintenance-1280.webp" type="image/webp" media="(min-width: 768px) and (max-width: 1279px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/src/assets/hero-building-maintenance.webp" type="image/webp" media="(min-width: 1280px)" fetchpriority="high" />
   </head>
 
   <body>
