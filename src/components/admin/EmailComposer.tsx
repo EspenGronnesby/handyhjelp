@@ -281,7 +281,7 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
           {recipients.length > 0 && (
             <div className="space-y-2">
               <Label>Valgte mottakere ({recipients.length})</Label>
-              <ScrollArea className="h-[120px] rounded-md border p-2">
+              <div className="md:max-h-[200px] md:overflow-y-auto rounded-md border p-2">
                 <div className="space-y-1">
                   {recipients.map((recipient) => (
                     <div
@@ -320,7 +320,8 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
                     </div>
                   ))}
                 </div>
-              </ScrollArea>
+              </div>
+
             </div>
           )}
         </CardContent>

@@ -240,7 +240,7 @@ const AdminDashboard = () => {
   const currentCategory = categories[activeCategory];
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 pb-24">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
         <p className="text-muted-foreground">Oversikt over alle forespørsler og jobber</p>
@@ -542,7 +542,7 @@ const AdminDashboard = () => {
             ))
           )}
         </TabsContent>
-        <TabsContent value="invoices">
+        <TabsContent value="invoices" forceMount className="data-[state=inactive]:hidden">
           <InvoiceManagement />
         </TabsContent>
 
@@ -558,34 +558,35 @@ const AdminDashboard = () => {
         </TabsContent>
 
         {/* Projects Tab */}
-        <TabsContent value="projects">
+        <TabsContent value="projects" forceMount className="data-[state=inactive]:hidden">
           <ProjectManagement />
         </TabsContent>
 
         {/* Blog Tab */}
-        <TabsContent value="blog">
+        <TabsContent value="blog" forceMount className="data-[state=inactive]:hidden">
           <BlogManagement />
         </TabsContent>
 
         {/* Reviews Tab */}
-        <TabsContent value="reviews">
+        <TabsContent value="reviews" forceMount className="data-[state=inactive]:hidden">
           <ReviewManagement />
         </TabsContent>
 
         {/* Email Templates Tab */}
-        <TabsContent value="templates">
+        <TabsContent value="templates" forceMount className="data-[state=inactive]:hidden">
           <EmailTemplateManager />
         </TabsContent>
 
         {/* Email Composer Tab */}
-        <TabsContent value="compose">
+        <TabsContent value="compose" forceMount className="data-[state=inactive]:hidden">
           <EmailComposer profiles={profiles} />
         </TabsContent>
 
         {/* Email History Tab */}
-        <TabsContent value="history">
+        <TabsContent value="history" forceMount className="data-[state=inactive]:hidden">
           <EmailHistory />
         </TabsContent>
+
 
       </Tabs>
 

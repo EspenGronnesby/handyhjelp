@@ -39,7 +39,7 @@ export function EmailConfirmModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Bekreft utsending</DialogTitle>
         </DialogHeader>
@@ -65,7 +65,7 @@ export function EmailConfirmModal({
               </div>
             </div>
             
-            <ScrollArea className="h-[150px] rounded-md border p-3">
+            <div className="max-h-[200px] overflow-y-auto rounded-md border p-3">
               <div className="space-y-2">
                 {recipients.map((recipient, index) => (
                   <div key={index} className="flex items-center gap-2 text-sm">
@@ -93,7 +93,8 @@ export function EmailConfirmModal({
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
+
           </div>
 
           {/* Email details */}

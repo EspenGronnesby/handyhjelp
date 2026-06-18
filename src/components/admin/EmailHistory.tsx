@@ -142,7 +142,7 @@ export function EmailHistory() {
       ) : (
         <Card>
           <CardContent className="p-0">
-            <ScrollArea className="h-[500px]">
+            <div className="md:max-h-[500px] md:overflow-y-auto overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -242,14 +242,15 @@ export function EmailHistory() {
                   ))}
                 </TableBody>
               </Table>
-            </ScrollArea>
+            </div>
           </CardContent>
         </Card>
+
       )}
 
       {/* Log Detail Modal */}
       <Dialog open={!!selectedLog} onOpenChange={() => setSelectedLog(null)}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>E-postdetaljer</DialogTitle>
           </DialogHeader>

@@ -9,20 +9,16 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import { EditButton } from "@/components/ui/EditButton";
 import heroDefaultImage from "@/assets/hero-building-maintenance.webp";
 import { MotionButton } from "@/components/motion";
-import { useReducedMotion } from "framer-motion";
-import { Spotlight } from "@/components/ui/Spotlight";
+
 
 // Admin-only chunks — never shipped to anonymous visitors
 const HeroImageEditor = lazy(() => import("@/components/admin/HeroImageEditor").then(m => ({ default: m.HeroImageEditor })));
 const HeroSectionEditModal = lazy(() => import("./HeroSectionEditModal").then(m => ({ default: m.HeroSectionEditModal })));
 
 export const HeroSection = () => {
-  const shouldReduceMotion = useReducedMotion();
-
   const {
     heroImage,
     opacity,
-    loading,
     refetch
   } = useHeroImage('home', heroDefaultImage);
   const {
@@ -50,9 +46,9 @@ export const HeroSection = () => {
         id="hero"
         className="min-h-[75svh] md:min-h-screen relative flex items-center pt-20 md:pt-20 section-mobile overflow-hidden"
       >
-        {/* Static background image — no parallax. */}
+        {/* Static background image — vises umiddelbart, ingen fade. */}
         <div
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: `url(${heroImage})`,
             backgroundPosition: 'center 30%'
@@ -63,14 +59,6 @@ export const HeroSection = () => {
           }}></div>
         </div>
 
-        {/* Aceternity Spotlight — subtle static light effect. Skipped when
-            user prefers reduced motion. */}
-        {!shouldReduceMotion && (
-          <Spotlight
-            className="-top-40 left-0 md:left-60 md:-top-20"
-            fill="white"
-          />
-        )}
 
         {isAdmin && (
           <Suspense fallback={null}>
