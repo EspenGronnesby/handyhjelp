@@ -250,7 +250,7 @@ export function EmailHistory() {
 
       {/* Log Detail Modal */}
       <Dialog open={!!selectedLog} onOpenChange={() => setSelectedLog(null)}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>E-postdetaljer</DialogTitle>
           </DialogHeader>
