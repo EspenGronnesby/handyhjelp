@@ -55,6 +55,7 @@ export const useAdminData = (isAdmin: boolean) => {
         .insert({
           quote_id: quote.id,
           user_id: quote.user_id,
+          customer_email: quote.email,
           status: 'in_progress',
           started_at: new Date().toISOString(),
         })

@@ -36,7 +36,8 @@ export interface Job {
   amount: number;
   notes: string | null;
   quote_id: string;
-  user_id: string;
+  user_id: string | null;
+  customer_email?: string | null;
   quotes: {
     name: string;
     email: string;

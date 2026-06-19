@@ -26,6 +26,7 @@ import { JobCard } from '@/components/admin/JobCard';
 import { ServiceAgreementCard } from '@/components/admin/ServiceAgreementCard';
 import { CustomerCard } from '@/components/admin/CustomerCard';
 import { CustomerDetailModal } from '@/components/admin/CustomerDetailModal';
+import { GuestCustomerModal } from '@/components/admin/GuestCustomerModal';
 import { AdminConfirmDialog } from '@/components/admin/AdminConfirmDialog';
 import { ProjectManagement } from '@/components/admin/ProjectManagement';
 import { BlogManagement } from '@/components/admin/BlogManagement';
@@ -80,6 +81,7 @@ const AdminDashboard = () => {
   const [agreementStatusFilter, setAgreementStatusFilter] = useState<AgreementStatusFilter>('new');
   const [singleJobStatusFilter, setSingleJobStatusFilter] = useState<SingleJobStatusFilter>('pending');
   const [showCreateJobModal, setShowCreateJobModal] = useState(false);
+  const [guestCustomer, setGuestCustomer] = useState<{ email: string; name: string } | null>(null);
 
   const {
     profiles,
@@ -349,6 +351,7 @@ const AdminDashboard = () => {
                   onStartJob={(q) => setConfirmDialog({ open: true, type: 'start', item: q })}
                   onCompleteDirectly={(q) => setConfirmDialog({ open: true, type: 'complete_directly', item: q })}
                   onDelete={(q) => setConfirmDialog({ open: true, type: 'delete_quote', item: q })}
+                  onViewHistory={(email, name) => setGuestCustomer({ email, name })}
                 />
               ))}
             </>
@@ -364,6 +367,7 @@ const AdminDashboard = () => {
                   variant="active"
                   actionLoading={actionLoading}
                   onComplete={(j) => setConfirmDialog({ open: true, type: 'complete', item: j })}
+                  onViewHistory={(email, name) => setGuestCustomer({ email, name })}
                 />
               ))}
             </>
@@ -609,6 +613,13 @@ const AdminDashboard = () => {
         profile={selectedCustomer}
         open={!!selectedCustomer}
         onClose={() => setSelectedCustomer(null)}
+      />
+
+      <GuestCustomerModal
+        email={guestCustomer?.email ?? null}
+        name={guestCustomer?.name ?? null}
+        open={!!guestCustomer}
+        onClose={() => setGuestCustomer(null)}
       />
 
       <InvoiceUploadModal

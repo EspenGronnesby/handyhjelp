@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard, Smile, Meh, Frown } from 'lucide-react';
+import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard, Smile, Meh, Frown, History } from 'lucide-react';
 import { Job, STATUS_COLORS, STATUS_LABELS, Invoice, InvoiceRequest, INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -24,6 +24,7 @@ interface JobCardProps {
   onComplete?: (job: Job) => void;
   onDelete?: (job: Job) => void;
   onAddInvoice?: (job: Job) => void;
+  onViewHistory?: (email: string, name: string) => void;
 }
 
 const RATING_CONFIG = {
@@ -32,7 +33,7 @@ const RATING_CONFIG = {
   sad: { icon: Frown, label: 'Misfornøyd', color: 'text-red-500', bg: 'bg-red-50' }
 };
 
-export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onAddInvoice }: JobCardProps) => {
+export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onAddInvoice, onViewHistory }: JobCardProps) => {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [invoiceRequest, setInvoiceRequest] = useState<InvoiceRequest | null>(null);
   const [markingPaid, setMarkingPaid] = useState(false);
@@ -240,18 +241,30 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
           </div>
         )}
         
-        {variant === 'active' && onComplete && (
-          <Button 
-            onClick={() => onComplete(job)}
-            disabled={actionLoading === job.id}
-            className="w-full sm:w-auto"
-          >
-            {actionLoading === job.id ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Fullfører...</>
-            ) : (
-              <><CheckCircle className="mr-2 h-4 w-4" /> Fullfør jobb</>
+        {variant === 'active' && (
+          <div className="flex flex-wrap gap-2">
+            {onComplete && (
+              <Button
+                onClick={() => onComplete(job)}
+                disabled={actionLoading === job.id}
+                className="w-full sm:w-auto"
+              >
+                {actionLoading === job.id ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Fullfører...</>
+                ) : (
+                  <><CheckCircle className="mr-2 h-4 w-4" /> Fullfør jobb</>
+                )}
+              </Button>
             )}
-          </Button>
+            {onViewHistory && !job.user_id && job.quotes?.email && (
+              <Button
+                variant="outline"
+                onClick={() => onViewHistory(job.quotes.email, job.quotes.type === 'business' ? (job.quotes.company_name || job.quotes.name) : job.quotes.name)}
+              >
+                <History className="mr-2 h-4 w-4" /> Se historikk
+              </Button>
+            )}
+          </div>
         )}
         
         {variant === 'completed' && (

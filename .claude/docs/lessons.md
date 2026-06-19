@@ -135,6 +135,26 @@ La til `VITE_HCAPTCHA_SITE_KEY` i `.env`-filen i Lovable og trigget ny build.
 
 ---
 
+### Gjestekundar og NOT NULL constraints
+**Date:** 2026-06-19
+**Category:** Supabase
+**Affected files:** src/hooks/useAdminData.tsx, supabase/migrations/
+
+**Problem:**
+handleStartJob() satte jobs.user_id = quote.user_id direkte. For gjestekundar er quote.user_id null — men jobs.user_id hadde NOT NULL constraint. Jobben ble aldri opprettet, men quote-status ble satt til 'in_progress' like før krasjet. Resultatet var en "stuck" quote som forsvant fra admin-panelet (vises ikke i "pending" og ingen job i "active").
+
+**Solution:**
+`ALTER TABLE public.jobs ALTER COLUMN user_id DROP NOT NULL;`
+Deretter reset stuck quote: `UPDATE public.quotes SET status = 'pending' WHERE id = '...';`
+
+**Prevention:**
+- Nullable foreign keys til profiles skal aldri ha NOT NULL på relaterte tabeller når kildetabellen (quotes) tillater null
+- Test alltid "start jobb"-flyten med et tilbud sendt uten innlogging (gjestekunde)
+- Legg customer_email direkte på jobs-tabellen — gjør gjestejobber søkbare uten JOIN
+- send-job-status-email edge function bør logge til email_logs slik at e-poster til gjester vises i historikken
+
+---
+
 <!--
 ADD NEW LESSONS BELOW
 
