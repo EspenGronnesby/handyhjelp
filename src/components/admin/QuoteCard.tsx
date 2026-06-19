@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { Loader2, Play, CheckCircle, Trash2 } from 'lucide-react';
+import { Loader2, Play, CheckCircle, Trash2, History } from 'lucide-react';
 import { Quote, STATUS_COLORS, STATUS_LABELS } from '@/types/admin';
 
 interface QuoteCardProps {
@@ -12,9 +12,10 @@ interface QuoteCardProps {
   onStartJob: (quote: Quote) => void;
   onCompleteDirectly?: (quote: Quote) => void;
   onDelete?: (quote: Quote) => void;
+  onViewHistory?: (email: string, name: string) => void;
 }
 
-export const QuoteCard = ({ quote, actionLoading, onStartJob, onCompleteDirectly, onDelete }: QuoteCardProps) => {
+export const QuoteCard = ({ quote, actionLoading, onStartJob, onCompleteDirectly, onDelete, onViewHistory }: QuoteCardProps) => {
   return (
     <Card className="interactive-card">
       <CardHeader>
@@ -86,6 +87,15 @@ export const QuoteCard = ({ quote, actionLoading, onStartJob, onCompleteDirectly
               ) : (
                 <><CheckCircle className="mr-2 h-4 w-4" /> Avslutt direkte</>
               )}
+            </Button>
+          )}
+          {onViewHistory && !quote.user_id && (
+            <Button
+              variant="outline"
+              onClick={() => onViewHistory(quote.email, quote.type === 'business' ? (quote.company_name || quote.name) : quote.name)}
+              className="w-full sm:w-auto"
+            >
+              <History className="mr-2 h-4 w-4" /> Se historikk
             </Button>
           )}
           {onDelete && (

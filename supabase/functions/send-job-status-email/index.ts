@@ -400,12 +400,22 @@ const handler = async (req: Request): Promise<Response> => {
       throw error;
     }
 
-    log.info("Job status email sent successfully", { 
-      requestId, 
+    log.info("Job status email sent successfully", {
+      requestId,
       messageId: data?.id,
       recipient: customerEmail,
-      status 
+      status
     });
+
+    await supabase.from('email_logs').insert({
+      recipient_email: customerEmail,
+      recipient_name: customerName,
+      recipient_type: 'customer',
+      subject: subject,
+      status: 'sent',
+      sent_at: new Date().toISOString(),
+      template_name: status === 'started' ? 'job_started' : 'job_completed',
+    }).catch((logErr: Error) => log.warn("Failed to write email_log", { requestId, error: logErr.message }));
 
     return new Response(JSON.stringify({ 
       success: true, 
