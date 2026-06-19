@@ -4,11 +4,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Loader2, Users, Palette, ScrollText, Home, Shield } from 'lucide-react';
+import { Loader2, Users, Palette, ScrollText, Home, Shield, UserSearch } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { RoleManagement } from '@/components/platform/RoleManagement';
 import { ActivityLogViewer } from '@/components/platform/ActivityLogViewer';
 import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
+import { AllCustomersPanel } from '@/components/admin/AllCustomersPanel';
 
 const OwnerDashboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -71,7 +72,7 @@ const OwnerDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto gap-2 bg-transparent">
+          <TabsList className="grid w-full grid-cols-4 h-auto gap-2 bg-transparent">
             <TabsTrigger 
               value="users" 
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -86,12 +87,19 @@ const OwnerDashboard = () => {
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Redigering</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="audit" 
+            <TabsTrigger
+              value="audit"
               className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <ScrollText className="h-4 w-4" />
               <span className="hidden sm:inline">Logg</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="customers"
+              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              <UserSearch className="h-4 w-4" />
+              <span className="hidden sm:inline">Kunder</span>
             </TabsTrigger>
           </TabsList>
 
@@ -105,6 +113,10 @@ const OwnerDashboard = () => {
 
           <TabsContent value="audit">
             <ActivityLogViewer />
+          </TabsContent>
+
+          <TabsContent value="customers">
+            <AllCustomersPanel />
           </TabsContent>
         </Tabs>
       </div>
