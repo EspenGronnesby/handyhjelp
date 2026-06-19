@@ -142,8 +142,8 @@ export function EmailHistory() {
       ) : (
         <Card>
           <CardContent className="p-0">
-            <div className="md:max-h-[500px] md:overflow-y-auto overflow-x-auto">
-              <Table>
+            <div className="w-full overflow-x-auto md:max-h-[500px] md:overflow-y-auto">
+              <Table className="min-w-[1000px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[140px]">Dato</TableHead>
@@ -305,9 +305,9 @@ export function EmailHistory() {
 
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">Innhold</Label>
-                <ScrollArea className="h-[150px] rounded-md border p-3">
+                <div className="h-[150px] overflow-y-auto rounded-md border p-3">
                   <p className="text-sm whitespace-pre-wrap">{selectedLog.content}</p>
-                </ScrollArea>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
