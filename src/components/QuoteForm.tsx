@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,7 +63,7 @@ export const QuoteForm = () => {
   const [createAccount, setCreateAccount] = useState(false);
   const [password, setPassword] = useState('');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HCaptcha>(null);
+  const captchaRef = useRef<TurnstileInstance>(null);
   const [formData, setFormData] = useState<FormData>({
     type: null,
     name: "",
@@ -621,11 +621,11 @@ export const QuoteForm = () => {
             </Button>
           ) : (
             <>
-            {import.meta.env.VITE_HCAPTCHA_SITE_KEY && (
-              <HCaptcha
+            {import.meta.env.VITE_TURNSTILE_SITE_KEY && (
+              <Turnstile
                 ref={captchaRef}
-                sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY}
-                onVerify={(token) => setCaptchaToken(token)}
+                siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                onSuccess={(token) => setCaptchaToken(token)}
                 onExpire={() => setCaptchaToken(null)}
               />
             )}
@@ -633,7 +633,7 @@ export const QuoteForm = () => {
               type="button"
               variant="cta"
               onClick={handleSubmit}
-              disabled={!isStepValid() || isSubmitting || (!captchaToken && !!import.meta.env.VITE_HCAPTCHA_SITE_KEY)}
+              disabled={!isStepValid() || isSubmitting || (!captchaToken && !!import.meta.env.VITE_TURNSTILE_SITE_KEY)}
             >
               {isSubmitting ? (
                 <>
