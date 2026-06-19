@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -181,7 +181,12 @@ const AdminDashboard = () => {
     }
   }, [isAdmin, adminLoading, navigate]);
 
-  if (adminLoading || loading) {
+  const hasLoadedOnceRef = useRef(false);
+  const isInitialLoad = (adminLoading || loading) && !hasLoadedOnceRef.current;
+  if (!isInitialLoad) {
+    hasLoadedOnceRef.current = true;
+  }
+  if (isInitialLoad) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
