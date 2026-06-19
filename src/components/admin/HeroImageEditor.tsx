@@ -109,7 +109,7 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Rediger Hero-bilde</DialogTitle>
           </DialogHeader>
