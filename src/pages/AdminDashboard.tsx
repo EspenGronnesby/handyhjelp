@@ -41,6 +41,7 @@ import { CreateJobModal } from '@/components/admin/CreateJobModal';
 import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
 import { EmailComposer } from '@/components/admin/EmailComposer';
 import { EmailHistory } from '@/components/admin/EmailHistory';
+import { AllCustomersPanel } from '@/components/admin/AllCustomersPanel';
 
 type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'mail';
 
@@ -557,13 +558,7 @@ const AdminDashboard = () => {
 
         {/* Kunder */}
         <TabsContent value="customers" className="space-y-4">
-          {profiles.map((profile) => (
-            <CustomerCard 
-              key={profile.id} 
-              profile={profile} 
-              onClick={() => setSelectedCustomer(profile)}
-            />
-          ))}
+          <AllCustomersPanel />
         </TabsContent>
 
         {/* Projects Tab */}
