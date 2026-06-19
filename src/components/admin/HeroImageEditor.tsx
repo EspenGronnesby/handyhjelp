@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useAdmin } from '@/hooks/useAdmin';
 import { useEditMode } from '@/contexts/EditModeContext';
 
 interface HeroImageEditorProps {
@@ -16,8 +15,7 @@ interface HeroImageEditorProps {
 }
 
 export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroImageEditorProps) => {
-  const { isAdmin } = useAdmin();
-  const { editMode } = useEditMode();
+  const { isAdmin, editMode } = useEditMode();
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -111,7 +109,7 @@ export const HeroImageEditor = ({ page, currentImageUrl, onImageUpdate }: HeroIm
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Rediger Hero-bilde</DialogTitle>
           </DialogHeader>
