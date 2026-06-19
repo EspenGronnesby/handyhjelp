@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,7 +63,7 @@ export const QuoteForm = () => {
   const [createAccount, setCreateAccount] = useState(false);
   const [password, setPassword] = useState('');
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HCaptcha>(null);
+  const captchaRef = useRef<TurnstileInstance>(null);
   const [formData, setFormData] = useState<FormData>({
     type: null,
     name: "",
@@ -157,10 +157,28 @@ export const QuoteForm = () => {
     e?.preventDefault();
     
     if (step !== 3 || !validateCurrentStep()) return;
-    
+
     setIsSubmitting(true);
 
     try {
+      // Server-side Turnstile-verifisering
+      if ("0x4AAAAAADn4g81NT3QFVWfT" && captchaToken) {
+        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-turnstile', {
+          body: { token: captchaToken },
+        });
+        if (verifyError || !verifyData?.success) {
+          toast({
+            title: "Verifisering feilet",
+            description: "Kunne ikke bekrefte at du er et menneske. Prøv igjen.",
+            variant: "destructive",
+          });
+          captchaRef.current?.reset();
+          setCaptchaToken(null);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       let newUserId = user?.id || null;
       
       // Opprett bruker hvis avkrysset og ikke innlogget
@@ -621,11 +639,11 @@ export const QuoteForm = () => {
             </Button>
           ) : (
             <>
-            {import.meta.env.VITE_HCAPTCHA_SITE_KEY && (
-              <HCaptcha
+            {"0x4AAAAAADn4g81NT3QFVWfT" && (
+              <Turnstile
                 ref={captchaRef}
-                sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY}
-                onVerify={(token) => setCaptchaToken(token)}
+                siteKey={"0x4AAAAAADn4g81NT3QFVWfT"}
+                onSuccess={(token) => setCaptchaToken(token)}
                 onExpire={() => setCaptchaToken(null)}
               />
             )}
@@ -633,7 +651,7 @@ export const QuoteForm = () => {
               type="button"
               variant="cta"
               onClick={handleSubmit}
-              disabled={!isStepValid() || isSubmitting || (!captchaToken && !!import.meta.env.VITE_HCAPTCHA_SITE_KEY)}
+              disabled={!isStepValid() || isSubmitting || (!captchaToken && !!"0x4AAAAAADn4g81NT3QFVWfT")}
             >
               {isSubmitting ? (
                 <>

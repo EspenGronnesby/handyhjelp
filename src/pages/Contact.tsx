@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
@@ -40,7 +40,7 @@ const Contact = () => {
     message: ""
   });
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const captchaRef = useRef<HCaptcha>(null);
+  const captchaRef = useRef<TurnstileInstance>(null);
   const {
     submitToWeb3Forms,
     sendConfirmationEmail
@@ -88,7 +88,7 @@ const Contact = () => {
         message: ""
       });
       setCaptchaToken(null);
-      captchaRef.current?.resetCaptcha();
+      captchaRef.current?.reset();
     });
   };
   return <div className="min-h-screen">
@@ -163,15 +163,15 @@ const Contact = () => {
                     <p className="text-sm text-muted-foreground">
                       <span className="text-destructive">*</span> Obligatoriske felt
                     </p>
-                    {import.meta.env.VITE_HCAPTCHA_SITE_KEY && (
-                      <HCaptcha
+                    {"0x4AAAAAADn4g81NT3QFVWfT" && (
+                      <Turnstile
                         ref={captchaRef}
-                        sitekey={import.meta.env.VITE_HCAPTCHA_SITE_KEY}
-                        onVerify={(token) => setCaptchaToken(token)}
+                        siteKey={"0x4AAAAAADn4g81NT3QFVWfT"}
+                        onSuccess={(token) => setCaptchaToken(token)}
                         onExpire={() => setCaptchaToken(null)}
                       />
                     )}
-                    <Button type="submit" className="w-full" disabled={isSubmitting || (!captchaToken && !!import.meta.env.VITE_HCAPTCHA_SITE_KEY)}>
+                    <Button type="submit" className="w-full" disabled={isSubmitting || (!captchaToken && !!"0x4AAAAAADn4g81NT3QFVWfT")}>
                       {isSubmitting ? <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Sender...
