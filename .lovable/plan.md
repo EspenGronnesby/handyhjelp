@@ -1,21 +1,24 @@
+Jeg fant at feilen oppstår rett etter trykk på kamera/hero-redigering, og appen navigerer videre mot `/dashboard` før den ender i ErrorBoundary. Den mest sannsynlige årsaken er at hero-redigering bruker en egen `useAdmin()`-sjekk som kun godkjenner rollen `admin`, mens resten av edit/admin-systemet også bruker `platform_owner`. Det kan gi feil tilstand/navigering for eierkonto og utløse fallbacken.
+
 Plan:
 
-1. Gjør adminnavigasjon rolig uten full refresh
-- Endre `AdminDashboard` slik at fullskjerm-loader kun vises på aller første lasting, ikke når data/hooker oppdateres etter at man trykker på Mail, Økonomi, Innhold eller underfaner.
-- La URL-oppdatering for kategori/fane skje uten at brukeropplevelsen føles som reload.
-- Behold innholdet montert der det allerede er `forceMount`, men unngå at skjulte faner skaper unødvendige synlige loading-states.
+1. Fiks rollelogikken for hero-redigering
+   - Endre `HeroImageEditor` slik at den bruker eksisterende `useEditMode()`-verdiene (`isAdmin`, `editMode`) i stedet for å starte en ny `useAdmin()`-sjekk.
+   - Da behandles eier/admin likt over hele siden, og komponenten slipper ekstra auth-kall når hero-knappen vises.
 
-2. Stabiliser admin-data
-- Oppdatere `useAdminData` slik at `loading` ikke slår tilbake til full loading ved senere refresh.
-- Eventuelle manuelle oppdateringer etter handlinger skal oppdatere data i bakgrunnen uten å blanke dashboardet.
+2. Stopp unødvendig dashboard-redirect/flimmer
+   - Rydd bort dobbelt auth-redirect i `Dashboard.tsx`.
+   - Sørg for at dashboard ikke viser full loader igjen bare fordi rolle/badge-kall oppdaterer seg i bakgrunnen.
 
-3. Fiks mailhistorikk på telefon
-- Bytte tabellen i `EmailHistory` til en mobiltilpasset horisontal scroll-container med fast minimumsbredde på tabellen, slik at man faktisk kan dra sideveis og se Status/handlinger.
-- Fjerne vertikal scroll-lås på mobil slik at siden fortsatt scroller naturlig opp/ned.
-- Gjøre status og visningsknapp tilgjengelig på mobil uten at de havner utenfor en låst Radix/ScrollArea-container.
+3. Forbedre feilsikkerhet rundt hero-redigering
+   - Gjør hero-editor-dialogen tryggere på mobil ved å gi dialogen maksimal høyde og naturlig scroll.
+   - Hvis opplasting eller rolledata feiler, skal det gi toast/ingen handling, ikke krasje hele siden.
 
-4. Fiks detaljmodal for mailhistorikk
-- Bytte innvendig `ScrollArea` i e-postdetaljer til vanlig `overflow-y-auto`, så modal og innhold scroller bedre på telefon.
+4. Fiks mail-historikk sideveis scroll endelig
+   - Juster `EmailHistory` slik at wrapperen faktisk tillater horisontal touch-scroll på mobil (`overflow-x-auto`, `touch-pan-x`, stabil min-bredde på tabellen).
+   - Unngå at en vertikal scroll-container fanger sveipene når brukeren prøver å dra sideveis.
 
 5. Verifisering
-- Sjekke dashboard-tabber og mailhistorikk i mobil viewport etter endringene: Mail/andre valg skal ikke gi full spinner/refresh, og mailhistorikk skal kunne scrolles horisontalt.
+   - Sjekk at kamera/hero-redigering ikke fører til “Noe gikk galt”.
+   - Sjekk at admin-faner ikke gir full refresh/fallback.
+   - Sjekk at e-posthistorikk kan scrolles sideveis på telefonstørrelse.
