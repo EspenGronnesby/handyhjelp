@@ -163,15 +163,15 @@ const Contact = () => {
                     <p className="text-sm text-muted-foreground">
                       <span className="text-destructive">*</span> Obligatoriske felt
                     </p>
-                    {import.meta.env.VITE_TURNSTILE_SITE_KEY && (
+                    {"0x4AAAAAADn4g81NT3QFVWfT" && (
                       <Turnstile
                         ref={captchaRef}
-                        siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                        siteKey={"0x4AAAAAADn4g81NT3QFVWfT"}
                         onSuccess={(token) => setCaptchaToken(token)}
                         onExpire={() => setCaptchaToken(null)}
                       />
                     )}
-                    <Button type="submit" className="w-full" disabled={isSubmitting || (!captchaToken && !!import.meta.env.VITE_TURNSTILE_SITE_KEY)}>
+                    <Button type="submit" className="w-full" disabled={isSubmitting || (!captchaToken && !!"0x4AAAAAADn4g81NT3QFVWfT")}>
                       {isSubmitting ? <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Sender...
