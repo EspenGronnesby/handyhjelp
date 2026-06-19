@@ -157,10 +157,28 @@ export const QuoteForm = () => {
     e?.preventDefault();
     
     if (step !== 3 || !validateCurrentStep()) return;
-    
+
     setIsSubmitting(true);
 
     try {
+      // Server-side Turnstile-verifisering
+      if (import.meta.env.VITE_TURNSTILE_SITE_KEY && captchaToken) {
+        const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-turnstile', {
+          body: { token: captchaToken },
+        });
+        if (verifyError || !verifyData?.success) {
+          toast({
+            title: "Verifisering feilet",
+            description: "Kunne ikke bekrefte at du er et menneske. Prøv igjen.",
+            variant: "destructive",
+          });
+          captchaRef.current?.reset();
+          setCaptchaToken(null);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       let newUserId = user?.id || null;
       
       // Opprett bruker hvis avkrysset og ikke innlogget
