@@ -424,18 +424,18 @@ const DashboardActivity = () => {
             </div>
             <div className="flex items-end justify-around mt-4">
               <div className="text-center">
-                <div className="text-4xl font-bold">{stats.totalQuotes}</div>
-                <div className="text-white/60 text-xs mt-1">Forespørsler</div>
+                <div className="text-5xl font-bold">{stats.totalQuotes}</div>
+                <div className="text-white/60 text-sm mt-1">Forespørsler</div>
               </div>
-              <div className="h-10 w-px bg-white/20 mb-4" />
+              <div className="h-12 w-px bg-white/20 mb-5" />
               <div className="text-center">
-                <div className="text-4xl font-bold">{stats.activeJobs}</div>
-                <div className="text-white/60 text-xs mt-1">Aktive</div>
+                <div className="text-5xl font-bold">{stats.activeJobs}</div>
+                <div className="text-white/60 text-sm mt-1">Aktive</div>
               </div>
-              <div className="h-10 w-px bg-white/20 mb-4" />
+              <div className="h-12 w-px bg-white/20 mb-5" />
               <div className="text-center">
-                <div className="text-4xl font-bold">{stats.completedJobs}</div>
-                <div className="text-white/60 text-xs mt-1">Fullførte</div>
+                <div className="text-5xl font-bold">{stats.completedJobs}</div>
+                <div className="text-white/60 text-sm mt-1">Fullførte</div>
               </div>
             </div>
           </div>
@@ -447,8 +447,8 @@ const DashboardActivity = () => {
               <CheckCircle className="h-8 w-8 text-white/25" strokeWidth={1.5} />
             </div>
             <div>
-              <div className="text-5xl font-bold">{stats.completedJobs}</div>
-              <p className="text-xs mt-1 text-white/60">Ferdigstilte prosjekter</p>
+              <div className="text-6xl font-bold">{stats.completedJobs}</div>
+              <p className="text-sm mt-1 text-white/60">Ferdigstilte prosjekter</p>
             </div>
           </div>
         </div>
