@@ -368,9 +368,11 @@ const DashboardActivity = () => {
   const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
   return <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Velkommen til din profil</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent mb-1">
+          Oversikt
+        </h1>
         <p className="text-muted-foreground">
-          Her kan du holde oversikt over alle dine tilbud, jobber og varslinger
+          Hold oversikt over alle dine tilbud, jobber og varsler
         </p>
       </div>
 
@@ -378,40 +380,36 @@ const DashboardActivity = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map(card => {
         const Icon = card.icon;
-        return <Card key={card.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                <Icon className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{card.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
-              </CardContent>
-            </Card>;
+        return <div key={card.title} className="card-professional card-hover-lift p-5">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Icon className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold">{card.value}</div>
+              <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
+            </div>;
       })}
       </div>
 
       {/* Kom i gang */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Kom i gang</CardTitle>
-          <CardDescription>
-            Her er noen ting du kan gjøre
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
+      <div className="card-professional p-6">
+        <h2 className="text-base font-semibold mb-1">Kom i gang</h2>
+        <p className="text-sm text-muted-foreground mb-4">Her er noen ting du kan gjøre</p>
+        <div className="flex flex-col sm:flex-row gap-3">
           <Link to="/tilbud">
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full sm:w-auto justify-start">
               Send inn en ny tilbudsforespørsel
             </Button>
           </Link>
           <Link to="/dashboard/profile">
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full sm:w-auto justify-start">
               Oppdater din profil
             </Button>
           </Link>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Mine forespørsler */}
       {!isEmpty && <>
@@ -420,26 +418,26 @@ const DashboardActivity = () => {
           </div>
 
       <Tabs defaultValue="quotes" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
-          <TabsTrigger value="quotes" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/60 rounded-xl p-1 h-auto">
+          <TabsTrigger value="quotes" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Forespørsel</span> ({quotes.length})
+            <span className="hidden sm:inline">Forespørsler</span> ({quotes.length})
           </TabsTrigger>
-          <TabsTrigger value="agreements" className="flex items-center gap-2">
+          <TabsTrigger value="agreements" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <CalendarCheck className="h-4 w-4" />
             <span className="hidden sm:inline">Avtaler</span> ({activeAgreements.length})
           </TabsTrigger>
-          <TabsTrigger value="jobs" className="flex items-center gap-2">
+          <TabsTrigger value="jobs" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Briefcase className="h-4 w-4" />
             <span className="hidden sm:inline">Fullført</span> ({completedJobs.length})
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="quotes" className="space-y-4">
-          {quotes.length === 0 ? <Card className="p-6 text-center">
+          {quotes.length === 0 ? <div className="card-professional p-6 text-center">
               <FileText className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground">Ingen forespørsler ennå</p>
-            </Card> : quotes.map(quote => <Card key={quote.id} className="border-l-4 border-l-amber-500">
+            </div> : quotes.map(quote => <Card key={quote.id} className="border-l-4 border-l-amber-500 card-hover-lift">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -490,13 +488,13 @@ const DashboardActivity = () => {
         </TabsContent>
 
         <TabsContent value="agreements" className="space-y-4">
-          {activeAgreements.length === 0 ? <Card className="p-6 text-center">
+          {activeAgreements.length === 0 ? <div className="card-professional p-6 text-center">
               <CalendarCheck className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground">
                 Ingen aktive avtaler ennå.
                 <a href="/fast-avtale" className="text-primary hover:underline ml-1">Forespør en fast avtale</a>
               </p>
-            </Card> : activeAgreements.map(agreement => <Card key={agreement.id} className="border-l-4 border-l-primary">
+            </div> : activeAgreements.map(agreement => <Card key={agreement.id} className="border-l-4 border-l-primary card-hover-lift">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
@@ -551,17 +549,17 @@ const DashboardActivity = () => {
         </TabsContent>
 
         <TabsContent value="jobs" className="space-y-4">
-          {completedJobs.length === 0 ? <Card className="p-6 text-center">
+          {completedJobs.length === 0 ? <div className="card-professional p-6 text-center">
               <Briefcase className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
               <p className="text-muted-foreground">
                 Ingen fullførte oppdrag ennå. Når jobbene dine er ferdige, vises de her.
               </p>
-            </Card> : <>
+            </div> : <>
               {paginatedCompletedJobs.map(job => {
                 const invoice = getInvoiceForJob(job.id);
                 const invoiceRequest = getInvoiceRequestForJob(job.id);
                 const hasRequestedInvoice = invoiceRequest && invoiceRequest.status === 'pending';
-                return <Card key={job.id} className="border-l-4 border-l-green-500">
+                return <Card key={job.id} className="border-l-4 border-l-green-500 card-hover-lift">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">

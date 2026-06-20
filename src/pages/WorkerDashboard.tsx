@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Camera, FileText, Home, Plus } from 'lucide-react';
+import { Loader2, Camera, FileText, Home, Plus, Hammer } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { WorkerProjectForm } from '@/components/worker/WorkerProjectForm';
 import { WorkerBlogForm } from '@/components/worker/WorkerBlogForm';
@@ -97,17 +97,24 @@ const WorkerDashboard = () => {
   return (
     <div>
       <div>
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold">Mine innleveringer</h1>
-          <p className="text-muted-foreground">Send inn prosjekter og blogginnlegg til godkjenning</p>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-primary/10">
+            <Hammer className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+              Mine innleveringer
+            </h1>
+            <p className="text-sm text-muted-foreground">Send inn prosjekter og blogginnlegg til godkjenning</p>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <TabsList className="grid w-full sm:w-auto grid-cols-2 h-auto gap-2 bg-transparent">
-              <TabsTrigger 
-                value="projects" 
-                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            <TabsList className="grid w-full sm:w-auto grid-cols-2 h-auto gap-1 bg-muted/60 rounded-xl p-1">
+              <TabsTrigger
+                value="projects"
+                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <Camera className="h-4 w-4" />
                 Prosjekter
@@ -117,9 +124,9 @@ const WorkerDashboard = () => {
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger 
-                value="blog" 
-                className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              <TabsTrigger
+                value="blog"
+                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <FileText className="h-4 w-4" />
                 Blogginnlegg

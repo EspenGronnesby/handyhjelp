@@ -190,28 +190,32 @@ const DashboardProfile = () => {
     );
   }
 
+  const initials = profile.full_name
+    ? profile.full_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+    : profile.email[0]?.toUpperCase() ?? '?';
+
   return (
     <div className="space-y-6">
-      <div>
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-3xl font-bold">Min profil</h1>
-          <div className="flex gap-2">
+      {/* Page header */}
+      <div className="flex items-center gap-4">
+        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-md">
+          {initials}
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+            Min profil
+          </h1>
+          <div className="flex flex-wrap gap-2 mt-1">
             {profile.customer_type && (
               <Badge variant="outline" className="flex items-center gap-1">
                 {profile.customer_type === 'private' ? (
-                  <>
-                    <Home className="h-3 w-3" />
-                    <span>Privatkunde</span>
-                  </>
+                  <><Home className="h-3 w-3" /><span>Privatkunde</span></>
                 ) : (
-                  <>
-                    <Building2 className="h-3 w-3" />
-                    <span>Bedriftskunde</span>
-                  </>
+                  <><Building2 className="h-3 w-3" /><span>Bedriftskunde</span></>
                 )}
               </Badge>
             )}
-            {roles.length > 0 && roles.map((role) => {
+            {roles.map((role) => {
               const Icon = roleIcons[role] || Shield;
               return (
                 <Badge key={role} variant="default" className="flex items-center gap-1">
@@ -222,153 +226,133 @@ const DashboardProfile = () => {
             })}
           </div>
         </div>
-        <p className="text-muted-foreground">
-          Oppdater dine personlige opplysninger
-        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Profilinformasjon</CardTitle>
-          <CardDescription>
+      <div className="card-professional p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">Profilinformasjon</h2>
+          <p className="text-sm text-muted-foreground">
             Denne informasjonen blir brukt når du sender inn tilbudsforespørsler
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="full_name">Fullt navn</Label>
-            <Input
-              id="full_name"
-              value={profile.full_name}
-              onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">E-post</Label>
-            <Input
-              id="email"
-              type="email"
-              value={profile.email}
-              disabled
-              className="bg-muted"
-            />
-            <p className="text-xs text-muted-foreground">
-              E-postadressen kan ikke endres
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Telefonnummer</Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="8 siffer"
-              value={profile.phone}
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^0-9]/g, '');
-                setProfile({ ...profile, phone: value });
-              }}
-              maxLength={8}
-              inputMode="numeric"
-              pattern="[0-9]*"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="address">Adresse</Label>
-            <Input
-              id="address"
-              value={profile.address}
-              onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-            />
-          </div>
-          {profile.customer_type === 'business' && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="company_name">Bedriftsnavn</Label>
-                <Input
-                  id="company_name"
-                  value={profile.company_name || ''}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="org_number">Organisasjonsnummer</Label>
-                <Input
-                  id="org_number"
-                  value={profile.org_number || ''}
-                  disabled
-                  className="bg-muted"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Organisasjonsnummer kan ikke endres
-                </p>
-              </div>
-            </>
-          )}
-          <Button onClick={handleSave} disabled={saving}>
-            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Lagre endringer
-          </Button>
-        </CardContent>
-      </Card>
+          </p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="full_name">Fullt navn</Label>
+          <Input
+            id="full_name"
+            value={profile.full_name}
+            onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">E-post</Label>
+          <Input
+            id="email"
+            type="email"
+            value={profile.email}
+            disabled
+            className="bg-muted"
+          />
+          <p className="text-xs text-muted-foreground">E-postadressen kan ikke endres</p>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="phone">Telefonnummer</Label>
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="8 siffer"
+            value={profile.phone}
+            onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9]/g, '');
+              setProfile({ ...profile, phone: value });
+            }}
+            maxLength={8}
+            inputMode="numeric"
+            pattern="[0-9]*"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="address">Adresse</Label>
+          <Input
+            id="address"
+            value={profile.address}
+            onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+          />
+        </div>
+        {profile.customer_type === 'business' && (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="company_name">Bedriftsnavn</Label>
+              <Input id="company_name" value={profile.company_name || ''} disabled className="bg-muted" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org_number">Organisasjonsnummer</Label>
+              <Input id="org_number" value={profile.org_number || ''} disabled className="bg-muted" />
+              <p className="text-xs text-muted-foreground">Organisasjonsnummer kan ikke endres</p>
+            </div>
+          </>
+        )}
+        <Button onClick={handleSave} disabled={saving}>
+          {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Lagre endringer
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5" />
-            Endre passord
-          </CardTitle>
-          <CardDescription>
-            Oppdater passordet ditt for økt sikkerhet
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="new_password">Nytt passord</Label>
-            <Input
-              id="new_password"
-              type="password"
-              placeholder="Minst 6 tegn"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              minLength={6}
-            />
+      <div className="card-professional p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Lock className="h-5 w-5 text-primary" />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirm_password">Bekreft nytt passord</Label>
-            <Input
-              id="confirm_password"
-              type="password"
-              placeholder="Skriv passordet på nytt"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              minLength={6}
-            />
+          <div>
+            <h2 className="text-lg font-semibold">Endre passord</h2>
+            <p className="text-sm text-muted-foreground">Oppdater passordet ditt for økt sikkerhet</p>
           </div>
-          <Button onClick={handlePasswordChange} disabled={changingPassword || !newPassword || !confirmPassword}>
-            {changingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Endre passord
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="new_password">Nytt passord</Label>
+          <Input
+            id="new_password"
+            type="password"
+            placeholder="Minst 6 tegn"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            minLength={6}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirm_password">Bekreft nytt passord</Label>
+          <Input
+            id="confirm_password"
+            type="password"
+            placeholder="Skriv passordet på nytt"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            minLength={6}
+          />
+        </div>
+        <Button onClick={handlePasswordChange} disabled={changingPassword || !newPassword || !confirmPassword}>
+          {changingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Endre passord
+        </Button>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Utseende</CardTitle>
-          <CardDescription>
-            Velg mellom lys og mørk modus
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ThemeToggle />
-        </CardContent>
-      </Card>
+      <div className="card-professional p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <UserIcon className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold">Utseende</h2>
+            <p className="text-sm text-muted-foreground">Velg mellom lys og mørk modus</p>
+          </div>
+        </div>
+        <ThemeToggle />
+      </div>
 
-      <div className="pt-6 border-t">
-        <Button 
-          onClick={handleSignOut} 
-          variant="outline" 
-          className="w-full flex items-center justify-center gap-2"
+      <div className="card-professional p-6">
+        <Button
+          onClick={handleSignOut}
+          variant="outline"
+          className="w-full flex items-center justify-center gap-2 border-destructive/30 text-destructive hover:bg-destructive/5"
         >
           <LogOut className="h-4 w-4" />
           Logg ut
