@@ -229,7 +229,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="content">
-              <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${contactPerson}</strong>,</p>
+              <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${escapeHtml(contactPerson)}</strong>,</p>
               
               <p style="font-size: 16px; line-height: 1.6;">
                 Takk for at dere vurderer HandyHjelp som deres faste servicepartner!
@@ -299,7 +299,7 @@ const handler = async (req: Request): Promise<Response> => {
         html: `
           <h2>Feil ved sending av avtalebekreftelse</h2>
           <p><strong>Request ID:</strong> ${requestId}</p>
-          <p><strong>Kontaktperson:</strong> ${contactPerson} (${email})</p>
+          <p><strong>Kontaktperson:</strong> ${escapeHtml(contactPerson)} (${escapeHtml(email)})</p>
           <p><strong>Feilmelding:</strong> ${error instanceof Error ? error.message : 'Ukjent feil'}</p>
           <p><strong>⚠️ Vennligst kontakt kunden manuelt.</strong></p>
         `,
