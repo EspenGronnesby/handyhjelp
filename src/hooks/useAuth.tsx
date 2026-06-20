@@ -51,9 +51,6 @@ export const useAuth = () => {
       }
     });
 
-    // Welcome bonus is now awarded automatically via database trigger
-    // See: award_welcome_bonus_trigger() function
-
     return { data, error };
   };
 

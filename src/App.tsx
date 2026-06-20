@@ -44,7 +44,7 @@ const ReviewSubmit = lazy(() => import("./pages/ReviewSubmit"));
 const Personvern = lazy(() => import("./pages/Personvern"));
 const Cookies = lazy(() => import("./pages/Cookies"));
 const Vilkaar = lazy(() => import("./pages/Vilkaar"));
-const DashboardLoyalty = lazy(() => import("./pages/DashboardLoyalty"));
+
 const Feedback = lazy(() => import("./pages/Feedback"));
 
 const queryClient = new QueryClient({
@@ -115,7 +115,7 @@ const AppRoutes = () => {
           <Route index element={<DashboardActivity />} />
           <Route path="profile" element={<DashboardProfile />} />
           <Route path="notifications" element={<DashboardNotifications />} />
-          <Route path="loyalty" element={<DashboardLoyalty />} />
+          
           <Route path="admin" element={
             <ErrorBoundary>
               <AdminDashboard />

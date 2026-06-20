@@ -6,7 +6,7 @@ export const NOTIFICATION_TYPES = {
   JOB_UPDATE: 'job_update',
   REVIEW_REQUEST: 'review_request',
   GENERAL: 'general',
-  LOYALTY: 'loyalty',
+  
   CONTENT_SUBMISSION: 'content_submission',
   CONTENT_APPROVED: 'content_approved',
   CONTENT_REJECTED: 'content_rejected',
