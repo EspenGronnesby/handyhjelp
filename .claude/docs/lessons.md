@@ -188,3 +188,35 @@ ADD NEW LESSONS BELOW
 
 Use the format above. Keep it short and concrete.
 -->
+
+---
+
+### Flex-element uten min-w-0 gjør hele siden for bred
+**Date:** 2026-06-20
+**Category:** React
+**Affected files:** src/pages/Dashboard.tsx
+
+**Problem:**
+`<main className="flex-1">` i et `flex-row`-layout hadde standardverdien `min-width: auto`. Det betyr at flex-elementet aldri kan krympe under sin "min-content bredde" — den minste bredden innholdet trenger. En tabell med mange kolonner i AdminDashboard satte en høy min-content bredde som boblet opp til `main`, som da ble bredere enn viewport og dytta alt innhold til høyre.
+
+**Solution:**
+Legg til `min-w-0` på flex-elementet: `<main className="flex-1 min-w-0">`. Dette lar elementet krympe til 0 og lar scrollbare barn (som tabeller med `overflow-auto`) håndtere overflyt internt.
+
+**Prevention:**
+Alltid legg `min-w-0` på `flex-1`-elementer som inneholder scrollbart innhold (tabeller, kode, lange tekster). Dette er CSS best practice for flex-layouts.
+
+---
+
+### Supabase storage: file_url er en sti, ikke en URL
+**Date:** 2026-06-20
+**Category:** Supabase
+**Affected files:** src/components/admin/CustomerDetailModal.tsx
+
+**Problem:**
+`file_url` i `invoices`-tabellen er en intern storage-sti (f.eks. `/invoices/filnavn.pdf`), ikke en nettadresse. Bruk av den direkte som `<a href>` ga "Bucket not found" 404 fra Supabase storage.
+
+**Solution:**
+Bruk `supabase.storage.from('invoices').download(filePath)` der `filePath = file_url.split('/invoices/')[1]`. Lag en blob-URL med `URL.createObjectURL(data)` og trigger nedlasting programmatisk.
+
+**Prevention:**
+Aldri bruk `file_url` fra databasen direkte som href. Alltid bruk `storage.download()` + `createObjectURL`, eller generer en signed URL med `storage.createSignedUrl()`.

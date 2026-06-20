@@ -67,7 +67,11 @@ const roleIcons: Record<string, LucideIcon> = {
   user: User,
 };
 
-export const RoleManagement = () => {
+interface RoleManagementProps {
+  canManageRoles?: boolean;
+}
+
+export const RoleManagement = ({ canManageRoles = false }: RoleManagementProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [searchEmail, setSearchEmail] = useState('');
@@ -193,7 +197,16 @@ export const RoleManagement = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Brukeradministrasjon</h2>
-        <p className="text-muted-foreground">Se registrerte brukere og administrer roller</p>
+        <p className="text-muted-foreground">
+          {canManageRoles
+            ? 'Se registrerte brukere og administrer roller'
+            : 'Se registrerte brukere og deres roller'}
+        </p>
+        {!canManageRoles && (
+          <p className="text-sm text-muted-foreground mt-1 bg-muted/60 rounded-lg px-3 py-2 inline-block">
+            Du kan se, men ikke endre roller.
+          </p>
+        )}
       </div>
 
       {/* Search */}
@@ -274,18 +287,20 @@ export const RoleManagement = () => {
                   userRoles.map((role) => {
                     const Icon = roleIcons[role.role] || User;
                     return (
-                      <Badge 
-                        key={role.id} 
+                      <Badge
+                        key={role.id}
                         className={`${roleColors[role.role] || 'bg-gray-500'} flex items-center gap-1`}
                       >
                         <Icon className="h-3 w-3" />
                         {roleLabels[role.role] || role.role}
-                        <button
-                          onClick={() => setDeleteDialog({ open: true, roleId: role.id, roleName: roleLabels[role.role] || role.role })}
-                          className="ml-1 hover:bg-white/20 rounded-full p-0.5"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                        {canManageRoles && (
+                          <button
+                            onClick={() => setDeleteDialog({ open: true, roleId: role.id, roleName: roleLabels[role.role] || role.role })}
+                            className="ml-1 hover:bg-white/20 rounded-full p-0.5"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        )}
                       </Badge>
                     );
                   })
@@ -295,30 +310,32 @@ export const RoleManagement = () => {
               </div>
             </div>
 
-            {/* Add Role */}
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Legg til rolle</Label>
-              <div className="flex gap-2">
-                <Select value={newRole} onValueChange={setNewRole}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Velg rolle..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrator</SelectItem>
-                    <SelectItem value="worker">Medarbeider</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button 
-                  onClick={handleAddRole} 
-                  disabled={!newRole || addRole.isPending}
-                >
-                  {addRole.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                </Button>
+            {/* Add Role — kun for owner */}
+            {canManageRoles && (
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Legg til rolle</Label>
+                <div className="flex gap-2">
+                  <Select value={newRole} onValueChange={setNewRole}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Velg rolle..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Administrator</SelectItem>
+                      <SelectItem value="worker">Medarbeider</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    onClick={handleAddRole}
+                    disabled={!newRole || addRole.isPending}
+                  >
+                    {addRole.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Administrator: Full driftstilgang. Medarbeider: Kan sende inn innhold til godkjenning.
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Administrator: Full driftstilgang. Medarbeider: Kan sende inn innhold til godkjenning.
-              </p>
-            </div>
+            )}
           </CardContent>
         </Card>
       )}
