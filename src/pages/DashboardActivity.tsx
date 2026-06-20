@@ -506,8 +506,8 @@ const DashboardActivity = () => {
 
         <TabsContent value="quotes" className="space-y-4">
           {quotes.length === 0 ? <div className="card-professional p-10 text-center">
-              <div className="mx-auto w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
-                <FileText className="h-7 w-7 text-amber-500" />
+              <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 shadow-md">
+                <FileText className="h-7 w-7 text-white drop-shadow" />
               </div>
               <p className="font-semibold mb-1">Ingen forespørsler ennå</p>
               <p className="text-sm text-muted-foreground">Send inn din første forespørsel for å komme i gang</p>
@@ -515,8 +515,8 @@ const DashboardActivity = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-amber-500/10">
-                        <FileText className="h-5 w-5 text-amber-600" />
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 shadow-sm shrink-0">
+                        <FileText className="h-4 w-4 text-white drop-shadow" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -564,8 +564,8 @@ const DashboardActivity = () => {
 
         <TabsContent value="agreements" className="space-y-4">
           {activeAgreements.length === 0 ? <div className="card-professional p-10 text-center">
-              <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <CalendarCheck className="h-7 w-7 text-primary" />
+              <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 shadow-md">
+                <CalendarCheck className="h-7 w-7 text-white drop-shadow" />
               </div>
               <p className="font-semibold mb-1">Ingen aktive avtaler ennå</p>
               <p className="text-sm text-muted-foreground">
@@ -575,8 +575,8 @@ const DashboardActivity = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <CalendarCheck className="h-5 w-5 text-primary" />
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 shadow-sm shrink-0">
+                        <CalendarCheck className="h-4 w-4 text-white drop-shadow" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -628,8 +628,8 @@ const DashboardActivity = () => {
 
         <TabsContent value="jobs" className="space-y-4">
           {completedJobs.length === 0 ? <div className="card-professional p-10 text-center">
-              <div className="mx-auto w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-                <Briefcase className="h-7 w-7 text-green-500" />
+              <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-md">
+                <Briefcase className="h-7 w-7 text-white drop-shadow" />
               </div>
               <p className="font-semibold mb-1">Ingen fullførte oppdrag ennå</p>
               <p className="text-sm text-muted-foreground">Når jobbene dine er ferdige, vises de her</p>
@@ -642,8 +642,8 @@ const DashboardActivity = () => {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-green-500/10">
-                          <Briefcase className="h-5 w-5 text-green-600" />
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-sm shrink-0">
+                          <Briefcase className="h-4 w-4 text-white drop-shadow" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">

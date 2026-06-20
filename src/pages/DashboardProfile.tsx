@@ -299,8 +299,8 @@ const DashboardProfile = () => {
 
       <div className="card-professional p-6 space-y-4">
         <div className="flex items-center gap-2">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Lock className="h-5 w-5 text-primary" />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 shadow-sm">
+            <Lock className="h-4 w-4 text-white drop-shadow" />
           </div>
           <div>
             <h2 className="text-lg font-semibold">Endre passord</h2>
@@ -337,8 +337,8 @@ const DashboardProfile = () => {
 
       <div className="card-professional p-6">
         <div className="flex items-center gap-2 mb-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <UserIcon className="h-5 w-5 text-primary" />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 shadow-sm">
+            <UserIcon className="h-4 w-4 text-white drop-shadow" />
           </div>
           <div>
             <h2 className="text-lg font-semibold">Utseende</h2>
