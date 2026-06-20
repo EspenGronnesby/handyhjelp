@@ -140,21 +140,21 @@ export function EmailHistory() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="overflow-hidden">
           <CardContent className="p-0">
-            <div className="w-full overflow-x-auto md:max-h-[500px] md:overflow-y-auto [-webkit-overflow-scrolling:touch]" style={{ touchAction: 'pan-x pan-y' }}>
-              <Table className="min-w-[1000px]">
+            <div className="w-full overflow-x-auto max-w-full md:max-h-[500px] md:overflow-y-auto [-webkit-overflow-scrolling:touch]" style={{ touchAction: 'pan-x pan-y' }}>
+              <Table className="min-w-[600px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[140px]">Dato</TableHead>
+                    <TableHead className="w-[100px]">Dato</TableHead>
                     <TableHead>Mottaker</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead className="hidden sm:table-cell">Type</TableHead>
                     <TableHead>Emne</TableHead>
-                    <TableHead>Mal</TableHead>
-                    <TableHead className="w-[50px] text-center">FB</TableHead>
-                    <TableHead>Avsender</TableHead>
+                    <TableHead className="hidden md:table-cell">Mal</TableHead>
+                    <TableHead className="hidden md:table-cell w-[50px] text-center">FB</TableHead>
+                    <TableHead className="hidden lg:table-cell">Avsender</TableHead>
                     <TableHead className="w-[80px]">Status</TableHead>
-                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead className="hidden sm:table-cell w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -175,7 +175,7 @@ export function EmailHistory() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         {log.recipient_type === 'customer' ? (
                           <Badge variant="secondary" className="text-xs gap-1">
                             <User className="h-3 w-3" />
@@ -193,19 +193,19 @@ export function EmailHistory() {
                           {log.subject}
                         </span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden md:table-cell">
                         <span className="text-sm text-muted-foreground">
                           {log.template_name || '-'}
                         </span>
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="hidden md:table-cell text-center">
                         {log.included_feedback_button ? (
                           <MessageSquare className="h-4 w-4 mx-auto text-primary" />
                         ) : (
                           <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden lg:table-cell">
                         <div className="text-sm">
                           <div className="truncate max-w-[100px]">{log.sender_name || '-'}</div>
                           {log.sender_role && (
@@ -228,12 +228,12 @@ export function EmailHistory() {
                           </Badge>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="ghost" 
+                      <TableCell className="hidden sm:table-cell">
+                        <Button
+                          variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => setSelectedLog(log)}
+                          onClick={(e) => { e.stopPropagation(); setSelectedLog(log); }}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
