@@ -360,16 +360,6 @@ const DashboardActivity = () => {
 
   const isOnlyWorker = isWorker && !isAdmin && !isOwner;
 
-  if (loading || statsLoading) {
-    return <div className="space-y-6">
-        <PageHeaderSkeleton />
-        <StatsSkeleton />
-        <CardGridSkeleton count={3} />
-      </div>;
-  }
-
-  const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
-
   const recentActivity = useMemo(() => {
     const events: { date: string; label: string; gradient: string }[] = [
       ...quotes.map(q => ({ date: q.created_at, label: 'Forespørsel sendt', gradient: 'from-amber-500 to-orange-500' })),
@@ -379,6 +369,16 @@ const DashboardActivity = () => {
     ];
     return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
   }, [quotes, jobs, invoices]);
+
+  if (loading || statsLoading) {
+    return <div className="space-y-6">
+        <PageHeaderSkeleton />
+        <StatsSkeleton />
+        <CardGridSkeleton count={3} />
+      </div>;
+  }
+
+  const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
 
   return <div className="space-y-6">
       <div>
