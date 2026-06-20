@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, Bell, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useRole } from '@/hooks/useRole';
+import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import {
   Pagination,
   PaginationContent,
@@ -147,6 +149,8 @@ const DashboardActivity = () => {
   const [requestingInvoice, setRequestingInvoice] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [completedJobsPage, setCompletedJobsPage] = useState(1);
+  const { isWorker, isAdmin, isOwner } = useRole();
+  const { badges } = useNavigationBadges();
   const fetchData = useCallback(async () => {
     const {
       data: {
@@ -354,27 +358,7 @@ const DashboardActivity = () => {
     [agreements]
   );
 
-  const statCards = [{
-    title: 'Totalt forespørsler',
-    value: stats.totalQuotes,
-    icon: FileText,
-    description: 'Alle dine forespørsler'
-  }, {
-    title: 'Aktive jobber',
-    value: stats.activeJobs,
-    icon: Briefcase,
-    description: 'Jobber under arbeid'
-  }, {
-    title: 'Fullførte jobber',
-    value: stats.completedJobs,
-    icon: CheckCircle,
-    description: 'Ferdigstilte prosjekter'
-  }, {
-    title: 'Uleste varsler',
-    value: stats.unreadNotifications,
-    icon: Bell,
-    description: 'Nye oppdateringer'
-  }];
+  const isOnlyWorker = isWorker && !isAdmin && !isOwner;
 
   if (loading || statsLoading) {
     return <div className="space-y-6">
@@ -388,47 +372,115 @@ const DashboardActivity = () => {
   return <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-1">Oversikt</h1>
-        <p className="text-muted-foreground">Hold oversikt over alle dine tilbud, jobber og varsler</p>
+        <p className="text-muted-foreground">
+          {isOnlyWorker ? 'Dine innleveringer og status' : 'Hold oversikt over dine tilbud og jobber'}
+        </p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {statCards.map((card, index) => {
-        const Icon = card.icon;
-        const isHero = index === 0;
-        return <div
-              key={card.title}
-              className={`card-hover-lift p-5 rounded-xl ${isHero ? 'bg-gradient-to-br from-secondary to-secondary/80 text-white border border-white/10' : 'card-professional'}`}
-            >
+      {/* Stats — arbeider-spesifikke */}
+      {isOnlyWorker && (
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Link to="/dashboard/worker">
+            <div className="card-professional card-hover-lift p-5 rounded-xl cursor-pointer">
               <div className="flex items-center justify-between mb-3">
-                <p className={`text-sm font-medium ${isHero ? 'text-white/70' : 'text-muted-foreground'}`}>{card.title}</p>
-                <div className={`p-2 rounded-lg ${isHero ? 'bg-white/10' : 'bg-primary/10'}`}>
-                  <Icon className={`h-4 w-4 ${isHero ? 'text-white' : 'text-primary'}`} />
+                <p className="text-sm font-medium text-muted-foreground">Venter godkjenning</p>
+                <div className="p-2 rounded-lg bg-amber-500/10">
+                  <ClipboardList className="h-4 w-4 text-amber-500" />
                 </div>
               </div>
-              <div className="text-3xl font-bold">{card.value}</div>
-              <p className={`text-xs mt-1 ${isHero ? 'text-white/50' : 'text-muted-foreground'}`}>{card.description}</p>
-            </div>;
-      })}
-      </div>
-
-      {/* Kom i gang */}
-      <div className="card-professional p-6">
-        <h2 className="text-base font-semibold mb-1">Kom i gang</h2>
-        <p className="text-sm text-muted-foreground mb-4">Her er noen ting du kan gjøre</p>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link to="/tilbud">
-            <Button variant="outline" className="w-full sm:w-auto justify-start">
-              Send inn en ny tilbudsforespørsel
-            </Button>
+              <div className="text-3xl font-bold">{badges.workerDetails.pendingProjects + badges.workerDetails.pendingBlogs}</div>
+              <p className="text-xs mt-1 text-muted-foreground">Prosjekter og innlegg til vurdering</p>
+            </div>
           </Link>
-          <Link to="/dashboard/profile">
-            <Button variant="outline" className="w-full sm:w-auto justify-start">
-              Oppdater din profil
-            </Button>
+          <Link to="/dashboard/worker">
+            <div className="card-professional card-hover-lift p-5 rounded-xl cursor-pointer">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-muted-foreground">Publiserte prosjekter</p>
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Camera className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold">—</div>
+              <p className="text-xs mt-1 text-muted-foreground">Se Mine innleveringer for detaljer</p>
+            </div>
+          </Link>
+          <Link to="/dashboard/worker">
+            <div className="card-professional card-hover-lift p-5 rounded-xl cursor-pointer">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium text-muted-foreground">Avviste innleveringer</p>
+                <div className="p-2 rounded-lg bg-destructive/10">
+                  <Upload className="h-4 w-4 text-destructive" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold">{badges.workerDetails.rejectedProjects + badges.workerDetails.rejectedBlogs}</div>
+              <p className="text-xs mt-1 text-muted-foreground">Må rettes og sendes inn på nytt</p>
+            </div>
           </Link>
         </div>
-      </div>
+      )}
+
+      {/* Stats — kunde-spesifikke */}
+      {!isOnlyWorker && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Mine oppdrag — kompakt samle-kort */}
+          <div className="bg-gradient-to-br from-secondary to-secondary/80 text-white border border-white/10 card-hover-lift p-5 rounded-xl">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm font-medium text-white/70">Mine oppdrag</p>
+              <div className="p-2 rounded-lg bg-white/10">
+                <Briefcase className="h-4 w-4 text-white" />
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-sm">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{stats.totalQuotes}</div>
+                <div className="text-white/50 text-xs mt-0.5">Forespørsler</div>
+              </div>
+              <div className="h-8 w-px bg-white/20" />
+              <div className="text-center">
+                <div className="text-2xl font-bold">{stats.activeJobs}</div>
+                <div className="text-white/50 text-xs mt-0.5">Aktive</div>
+              </div>
+              <div className="h-8 w-px bg-white/20" />
+              <div className="text-center">
+                <div className="text-2xl font-bold">{stats.completedJobs}</div>
+                <div className="text-white/50 text-xs mt-0.5">Fullførte</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Fullførte jobber */}
+          <div className="card-professional card-hover-lift p-5 rounded-xl">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-muted-foreground">Fullførte jobber</p>
+              <div className="p-2 rounded-lg bg-primary/10">
+                <CheckCircle className="h-4 w-4 text-primary" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold">{stats.completedJobs}</div>
+            <p className="text-xs mt-1 text-muted-foreground">Ferdigstilte prosjekter</p>
+          </div>
+        </div>
+      )}
+
+      {/* Kom i gang — vises bare når brukeren ikke har noen data ennå */}
+      {isEmpty && !isOnlyWorker && (
+        <div className="card-professional p-6">
+          <h2 className="text-base font-semibold mb-1">Kom i gang</h2>
+          <p className="text-sm text-muted-foreground mb-4">Her er noen ting du kan gjøre</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link to="/tilbud">
+              <Button variant="outline" className="w-full sm:w-auto justify-start">
+                Send inn en ny tilbudsforespørsel
+              </Button>
+            </Link>
+            <Link to="/dashboard/profile">
+              <Button variant="outline" className="w-full sm:w-auto justify-start">
+                Oppdater din profil
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Mine forespørsler */}
       {!isEmpty && <>

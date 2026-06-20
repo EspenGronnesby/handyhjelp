@@ -1,10 +1,14 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useAdmin } from '@/hooks/useAdmin';
+import { useRole } from '@/hooks/useRole';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Briefcase, CreditCard, FileText, Package, ChevronLeft, ChevronRight, Plus, Mail, Shield } from 'lucide-react';
+import { Loader2, Briefcase, CreditCard, FileText, Package, ChevronLeft, ChevronRight, Plus, Mail, Shield, Users, Palette, ScrollText } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
+import { RoleManagement } from '@/components/platform/RoleManagement';
+import { ActivityLogViewer } from '@/components/platform/ActivityLogViewer';
+import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter, SingleJobStatusFilter, SINGLE_JOB_STATUS_LABELS } from '@/types/admin';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,7 +47,7 @@ import { EmailComposer } from '@/components/admin/EmailComposer';
 import { EmailHistory } from '@/components/admin/EmailHistory';
 import { AllCustomersPanel } from '@/components/admin/AllCustomersPanel';
 
-type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'mail';
+type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'mail' | 'brukere' | 'redigering' | 'logg';
 
 const VALID_CATEGORIES: CategoryKey[] = ['oppdrag', 'okonomi', 'innhold', 'mail'];
 
@@ -52,10 +56,14 @@ const CATEGORY_DEFAULT_TABS: Record<CategoryKey, string> = {
   okonomi: 'invoices',
   innhold: 'projects',
   mail: 'templates',
+  brukere: 'brukere',
+  redigering: 'redigering',
+  logg: 'logg',
 };
 
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
+  const { isOwner } = useRole();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { badges } = useNavigationBadges();
@@ -123,7 +131,7 @@ const AdminDashboard = () => {
   };
 
   // Category configuration with realtime badge counts
-  const categories = {
+  const baseCategories = {
     oppdrag: {
       label: 'Oppdrag',
       icon: Briefcase,
@@ -163,6 +171,29 @@ const AdminDashboard = () => {
       totalBadge: 0,
     },
   };
+
+  const ownerCategories = isOwner ? {
+    brukere: {
+      label: 'Brukere',
+      icon: Users,
+      tabs: [{ key: 'brukere', label: 'Rollestyring', count: null, badge: 0 }],
+      totalBadge: 0,
+    },
+    redigering: {
+      label: 'Redigering',
+      icon: Palette,
+      tabs: [{ key: 'redigering', label: 'Nettstedsinnhold', count: null, badge: 0 }],
+      totalBadge: 0,
+    },
+    logg: {
+      label: 'Logg',
+      icon: ScrollText,
+      tabs: [{ key: 'logg', label: 'Aktivitetslogg', count: null, badge: 0 }],
+      totalBadge: 0,
+    },
+  } : {};
+
+  const categories = { ...baseCategories, ...ownerCategories };
 
   // Set default tab when category changes and update URL
   const handleCategoryChange = useCallback((category: CategoryKey) => {
@@ -248,7 +279,7 @@ const AdminDashboard = () => {
   const currentCategory = categories[activeCategory];
 
   return (
-    <div className="container mx-auto py-8 px-4 pb-24">
+    <div className="container mx-auto py-8 px-4 pb-24 md:pb-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2.5 rounded-xl bg-primary/10">
@@ -598,6 +629,26 @@ const AdminDashboard = () => {
           <EmailHistory />
         </TabsContent>
 
+        {/* Eier: Brukere / Rollestyring */}
+        {isOwner && (
+          <TabsContent value="brukere" forceMount className="data-[state=inactive]:hidden">
+            <RoleManagement />
+          </TabsContent>
+        )}
+
+        {/* Eier: Redigering av nettstedsinnhold */}
+        {isOwner && (
+          <TabsContent value="redigering" forceMount className="data-[state=inactive]:hidden">
+            <SiteEditingPanel />
+          </TabsContent>
+        )}
+
+        {/* Eier: Aktivitetslogg */}
+        {isOwner && (
+          <TabsContent value="logg" forceMount className="data-[state=inactive]:hidden">
+            <ActivityLogViewer />
+          </TabsContent>
+        )}
 
       </Tabs>
 
