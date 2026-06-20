@@ -61,6 +61,16 @@ const CATEGORY_DEFAULT_TABS: Record<CategoryKey, string> = {
   logg: 'logg',
 };
 
+const CATEGORY_GRADIENTS: Partial<Record<CategoryKey, string>> = {
+  oppdrag:  'from-cyan-500 via-blue-500 to-indigo-600',
+  okonomi:  'from-emerald-500 via-teal-500 to-cyan-600',
+  innhold:  'from-fuchsia-500 via-purple-500 to-indigo-600',
+  mail:     'from-amber-500 via-orange-500 to-rose-600',
+  brukere:  'from-rose-500 via-pink-500 to-fuchsia-600',
+  redigering:'from-yellow-500 via-amber-500 to-orange-600',
+  logg:     'from-slate-500 via-gray-500 to-zinc-600',
+};
+
 const AdminDashboard = () => {
   const { isAdmin, loading: adminLoading } = useAdmin();
   const { isOwner } = useRole();
@@ -284,8 +294,8 @@ const AdminDashboard = () => {
     <div className="container mx-auto py-8 px-4 pb-24 md:pb-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="p-2.5 rounded-xl bg-primary/10">
-            <Shield className="h-6 w-6 text-primary" />
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 shadow-sm">
+            <Shield className="h-5 w-5 text-white drop-shadow" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">
             Admin Dashboard
@@ -318,7 +328,13 @@ const AdminDashboard = () => {
                   : "border-border bg-card hover:border-primary/50 hover:bg-muted/50"
               )}
             >
-              <Icon className="h-6 w-6" />
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm transition-transform duration-200",
+                isActive ? "scale-110" : "",
+                CATEGORY_GRADIENTS[key] || 'from-cyan-500 via-blue-500 to-indigo-600'
+              )}>
+                <Icon className="h-5 w-5 text-white drop-shadow" />
+              </div>
               <span className="font-medium text-sm">{category.label}</span>
               {category.totalBadge > 0 && (
                 <Badge variant="destructive" className="text-xs">
