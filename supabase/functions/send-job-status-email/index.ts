@@ -255,7 +255,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="content">
-              <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+              <p style="font-size: 18px;">Hei <strong>${escapeHtml(customerName)}</strong>,</p>
               
               <p style="font-size: 16px; line-height: 1.6;">
                 Gode nyheter! Vi har startet arbeidet med ditt oppdrag:
@@ -263,7 +263,7 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div class="job-description">
                 <p style="font-size: 16px; font-weight: bold; margin: 0;">
-                  "${jobDescription}"
+                  "${escapeHtml(jobDescription)}"
                 </p>
               </div>
               
