@@ -50,22 +50,27 @@ export const GuaranteeSection = () => {
             title={displayHeading}
           />
 
-          <div className="glass-card p-6 md:p-8 !border-success !border-2">
-            <p className="text-lg md:text-xl text-foreground leading-relaxed mb-6 font-medium">
-              "{displayPromise}"
-            </p>
+          <div className="glass-card p-6 md:p-8">
+            <div className="relative pl-5 md:pl-6 mb-6">
+              <div className="absolute left-0 top-0 bottom-0 w-1 rounded-full bg-gradient-to-b from-emerald-400 to-teal-500" />
+              <p className="text-lg md:text-xl text-foreground leading-relaxed font-medium italic">
+                "{displayPromise}"
+              </p>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-5 pt-2 border-t border-white/10">
               {[
                 { icon: ShieldCheck, text: displayPoint1 },
                 { icon: BadgeCheck, text: displayPoint2 },
                 { icon: Sparkles, text: displayPoint3 },
               ].map(({ icon: Icon, text }, idx) => (
-                <div key={idx} className="flex items-start gap-2">
-                  <Icon
-                    className="h-5 w-5 text-success shrink-0 mt-0.5"
-                    strokeWidth={2}
-                  />
+                <div key={idx} className="flex items-center gap-3 pt-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-900/30">
+                    <Icon
+                      className="h-5 w-5 text-white"
+                      strokeWidth={2}
+                    />
+                  </div>
                   <span className="text-sm md:text-base text-foreground font-medium">
                     {text}
                   </span>
