@@ -155,6 +155,34 @@ Deretter reset stuck quote: `UPDATE public.quotes SET status = 'pending' WHERE i
 
 ---
 
+### REVOKE på has_role() brekker RLS for anonyme brukere
+**Date:** 2026-06-20
+**Category:** Supabase
+**Affected files:** supabase/migrations/, alle tabeller med has_role() i SELECT-policies
+
+**Problem:**
+Sikkerhets-migrering kjørte `REVOKE EXECUTE ON FUNCTION public.has_role(uuid, app_role) FROM PUBLIC, anon`.
+Dette brøt prosjektvisningen (og potensielt andre sider) for alle ikke-innloggede besøkende.
+
+Årsak: PostgreSQL evaluerer **alle** permissive SELECT-policies med OR. Selv om `projects`-tabellen
+har en enkel policy `status = 'published'` (trenger ikke has_role), finnes det også en
+"Admins can view all projects"-policy som kaller `has_role()`. Når anon mangler EXECUTE,
+krasjer hele spørringen — selv om den enkle policyen ville returnert true.
+
+**Solution:**
+```sql
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, app_role) TO anon;
+```
+
+Dette er trygt: `anon` kaller `has_role(auth.uid(), 'admin')` → `auth.uid()` er null for
+uinnloggede → funksjonen returnerer alltid false. Ingen sikkerhetsrisiko.
+
+**Prevention:**
+- Når du REVOKEr EXECUTE på hjelpefunksjoner som brukes i RLS-policies, **alltid** behold
+  GRANT til `anon` — ellers brekker du tilgang for alle besøkende
+- Etter sikkerhets-migreringer: test alltid `/prosjekter` og forsiden uten å være innlogget
+- Regel: `has_role()` må alltid ha EXECUTE for både `authenticated` og `anon`
+
 <!--
 ADD NEW LESSONS BELOW
 
