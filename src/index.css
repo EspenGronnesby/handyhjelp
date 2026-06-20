@@ -1096,3 +1096,8 @@ html, body {
 .blue .glass-card {
   border-color: hsl(var(--primary) / 0.2);
 }
+
+/* iOS safe-area support for bottom navigation (notch/home indicator) */
+.safe-area-inset-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.5rem);
+}

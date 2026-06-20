@@ -110,9 +110,9 @@ const DashboardNotifications = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-primary/10">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-3 flex-1">
+          <div className="p-2.5 rounded-xl bg-primary/10 shrink-0">
             <Bell className="h-6 w-6 text-primary" />
           </div>
           <div>
@@ -124,13 +124,13 @@ const DashboardNotifications = () => {
             </p>
           </div>
           {unreadCount > 0 && (
-            <span className="bg-destructive text-destructive-foreground text-xs font-semibold rounded-full px-2.5 py-0.5">
+            <span className="bg-destructive text-destructive-foreground text-xs font-semibold rounded-full px-2.5 py-0.5 shrink-0">
               {unreadCount}
             </span>
           )}
         </div>
         {unreadCount > 0 && (
-          <Button onClick={markAllAsRead} variant="outline" size="sm">
+          <Button onClick={markAllAsRead} variant="outline" size="sm" className="w-full sm:w-auto">
             Marker alle som lest
           </Button>
         )}
@@ -149,8 +149,11 @@ const DashboardNotifications = () => {
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              className={`card-professional card-hover-lift p-4 flex items-start gap-4 ${
-                !notification.read ? 'border-l-4 border-l-primary bg-primary/5' : ''
+              onClick={() => !notification.read && markAsRead(notification.id)}
+              className={`card-professional p-4 flex items-start gap-4 transition-all duration-200 ${
+                !notification.read
+                  ? 'border-l-4 border-l-primary bg-primary/5 cursor-pointer active:bg-primary/10'
+                  : ''
               }`}
             >
               <div className={`p-2 rounded-lg shrink-0 ${getIconBg(notification.type)}`}>
@@ -167,14 +170,9 @@ const DashboardNotifications = () => {
                 </p>
               </div>
               {!notification.read && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => markAsRead(notification.id)}
-                  className="shrink-0 text-xs"
-                >
-                  Lest
-                </Button>
+                <div className="shrink-0 text-xs text-muted-foreground/50 self-center">
+                  Trykk
+                </div>
               )}
             </div>
           ))}

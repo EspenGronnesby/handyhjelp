@@ -114,7 +114,7 @@ export const SubmissionList = ({ type, userId, onEditProject, onEditBlog, onDele
 
         return (
           <Card key={item.id} className="overflow-hidden">
-            <div className="relative h-40">
+            <div className="relative h-32 md:h-40">
               <img 
                 src={imageUrl} 
                 alt={item.title}
@@ -146,9 +146,9 @@ export const SubmissionList = ({ type, userId, onEditProject, onEditBlog, onDele
 
               {(item.status === 'rejected' || item.status === 'draft') && (
                 <div className="flex gap-2 mt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="default"
                     className="flex-1"
                     onClick={() => {
                       if (type === 'projects' && onEditProject) {
@@ -161,9 +161,9 @@ export const SubmissionList = ({ type, userId, onEditProject, onEditBlog, onDele
                     <Edit className="h-4 w-4 mr-1" />
                     Rediger
                   </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm" 
+                  <Button
+                    variant="destructive"
+                    size="default"
                     className="flex-1"
                     onClick={() => {
                       if (type === 'projects' && onDeleteProject) {

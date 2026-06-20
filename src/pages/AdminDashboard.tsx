@@ -279,7 +279,7 @@ const AdminDashboard = () => {
   const currentCategory = categories[activeCategory];
 
   return (
-    <div className="container mx-auto py-8 px-4 pb-24">
+    <div className="container mx-auto py-8 px-4 pb-24 md:pb-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2.5 rounded-xl bg-primary/10">
