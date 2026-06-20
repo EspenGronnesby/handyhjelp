@@ -102,7 +102,7 @@ const WorkerDashboard = () => {
             <Hammer className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Mine innleveringer
             </h1>
             <p className="text-sm text-muted-foreground">Send inn prosjekter og blogginnlegg til godkjenning</p>

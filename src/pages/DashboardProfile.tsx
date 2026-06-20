@@ -202,7 +202,7 @@ const DashboardProfile = () => {
           {initials}
         </div>
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-foreground">
             Min profil
           </h1>
           <div className="flex flex-wrap gap-2 mt-1">

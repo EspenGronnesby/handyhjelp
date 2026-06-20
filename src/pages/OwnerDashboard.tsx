@@ -49,7 +49,7 @@ const OwnerDashboard = () => {
             <Shield className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               Eier-panel
             </h1>
             <p className="text-muted-foreground text-sm">Administrer brukere, roller og globale innstillinger</p>

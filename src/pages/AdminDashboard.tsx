@@ -254,7 +254,7 @@ const AdminDashboard = () => {
           <div className="p-2.5 rounded-xl bg-primary/10">
             <Shield className="h-6 w-6 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-foreground">
             Admin Dashboard
           </h1>
         </div>
