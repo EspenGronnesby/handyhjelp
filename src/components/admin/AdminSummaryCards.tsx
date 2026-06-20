@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, FileText, Briefcase } from 'lucide-react';
 
 interface AdminSummaryCardsProps {
   totalCustomers: number;
@@ -7,32 +7,29 @@ interface AdminSummaryCardsProps {
 }
 
 export const AdminSummaryCards = ({ totalCustomers, pendingQuotes, activeJobs }: AdminSummaryCardsProps) => {
+  const stats = [
+    { title: 'Totalt kunder', value: totalCustomers, icon: Users, desc: 'Registrerte brukere' },
+    { title: 'Nye forespørsler', value: pendingQuotes, icon: FileText, desc: 'Venter på behandling' },
+    { title: 'Aktive jobber', value: activeJobs, icon: Briefcase, desc: 'Under arbeid' },
+  ];
+
   return (
     <div className="grid gap-4 md:grid-cols-3 mb-8">
-      <Card className="interactive-card">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Totalt kunder</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{totalCustomers}</div>
-        </CardContent>
-      </Card>
-      <Card className="interactive-card">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Nye forespørsler</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{pendingQuotes}</div>
-        </CardContent>
-      </Card>
-      <Card className="interactive-card">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Aktive jobber</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{activeJobs}</div>
-        </CardContent>
-      </Card>
+      {stats.map((stat) => {
+        const Icon = stat.icon;
+        return (
+          <div key={stat.title} className="card-professional card-hover-lift p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Icon className="h-4 w-4 text-primary" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold">{stat.value}</div>
+            <p className="text-xs text-muted-foreground mt-1">{stat.desc}</p>
+          </div>
+        );
+      })}
     </div>
   );
 };

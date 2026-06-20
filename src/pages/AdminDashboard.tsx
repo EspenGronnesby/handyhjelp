@@ -3,7 +3,7 @@ import { useAdmin } from '@/hooks/useAdmin';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Briefcase, CreditCard, FileText, Package, ChevronLeft, ChevronRight, Plus, Mail } from 'lucide-react';
+import { Loader2, Briefcase, CreditCard, FileText, Package, ChevronLeft, ChevronRight, Plus, Mail, Shield } from 'lucide-react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Quote, Job, Profile, ServiceAgreement, AgreementStatusFilter, SingleJobStatusFilter, SINGLE_JOB_STATUS_LABELS } from '@/types/admin';
 import { Badge } from '@/components/ui/badge';
@@ -250,7 +250,14 @@ const AdminDashboard = () => {
   return (
     <div className="container mx-auto py-8 px-4 pb-24">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="p-2.5 rounded-xl bg-primary/10">
+            <Shield className="h-6 w-6 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+            Admin Dashboard
+          </h1>
+        </div>
         <p className="text-muted-foreground">Oversikt over alle forespørsler og jobber</p>
       </div>
 
@@ -272,9 +279,9 @@ const AdminDashboard = () => {
               key={key}
               onClick={() => handleCategoryChange(key)}
               className={cn(
-                "flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all",
-                isActive 
-                  ? "border-primary bg-primary/10 text-primary" 
+                "flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all duration-200",
+                isActive
+                  ? "border-primary bg-primary/10 text-primary shadow-sm"
                   : "border-border bg-card hover:border-primary/50 hover:bg-muted/50"
               )}
             >
@@ -292,12 +299,12 @@ const AdminDashboard = () => {
 
       {/* Sub-category Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
-        <TabsList className="h-auto flex-wrap gap-2 p-2 bg-muted/50">
+        <TabsList className="h-auto flex-wrap gap-1 p-1 bg-muted/60 rounded-xl">
           {currentCategory.tabs.map((tab) => (
-            <TabsTrigger 
-              key={tab.key} 
-              value={tab.key} 
-              className="text-sm whitespace-nowrap gap-2"
+            <TabsTrigger
+              key={tab.key}
+              value={tab.key}
+              className="text-sm whitespace-nowrap gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               {tab.label} {tab.count !== null && `(${tab.count})`}
               {tab.badge > 0 && (
