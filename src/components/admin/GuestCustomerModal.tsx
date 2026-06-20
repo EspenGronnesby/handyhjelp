@@ -87,17 +87,17 @@ export const GuestCustomerModal = ({ email, name, open, onClose }: GuestCustomer
           </div>
         ) : (
           <Tabs defaultValue="quotes" className="mt-4">
-            <TabsList className="grid grid-cols-4 w-full">
-              <TabsTrigger value="quotes" className="text-xs sm:text-sm">
+            <TabsList className="grid grid-cols-4 w-full gap-1 p-1 bg-muted/60 rounded-xl h-auto">
+              <TabsTrigger value="quotes" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 Forespørsler ({quotes.length})
               </TabsTrigger>
-              <TabsTrigger value="active" className="text-xs sm:text-sm">
+              <TabsTrigger value="active" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 Aktive ({activeJobs.length})
               </TabsTrigger>
-              <TabsTrigger value="completed" className="text-xs sm:text-sm">
+              <TabsTrigger value="completed" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 Fullført ({completedJobs.length})
               </TabsTrigger>
-              <TabsTrigger value="emails" className="text-xs sm:text-sm">
+              <TabsTrigger value="emails" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 E-poster ({emailLogs.length})
               </TabsTrigger>
             </TabsList>
