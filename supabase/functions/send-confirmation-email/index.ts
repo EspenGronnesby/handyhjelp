@@ -1,5 +1,15 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 const FUNCTION_NAME = "send-confirmation-email";
 
@@ -142,6 +152,28 @@ const handler = async (req: Request): Promise<Response> => {
   if (req.method !== "POST") {
     log.warn("Invalid request method", { requestId, method: req.method });
     return errorResponse("Method not allowed", 405);
+  }
+
+  // --- AuthN: require a valid Supabase-issued JWT (anon key acceptable
+  // since this is called from the public quote form via supabase-js) ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return errorResponse("Unauthorized", 401);
+  }
+  try {
+    const jwt = authHeader.replace("Bearer ", "");
+    const authClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+    );
+    // getUser validates the JWT signature against Supabase; anon tokens
+    // return null user without error, which we accept here.
+    const { error: authErr } = await authClient.auth.getUser(jwt);
+    if (authErr && authErr.message?.toLowerCase().includes("invalid")) {
+      return errorResponse("Unauthorized", 401);
+    }
+  } catch {
+    return errorResponse("Unauthorized", 401);
   }
 
   let requestData: ConfirmationEmailRequest;
