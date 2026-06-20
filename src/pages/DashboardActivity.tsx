@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, Bell, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, Bell, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
@@ -398,19 +398,14 @@ const DashboardActivity = () => {
 
   return <div className="space-y-6">
       {/* Velkomstkort */}
-      <div className="glass-card p-5 flex items-center justify-between gap-4">
-        <div>
-          <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{todayStr}</p>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
-            {greeting}, {displayName}!
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Hold oversikt over alle dine tilbud, jobber og varsler
-          </p>
-        </div>
-        <div className="p-3 rounded-xl bg-primary/10 shrink-0 hidden sm:block">
-          <Sparkles className="h-7 w-7 text-primary" />
-        </div>
+      <div className="card-professional p-5">
+        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">{todayStr}</p>
+        <h1 className="text-2xl font-bold text-foreground">
+          {greeting}, {displayName}!
+        </h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Hold oversikt over alle dine tilbud, jobber og varsler
+        </p>
       </div>
 
       {/* Stats Cards */}
