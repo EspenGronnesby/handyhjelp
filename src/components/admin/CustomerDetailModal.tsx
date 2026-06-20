@@ -186,20 +186,20 @@ export const CustomerDetailModal = ({ profile, open, onClose }: CustomerDetailMo
         ) : (
           <Tabs defaultValue="profil" className="mt-4">
             <TabsList className="h-auto flex-wrap gap-1 p-1 bg-muted/60 rounded-xl">
-              <TabsTrigger value="profil" className="text-xs sm:text-sm rounded-lg">Profil</TabsTrigger>
-              <TabsTrigger value="foresporsler" className="text-xs sm:text-sm rounded-lg">
+              <TabsTrigger value="profil" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">Profil</TabsTrigger>
+              <TabsTrigger value="foresporsler" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 Forespørsler ({quotes.length})
               </TabsTrigger>
-              <TabsTrigger value="jobber" className="text-xs sm:text-sm rounded-lg">
+              <TabsTrigger value="jobber" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 Jobber ({jobs.length})
               </TabsTrigger>
-              <TabsTrigger value="avtaler" className="text-xs sm:text-sm rounded-lg">
+              <TabsTrigger value="avtaler" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 Avtaler ({agreements.length})
               </TabsTrigger>
-              <TabsTrigger value="epost" className="text-xs sm:text-sm rounded-lg">
+              <TabsTrigger value="epost" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 E-post ({emails.length})
               </TabsTrigger>
-              <TabsTrigger value="fakturaer" className="text-xs sm:text-sm rounded-lg">
+              <TabsTrigger value="fakturaer" className="text-xs sm:text-sm rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
                 Fakturaer ({invoices.length})
               </TabsTrigger>
             </TabsList>

@@ -563,16 +563,16 @@ const ReviewManagement = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="pending" className="gap-2">
+        <TabsList className="gap-1 p-1 bg-muted/60 rounded-xl h-auto">
+          <TabsTrigger value="pending" className="gap-2 rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
             <Clock className="h-4 w-4" />
             Venter ({pendingCount})
           </TabsTrigger>
-          <TabsTrigger value="approved" className="gap-2">
+          <TabsTrigger value="approved" className="gap-2 rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
             <CheckCircle className="h-4 w-4" />
             Godkjent ({approvedCount})
           </TabsTrigger>
-          <TabsTrigger value="rejected" className="gap-2">
+          <TabsTrigger value="rejected" className="gap-2 rounded-lg border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
             <XCircle className="h-4 w-4" />
             Avvist ({rejectedCount})
           </TabsTrigger>
