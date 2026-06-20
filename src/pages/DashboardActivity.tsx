@@ -369,6 +369,17 @@ const DashboardActivity = () => {
   }
 
   const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
+
+  const recentActivity = useMemo(() => {
+    const events: { date: string; label: string; gradient: string }[] = [
+      ...quotes.map(q => ({ date: q.created_at, label: 'Forespørsel sendt', gradient: 'from-amber-500 to-orange-500' })),
+      ...jobs.filter(j => j.started_at).map(j => ({ date: j.started_at!, label: 'Jobb påbegynt', gradient: 'from-cyan-500 to-blue-500' })),
+      ...jobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({ date: j.completed_date!, label: 'Jobb fullført', gradient: 'from-emerald-500 to-teal-500' })),
+      ...invoices.filter(i => i.status === 'paid').map(i => ({ date: i.created_at, label: `Faktura betalt — ${(i.amount || 0).toLocaleString('nb-NO')} kr`, gradient: 'from-emerald-500 to-cyan-500' })),
+    ];
+    return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+  }, [quotes, jobs, invoices]);
+
   return <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-1">Oversikt</h1>
@@ -376,6 +387,24 @@ const DashboardActivity = () => {
           {isOnlyWorker ? 'Dine innleveringer og status' : 'Hold oversikt over dine tilbud og jobber'}
         </p>
       </div>
+
+      {/* Siste aktivitet */}
+      {!isOnlyWorker && recentActivity.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Siste aktivitet</p>
+          <div className="flex flex-col sm:flex-row gap-2 overflow-x-auto pb-1">
+            {recentActivity.map((event, i) => (
+              <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-card border border-border/50 shrink-0">
+                <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${event.gradient} shrink-0`} />
+                <span className="text-sm text-foreground/80 whitespace-nowrap">{event.label}</span>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {new Date(event.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats — arbeider-spesifikke */}
       {isOnlyWorker && (

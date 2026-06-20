@@ -46,6 +46,7 @@ import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
 import { EmailComposer } from '@/components/admin/EmailComposer';
 import { EmailHistory } from '@/components/admin/EmailHistory';
 import { AllCustomersPanel } from '@/components/admin/AllCustomersPanel';
+import { AdminAttentionPanel } from '@/components/admin/AdminAttentionPanel';
 
 type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'mail' | 'brukere' | 'redigering' | 'logg';
 
@@ -304,10 +305,15 @@ const AdminDashboard = () => {
         <p className="text-muted-foreground">Oversikt over alle forespørsler og jobber</p>
       </div>
 
-      <AdminSummaryCards 
+      <AdminSummaryCards
         totalCustomers={profiles.length}
         pendingQuotes={pendingQuotes.length}
         activeJobs={activeJobs.length}
+      />
+
+      <AdminAttentionPanel
+        pendingQuotes={pendingQuotes}
+        pendingContentCount={badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs}
       />
 
       {/* Main Category Navigation */}
