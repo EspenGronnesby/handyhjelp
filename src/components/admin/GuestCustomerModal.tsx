@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Mail, UserX, Briefcase, CheckCircle, Send } from 'lucide-react';
+import { Loader2, Mail, UserX, Briefcase, CheckCircle, Send, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Quote, Job, STATUS_LABELS, STATUS_COLORS } from '@/types/admin';
 import { format } from 'date-fns';
@@ -12,6 +12,7 @@ import { nb } from 'date-fns/locale';
 interface EmailLog {
   id: string;
   subject: string;
+  content: string;
   template_name: string | null;
   status: string;
   sent_at: string;
@@ -29,6 +30,7 @@ export const GuestCustomerModal = ({ email, name, open, onClose }: GuestCustomer
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
+  const [expandedEmail, setExpandedEmail] = useState<string | null>(null);
 
   useEffect(() => {
     if (email && open) {
@@ -43,7 +45,7 @@ export const GuestCustomerModal = ({ email, name, open, onClose }: GuestCustomer
       const [quotesRes, jobsRes, logsRes] = await Promise.all([
         supabase.from('quotes').select('*').eq('email', email).order('created_at', { ascending: false }),
         supabase.from('jobs').select('*, quotes(name, email, phone, description, type, company_name, org_number)').eq('customer_email', email).order('created_at', { ascending: false }),
-        supabase.from('email_logs').select('id, subject, template_name, status, sent_at').eq('recipient_email', email).order('sent_at', { ascending: false }),
+        supabase.from('email_logs').select('id, subject, content, template_name, status, sent_at').eq('recipient_email', email).order('sent_at', { ascending: false }),
       ]);
       setQuotes(quotesRes.data || []);
       setJobs(jobsRes.data || []);
@@ -191,7 +193,11 @@ export const GuestCustomerModal = ({ email, name, open, onClose }: GuestCustomer
                 <p className="text-center text-muted-foreground py-6">Ingen e-poster registrert</p>
               ) : (
                 emailLogs.map(log => (
-                  <Card key={log.id} className="border-l-4 border-l-cyan-500">
+                  <Card
+                    key={log.id}
+                    className="border-l-4 border-l-cyan-500 cursor-pointer"
+                    onClick={() => setExpandedEmail(expandedEmail === log.id ? null : log.id)}
+                  >
                     <CardContent className="pt-4">
                       <div className="flex justify-between items-start gap-4">
                         <div className="flex-1">
@@ -206,10 +212,20 @@ export const GuestCustomerModal = ({ email, name, open, onClose }: GuestCustomer
                           </div>
                           <p className="text-sm font-medium mt-1">{log.subject}</p>
                         </div>
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">
-                          {format(new Date(log.sent_at), 'dd.MM.yyyy HH:mm', { locale: nb })}
-                        </span>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
+                            {format(new Date(log.sent_at), 'dd.MM.yyyy HH:mm', { locale: nb })}
+                          </span>
+                          {expandedEmail === log.id
+                            ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                            : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                        </div>
                       </div>
+                      {expandedEmail === log.id && (
+                        <div className="mt-3 pt-3 border-t text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 rounded p-3 max-h-64 overflow-y-auto">
+                          {log.content}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))

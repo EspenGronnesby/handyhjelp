@@ -188,3 +188,19 @@ ADD NEW LESSONS BELOW
 
 Use the format above. Keep it short and concrete.
 -->
+
+---
+
+### Supabase storage: file_url er en sti, ikke en URL
+**Date:** 2026-06-20
+**Category:** Supabase
+**Affected files:** src/components/admin/CustomerDetailModal.tsx
+
+**Problem:**
+`file_url` i `invoices`-tabellen er en intern storage-sti (f.eks. `/invoices/filnavn.pdf`), ikke en nettadresse. Bruk av den direkte som `<a href>` ga "Bucket not found" 404 fra Supabase storage.
+
+**Solution:**
+Bruk `supabase.storage.from('invoices').download(filePath)` der `filePath = file_url.split('/invoices/')[1]`. Lag en blob-URL med `URL.createObjectURL(data)` og trigger nedlasting programmatisk.
+
+**Prevention:**
+Aldri bruk `file_url` fra databasen direkte som href. Alltid bruk `storage.download()` + `createObjectURL`, eller generer en signed URL med `storage.createSignedUrl()`.
