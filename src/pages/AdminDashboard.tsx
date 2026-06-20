@@ -353,7 +353,7 @@ const AdminDashboard = () => {
             <TabsTrigger
               key={tab.key}
               value={tab.key}
-              className="text-sm whitespace-nowrap gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground"
+              className="text-sm whitespace-nowrap gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground"
             >
               {tab.label} {tab.count !== null && `(${tab.count})`}
               {tab.badge > 0 && (

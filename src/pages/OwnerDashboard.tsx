@@ -60,28 +60,28 @@ const OwnerDashboard = () => {
           <TabsList className="grid w-full grid-cols-4 h-auto gap-1 bg-muted/60 rounded-xl p-1">
             <TabsTrigger
               value="users"
-              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground"
             >
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Brukere</span>
             </TabsTrigger>
             <TabsTrigger
               value="editing"
-              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground"
             >
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Redigering</span>
             </TabsTrigger>
             <TabsTrigger
               value="audit"
-              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground"
             >
               <ScrollText className="h-4 w-4" />
               <span className="hidden sm:inline">Logg</span>
             </TabsTrigger>
             <TabsTrigger
               value="customers"
-              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground"
             >
               <UserSearch className="h-4 w-4" />
               <span className="hidden sm:inline">Kunder</span>

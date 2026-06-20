@@ -482,15 +482,15 @@ const DashboardActivity = () => {
 
       <Tabs defaultValue="quotes" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/60 rounded-xl p-1 h-auto">
-          <TabsTrigger value="quotes" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground">
+          <TabsTrigger value="quotes" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
             <FileText className="h-4 w-4" />
             <span className="hidden sm:inline">Forespørsler</span> ({quotes.length})
           </TabsTrigger>
-          <TabsTrigger value="agreements" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground">
+          <TabsTrigger value="agreements" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
             <CalendarCheck className="h-4 w-4" />
             <span className="hidden sm:inline">Avtaler</span> ({activeAgreements.length})
           </TabsTrigger>
-          <TabsTrigger value="jobs" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground">
+          <TabsTrigger value="jobs" className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground">
             <Briefcase className="h-4 w-4" />
             <span className="hidden sm:inline">Fullført</span> ({completedJobs.length})
           </TabsTrigger>
