@@ -329,13 +329,13 @@ const AdminDashboard = () => {
               )}
             >
               <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm transition-transform duration-200",
+                "w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-sm transition-transform duration-200",
                 isActive ? "scale-110" : "",
                 CATEGORY_GRADIENTS[key] || 'from-cyan-500 via-blue-500 to-indigo-600'
               )}>
-                <Icon className="h-5 w-5 text-white drop-shadow" />
+                <Icon className="h-7 w-7 text-white drop-shadow" />
               </div>
-              <span className="font-medium text-sm">{category.label}</span>
+              <span className="font-semibold text-base">{category.label}</span>
               {category.totalBadge > 0 && (
                 <Badge variant="destructive" className="text-xs">
                   {category.totalBadge}
