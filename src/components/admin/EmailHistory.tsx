@@ -159,7 +159,7 @@ export function EmailHistory() {
                 </TableHeader>
                 <TableBody>
                   {logs.map((log) => (
-                    <TableRow key={log.id}>
+                    <TableRow key={log.id} className="cursor-pointer hover:bg-muted/60" onClick={() => setSelectedLog(log)}>
                       <TableCell className="text-sm">
                         {format(new Date(log.sent_at), 'dd.MM.yy HH:mm', { locale: nb })}
                       </TableCell>
@@ -305,7 +305,7 @@ export function EmailHistory() {
 
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">Innhold</Label>
-                <div className="h-[150px] overflow-y-auto rounded-md border p-3">
+                <div className="max-h-[350px] overflow-y-auto rounded-md border p-3 bg-muted/30">
                   <p className="text-sm whitespace-pre-wrap">{selectedLog.content}</p>
                 </div>
               </div>
