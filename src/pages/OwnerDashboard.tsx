@@ -44,37 +44,44 @@ const OwnerDashboard = () => {
   return (
     <div>
       <div>
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold">Eier-panel</h1>
-          <p className="text-muted-foreground">Administrer brukere, roller og globale innstillinger</p>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-primary/10">
+            <Shield className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
+              Eier-panel
+            </h1>
+            <p className="text-muted-foreground text-sm">Administrer brukere, roller og globale innstillinger</p>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto gap-2 bg-transparent">
-            <TabsTrigger 
-              value="users" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          <TabsList className="grid w-full grid-cols-4 h-auto gap-1 bg-muted/60 rounded-xl p-1">
+            <TabsTrigger
+              value="users"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Brukere</span>
             </TabsTrigger>
-            <TabsTrigger 
-              value="editing" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            <TabsTrigger
+              value="editing"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <Palette className="h-4 w-4" />
               <span className="hidden sm:inline">Redigering</span>
             </TabsTrigger>
             <TabsTrigger
               value="audit"
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <ScrollText className="h-4 w-4" />
               <span className="hidden sm:inline">Logg</span>
             </TabsTrigger>
             <TabsTrigger
               value="customers"
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               <UserSearch className="h-4 w-4" />
               <span className="hidden sm:inline">Kunder</span>
