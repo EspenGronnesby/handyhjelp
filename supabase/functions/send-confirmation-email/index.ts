@@ -292,7 +292,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="content">
-              <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${name}</strong>,</p>
+              <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${escapeHtml(name)}</strong>,</p>
               
               <p>Takk for at du kontaktet HandyHjelp!</p>
               
