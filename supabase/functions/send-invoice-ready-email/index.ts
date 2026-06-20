@@ -225,15 +225,15 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="content">
-              <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+              <p style="font-size: 18px;">Hei <strong>${escapeHtml(customerName)}</strong>,</p>
               
               <p style="font-size: 16px; line-height: 1.6;">Din faktura for utført arbeid er nå klar.</p>
               
               <div class="invoice-details">
                 <h3 style="margin-top: 0; color: #0891B2;">Fakturadetaljer</h3>
-                <p style="margin: 8px 0;"><strong>Fakturanummer:</strong> ${invoiceNumber}</p>
-                <p style="margin: 8px 0;"><strong>Beløp:</strong> ${formattedAmount}</p>
-                <p style="margin: 8px 0;"><strong>Forfallsdato:</strong> ${formattedDate}</p>
+                <p style="margin: 8px 0;"><strong>Fakturanummer:</strong> ${escapeHtml(invoiceNumber)}</p>
+                <p style="margin: 8px 0;"><strong>Beløp:</strong> ${escapeHtml(formattedAmount)}</p>
+                <p style="margin: 8px 0;"><strong>Forfallsdato:</strong> ${escapeHtml(formattedDate)}</p>
               </div>
               
               <p style="font-size: 16px; line-height: 1.6;">Du kan laste ned fakturaen fra din kundeside på handyhjelp.no</p>
