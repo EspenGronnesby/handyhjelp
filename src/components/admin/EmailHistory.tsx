@@ -142,7 +142,7 @@ export function EmailHistory() {
       ) : (
         <Card className="overflow-hidden">
           <CardContent className="p-0">
-            <div className="w-full overflow-x-auto max-w-full md:max-h-[500px] md:overflow-y-auto [-webkit-overflow-scrolling:touch]" style={{ touchAction: 'pan-x pan-y' }}>
+            <div className="md:max-h-[500px] md:overflow-y-auto">
               <Table className="min-w-[600px]">
                 <TableHeader>
                   <TableRow>
