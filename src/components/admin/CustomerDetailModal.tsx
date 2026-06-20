@@ -4,8 +4,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, User, Mail, Phone, Building2, FileText, Briefcase, CheckCircle, Calendar, MapPin, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { Loader2, User, Mail, Phone, Building2, FileText, Briefcase, CheckCircle, Calendar, MapPin, ChevronDown, ChevronUp, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { Profile, Quote, Job, ServiceAgreement, STATUS_LABELS, STATUS_COLORS, AGREEMENT_STATUS_LABELS, AGREEMENT_STATUS_COLORS } from '@/types/admin';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
@@ -52,6 +53,7 @@ const INVOICE_STATUS_COLORS: Record<string, string> = {
 };
 
 export const CustomerDetailModal = ({ profile, open, onClose }: CustomerDetailModalProps) => {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -116,6 +118,26 @@ export const CustomerDetailModal = ({ profile, open, onClose }: CustomerDetailMo
       console.error('Error fetching customer data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadInvoice = async (invoice: Invoice) => {
+    if (!invoice.file_url) return;
+    try {
+      const filePath = invoice.file_url.split('/invoices/')[1];
+      if (!filePath) throw new Error('Invalid file path');
+      const { data, error } = await supabase.storage.from('invoices').download(filePath);
+      if (error) throw error;
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Faktura-${invoice.invoice_number}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      toast({ title: 'Feil', description: 'Kunne ikke laste ned faktura.', variant: 'destructive' });
     }
   };
 
@@ -453,10 +475,8 @@ export const CustomerDetailModal = ({ profile, open, onClose }: CustomerDetailMo
                         <div className="flex items-center gap-3">
                           <span className="font-bold text-base">{invoice.amount.toLocaleString('nb-NO')} kr</span>
                           {invoice.file_url && (
-                            <Button size="sm" variant="outline" asChild>
-                              <a href={invoice.file_url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4" />
-                              </a>
+                            <Button size="sm" variant="outline" onClick={() => handleDownloadInvoice(invoice)}>
+                              <Download className="h-4 w-4" />
                             </Button>
                           )}
                         </div>
