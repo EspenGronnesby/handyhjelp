@@ -417,37 +417,39 @@ const DashboardActivity = () => {
       {!isOnlyWorker && (
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Mine oppdrag — kompakt samle-kort */}
-          <div className="bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white card-hover-lift p-5 rounded-xl">
-            <div className="flex items-start justify-between mb-4">
+          <div className="bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white card-hover-lift p-6 rounded-xl flex flex-col justify-between min-h-[140px]">
+            <div className="flex items-start justify-between">
               <p className="text-sm font-medium text-white/80">Mine oppdrag</p>
-              <Briefcase className="h-8 w-8 text-white/30" strokeWidth={1.5} />
+              <Briefcase className="h-8 w-8 text-white/25" strokeWidth={1.5} />
             </div>
-            <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-end justify-around mt-4">
               <div className="text-center">
-                <div className="text-2xl font-bold">{stats.totalQuotes}</div>
-                <div className="text-white/60 text-xs mt-0.5">Forespørsler</div>
+                <div className="text-4xl font-bold">{stats.totalQuotes}</div>
+                <div className="text-white/60 text-xs mt-1">Forespørsler</div>
               </div>
-              <div className="h-8 w-px bg-white/20" />
+              <div className="h-10 w-px bg-white/20 mb-4" />
               <div className="text-center">
-                <div className="text-2xl font-bold">{stats.activeJobs}</div>
-                <div className="text-white/60 text-xs mt-0.5">Aktive</div>
+                <div className="text-4xl font-bold">{stats.activeJobs}</div>
+                <div className="text-white/60 text-xs mt-1">Aktive</div>
               </div>
-              <div className="h-8 w-px bg-white/20" />
+              <div className="h-10 w-px bg-white/20 mb-4" />
               <div className="text-center">
-                <div className="text-2xl font-bold">{stats.completedJobs}</div>
-                <div className="text-white/60 text-xs mt-0.5">Fullførte</div>
+                <div className="text-4xl font-bold">{stats.completedJobs}</div>
+                <div className="text-white/60 text-xs mt-1">Fullførte</div>
               </div>
             </div>
           </div>
 
           {/* Fullførte jobber */}
-          <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white">
-            <div className="flex items-start justify-between mb-3">
+          <div className="card-hover-lift p-6 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white flex flex-col justify-between min-h-[140px]">
+            <div className="flex items-start justify-between">
               <p className="text-sm font-medium text-white/80">Fullførte jobber</p>
-              <CheckCircle className="h-8 w-8 text-white/30" strokeWidth={1.5} />
+              <CheckCircle className="h-8 w-8 text-white/25" strokeWidth={1.5} />
             </div>
-            <div className="text-3xl font-bold">{stats.completedJobs}</div>
-            <p className="text-xs mt-1 text-white/60">Ferdigstilte prosjekter</p>
+            <div>
+              <div className="text-5xl font-bold">{stats.completedJobs}</div>
+              <p className="text-xs mt-1 text-white/60">Ferdigstilte prosjekter</p>
+            </div>
           </div>
         </div>
       )}
