@@ -114,7 +114,7 @@ const WorkerDashboard = () => {
             <TabsList className="grid w-full sm:w-auto grid-cols-2 h-auto gap-1 bg-muted/60 rounded-xl p-1">
               <TabsTrigger
                 value="projects"
-                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground"
               >
                 <Camera className="h-4 w-4" />
                 Prosjekter
@@ -126,7 +126,7 @@ const WorkerDashboard = () => {
               </TabsTrigger>
               <TabsTrigger
                 value="blog"
-                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-background/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:bg-background/80 data-[state=inactive]:hover:text-foreground"
               >
                 <FileText className="h-4 w-4" />
                 Blogginnlegg
