@@ -381,39 +381,33 @@ const DashboardActivity = () => {
       {isOnlyWorker && (
         <div className="grid gap-4 sm:grid-cols-3">
           <Link to="/dashboard/worker">
-            <div className="card-professional card-hover-lift p-5 rounded-xl cursor-pointer">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-muted-foreground">Venter godkjenning</p>
-                <div className="p-2 rounded-lg bg-amber-500/10">
-                  <ClipboardList className="h-4 w-4 text-amber-500" />
-                </div>
+            <div className="card-hover-lift p-5 rounded-xl cursor-pointer bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white">
+              <div className="flex items-start justify-between mb-3">
+                <p className="text-sm font-medium text-white/80">Venter godkjenning</p>
+                <ClipboardList className="h-8 w-8 text-white/30" strokeWidth={1.5} />
               </div>
               <div className="text-3xl font-bold">{badges.workerDetails.pendingProjects + badges.workerDetails.pendingBlogs}</div>
-              <p className="text-xs mt-1 text-muted-foreground">Prosjekter og innlegg til vurdering</p>
+              <p className="text-xs mt-1 text-white/60">Prosjekter og innlegg til vurdering</p>
             </div>
           </Link>
           <Link to="/dashboard/worker">
-            <div className="card-professional card-hover-lift p-5 rounded-xl cursor-pointer">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-muted-foreground">Publiserte prosjekter</p>
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Camera className="h-4 w-4 text-primary" />
-                </div>
+            <div className="card-hover-lift p-5 rounded-xl cursor-pointer bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white">
+              <div className="flex items-start justify-between mb-3">
+                <p className="text-sm font-medium text-white/80">Publiserte prosjekter</p>
+                <Camera className="h-8 w-8 text-white/30" strokeWidth={1.5} />
               </div>
               <div className="text-3xl font-bold">—</div>
-              <p className="text-xs mt-1 text-muted-foreground">Se Mine innleveringer for detaljer</p>
+              <p className="text-xs mt-1 text-white/60">Se Mine innleveringer for detaljer</p>
             </div>
           </Link>
           <Link to="/dashboard/worker">
-            <div className="card-professional card-hover-lift p-5 rounded-xl cursor-pointer">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-medium text-muted-foreground">Avviste innleveringer</p>
-                <div className="p-2 rounded-lg bg-destructive/10">
-                  <Upload className="h-4 w-4 text-destructive" />
-                </div>
+            <div className="card-hover-lift p-5 rounded-xl cursor-pointer bg-gradient-to-br from-rose-500 via-pink-500 to-fuchsia-600 text-white">
+              <div className="flex items-start justify-between mb-3">
+                <p className="text-sm font-medium text-white/80">Avviste innleveringer</p>
+                <Upload className="h-8 w-8 text-white/30" strokeWidth={1.5} />
               </div>
               <div className="text-3xl font-bold">{badges.workerDetails.rejectedProjects + badges.workerDetails.rejectedBlogs}</div>
-              <p className="text-xs mt-1 text-muted-foreground">Må rettes og sendes inn på nytt</p>
+              <p className="text-xs mt-1 text-white/60">Må rettes og sendes inn på nytt</p>
             </div>
           </Link>
         </div>
@@ -423,41 +417,37 @@ const DashboardActivity = () => {
       {!isOnlyWorker && (
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Mine oppdrag — kompakt samle-kort */}
-          <div className="bg-gradient-to-br from-secondary to-secondary/80 text-white border border-white/10 card-hover-lift p-5 rounded-xl">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm font-medium text-white/70">Mine oppdrag</p>
-              <div className="p-2 rounded-lg bg-white/10">
-                <Briefcase className="h-4 w-4 text-white" />
-              </div>
+          <div className="bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white card-hover-lift p-5 rounded-xl">
+            <div className="flex items-start justify-between mb-4">
+              <p className="text-sm font-medium text-white/80">Mine oppdrag</p>
+              <Briefcase className="h-8 w-8 text-white/30" strokeWidth={1.5} />
             </div>
             <div className="flex items-center gap-4 text-sm">
               <div className="text-center">
                 <div className="text-2xl font-bold">{stats.totalQuotes}</div>
-                <div className="text-white/50 text-xs mt-0.5">Forespørsler</div>
+                <div className="text-white/60 text-xs mt-0.5">Forespørsler</div>
               </div>
               <div className="h-8 w-px bg-white/20" />
               <div className="text-center">
                 <div className="text-2xl font-bold">{stats.activeJobs}</div>
-                <div className="text-white/50 text-xs mt-0.5">Aktive</div>
+                <div className="text-white/60 text-xs mt-0.5">Aktive</div>
               </div>
               <div className="h-8 w-px bg-white/20" />
               <div className="text-center">
                 <div className="text-2xl font-bold">{stats.completedJobs}</div>
-                <div className="text-white/50 text-xs mt-0.5">Fullførte</div>
+                <div className="text-white/60 text-xs mt-0.5">Fullførte</div>
               </div>
             </div>
           </div>
 
           {/* Fullførte jobber */}
-          <div className="card-professional card-hover-lift p-5 rounded-xl">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-medium text-muted-foreground">Fullførte jobber</p>
-              <div className="p-2 rounded-lg bg-primary/10">
-                <CheckCircle className="h-4 w-4 text-primary" />
-              </div>
+          <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white">
+            <div className="flex items-start justify-between mb-3">
+              <p className="text-sm font-medium text-white/80">Fullførte jobber</p>
+              <CheckCircle className="h-8 w-8 text-white/30" strokeWidth={1.5} />
             </div>
             <div className="text-3xl font-bold">{stats.completedJobs}</div>
-            <p className="text-xs mt-1 text-muted-foreground">Ferdigstilte prosjekter</p>
+            <p className="text-xs mt-1 text-white/60">Ferdigstilte prosjekter</p>
           </div>
         </div>
       )}
