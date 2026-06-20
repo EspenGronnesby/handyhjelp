@@ -6,12 +6,42 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Require a valid Supabase user JWT (workers/admins call this)
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const token = authHeader.replace("Bearer ", "");
+    const authClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+    );
+    const { data: userData, error: userError } = await authClient.auth.getUser(token);
+    if (userError || !userData?.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { type, title, submitterEmail, isEdit } = await req.json();
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
@@ -64,11 +94,11 @@ Deno.serve(async (req) => {
           <div style="padding:32px;">
             <h2 style="color:#1a1a2e;margin:0 0 16px;font-size:18px;">Nytt innhold til godkjenning</h2>
             <p style="color:#555;line-height:1.6;margin:0 0 12px;">
-              <strong>${submitterEmail || "En worker"}</strong> har ${actionLabel} et ${typeLabel}:
+              <strong>${escapeHtml(submitterEmail || "En worker")}</strong> har ${escapeHtml(actionLabel)} et ${escapeHtml(typeLabel)}:
             </p>
             <div style="background:#f4f4f5;border-radius:8px;padding:16px;margin:16px 0;">
-              <p style="margin:0;font-size:16px;font-weight:600;color:#1a1a2e;">${title}</p>
-              <p style="margin:4px 0 0;font-size:13px;color:#888;">Type: ${typeLabel} · ${isEdit ? "Redigert" : "Ny innsending"}</p>
+              <p style="margin:0;font-size:16px;font-weight:600;color:#1a1a2e;">${escapeHtml(title)}</p>
+              <p style="margin:4px 0 0;font-size:13px;color:#888;">Type: ${escapeHtml(typeLabel)} · ${isEdit ? "Redigert" : "Ny innsending"}</p>
             </div>
             <p style="color:#555;line-height:1.6;margin:16px 0 0;">
               Logg inn i admin-panelet for å godkjenne eller avvise innholdet.
