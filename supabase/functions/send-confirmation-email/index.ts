@@ -384,9 +384,9 @@ const handler = async (req: Request): Promise<Response> => {
                 <p>Request ID: ${requestId}</p>
               </div>
               <div class="info-box">
-                <p><strong>Navn:</strong> ${name}</p>
-                <p><strong>E-post:</strong> ${email}</p>
-                <p><strong>Telefon:</strong> ${phone || 'Ikke oppgitt'}</p>
+                <p><strong>Navn:</strong> ${escapeHtml(name)}</p>
+                <p><strong>E-post:</strong> ${escapeHtml(email)}</p>
+                <p><strong>Telefon:</strong> ${escapeHtml(phone || 'Ikke oppgitt')}</p>
                 <p><strong>Type:</strong> ${customerType === 'private' ? 'Privat' : 'Bedrift'}</p>
               </div>
               <div class="info-box">
