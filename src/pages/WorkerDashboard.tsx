@@ -98,8 +98,8 @@ const WorkerDashboard = () => {
     <div>
       <div>
         <div className="mb-6 flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-primary/10">
-            <Hammer className="h-6 w-6 text-primary" />
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-sm">
+            <Hammer className="h-5 w-5 text-white drop-shadow" />
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">

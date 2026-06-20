@@ -89,12 +89,16 @@ export const SubmissionList = ({ type, userId, onEditProject, onEditBlog, onDele
         <CardContent className="py-12 text-center text-muted-foreground">
           {type === 'projects' ? (
             <>
-              <Camera className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-md">
+                <Camera className="h-7 w-7 text-white drop-shadow" />
+              </div>
               <p>Du har ikke sendt inn noen prosjekter ennå</p>
             </>
           ) : (
             <>
-              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 shadow-md">
+                <FileText className="h-7 w-7 text-white drop-shadow" />
+              </div>
               <p>Du har ikke sendt inn noen blogginnlegg ennå</p>
             </>
           )}
