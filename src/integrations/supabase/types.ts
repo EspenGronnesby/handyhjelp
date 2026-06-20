@@ -617,6 +617,7 @@ export type Database = {
           amount: number | null
           completed_date: string | null
           created_at: string
+          customer_email: string | null
           estimated_completion: string | null
           feedback_sent_at: string | null
           id: string
@@ -627,12 +628,13 @@ export type Database = {
           status: string
           tenant_id: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           amount?: number | null
           completed_date?: string | null
           created_at?: string
+          customer_email?: string | null
           estimated_completion?: string | null
           feedback_sent_at?: string | null
           id?: string
@@ -643,12 +645,13 @@ export type Database = {
           status?: string
           tenant_id?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           amount?: number | null
           completed_date?: string | null
           created_at?: string
+          customer_email?: string | null
           estimated_completion?: string | null
           feedback_sent_at?: string | null
           id?: string
@@ -659,7 +662,7 @@ export type Database = {
           status?: string
           tenant_id?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
