@@ -95,25 +95,8 @@ const WorkerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-3 md:py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <img src={handyhjelpLogoWhite} alt="HandyHjelp" className="h-8 md:h-10" />
-            </Link>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => navigate('/dashboard')}>
-                <Home className="h-4 w-4 mr-2" />
-                Dashboard
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-6 md:py-8">
+    <div>
+      <div>
         <div className="mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">Mine innleveringer</h1>
           <p className="text-muted-foreground">Send inn prosjekter og blogginnlegg til godkjenning</p>

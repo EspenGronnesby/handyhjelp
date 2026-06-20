@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -115,15 +115,24 @@ const AppRoutes = () => {
           <Route index element={<DashboardActivity />} />
           <Route path="profile" element={<DashboardProfile />} />
           <Route path="notifications" element={<DashboardNotifications />} />
-          
           <Route path="admin" element={
             <ErrorBoundary>
               <AdminDashboard />
             </ErrorBoundary>
           } />
+          <Route path="owner" element={
+            <ErrorBoundary>
+              <OwnerDashboard />
+            </ErrorBoundary>
+          } />
+          <Route path="worker" element={
+            <ErrorBoundary>
+              <WorkerDashboard />
+            </ErrorBoundary>
+          } />
         </Route>
-        <Route path="/owner" element={<OwnerDashboard />} />
-        <Route path="/worker" element={<WorkerDashboard />} />
+        <Route path="/owner" element={<Navigate to="/dashboard/owner" replace />} />
+        <Route path="/worker" element={<Navigate to="/dashboard/worker" replace />} />
       </Routes>
     </Suspense>
   );

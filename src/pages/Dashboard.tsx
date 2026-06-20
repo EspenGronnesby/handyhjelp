@@ -63,7 +63,7 @@ const Dashboard = () => {
     { path: '/dashboard/notifications', label: 'Varsler', icon: Bell, badge: badges.notifications },
     // Owner: Access to both Owner panel and Admin panel
     ...(isOwner ? [
-      { path: '/owner', label: 'Eier', icon: Crown, badge: 0 },
+      { path: '/dashboard/owner', label: 'Eier', icon: Crown, badge: 0 },
       { path: '/dashboard/admin', label: 'Admin', icon: Shield, badge: badges.admin },
     ] : []),
     // Admin (not owner): Only Admin panel
@@ -72,7 +72,7 @@ const Dashboard = () => {
     ] : []),
     // Worker: Submissions
     ...(isWorker ? [
-      { path: '/worker', label: 'Innleveringer', icon: Upload, badge: badges.worker },
+      { path: '/dashboard/worker', label: 'Innleveringer', icon: Upload, badge: badges.worker },
     ] : []),
   ];
 
