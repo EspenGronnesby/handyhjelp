@@ -191,6 +191,22 @@ Use the format above. Keep it short and concrete.
 
 ---
 
+### Flex-element uten min-w-0 gjør hele siden for bred
+**Date:** 2026-06-20
+**Category:** React
+**Affected files:** src/pages/Dashboard.tsx
+
+**Problem:**
+`<main className="flex-1">` i et `flex-row`-layout hadde standardverdien `min-width: auto`. Det betyr at flex-elementet aldri kan krympe under sin "min-content bredde" — den minste bredden innholdet trenger. En tabell med mange kolonner i AdminDashboard satte en høy min-content bredde som boblet opp til `main`, som da ble bredere enn viewport og dytta alt innhold til høyre.
+
+**Solution:**
+Legg til `min-w-0` på flex-elementet: `<main className="flex-1 min-w-0">`. Dette lar elementet krympe til 0 og lar scrollbare barn (som tabeller med `overflow-auto`) håndtere overflyt internt.
+
+**Prevention:**
+Alltid legg `min-w-0` på `flex-1`-elementer som inneholder scrollbart innhold (tabeller, kode, lange tekster). Dette er CSS best practice for flex-layouts.
+
+---
+
 ### Supabase storage: file_url er en sti, ikke en URL
 **Date:** 2026-06-20
 **Category:** Supabase
