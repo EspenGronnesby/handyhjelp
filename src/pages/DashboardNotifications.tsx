@@ -138,11 +138,11 @@ const DashboardNotifications = () => {
 
       {notifications.length === 0 ? (
         <div className="card-professional p-12 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-            <Bell className="h-8 w-8 text-muted-foreground" />
+          <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+            <Bell className="h-8 w-8 text-primary" />
           </div>
-          <h3 className="text-lg font-semibold mb-1">Ingen varsler</h3>
-          <p className="text-sm text-muted-foreground">Du har ingen varsler ennå</p>
+          <p className="font-semibold text-lg mb-1">Ingen varsler</p>
+          <p className="text-sm text-muted-foreground">Du er helt oppdatert! Nye varsler dukker opp her.</p>
         </div>
       ) : (
         <div className="space-y-3">

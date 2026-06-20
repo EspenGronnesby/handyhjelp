@@ -113,8 +113,12 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row gap-4 md:gap-8">
           {/* Sidebar Navigation - Hidden on mobile */}
           <aside className="hidden md:block w-60 shrink-0">
-            <div className="bg-secondary rounded-xl p-3 space-y-1 sticky top-24">
-              {navItems.map((item) => {
+            <div className="bg-secondary rounded-xl p-3 sticky top-24 flex flex-col gap-1">
+              {/* Section: MENY */}
+              <p className="text-[10px] uppercase tracking-widest text-secondary-foreground/40 px-3 pt-2 pb-1">
+                Meny
+              </p>
+              {navItems.filter(i => ['/dashboard', '/dashboard/profile', '/dashboard/notifications'].includes(i.path)).map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 return (
@@ -129,7 +133,7 @@ const Dashboard = () => {
                       <Icon className="h-4 w-4 shrink-0" />
                       {item.label}
                       {item.badge > 0 && (
-                        <span className={`ml-auto text-xs font-semibold rounded-full px-2 py-0.5 min-w-[20px] text-center ${
+                        <span className={`ml-auto text-xs font-semibold rounded-full px-2 py-0.5 min-w-[20px] text-center animate-subtle-pulse ${
                           isActive ? 'bg-white/20 text-white' : 'bg-destructive text-destructive-foreground'
                         }`}>
                           {item.badge > 99 ? '99+' : item.badge}
@@ -139,6 +143,52 @@ const Dashboard = () => {
                   </Link>
                 );
               })}
+
+              {/* Section: ADMIN/ARBEID (if role-specific items exist) */}
+              {navItems.filter(i => !['/dashboard', '/dashboard/profile', '/dashboard/notifications'].includes(i.path)).length > 0 && (
+                <>
+                  <p className="text-[10px] uppercase tracking-widest text-secondary-foreground/40 px-3 pt-3 pb-1">
+                    {isWorker && !isAdmin && !isOwner ? 'Arbeid' : 'Admin'}
+                  </p>
+                  {navItems.filter(i => !['/dashboard', '/dashboard/profile', '/dashboard/notifications'].includes(i.path)).map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link key={item.path} to={item.path}>
+                        <button
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 min-h-[44px] ${
+                            isActive
+                              ? 'bg-primary text-primary-foreground shadow-sm'
+                              : 'text-secondary-foreground/75 hover:bg-white/10 hover:text-white'
+                          }`}
+                        >
+                          <Icon className="h-4 w-4 shrink-0" />
+                          {item.label}
+                          {item.badge > 0 && (
+                            <span className={`ml-auto text-xs font-semibold rounded-full px-2 py-0.5 min-w-[20px] text-center animate-subtle-pulse ${
+                              isActive ? 'bg-white/20 text-white' : 'bg-destructive text-destructive-foreground'
+                            }`}>
+                              {item.badge > 99 ? '99+' : item.badge}
+                            </span>
+                          )}
+                        </button>
+                      </Link>
+                    );
+                  })}
+                </>
+              )}
+
+              {/* User profile footer */}
+              <div className="mt-4 pt-3 border-t border-white/10">
+                <div className="flex items-center gap-3 px-3 py-2">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary to-cyan-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                    {user.email?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+                  <span className="text-xs text-secondary-foreground/60 truncate">
+                    {user.email}
+                  </span>
+                </div>
+              </div>
             </div>
           </aside>
 
@@ -169,7 +219,7 @@ const Dashboard = () => {
                 <div className="relative">
                   <Icon className="h-5 w-5 mb-1" />
                   {item.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2.5 bg-destructive text-destructive-foreground text-[10px] font-medium rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                    <span className="absolute -top-1.5 -right-2.5 bg-destructive text-destructive-foreground text-[10px] font-medium rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 animate-subtle-pulse">
                       {item.badge > 9 ? '9+' : item.badge}
                     </span>
                   )}
