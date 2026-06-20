@@ -49,14 +49,14 @@ import { AllCustomersPanel } from '@/components/admin/AllCustomersPanel';
 
 type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'mail' | 'brukere' | 'redigering' | 'logg';
 
-const VALID_CATEGORIES: CategoryKey[] = ['oppdrag', 'okonomi', 'innhold', 'mail'];
+const VALID_CATEGORIES: CategoryKey[] = ['oppdrag', 'okonomi', 'innhold', 'mail', 'brukere'];
 
 const CATEGORY_DEFAULT_TABS: Record<CategoryKey, string> = {
   oppdrag: 'single-jobs',
   okonomi: 'invoices',
   innhold: 'projects',
   mail: 'templates',
-  brukere: 'brukere',
+  brukere: 'kunder',
   redigering: 'redigering',
   logg: 'logg',
 };
@@ -142,11 +142,10 @@ const AdminDashboard = () => {
       totalBadge: badges.adminDetails.pendingQuotes + badges.adminDetails.newAgreements + badges.adminDetails.activeJobs,
     },
     okonomi: {
-      label: 'Økonomi / Kunder',
+      label: 'Økonomi',
       icon: CreditCard,
       tabs: [
         { key: 'invoices', label: 'Fakturaer', count: null, badge: 0 },
-        { key: 'customers', label: 'Kunder', count: profiles.length, badge: 0 },
       ],
       totalBadge: 0,
     },
@@ -170,15 +169,18 @@ const AdminDashboard = () => {
       ],
       totalBadge: 0,
     },
-  };
-
-  const ownerCategories = isOwner ? {
     brukere: {
       label: 'Brukere',
       icon: Users,
-      tabs: [{ key: 'brukere', label: 'Rollestyring', count: null, badge: 0 }],
+      tabs: [
+        { key: 'kunder', label: 'Kunder', count: profiles.length, badge: 0 },
+        { key: 'rollestyring', label: 'Rollestyring', count: null, badge: 0 },
+      ],
       totalBadge: 0,
     },
+  };
+
+  const ownerCategories = isOwner ? {
     redigering: {
       label: 'Redigering',
       icon: Palette,
@@ -595,7 +597,7 @@ const AdminDashboard = () => {
         </TabsContent>
 
         {/* Kunder */}
-        <TabsContent value="customers" className="space-y-4">
+        <TabsContent value="kunder" className="space-y-4">
           <AllCustomersPanel />
         </TabsContent>
 
@@ -629,12 +631,10 @@ const AdminDashboard = () => {
           <EmailHistory />
         </TabsContent>
 
-        {/* Eier: Brukere / Rollestyring */}
-        {isOwner && (
-          <TabsContent value="brukere" forceMount className="data-[state=inactive]:hidden">
-            <RoleManagement />
-          </TabsContent>
-        )}
+        {/* Brukere: Rollestyring — owner kan endre, admin read-only */}
+        <TabsContent value="rollestyring" forceMount className="data-[state=inactive]:hidden">
+          <RoleManagement canManageRoles={isOwner} />
+        </TabsContent>
 
         {/* Eier: Redigering av nettstedsinnhold */}
         {isOwner && (
