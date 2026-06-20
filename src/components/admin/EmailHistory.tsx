@@ -140,10 +140,9 @@ export function EmailHistory() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="overflow-hidden">
+        <Card>
           <CardContent className="p-0">
-            <div className="md:max-h-[500px] md:overflow-y-auto">
-              <Table className="min-w-[600px]">
+            <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-[100px]">Dato</TableHead>
@@ -242,7 +241,6 @@ export function EmailHistory() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
           </CardContent>
         </Card>
 
