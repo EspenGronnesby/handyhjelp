@@ -688,96 +688,6 @@ export type Database = {
           },
         ]
       }
-      loyalty_campaigns: {
-        Row: {
-          active: boolean | null
-          created_at: string | null
-          description: string | null
-          end_date: string
-          id: string
-          multiplier: number | null
-          name: string
-          start_date: string
-        }
-        Insert: {
-          active?: boolean | null
-          created_at?: string | null
-          description?: string | null
-          end_date: string
-          id?: string
-          multiplier?: number | null
-          name: string
-          start_date: string
-        }
-        Update: {
-          active?: boolean | null
-          created_at?: string | null
-          description?: string | null
-          end_date?: string
-          id?: string
-          multiplier?: number | null
-          name?: string
-          start_date?: string
-        }
-        Relationships: []
-      }
-      loyalty_points: {
-        Row: {
-          balance: number | null
-          created_at: string | null
-          id: string
-          lifetime_points: number | null
-          tier: Database["public"]["Enums"]["loyalty_tier"] | null
-          tier_updated_at: string | null
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          balance?: number | null
-          created_at?: string | null
-          id?: string
-          lifetime_points?: number | null
-          tier?: Database["public"]["Enums"]["loyalty_tier"] | null
-          tier_updated_at?: string | null
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          balance?: number | null
-          created_at?: string | null
-          id?: string
-          lifetime_points?: number | null
-          tier?: Database["public"]["Enums"]["loyalty_tier"] | null
-          tier_updated_at?: string | null
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      loyalty_tiers: {
-        Row: {
-          benefits: Json | null
-          created_at: string | null
-          discount_percentage: number | null
-          points_required: number
-          tier: Database["public"]["Enums"]["loyalty_tier"]
-        }
-        Insert: {
-          benefits?: Json | null
-          created_at?: string | null
-          discount_percentage?: number | null
-          points_required: number
-          tier: Database["public"]["Enums"]["loyalty_tier"]
-        }
-        Update: {
-          benefits?: Json | null
-          created_at?: string | null
-          discount_percentage?: number | null
-          points_required?: number
-          tier?: Database["public"]["Enums"]["loyalty_tier"]
-        }
-        Relationships: []
-      }
       notifications: {
         Row: {
           created_at: string
@@ -825,42 +735,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      points_transactions: {
-        Row: {
-          amount: number
-          created_at: string | null
-          description: string
-          expires_at: string | null
-          id: string
-          reference_id: string | null
-          reference_type: string | null
-          transaction_type: Database["public"]["Enums"]["transaction_type"]
-          user_id: string
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          description: string
-          expires_at?: string | null
-          id?: string
-          reference_id?: string | null
-          reference_type?: string | null
-          transaction_type: Database["public"]["Enums"]["transaction_type"]
-          user_id: string
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          description?: string
-          expires_at?: string | null
-          id?: string
-          reference_id?: string | null
-          reference_type?: string | null
-          transaction_type?: Database["public"]["Enums"]["transaction_type"]
-          user_id?: string
-        }
-        Relationships: []
       }
       profiles: {
         Row: {
@@ -1089,30 +963,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      referral_codes: {
-        Row: {
-          code: string
-          created_at: string | null
-          id: string
-          referrer_user_id: string
-          uses_count: number | null
-        }
-        Insert: {
-          code: string
-          created_at?: string | null
-          id?: string
-          referrer_user_id: string
-          uses_count?: number | null
-        }
-        Update: {
-          code?: string
-          created_at?: string | null
-          id?: string
-          referrer_user_id?: string
-          uses_count?: number | null
-        }
-        Relationships: []
       }
       reviews: {
         Row: {
@@ -1582,27 +1432,14 @@ export type Database = {
       }
     }
     Functions: {
-      award_points: {
-        Args: {
-          p_amount: number
-          p_description: string
-          p_reference_id?: string
-          p_reference_type?: string
-          p_type: Database["public"]["Enums"]["transaction_type"]
-          p_user_id: string
-        }
-        Returns: string
-      }
       can_access_tenant: {
         Args: { _tenant_id: string; _user_id: string }
         Returns: boolean
       }
-      expire_old_points: { Args: never; Returns: number }
       generate_download_token: {
         Args: { p_agreement_id: string; p_document_type: string }
         Returns: string
       }
-      get_active_campaign_multiplier: { Args: never; Returns: number }
       get_user_tenant_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -1646,14 +1483,6 @@ export type Database = {
         | "platform_owner"
         | "tenant_admin"
         | "worker"
-      loyalty_tier: "bronze" | "silver" | "gold"
-      transaction_type:
-        | "earned"
-        | "spent"
-        | "expired"
-        | "bonus"
-        | "referral"
-        | "welcome"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1788,15 +1617,6 @@ export const Constants = {
         "platform_owner",
         "tenant_admin",
         "worker",
-      ],
-      loyalty_tier: ["bronze", "silver", "gold"],
-      transaction_type: [
-        "earned",
-        "spent",
-        "expired",
-        "bonus",
-        "referral",
-        "welcome",
       ],
     },
   },
