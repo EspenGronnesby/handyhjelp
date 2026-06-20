@@ -325,7 +325,7 @@ const handler = async (req: Request): Promise<Response> => {
       rejectionSection = `
         <div style="background-color: #FEE2E2; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #EF4444;">
           <h3 style="margin: 0 0 10px 0; color: #991B1B;">Årsak</h3>
-          <p style="color: #991B1B; margin: 0; font-style: italic;">"${rejectionReason}"</p>
+          <p style="color: #991B1B; margin: 0; font-style: italic;">"${escapeHtml(rejectionReason)}"</p>
         </div>
       `;
     }
@@ -345,7 +345,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="padding: 30px; background-color: #ffffff; border: 1px solid #E5E7EB; border-top: none;">
-            <h2 style="color: #2C3E50; margin-top: 0;">Hei ${contactPerson},</h2>
+            <h2 style="color: #2C3E50; margin-top: 0;">Hei ${escapeHtml(contactPerson)},</h2>
             
             <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">
               ${config.message}
@@ -357,8 +357,8 @@ const handler = async (req: Request): Promise<Response> => {
             
             <div style="background-color: #F1F5F9; padding: 20px; border-radius: 8px; margin: 25px 0;">
               <h3 style="margin: 0 0 15px 0; color: #2C3E50;">Detaljer om forespørselen:</h3>
-              <p style="margin: 8px 0; color: #4A5568;"><strong>Adresse:</strong> ${address || 'Ikke oppgitt'}</p>
-              <p style="margin: 8px 0; color: #4A5568;"><strong>Tjenester:</strong> ${servicesList}</p>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>Adresse:</strong> ${escapeHtml(address || 'Ikke oppgitt')}</p>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>Tjenester:</strong> ${escapeHtml(servicesList)}</p>
             </div>
             
             <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0;">
