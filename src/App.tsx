@@ -115,15 +115,24 @@ const AppRoutes = () => {
           <Route index element={<DashboardActivity />} />
           <Route path="profile" element={<DashboardProfile />} />
           <Route path="notifications" element={<DashboardNotifications />} />
-          
           <Route path="admin" element={
             <ErrorBoundary>
               <AdminDashboard />
             </ErrorBoundary>
           } />
+          <Route path="owner" element={
+            <ErrorBoundary>
+              <OwnerDashboard />
+            </ErrorBoundary>
+          } />
+          <Route path="worker" element={
+            <ErrorBoundary>
+              <WorkerDashboard />
+            </ErrorBoundary>
+          } />
         </Route>
-        <Route path="/owner" element={<OwnerDashboard />} />
-        <Route path="/worker" element={<WorkerDashboard />} />
+        <Route path="/owner" element={<Navigate to="/dashboard/owner" replace />} />
+        <Route path="/worker" element={<Navigate to="/dashboard/worker" replace />} />
       </Routes>
     </Suspense>
   );
