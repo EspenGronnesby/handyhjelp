@@ -80,6 +80,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const errorResponse = (message: string, status: number, requestId: string, details?: unknown) => {
   return new Response(
     JSON.stringify({
@@ -172,6 +181,33 @@ const handler = async (req: Request): Promise<Response> => {
   if (req.method !== "POST") {
     log.warn("Invalid request method", { requestId, method: req.method });
     return errorResponse("Method not allowed", 405, requestId);
+  }
+
+  // --- AuthN/Z: require admin or platform_owner ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return errorResponse("Unauthorized", 401, requestId);
+  }
+  const jwt = authHeader.replace("Bearer ", "");
+  const authClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+  );
+  const { data: userData, error: userError } = await authClient.auth.getUser(jwt);
+  if (userError || !userData?.user) {
+    return errorResponse("Unauthorized", 401, requestId);
+  }
+  const adminClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+  const { data: roleRows } = await adminClient
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userData.user.id)
+    .in("role", ["admin", "platform_owner"]);
+  if (!roleRows || roleRows.length === 0) {
+    return errorResponse("Forbidden", 403, requestId);
   }
 
   let requestData: AgreementStatusEmailRequest;
