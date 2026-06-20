@@ -80,6 +80,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 interface InvoiceReadyPayload {
   userId: string;
   customerName: string;
@@ -117,6 +126,35 @@ const handler = async (req: Request): Promise<Response> => {
         }
       }
     );
+  }
+
+  // --- AuthN/Z: require admin or platform_owner ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+      status: 401, headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+  const jwt = authHeader.replace("Bearer ", "");
+  const supabaseUrlForAuth = Deno.env.get("SUPABASE_URL")!;
+  const supabaseServiceKeyForAuth = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const authClient = createClient(supabaseUrlForAuth, Deno.env.get("SUPABASE_ANON_KEY")!);
+  const { data: userData, error: userError } = await authClient.auth.getUser(jwt);
+  if (userError || !userData?.user) {
+    return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+      status: 401, headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+  const supabaseForRoles = createClient(supabaseUrlForAuth, supabaseServiceKeyForAuth);
+  const { data: roleRows } = await supabaseForRoles
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userData.user.id)
+    .in("role", ["admin", "platform_owner"]);
+  if (!roleRows || roleRows.length === 0) {
+    return new Response(JSON.stringify({ success: false, error: "Forbidden" }), {
+      status: 403, headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
 
   try {
@@ -187,15 +225,15 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="content">
-              <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+              <p style="font-size: 18px;">Hei <strong>${escapeHtml(customerName)}</strong>,</p>
               
               <p style="font-size: 16px; line-height: 1.6;">Din faktura for utført arbeid er nå klar.</p>
               
               <div class="invoice-details">
                 <h3 style="margin-top: 0; color: #0891B2;">Fakturadetaljer</h3>
-                <p style="margin: 8px 0;"><strong>Fakturanummer:</strong> ${invoiceNumber}</p>
-                <p style="margin: 8px 0;"><strong>Beløp:</strong> ${formattedAmount}</p>
-                <p style="margin: 8px 0;"><strong>Forfallsdato:</strong> ${formattedDate}</p>
+                <p style="margin: 8px 0;"><strong>Fakturanummer:</strong> ${escapeHtml(invoiceNumber)}</p>
+                <p style="margin: 8px 0;"><strong>Beløp:</strong> ${escapeHtml(formattedAmount)}</p>
+                <p style="margin: 8px 0;"><strong>Forfallsdato:</strong> ${escapeHtml(formattedDate)}</p>
               </div>
               
               <p style="font-size: 16px; line-height: 1.6;">Du kan laste ned fakturaen fra din kundeside på handyhjelp.no</p>

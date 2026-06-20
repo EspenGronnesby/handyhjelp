@@ -162,7 +162,7 @@ export const QuoteForm = () => {
 
     try {
       // Server-side Turnstile-verifisering
-      if ("0x4AAAAAADn4g81NT3QFVWfT" && captchaToken) {
+      if (captchaToken) {
         const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-turnstile', {
           body: { token: captchaToken },
         });
@@ -639,19 +639,17 @@ export const QuoteForm = () => {
             </Button>
           ) : (
             <>
-            {"0x4AAAAAADn4g81NT3QFVWfT" && (
-              <Turnstile
-                ref={captchaRef}
-                siteKey={"0x4AAAAAADn4g81NT3QFVWfT"}
-                onSuccess={(token) => setCaptchaToken(token)}
-                onExpire={() => setCaptchaToken(null)}
-              />
-            )}
+            <Turnstile
+              ref={captchaRef}
+              siteKey={"0x4AAAAAADn4g81NT3QFVWfT"}
+              onSuccess={(token) => setCaptchaToken(token)}
+              onExpire={() => setCaptchaToken(null)}
+            />
             <Button
               type="button"
               variant="cta"
               onClick={handleSubmit}
-              disabled={!isStepValid() || isSubmitting || (!captchaToken && !!"0x4AAAAAADn4g81NT3QFVWfT")}
+              disabled={!isStepValid() || isSubmitting || !captchaToken}
             >
               {isSubmitting ? (
                 <>

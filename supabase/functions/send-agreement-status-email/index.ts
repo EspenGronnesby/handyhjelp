@@ -80,6 +80,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const errorResponse = (message: string, status: number, requestId: string, details?: unknown) => {
   return new Response(
     JSON.stringify({
@@ -172,6 +181,33 @@ const handler = async (req: Request): Promise<Response> => {
   if (req.method !== "POST") {
     log.warn("Invalid request method", { requestId, method: req.method });
     return errorResponse("Method not allowed", 405, requestId);
+  }
+
+  // --- AuthN/Z: require admin or platform_owner ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return errorResponse("Unauthorized", 401, requestId);
+  }
+  const jwt = authHeader.replace("Bearer ", "");
+  const authClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+  );
+  const { data: userData, error: userError } = await authClient.auth.getUser(jwt);
+  if (userError || !userData?.user) {
+    return errorResponse("Unauthorized", 401, requestId);
+  }
+  const adminClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+  const { data: roleRows } = await adminClient
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userData.user.id)
+    .in("role", ["admin", "platform_owner"]);
+  if (!roleRows || roleRows.length === 0) {
+    return errorResponse("Forbidden", 403, requestId);
   }
 
   let requestData: AgreementStatusEmailRequest;
@@ -289,7 +325,7 @@ const handler = async (req: Request): Promise<Response> => {
       rejectionSection = `
         <div style="background-color: #FEE2E2; padding: 20px; border-radius: 8px; margin: 20px 0; border: 2px solid #EF4444;">
           <h3 style="margin: 0 0 10px 0; color: #991B1B;">Årsak</h3>
-          <p style="color: #991B1B; margin: 0; font-style: italic;">"${rejectionReason}"</p>
+          <p style="color: #991B1B; margin: 0; font-style: italic;">"${escapeHtml(rejectionReason)}"</p>
         </div>
       `;
     }
@@ -309,7 +345,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div>
           
           <div style="padding: 30px; background-color: #ffffff; border: 1px solid #E5E7EB; border-top: none;">
-            <h2 style="color: #2C3E50; margin-top: 0;">Hei ${contactPerson},</h2>
+            <h2 style="color: #2C3E50; margin-top: 0;">Hei ${escapeHtml(contactPerson)},</h2>
             
             <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">
               ${config.message}
@@ -321,8 +357,8 @@ const handler = async (req: Request): Promise<Response> => {
             
             <div style="background-color: #F1F5F9; padding: 20px; border-radius: 8px; margin: 25px 0;">
               <h3 style="margin: 0 0 15px 0; color: #2C3E50;">Detaljer om forespørselen:</h3>
-              <p style="margin: 8px 0; color: #4A5568;"><strong>Adresse:</strong> ${address || 'Ikke oppgitt'}</p>
-              <p style="margin: 8px 0; color: #4A5568;"><strong>Tjenester:</strong> ${servicesList}</p>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>Adresse:</strong> ${escapeHtml(address || 'Ikke oppgitt')}</p>
+              <p style="margin: 8px 0; color: #4A5568;"><strong>Tjenester:</strong> ${escapeHtml(servicesList)}</p>
             </div>
             
             <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 25px 0;">
@@ -378,9 +414,9 @@ const handler = async (req: Request): Promise<Response> => {
         html: `
           <h2>Feil ved sending av avtalestatus-epost</h2>
           <p><strong>Request ID:</strong> ${requestId}</p>
-          <p><strong>Kontaktperson:</strong> ${contactPerson} (${email})</p>
-          <p><strong>Status:</strong> ${status}</p>
-          <p><strong>Adresse:</strong> ${address}</p>
+          <p><strong>Kontaktperson:</strong> ${escapeHtml(contactPerson)} (${escapeHtml(email)})</p>
+          <p><strong>Status:</strong> ${escapeHtml(status)}</p>
+          <p><strong>Adresse:</strong> ${escapeHtml(address)}</p>
           <p><strong>Feilmelding:</strong> ${error instanceof Error ? error.message : 'Ukjent feil'}</p>
           <p><strong>⚠️ Vennligst informer kunden manuelt.</strong></p>
         `,

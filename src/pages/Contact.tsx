@@ -163,15 +163,13 @@ const Contact = () => {
                     <p className="text-sm text-muted-foreground">
                       <span className="text-destructive">*</span> Obligatoriske felt
                     </p>
-                    {"0x4AAAAAADn4g81NT3QFVWfT" && (
-                      <Turnstile
-                        ref={captchaRef}
-                        siteKey={"0x4AAAAAADn4g81NT3QFVWfT"}
-                        onSuccess={(token) => setCaptchaToken(token)}
-                        onExpire={() => setCaptchaToken(null)}
-                      />
-                    )}
-                    <Button type="submit" className="w-full" disabled={isSubmitting || (!captchaToken && !!"0x4AAAAAADn4g81NT3QFVWfT")}>
+                    <Turnstile
+                      ref={captchaRef}
+                      siteKey={"0x4AAAAAADn4g81NT3QFVWfT"}
+                      onSuccess={(token) => setCaptchaToken(token)}
+                      onExpire={() => setCaptchaToken(null)}
+                    />
+                    <Button type="submit" className="w-full" disabled={isSubmitting || !captchaToken}>
                       {isSubmitting ? <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Sender...

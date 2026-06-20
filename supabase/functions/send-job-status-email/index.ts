@@ -82,6 +82,15 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // Error response helper
 const errorResponse = (message: string, status: number, requestId: string, details?: unknown) => {
   return new Response(
@@ -152,6 +161,29 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Method not allowed", 405, requestId);
   }
 
+  // --- AuthN/Z: require admin or platform_owner ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return errorResponse("Unauthorized", 401, requestId);
+  }
+  const jwt = authHeader.replace("Bearer ", "");
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const authClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
+  const { data: userData, error: userError } = await authClient.auth.getUser(jwt);
+  if (userError || !userData?.user) {
+    return errorResponse("Unauthorized", 401, requestId);
+  }
+  const supabase = createClient(supabaseUrl, supabaseKey);
+  const { data: roleRows } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userData.user.id)
+    .in("role", ["admin", "platform_owner"]);
+  if (!roleRows || roleRows.length === 0) {
+    return errorResponse("Forbidden", 403, requestId);
+  }
+
   let requestData: JobStatusEmailRequest;
 
   try {
@@ -165,12 +197,12 @@ const handler = async (req: Request): Promise<Response> => {
 
   // Validate required fields
   if (!customerName || !customerEmail || !jobDescription || !status) {
-    log.warn("Missing required fields", { 
-      requestId, 
-      customerName: !!customerName, 
-      customerEmail: !!customerEmail, 
-      jobDescription: !!jobDescription, 
-      status: !!status 
+    log.warn("Missing required fields", {
+      requestId,
+      customerName: !!customerName,
+      customerEmail: !!customerEmail,
+      jobDescription: !!jobDescription,
+      status: !!status
     });
     return errorResponse("Missing required fields", 400, requestId);
   }
@@ -188,12 +220,8 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Invalid email format", 400, requestId);
   }
 
-  log.info("Sending job status email", { requestId, customerEmail, status });
-
-  // Initialize Supabase client for feedback token
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  // (supabaseUrl, supabase initialized above for auth)
+  const supabaseUrlForFeedback = supabaseUrl;
 
   try {
     let subject: string;
@@ -227,7 +255,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="content">
-              <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+              <p style="font-size: 18px;">Hei <strong>${escapeHtml(customerName)}</strong>,</p>
               
               <p style="font-size: 16px; line-height: 1.6;">
                 Gode nyheter! Vi har startet arbeidet med ditt oppdrag:
@@ -235,7 +263,7 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div class="job-description">
                 <p style="font-size: 16px; font-weight: bold; margin: 0;">
-                  "${jobDescription}"
+                  "${escapeHtml(jobDescription)}"
                 </p>
               </div>
               
@@ -347,7 +375,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="content">
-              <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+              <p style="font-size: 18px;">Hei <strong>${escapeHtml(customerName)}</strong>,</p>
               
               <p style="font-size: 16px; line-height: 1.6;">
                 Oppdraget ditt er nå fullført:
@@ -355,7 +383,7 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div class="job-description">
                 <p style="font-size: 16px; font-weight: bold; margin: 0;">
-                  "${jobDescription}"
+                  "${escapeHtml(jobDescription)}"
                 </p>
               </div>
               
@@ -438,9 +466,9 @@ const handler = async (req: Request): Promise<Response> => {
         html: `
           <h2>Feil ved sending av jobbstatus-epost</h2>
           <p><strong>Request ID:</strong> ${requestId}</p>
-          <p><strong>Kunde:</strong> ${customerName} (${customerEmail})</p>
-          <p><strong>Status:</strong> ${status}</p>
-          <p><strong>Jobbeskrivelse:</strong> ${jobDescription}</p>
+          <p><strong>Kunde:</strong> ${escapeHtml(customerName)} (${escapeHtml(customerEmail)})</p>
+          <p><strong>Status:</strong> ${escapeHtml(status)}</p>
+          <p><strong>Jobbeskrivelse:</strong> ${escapeHtml(jobDescription)}</p>
           <p><strong>Feilmelding:</strong> ${error instanceof Error ? error.message : 'Ukjent feil'}</p>
           <p><strong>Vennligst informer kunden manuelt.</strong></p>
         `,

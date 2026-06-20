@@ -80,9 +80,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 interface InvoiceRequestPayload {
   jobId: string;
-  userId: string;
+  userId?: string;
   customerName: string;
   customerEmail: string;
   jobDescription: string;
@@ -118,14 +127,37 @@ const handler = async (req: Request): Promise<Response> => {
     );
   }
 
+  // --- AuthN: require a valid Supabase user JWT ---
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+  const jwt = authHeader.replace("Bearer ", "");
+  const authClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+  );
+  const { data: userData, error: userError } = await authClient.auth.getUser(jwt);
+  if (userError || !userData?.user) {
+    return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+
   try {
     const payload: InvoiceRequestPayload = await req.json();
     log.info("Processing payload", { requestId, jobId: payload.jobId });
 
-    const { jobId, userId, customerName, customerEmail, jobDescription } = payload;
+    // Derive userId from authenticated session — ignore client-supplied value
+    const userId = userData.user.id;
+    const { jobId, customerName, customerEmail, jobDescription } = payload;
 
     // Validate required fields
-    if (!jobId || !userId || !customerName || !customerEmail || !jobDescription) {
+    if (!jobId || !customerName || !customerEmail || !jobDescription) {
       log.warn("Missing required fields", { requestId });
       return new Response(
         JSON.stringify({ success: false, error: "Missing required fields" }),
@@ -155,14 +187,14 @@ const handler = async (req: Request): Promise<Response> => {
           
           <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Kundedetaljer</h3>
-            <p><strong>Navn:</strong> ${customerName}</p>
-            <p><strong>E-post:</strong> ${customerEmail}</p>
+            <p><strong>Navn:</strong> ${escapeHtml(customerName)}</p>
+            <p><strong>E-post:</strong> ${escapeHtml(customerEmail)}</p>
           </div>
           
           <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="margin-top: 0;">Jobbdetaljer</h3>
-            <p><strong>Beskrivelse:</strong> ${jobDescription}</p>
-            <p><strong>Jobb-ID:</strong> ${jobId}</p>
+            <p><strong>Beskrivelse:</strong> ${escapeHtml(jobDescription)}</p>
+            <p><strong>Jobb-ID:</strong> ${escapeHtml(jobId)}</p>
           </div>
           
           <p>Logg inn på admin-dashboardet for å legge til faktura.</p>
