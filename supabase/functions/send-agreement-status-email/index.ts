@@ -414,9 +414,9 @@ const handler = async (req: Request): Promise<Response> => {
         html: `
           <h2>Feil ved sending av avtalestatus-epost</h2>
           <p><strong>Request ID:</strong> ${requestId}</p>
-          <p><strong>Kontaktperson:</strong> ${contactPerson} (${email})</p>
-          <p><strong>Status:</strong> ${status}</p>
-          <p><strong>Adresse:</strong> ${address}</p>
+          <p><strong>Kontaktperson:</strong> ${escapeHtml(contactPerson)} (${escapeHtml(email)})</p>
+          <p><strong>Status:</strong> ${escapeHtml(status)}</p>
+          <p><strong>Adresse:</strong> ${escapeHtml(address)}</p>
           <p><strong>Feilmelding:</strong> ${error instanceof Error ? error.message : 'Ukjent feil'}</p>
           <p><strong>⚠️ Vennligst informer kunden manuelt.</strong></p>
         `,
