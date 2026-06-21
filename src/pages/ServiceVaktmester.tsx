@@ -8,6 +8,7 @@ import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 import { EditableServiceHero } from "@/components/service-edit/EditableServiceHero";
 import { EditableServiceAbout } from "@/components/service-edit/EditableServiceAbout";
+import { EditableServiceCallout } from "@/components/service-edit/EditableServiceCallout";
 import { EditableServiceIncluded } from "@/components/service-edit/EditableServiceIncluded";
 import { EditableServiceTarget } from "@/components/service-edit/EditableServiceTarget";
 import { EditableServicePricing } from "@/components/service-edit/EditableServicePricing";
@@ -18,7 +19,7 @@ const ServiceVaktmester = () => {
   const { heroImage, loading, refetch } = useHeroImage('services-vaktmester', servicesBackground);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20 lg:pt-40">
       <PageSEO path="/tjenester/vaktmester" />
       <GoogleAnalytics />
       <Header />
@@ -55,6 +56,16 @@ const ServiceVaktmester = () => {
         </div>
       </section>
 
+      {/* Sitat */}
+      <section className="py-8 md:py-10 bg-primary/5 border-y border-primary/10">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceCallout
+            section="service-vaktmester"
+            defaultCallout="Din eiendom er i trygge hender — vi følger opp og sørger for at alt vedlikehold blir utført til avtalt tid."
+          />
+        </div>
+      </section>
+
       {/* Hva er inkludert */}
       <section className="py-10 md:py-14 bg-muted/30">
         <div className="container mx-auto px-4 max-w-4xl">
@@ -78,8 +89,8 @@ const ServiceVaktmester = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <EditableServiceTarget
             section="service-vaktmester"
-            defaultTarget="Borettslag, sameier, næringseiendom"
-            defaultDescription="Våre vaktmestertjenester er spesielt tilpasset for større eiendommer med behov for jevnlig tilsyn og vedlikehold. Vi jobber tett med styrer, eiendomsforvaltere og ansvarlige for å sikre best mulig eiendomspleie."
+            defaultTarget="Borettslag, sameier, næringseiendom, arrangører"
+            defaultDescription="Vi avlaster deg før store anledninger — enten det er 17. mai, sommerfest, generalforsamling eller andre arrangementer der det skal se pent ut. Vi tar oss av uteområder, fellesarealer og inngangspartier slik at du kan fokusere på det som skjer. Perfekt for borettslag og sameier som vil gjøre et godt inntrykk på beboere og gjester."
           />
         </div>
       </section>

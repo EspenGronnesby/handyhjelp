@@ -78,6 +78,11 @@ export const EditableServiceTarget = ({
     }
   };
 
+  const audienceTags = displayData.target
+    .split(',')
+    .map(t => t.trim())
+    .filter(Boolean);
+
   const { ref, style } = useFadeInUp({ threshold: 0.15 });
 
   return (
@@ -93,14 +98,20 @@ export const EditableServiceTarget = ({
           title="Hvem er dette for?"
         />
 
-        <div>
-          <p className="text-base md:text-lg text-foreground mb-2">
-            <span className="font-semibold">Passer for:</span> {displayData.target}
-          </p>
-          <p className="text-sm md:text-base text-muted-foreground">
-            {displayData.description}
-          </p>
+        <div className="flex flex-wrap gap-2 mb-5">
+          {audienceTags.map((tag, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20"
+            >
+              {tag}
+            </span>
+          ))}
         </div>
+
+        <p className="text-sm md:text-base text-muted-foreground max-w-3xl">
+          {displayData.description}
+        </p>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -118,7 +129,7 @@ export const EditableServiceTarget = ({
                 maxLength={200}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Eks: "Privatpersoner, bedrifter, boligselskaper"
+                Kommaseparert — f.eks. «Privatpersoner, Bedrifter, Boligselskaper». Hvert punkt vises som en badge.
               </p>
             </div>
             <div>

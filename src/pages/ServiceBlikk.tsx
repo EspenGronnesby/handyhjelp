@@ -8,6 +8,7 @@ import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 import { EditableServiceHero } from "@/components/service-edit/EditableServiceHero";
 import { EditableServiceAbout } from "@/components/service-edit/EditableServiceAbout";
+import { EditableServiceCallout } from "@/components/service-edit/EditableServiceCallout";
 import { EditableServiceIncluded } from "@/components/service-edit/EditableServiceIncluded";
 import { EditableServiceTarget } from "@/components/service-edit/EditableServiceTarget";
 import { EditableServicePricing } from "@/components/service-edit/EditableServicePricing";
@@ -18,7 +19,7 @@ const ServiceBlikk = () => {
   const { heroImage, loading, refetch } = useHeroImage('services-blikk', servicesBackground);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20 lg:pt-40">
       <PageSEO path="/tjenester/blikk" />
       <GoogleAnalytics />
       <Header />
@@ -50,6 +51,15 @@ const ServiceBlikk = () => {
             defaultParagraph1="Profesjonelle takteknings- og vannsikringsløsninger. Vi sikrer at taket ditt holder tett og at vannet ledes bort på riktig måte."
             defaultParagraph2="Våre erfarne blikkenslagere har lang erfaring med alle typer tak og vannsystemer. Vi jobber med presisjon og kvalitet for å sikre at eiendommen din er beskyttet mot vær og vind."
             defaultParagraph3="Fra takrenner og nedløp til tetting og vannsikring – vi tar oss av alt som har med blikk og taktekking å gjøre. Du kan stole på at jobben blir gjort riktig første gang."
+          />
+        </div>
+      </section>
+
+      <section className="py-8 md:py-10 bg-primary/5 border-y border-primary/10">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceCallout
+            section="service-blikk"
+            defaultCallout="Taket ditt skal holde tett — vi jobber med presisjon for å beskytte eiendommen din mot vær og vind."
           />
         </div>
       </section>

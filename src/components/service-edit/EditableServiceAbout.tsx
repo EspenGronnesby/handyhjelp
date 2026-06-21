@@ -67,7 +67,7 @@ export const EditableServiceAbout = ({
           }, {
             onConflict: 'section,content_key'
           });
-        
+
         if (error) throw error;
       }
 

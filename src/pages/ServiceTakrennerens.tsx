@@ -8,6 +8,7 @@ import { useHeroImage } from "@/hooks/useHeroImage";
 import servicesBackground from "@/assets/hero-services-background.png";
 import { EditableServiceHero } from "@/components/service-edit/EditableServiceHero";
 import { EditableServiceAbout } from "@/components/service-edit/EditableServiceAbout";
+import { EditableServiceCallout } from "@/components/service-edit/EditableServiceCallout";
 import { EditableServiceIncluded } from "@/components/service-edit/EditableServiceIncluded";
 import { EditableServiceTarget } from "@/components/service-edit/EditableServiceTarget";
 import { EditableServicePricing } from "@/components/service-edit/EditableServicePricing";
@@ -18,7 +19,7 @@ const ServiceTakrennerens = () => {
   const { heroImage, loading, refetch } = useHeroImage('services-takrennerens', servicesBackground);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20 lg:pt-40">
       <PageSEO path="/tjenester/takrennerens" />
       <GoogleAnalytics />
       <Header />
@@ -52,6 +53,15 @@ const ServiceTakrennerens = () => {
             defaultParagraph1="Hold takrennene i topp stand! Tilstoppede takrenner kan føre til vannskader, fuktproblemer og dyre reparasjoner. Vi sørger for grundig rensing og vedlikehold slik at vannet dreneres riktig."
             defaultParagraph2="Våre erfarne fagfolk fjerner alle typer avfall fra takrennene dine – løv, mose, rusk og annet som kan blokkere for god drenering. Vi inspiserer samtidig beslag, feste og nedløpsrør for å sikre at alt fungerer som det skal."
             defaultParagraph3="Med vår tjeneste får du trygghet mot vannskader og lange levetid på takrennene. Vi leverer rask og profesjonell service til en fast, konkurransedyktig pris."
+          />
+        </div>
+      </section>
+
+      <section className="py-8 md:py-10 bg-primary/5 border-y border-primary/10">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <EditableServiceCallout
+            section="service-takrennerens"
+            defaultCallout="Tilstoppede takrenner kan føre til vannskader og dyre reparasjoner — vi sørger for grundig rensing og vedlikehold slik at vannet alltid dreneres riktig."
           />
         </div>
       </section>
