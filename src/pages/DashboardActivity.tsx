@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Mail } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -78,14 +78,31 @@ interface Invoice {
   invoice_number: string;
   created_at: string;
 }
+interface ActivityLogEntry {
+  id: string;
+  action_type: string;
+  user_name: string | null;
+  metadata: Record<string, any> | null;
+  created_at: string | null;
+  description: string;
+}
+interface EmailLogEntry {
+  id: string;
+  subject: string;
+  sent_at: string | null;
+  sender_name: string | null;
+  recipient_name: string | null;
+  template_name: string | null;
+}
 interface ActivityEvent {
   date: string;
   label: string;
   gradient: string;
   id: string;
-  entityType: 'quote' | 'job' | 'agreement' | 'invoice';
-  entity: Quote | Job | ServiceAgreement | Invoice;
+  entityType: 'quote' | 'job' | 'agreement' | 'invoice' | 'email';
+  entity: Quote | Job | ServiceAgreement | Invoice | EmailLogEntry;
   customerName?: string;
+  actorName?: string;
 }
 interface InvoiceRequest {
   id: string;
@@ -167,6 +184,9 @@ const DashboardActivity = () => {
   const [completedJobsPage, setCompletedJobsPage] = useState(1);
   const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(null);
   const [showAllActivity, setShowAllActivity] = useState(false);
+  const [jobActivityLogs, setJobActivityLogs] = useState<ActivityLogEntry[]>([]);
+  const [emailLogs, setEmailLogs] = useState<EmailLogEntry[]>([]);
+  const [adminEmailLogs, setAdminEmailLogs] = useState<EmailLogEntry[]>([]);
   const [adminQuotes, setAdminQuotes] = useState<Quote[]>([]);
   const [adminJobs, setAdminJobs] = useState<Job[]>([]);
   const [adminAgreements, setAdminAgreements] = useState<ServiceAgreement[]>([]);
@@ -226,6 +246,24 @@ const DashboardActivity = () => {
     if (invoicesData) setInvoices(invoicesData as Invoice[]);
     if (requestsData) setInvoiceRequests(requestsData as InvoiceRequest[]);
 
+    // Hent aktørnavn for jobber fra activity_logs
+    const { data: activityLogsData } = await supabase
+      .from('activity_logs')
+      .select('id, action_type, user_name, metadata, created_at, description')
+      .in('action_type', ['job_started', 'job_completed'])
+      .order('created_at', { ascending: false })
+      .limit(30);
+    if (activityLogsData) setJobActivityLogs(activityLogsData as ActivityLogEntry[]);
+
+    // Hent e-poster sendt til denne brukeren
+    const { data: emailLogsData } = await supabase
+      .from('email_logs')
+      .select('id, subject, sent_at, sender_name, recipient_name, template_name')
+      .eq('recipient_user_id', user.id)
+      .order('sent_at', { ascending: false })
+      .limit(10);
+    if (emailLogsData) setEmailLogs(emailLogsData as EmailLogEntry[]);
+
     // Admin/owner: fetch platform-wide data for activity feed
     const userRolesRes = await supabase.from('user_roles').select('role').eq('user_id', user.id);
     const userRoles = userRolesRes.data?.map(r => r.role) ?? [];
@@ -240,6 +278,14 @@ const DashboardActivity = () => {
       if (adminQRes.data) setAdminQuotes(adminQRes.data);
       if (adminJRes.data) setAdminJobs(adminJRes.data);
       if (adminARes.data) setAdminAgreements(adminARes.data as ServiceAgreement[]);
+
+      // Admin e-poster (alle, nyeste)
+      const { data: adminEmailData } = await supabase
+        .from('email_logs')
+        .select('id, subject, sent_at, sender_name, recipient_name, template_name')
+        .order('sent_at', { ascending: false })
+        .limit(10);
+      if (adminEmailData) setAdminEmailLogs(adminEmailData as EmailLogEntry[]);
     }
 
     setLoading(false);
@@ -400,6 +446,13 @@ const DashboardActivity = () => {
   const isOnlyWorker = isWorker && !isAdmin && !isOwner;
 
   const allActivityEvents = useMemo((): ActivityEvent[] => {
+    // Bygg lookup-map: jobId/quoteId → aktørnavn fra activity_logs
+    const jobActorMap: Record<string, string> = {};
+    jobActivityLogs.forEach(log => {
+      const id = log.metadata?.job_id ?? log.metadata?.quote_id ?? log.metadata?.profile_id;
+      if (id && log.user_name) jobActorMap[id] = log.user_name;
+    });
+
     if (isAdmin || isOwner) {
       // Plattformomfattende visning for admin/owner
       const events: ActivityEvent[] = [
@@ -420,6 +473,7 @@ const DashboardActivity = () => {
           entityType: 'job' as const,
           entity: j,
           customerName: j.quotes?.type === 'business' ? (j.quotes?.company_name ?? j.quotes?.name) : j.quotes?.name,
+          actorName: jobActorMap[j.id],
         })),
         ...adminJobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({
           date: j.completed_date!,
@@ -429,6 +483,7 @@ const DashboardActivity = () => {
           entityType: 'job' as const,
           entity: j,
           customerName: j.quotes?.type === 'business' ? (j.quotes?.company_name ?? j.quotes?.name) : j.quotes?.name,
+          actorName: jobActorMap[j.id],
         })),
         ...adminAgreements.map(a => ({
           date: a.created_at,
@@ -438,6 +493,16 @@ const DashboardActivity = () => {
           entityType: 'agreement' as const,
           entity: a,
           customerName: a.contact_person,
+        })),
+        ...adminEmailLogs.filter(e => e.sent_at).map(e => ({
+          date: e.sent_at!,
+          label: 'E-post sendt',
+          gradient: 'from-sky-500 to-blue-500',
+          id: e.id,
+          entityType: 'email' as const,
+          entity: e,
+          customerName: e.recipient_name ?? undefined,
+          actorName: e.sender_name ?? 'HandyHjelp',
         })),
       ];
       return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -454,7 +519,6 @@ const DashboardActivity = () => {
         entity: q,
       };
       if (q.status === 'pending') return [base];
-      // For quotes med progresjon: vis opprettelse + statusendring
       const statusEvent: ActivityEvent = {
         date: q.updated_at,
         label: q.status === 'under_review' ? 'Forespørsel under vurdering'
@@ -508,6 +572,7 @@ const DashboardActivity = () => {
         id: `${j.id}-started`,
         entityType: 'job' as const,
         entity: j,
+        actorName: jobActorMap[j.id],
       })),
       ...jobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({
         date: j.completed_date!,
@@ -516,6 +581,7 @@ const DashboardActivity = () => {
         id: `${j.id}-completed`,
         entityType: 'job' as const,
         entity: j,
+        actorName: jobActorMap[j.id],
       })),
       ...agreementMilestones,
       ...invoices.filter(i => i.status === 'paid').map(i => ({
@@ -526,9 +592,19 @@ const DashboardActivity = () => {
         entityType: 'invoice' as const,
         entity: i,
       })),
+      ...emailLogs.filter(e => e.sent_at).map(e => ({
+        date: e.sent_at!,
+        label: 'E-post sendt',
+        gradient: 'from-sky-500 to-blue-500',
+        id: e.id,
+        entityType: 'email' as const,
+        entity: e,
+        actorName: e.sender_name ?? 'HandyHjelp',
+      })),
     ];
     return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [quotes, jobs, invoices, agreements, adminQuotes, adminJobs, adminAgreements, isAdmin, isOwner]);
+  }, [quotes, jobs, invoices, agreements, adminQuotes, adminJobs, adminAgreements,
+      jobActivityLogs, emailLogs, adminEmailLogs, isAdmin, isOwner]);
 
   const recentActivity = allActivityEvents.slice(0, showAllActivity ? 10 : 5);
 
@@ -576,8 +652,13 @@ const DashboardActivity = () => {
                     <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${event.gradient} shrink-0`} />
                     <div className="flex flex-col">
                       <span className="text-sm text-foreground/80 whitespace-nowrap">{event.label}</span>
-                      {event.customerName && (
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">{event.customerName}</span>
+                      {(isAdmin || isOwner) ? (
+                        <>
+                          {event.customerName && <span className="text-xs text-muted-foreground whitespace-nowrap">{event.customerName}</span>}
+                          {event.actorName && <span className="text-xs text-muted-foreground/60 whitespace-nowrap">Av: {event.actorName}</span>}
+                        </>
+                      ) : (
+                        event.actorName && <span className="text-xs text-muted-foreground whitespace-nowrap">{event.actorName}</span>
                       )}
                     </div>
                     <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
@@ -679,6 +760,12 @@ const DashboardActivity = () => {
                           {j.status === 'completed' ? 'Fullført' : 'Pågår'}
                         </Badge>
                       </div>
+                      {selectedEvent.actorName && (
+                        <div className="flex items-center justify-between pt-1 border-t border-border/40">
+                          <span className="text-xs text-muted-foreground">Utført av</span>
+                          <span className="text-sm font-medium">{selectedEvent.actorName}</span>
+                        </div>
+                      )}
                     </>
                   );
                 })()}
@@ -740,6 +827,34 @@ const DashboardActivity = () => {
                       <Badge className="bg-green-500 w-fit flex items-center gap-1">
                         <CheckCircle className="h-3 w-3" /> Betalt
                       </Badge>
+                    </>
+                  );
+                })()}
+
+                {selectedEvent.entityType === 'email' && (() => {
+                  const e = selectedEvent.entity as EmailLogEntry;
+                  return (
+                    <>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Emne</p>
+                        <p className="text-sm font-medium">{e.subject}</p>
+                      </div>
+                      {e.recipient_name && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Mottaker</span>
+                          <span className="text-sm">{e.recipient_name}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Sendt av</span>
+                        <span className="text-sm font-medium">{e.sender_name ?? 'HandyHjelp'}</span>
+                      </div>
+                      {e.sent_at && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Tidspunkt</span>
+                          <span className="text-sm">{format(new Date(e.sent_at), 'd. MMM yyyy HH:mm', { locale: nb })}</span>
+                        </div>
+                      )}
                     </>
                   );
                 })()}
