@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, EyeOff, ClipboardCheck } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { EyeOff, ClipboardCheck } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -14,6 +13,7 @@ import { isStringEmpty, getDisplayValue } from '@/lib/gridUtils';
 import { EditButton } from '@/components/ui/EditButton';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useFadeInUp } from '@/hooks/useScrollAnimation';
+import { cn } from '@/lib/utils';
 
 interface EditableServiceIncludedProps {
   section: string;
@@ -102,6 +102,14 @@ export const EditableServiceIncluded = ({
     return null;
   }
 
+  // Split into two columns for desktop layout
+  const visibleItems = isAdmin && editMode ? displayItems : displayItems.filter(i => !isStringEmpty(i));
+  const half = Math.ceil(visibleItems.length / 2);
+  const leftCol = visibleItems.slice(0, half);
+  const rightCol = visibleItems.slice(half);
+
+  let visibleIndex = 0;
+
   return (
     <>
       <div ref={ref} style={style} className="relative">
@@ -115,35 +123,38 @@ export const EditableServiceIncluded = ({
           title="Hva er inkludert?"
         />
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
-          {displayItems.map((item, idx) => {
-            const isHidden = isStringEmpty(item);
-            if (isHidden && !(isAdmin && editMode)) {
-              return null;
-            }
-            return (
-              <div
-                key={idx}
-                className={cn(
-                  "flex flex-col items-center text-center gap-3 p-4 rounded-xl glass-surface",
-                  isHidden && isAdmin && editMode ? "opacity-50" : ""
-                )}
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-md shrink-0">
-                  {isHidden && isAdmin && editMode ? (
-                    <EyeOff className="h-4 w-4 text-white" strokeWidth={2} />
-                  ) : (
-                    <CheckCircle2 className="h-5 w-5 text-white" strokeWidth={2.5} />
-                  )}
-                </div>
-                {isHidden && isAdmin && editMode ? (
-                  <span className="text-muted-foreground italic text-xs">Tom (skjult)</span>
-                ) : (
-                  <span className="text-sm text-foreground font-medium leading-snug">{item}</span>
-                )}
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-0">
+          {[leftCol, rightCol].map((col, colIdx) => (
+            <div key={colIdx} className="divide-y divide-border">
+              {col.map((item) => {
+                const globalIdx = visibleIndex++;
+                const isHidden = isStringEmpty(item);
+                const displayNumber = String(globalIdx + 1).padStart(2, '0');
+
+                return (
+                  <div
+                    key={globalIdx}
+                    className={cn(
+                      "flex items-center gap-4 py-4",
+                      isHidden && isAdmin && editMode ? "opacity-40" : ""
+                    )}
+                  >
+                    <span className="text-xl font-bold font-heading text-primary/40 w-8 shrink-0 tabular-nums select-none">
+                      {displayNumber}
+                    </span>
+                    {isHidden && isAdmin && editMode ? (
+                      <span className="flex items-center gap-1.5 text-muted-foreground italic text-sm">
+                        <EyeOff className="h-3.5 w-3.5" />
+                        Tom (skjult)
+                      </span>
+                    ) : (
+                      <span className="text-sm md:text-base text-foreground">{item}</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
 
