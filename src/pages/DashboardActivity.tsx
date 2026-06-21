@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Mail } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -40,6 +40,7 @@ interface Quote {
 interface Job {
   id: string;
   user_id: string;
+  quote_id: string;
   status: string;
   scheduled_date?: string;
   completed_date?: string;
@@ -201,91 +202,67 @@ const DashboardActivity = () => {
     if (!user) return;
     setUserId(user.id);
 
-    // Fetch quotes - filtrer bort completed (vises kun i jobber)
-    const {
-      data: quotesData
-    } = await supabase.from('quotes').select('*').or(`user_id.eq.${user.id},email.eq.${user.email}`).neq('status', 'completed').order('created_at', {
-      ascending: false
-    });
+    // Alle bruker-queries parallelt
+    const [
+      { data: quotesData },
+      { data: jobsData },
+      { data: agreementsData },
+      { data: invoicesData },
+      { data: requestsData },
+      { data: activityLogsData },
+      { data: emailLogsData },
+      { data: rolesData },
+    ] = await Promise.all([
+      supabase.from('quotes').select('*')
+        .or(`user_id.eq.${user.id},email.eq.${user.email}`)
+        .neq('status', 'completed')
+        .order('created_at', { ascending: false }),
+      supabase.from('jobs').select('*, quotes(description, type, name, company_name, created_at)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }),
+      supabase.from('service_agreements').select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }),
+      supabase.from('invoices').select('*').eq('user_id', user.id),
+      supabase.from('invoice_requests').select('*').eq('user_id', user.id),
+      supabase.from('activity_logs')
+        .select('id, action_type, user_name, metadata, created_at, description')
+        .in('action_type', ['job_started', 'job_completed'])
+        .order('created_at', { ascending: false })
+        .limit(30),
+      supabase.from('email_logs')
+        .select('id, subject, sent_at, sender_name, recipient_name, template_name')
+        .eq('recipient_user_id', user.id)
+        .order('sent_at', { ascending: false })
+        .limit(10),
+      supabase.from('user_roles').select('role').eq('user_id', user.id),
+    ]);
 
-    // Fetch jobs
-    const {
-      data: jobsData
-    } = await supabase.from('jobs').select(`
-        *,
-        quotes (
-          description,
-          type,
-          name,
-          company_name,
-          created_at
-        )
-      `).eq('user_id', user.id).order('created_at', {
-      ascending: false
-    });
-
-    // Fetch service agreements
-    const {
-      data: agreementsData
-    } = await supabase.from('service_agreements').select('*').eq('user_id', user.id).order('created_at', {
-      ascending: false
-    });
-
-    // Fetch invoices
-    const {
-      data: invoicesData
-    } = await supabase.from('invoices').select('*').eq('user_id', user.id);
-
-    // Fetch invoice requests
-    const {
-      data: requestsData
-    } = await supabase.from('invoice_requests').select('*').eq('user_id', user.id);
     if (quotesData) setQuotes(quotesData);
     if (jobsData) setJobs(jobsData);
     if (agreementsData) setAgreements(agreementsData as ServiceAgreement[]);
     if (invoicesData) setInvoices(invoicesData as Invoice[]);
     if (requestsData) setInvoiceRequests(requestsData as InvoiceRequest[]);
-
-    // Hent aktørnavn for jobber fra activity_logs
-    const { data: activityLogsData } = await supabase
-      .from('activity_logs')
-      .select('id, action_type, user_name, metadata, created_at, description')
-      .in('action_type', ['job_started', 'job_completed'])
-      .order('created_at', { ascending: false })
-      .limit(30);
     if (activityLogsData) setJobActivityLogs(activityLogsData as ActivityLogEntry[]);
-
-    // Hent e-poster sendt til denne brukeren
-    const { data: emailLogsData } = await supabase
-      .from('email_logs')
-      .select('id, subject, sent_at, sender_name, recipient_name, template_name')
-      .eq('recipient_user_id', user.id)
-      .order('sent_at', { ascending: false })
-      .limit(10);
     if (emailLogsData) setEmailLogs(emailLogsData as EmailLogEntry[]);
 
-    // Admin/owner: fetch platform-wide data for activity feed
-    const userRolesRes = await supabase.from('user_roles').select('role').eq('user_id', user.id);
-    const userRoles = userRolesRes.data?.map(r => r.role) ?? [];
+    const userRoles = rolesData?.map(r => r.role) ?? [];
     const hasAdminAccess = userRoles.includes('admin') || userRoles.includes('platform_owner');
 
     if (hasAdminAccess) {
-      const [adminQRes, adminJRes, adminARes] = await Promise.all([
+      const [adminQRes, adminJRes, adminARes, adminEmailRes] = await Promise.all([
         supabase.from('quotes').select('*').order('created_at', { ascending: false }).limit(10),
         supabase.from('jobs').select('*, quotes(description, type, name, company_name, created_at)').order('created_at', { ascending: false }).limit(10),
         supabase.from('service_agreements').select('*').order('created_at', { ascending: false }).limit(5),
+        supabase.from('email_logs')
+          .select('id, subject, sent_at, sender_name, recipient_name, template_name')
+          .order('sent_at', { ascending: false })
+          .limit(10),
       ]);
       if (adminQRes.data) setAdminQuotes(adminQRes.data);
       if (adminJRes.data) setAdminJobs(adminJRes.data);
       if (adminARes.data) setAdminAgreements(adminARes.data as ServiceAgreement[]);
-
-      // Admin e-poster (alle, nyeste)
-      const { data: adminEmailData } = await supabase
-        .from('email_logs')
-        .select('id, subject, sent_at, sender_name, recipient_name, template_name')
-        .order('sent_at', { ascending: false })
-        .limit(10);
-      if (adminEmailData) setAdminEmailLogs(adminEmailData as EmailLogEntry[]);
+      if (adminEmailRes.data) setAdminEmailLogs(adminEmailRes.data as EmailLogEntry[]);
     }
 
     setLoading(false);
@@ -473,7 +450,7 @@ const DashboardActivity = () => {
           entityType: 'job' as const,
           entity: j,
           customerName: j.quotes?.type === 'business' ? (j.quotes?.company_name ?? j.quotes?.name) : j.quotes?.name,
-          actorName: jobActorMap[j.id],
+          actorName: jobActorMap[j.id] ?? jobActorMap[j.quote_id],
         })),
         ...adminJobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({
           date: j.completed_date!,
@@ -483,7 +460,7 @@ const DashboardActivity = () => {
           entityType: 'job' as const,
           entity: j,
           customerName: j.quotes?.type === 'business' ? (j.quotes?.company_name ?? j.quotes?.name) : j.quotes?.name,
-          actorName: jobActorMap[j.id],
+          actorName: jobActorMap[j.id] ?? jobActorMap[j.quote_id],
         })),
         ...adminAgreements.map(a => ({
           date: a.created_at,
@@ -572,7 +549,7 @@ const DashboardActivity = () => {
         id: `${j.id}-started`,
         entityType: 'job' as const,
         entity: j,
-        actorName: jobActorMap[j.id],
+        actorName: jobActorMap[j.id] ?? jobActorMap[j.quote_id],
       })),
       ...jobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({
         date: j.completed_date!,
@@ -581,7 +558,7 @@ const DashboardActivity = () => {
         id: `${j.id}-completed`,
         entityType: 'job' as const,
         entity: j,
-        actorName: jobActorMap[j.id],
+        actorName: jobActorMap[j.id] ?? jobActorMap[j.quote_id],
       })),
       ...agreementMilestones,
       ...invoices.filter(i => i.status === 'paid').map(i => ({
