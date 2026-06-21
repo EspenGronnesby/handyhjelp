@@ -132,14 +132,14 @@ export const EditableServiceBenefits = ({
                 key={idx}
                 style={getItemStyle(idx)}
                 className={cn(
-                  "flex flex-col items-center text-center gap-3 p-4 rounded-lg",
-                  "bg-card/50 hover:bg-card transition-colors duration-200",
+                  "flex flex-col items-center text-center gap-3 p-5 rounded-xl",
+                  "glass-surface card-hover-lift",
                   isHidden && isAdmin && editMode ? "opacity-50" : ""
                 )}
               >
                 <div
                   className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br shadow-sm",
+                    "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-lg",
                     visual.gradient
                   )}
                 >

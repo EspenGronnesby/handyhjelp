@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle2, EyeOff, ClipboardCheck } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -114,7 +115,7 @@ export const EditableServiceIncluded = ({
           title="Hva er inkludert?"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
           {displayItems.map((item, idx) => {
             const isHidden = isStringEmpty(item);
             if (isHidden && !(isAdmin && editMode)) {
@@ -123,18 +124,22 @@ export const EditableServiceIncluded = ({
             return (
               <div
                 key={idx}
-                className={`flex items-start gap-2 ${isHidden && isAdmin && editMode ? 'opacity-50' : ''}`}
+                className={cn(
+                  "flex flex-col items-center text-center gap-3 p-4 rounded-xl glass-surface",
+                  isHidden && isAdmin && editMode ? "opacity-50" : ""
+                )}
               >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-md shrink-0">
+                  {isHidden && isAdmin && editMode ? (
+                    <EyeOff className="h-4 w-4 text-white" strokeWidth={2} />
+                  ) : (
+                    <CheckCircle2 className="h-5 w-5 text-white" strokeWidth={2.5} />
+                  )}
+                </div>
                 {isHidden && isAdmin && editMode ? (
-                  <>
-                    <EyeOff className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground italic text-sm">Tom (skjult)</span>
-                  </>
+                  <span className="text-muted-foreground italic text-xs">Tom (skjult)</span>
                 ) : (
-                  <>
-                    <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base text-foreground">{item}</span>
-                  </>
+                  <span className="text-sm text-foreground font-medium leading-snug">{item}</span>
                 )}
               </div>
             );

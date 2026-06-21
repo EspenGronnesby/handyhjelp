@@ -18,7 +18,7 @@ const ServiceVaktmester = () => {
   const { heroImage, loading, refetch } = useHeroImage('services-vaktmester', servicesBackground);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20 lg:pt-40">
       <PageSEO path="/tjenester/vaktmester" />
       <GoogleAnalytics />
       <Header />
@@ -48,6 +48,7 @@ const ServiceVaktmester = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <EditableServiceAbout
             section="service-vaktmester"
+            defaultCallout="Din eiendom er i trygge hender — vi følger opp og sørger for at alt vedlikehold blir utført til avtalt tid."
             defaultParagraph1="Profesjonell eiendomspleie for borettslag, sameier og næringseiendom. Vi sørger for at ditt bygg holder seg i topp stand gjennom året med jevnlig tilsyn, vedlikehold og rask respons på akutte behov."
             defaultParagraph2="Våre erfarne vaktmestere har lang erfaring med alle typer eiendommer og sørger for at bygget ditt får den oppmerksomheten det fortjener. Vi tilbyr skreddersydde løsninger tilpasset dine behov, enten det er daglig, ukentlig eller månedlig service."
             defaultParagraph3="Med oss får du trygghet og forutsigbarhet. Vi følger opp, dokumenterer og sørger for at alle oppgaver blir utført til avtalt tid. Din eiendom er i trygge hender."

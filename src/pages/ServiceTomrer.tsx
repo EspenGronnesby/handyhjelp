@@ -18,7 +18,7 @@ const ServiceTomrer = () => {
   const { heroImage, loading, refetch } = useHeroImage('services-tomrer', servicesBackground);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20 lg:pt-40">
       <PageSEO path="/tjenester/tomrer" />
       <GoogleAnalytics />
       <Header />
@@ -47,6 +47,7 @@ const ServiceTomrer = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <EditableServiceAbout
             section="service-tomrer"
+            defaultCallout="Solid håndverk som varer — vi tar oppdraget fra start til slutt, og leverer til avtalt tid og pris."
             defaultParagraph1="Kvalitetssnekring og konstruksjonsarbeid fra erfarne tømrere. Enten du skal bygge nytt, renovere eller reparere, leverer vi solid håndverk som varer."
             defaultParagraph2="Våre dyktige tømrere har lang erfaring med alle typer trearbeider, fra mindre reparasjoner til store byggeprosjekter. Vi jobber alltid med fokus på kvalitet, presisjon og godt håndverk."
             defaultParagraph3="Fra terrasser og vinduer til større renoveringsprosjekter – vi tar oppdraget fra start til slutt. Du kan stole på at vi leverer til avtalt tid og pris, med resultater du blir fornøyd med."
