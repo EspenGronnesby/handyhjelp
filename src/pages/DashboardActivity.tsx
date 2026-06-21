@@ -619,7 +619,7 @@ const DashboardActivity = () => {
             </div>
           ) : (
             <>
-              <div className="flex flex-col sm:flex-row gap-2 overflow-x-auto pb-1">
+              <div className="flex flex-row gap-2 overflow-x-auto pb-1 scrollbar-hide">
                 {recentActivity.map((event) => (
                   <button
                     key={event.id}
