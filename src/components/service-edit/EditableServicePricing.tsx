@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, Tag } from 'lucide-react';
+import { CheckCircle2, Tag, ArrowRight, Clock } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -14,7 +14,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { EditButton } from '@/components/ui/EditButton';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useFadeInUp } from '@/hooks/useScrollAnimation';
-import { cn } from '@/lib/utils';
 
 interface EditableServicePricingProps {
   section: string;
@@ -119,41 +118,73 @@ export const EditableServicePricing = ({
         />
 
         {isFixedPrice ? (
-          <div className={cn(
-            "glass-card max-w-xl mx-auto p-6 md:p-8 text-center !border-success !border-2"
-          )}>
-            <p className="text-xs md:text-sm text-muted-foreground mb-1 uppercase tracking-wide">
-              Fast pris for enebolig
-            </p>
-            <p className="text-4xl md:text-5xl font-bold text-success mb-2">
-              {displayData.price}
-            </p>
-            <p className="text-sm text-muted-foreground mb-5">Ingen skjulte kostnader</p>
+          /* ── Fast pris ─────────────────────────────────────── */
+          <div className="flex flex-col sm:flex-row gap-6 items-start">
+            {/* Pris-kort */}
+            <div className="glass-card p-6 md:p-8 flex-1 max-w-sm">
+              <span className="inline-block text-xs font-semibold uppercase tracking-widest text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full mb-4">
+                Fast pris
+              </span>
+              <p className="text-5xl md:text-6xl font-bold font-heading text-foreground mb-1">
+                {displayData.price}
+              </p>
+              <p className="text-sm text-muted-foreground mb-5">Ingen skjulte kostnader</p>
 
-            {displayData.includes.length > 0 && (
-              <ul className="space-y-2 text-left max-w-sm mx-auto mb-6">
-                {displayData.includes.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                    <span className="text-sm md:text-base text-foreground">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+              {displayData.includes.length > 0 && (
+                <ul className="space-y-2 mb-6">
+                  {displayData.includes.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                      <span className="text-sm text-foreground">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            <Button asChild variant="cta" size="lg">
-              <Link to="/tilbud">Få tilbud</Link>
-            </Button>
+              <Button asChild variant="cta" className="w-full">
+                <Link to="/tilbud">Bestill nå</Link>
+              </Button>
+            </div>
+
+            {/* Hva som inngår */}
+            <div className="flex-1 pt-2">
+              <p className="text-base text-foreground font-medium mb-3">
+                {displayData.description}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Prisen gjelder standard enebolig. Kontakt oss for tilbud på større eiendommer eller spesielle oppdrag.
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="max-w-2xl">
-            <p className="text-base md:text-lg text-foreground mb-2">{displayData.description}</p>
-            <p className="text-sm md:text-base text-muted-foreground mb-5">
-              Priser varierer basert på størrelse, kompleksitet og materialvalg. Vi lager alltid et tilbud som er tilpasset dine behov og budsjett.
-            </p>
-            <Button asChild variant="cta" size="lg">
-              <Link to="/tilbud">Få tilbud</Link>
-            </Button>
+          /* ── Variabel pris ──────────────────────────────────── */
+          <div className="grid md:grid-cols-[1fr_auto] gap-6 md:gap-10 items-start">
+            {/* Venstre: forklaring */}
+            <div>
+              <p className="text-base md:text-lg text-foreground">
+                {displayData.description}
+              </p>
+            </div>
+
+            {/* Høyre: CTA-boks */}
+            <div className="glass-card p-6 text-center min-w-[200px] border-primary/20">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
+                Gratis tilbud
+              </p>
+              <p className="text-lg font-semibold text-foreground mb-1">
+                Uforpliktende
+              </p>
+              <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground mb-4">
+                <Clock className="h-3.5 w-3.5" />
+                <span>Svar innen 24 timer</span>
+              </div>
+              <Button asChild variant="cta" className="w-full gap-1.5">
+                <Link to="/tilbud">
+                  Få tilbud
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </div>
         )}
       </div>
