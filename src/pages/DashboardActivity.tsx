@@ -49,6 +49,7 @@ interface Job {
     type: string;
     name: string;
     company_name?: string;
+    created_at?: string;
   };
 }
 interface ServiceAgreement {
@@ -176,7 +177,8 @@ const DashboardActivity = () => {
           description,
           type,
           name,
-          company_name
+          company_name,
+          created_at
         )
       `).eq('user_id', user.id).order('created_at', {
       ascending: false
@@ -362,13 +364,20 @@ const DashboardActivity = () => {
 
   const recentActivity = useMemo(() => {
     const events: { date: string; label: string; gradient: string }[] = [
+      // Forespørsler som IKKE ble til jobb ennå
       ...quotes.map(q => ({ date: q.created_at, label: 'Forespørsel sendt', gradient: 'from-amber-500 to-orange-500' })),
+      // Forespørsler som ble til jobber (hentes fra quotes.created_at på jobben)
+      ...jobs.filter(j => j.quotes?.created_at).map(j => ({ date: j.quotes.created_at!, label: 'Forespørsel sendt', gradient: 'from-amber-500 to-orange-500' })),
+      // Jobber påbegynt og fullført
       ...jobs.filter(j => j.started_at).map(j => ({ date: j.started_at!, label: 'Jobb påbegynt', gradient: 'from-cyan-500 to-blue-500' })),
       ...jobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({ date: j.completed_date!, label: 'Jobb fullført', gradient: 'from-emerald-500 to-teal-500' })),
+      // Avtaler sendt inn
+      ...agreements.map(a => ({ date: a.created_at, label: 'Avtaleforespørsel sendt', gradient: 'from-fuchsia-500 to-purple-500' })),
+      // Fakturaer betalt
       ...invoices.filter(i => i.status === 'paid').map(i => ({ date: i.created_at, label: `Faktura betalt — ${(i.amount || 0).toLocaleString('nb-NO')} kr`, gradient: 'from-emerald-500 to-cyan-500' })),
     ];
     return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
-  }, [quotes, jobs, invoices]);
+  }, [quotes, jobs, invoices, agreements]);
 
   if (loading || statsLoading) {
     return <div className="space-y-6">
