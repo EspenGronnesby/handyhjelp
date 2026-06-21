@@ -184,7 +184,6 @@ const DashboardActivity = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [completedJobsPage, setCompletedJobsPage] = useState(1);
   const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(null);
-  const [showAllActivity, setShowAllActivity] = useState(false);
   const [jobActivityLogs, setJobActivityLogs] = useState<ActivityLogEntry[]>([]);
   const [emailLogs, setEmailLogs] = useState<EmailLogEntry[]>([]);
   const [adminEmailLogs, setAdminEmailLogs] = useState<EmailLogEntry[]>([]);
@@ -583,7 +582,7 @@ const DashboardActivity = () => {
   }, [quotes, jobs, invoices, agreements, adminQuotes, adminJobs, adminAgreements,
       jobActivityLogs, emailLogs, adminEmailLogs, isAdmin, isOwner]);
 
-  const recentActivity = allActivityEvents.slice(0, showAllActivity ? 10 : 5);
+  const recentActivity = allActivityEvents.slice(0, 5);
 
   if (loading || statsLoading) {
     return <div className="space-y-6">
@@ -644,14 +643,6 @@ const DashboardActivity = () => {
                   </button>
                 ))}
               </div>
-              {allActivityEvents.length > 5 && (
-                <button
-                  onClick={() => setShowAllActivity(v => !v)}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showAllActivity ? 'Vis færre' : `Vis mer (${allActivityEvents.length - 5} til)`}
-                </button>
-              )}
             </>
           )}
         </div>
