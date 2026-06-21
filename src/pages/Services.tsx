@@ -38,7 +38,7 @@ const Services = () => {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pt-20 lg:pt-40">
       <Helmet>
         <title>Våre tjenester | HandyHjelp</title>
         <meta name="description" content="Se våre tjenester: vaktmester, tømrer, blikkenslager og takrennerens. Kvalitetsarbeid til konkurransedyktige priser." />
