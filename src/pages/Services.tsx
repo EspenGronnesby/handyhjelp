@@ -5,7 +5,7 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { useEffect } from "react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
-import servicesBackground from "@/assets/hero-vaktmester.png";
+import servicesBackground from "@/assets/hero-tjenester.png";
 import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { EditableHero } from "@/components/EditableHero";
