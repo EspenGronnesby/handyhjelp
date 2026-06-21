@@ -5,7 +5,7 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
-import servicesBackground from "@/assets/hero-services-background.png";
+import servicesBackground from "@/assets/hero-vaktmester.png";
 import { EditableServiceHero } from "@/components/service-edit/EditableServiceHero";
 import { EditableServiceAbout } from "@/components/service-edit/EditableServiceAbout";
 import { EditableServiceCallout } from "@/components/service-edit/EditableServiceCallout";
