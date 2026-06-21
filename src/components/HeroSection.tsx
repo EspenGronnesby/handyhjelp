@@ -1,4 +1,5 @@
 import { lazy, Suspense, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { QuickCallbackForm } from "@/components/QuickCallbackForm";
 import { QuickCallbackDialog } from "@/components/QuickCallbackDialog";
 import { Phone } from "lucide-react";
@@ -25,6 +26,7 @@ export const HeroSection = () => {
     editMode,
     isAdmin
   } = useEditMode();
+  const navigate = useNavigate();
   const { phone, phoneHref } = useContactInfo();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const {
@@ -104,9 +106,7 @@ export const HeroSection = () => {
                   variant="cta-outline"
                   size="lg"
                   className="text-base md:text-lg px-6 md:px-6 py-4 md:py-6 bg-white/10 text-white border-white/30 hover:bg-white/20"
-                  onClick={() => document.getElementById('services')?.scrollIntoView({
-                    behavior: 'smooth'
-                  })}
+                  onClick={() => navigate('/tjenester')}
                 >
                   {displayServicesButtonText}
                 </MotionButton>
