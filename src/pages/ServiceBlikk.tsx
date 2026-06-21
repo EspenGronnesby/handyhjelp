@@ -27,8 +27,8 @@ const ServiceBlikk = () => {
 
       {/* Hero */}
       <div
-        className={`relative h-[280px] md:h-[500px] bg-cover bg-no-repeat overflow-hidden transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
-        style={{ backgroundImage: `url(${heroImage})`, backgroundPosition: 'center 20%', boxShadow: 'inset 0 0 80px 35px rgba(0,0,0,0.85)' }}
+        className={`relative h-[280px] md:h-[500px] bg-cover bg-center bg-no-repeat overflow-hidden transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
+        style={{ backgroundImage: `url(${heroImage})`, boxShadow: 'inset 0 0 80px 35px rgba(0,0,0,0.85)' }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <HeroImageEditor page="services-blikk" currentImageUrl={heroImage} onImageUpdate={refetch} />
