@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatDistanceToNow } from 'date-fns';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -42,6 +43,7 @@ interface Job {
   scheduled_date?: string;
   completed_date?: string;
   estimated_completion?: string;
+  started_at?: string;
   notes?: string;
   created_at: string;
   quotes: {
@@ -71,6 +73,16 @@ interface Invoice {
   file_url: string | null;
   status: string;
   invoice_number: string;
+  created_at: string;
+}
+interface ActivityEvent {
+  date: string;
+  label: string;
+  gradient: string;
+  id: string;
+  entityType: 'quote' | 'job' | 'agreement' | 'invoice';
+  entity: Quote | Job | ServiceAgreement | Invoice;
+  customerName?: string;
 }
 interface InvoiceRequest {
   id: string;
@@ -150,6 +162,10 @@ const DashboardActivity = () => {
   const [requestingInvoice, setRequestingInvoice] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [completedJobsPage, setCompletedJobsPage] = useState(1);
+  const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(null);
+  const [adminQuotes, setAdminQuotes] = useState<Quote[]>([]);
+  const [adminJobs, setAdminJobs] = useState<Job[]>([]);
+  const [adminAgreements, setAdminAgreements] = useState<ServiceAgreement[]>([]);
   const { isWorker, isAdmin, isOwner } = useRole();
   const { badges } = useNavigationBadges();
   const fetchData = useCallback(async () => {
@@ -205,6 +221,23 @@ const DashboardActivity = () => {
     if (agreementsData) setAgreements(agreementsData as ServiceAgreement[]);
     if (invoicesData) setInvoices(invoicesData as Invoice[]);
     if (requestsData) setInvoiceRequests(requestsData as InvoiceRequest[]);
+
+    // Admin/owner: fetch platform-wide data for activity feed
+    const userRolesRes = await supabase.from('user_roles').select('role').eq('user_id', user.id);
+    const userRoles = userRolesRes.data?.map(r => r.role) ?? [];
+    const hasAdminAccess = userRoles.includes('admin') || userRoles.includes('platform_owner');
+
+    if (hasAdminAccess) {
+      const [adminQRes, adminJRes, adminARes] = await Promise.all([
+        supabase.from('quotes').select('*').order('created_at', { ascending: false }).limit(10),
+        supabase.from('jobs').select('*, quotes(description, type, name, company_name, created_at)').order('created_at', { ascending: false }).limit(10),
+        supabase.from('service_agreements').select('*').order('created_at', { ascending: false }).limit(5),
+      ]);
+      if (adminQRes.data) setAdminQuotes(adminQRes.data);
+      if (adminJRes.data) setAdminJobs(adminJRes.data);
+      if (adminARes.data) setAdminAgreements(adminARes.data as ServiceAgreement[]);
+    }
+
     setLoading(false);
   }, []);
   useEffect(() => {
@@ -362,22 +395,103 @@ const DashboardActivity = () => {
 
   const isOnlyWorker = isWorker && !isAdmin && !isOwner;
 
-  const recentActivity = useMemo(() => {
-    const events: { date: string; label: string; gradient: string }[] = [
-      // Forespørsler som IKKE ble til jobb ennå
-      ...quotes.map(q => ({ date: q.created_at, label: 'Forespørsel sendt', gradient: 'from-amber-500 to-orange-500' })),
-      // Forespørsler som ble til jobber (hentes fra quotes.created_at på jobben)
-      ...jobs.filter(j => j.quotes?.created_at).map(j => ({ date: j.quotes.created_at!, label: 'Forespørsel sendt', gradient: 'from-amber-500 to-orange-500' })),
-      // Jobber påbegynt og fullført
-      ...jobs.filter(j => j.started_at).map(j => ({ date: j.started_at!, label: 'Jobb påbegynt', gradient: 'from-cyan-500 to-blue-500' })),
-      ...jobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({ date: j.completed_date!, label: 'Jobb fullført', gradient: 'from-emerald-500 to-teal-500' })),
-      // Avtaler sendt inn
-      ...agreements.map(a => ({ date: a.created_at, label: 'Avtaleforespørsel sendt', gradient: 'from-fuchsia-500 to-purple-500' })),
-      // Fakturaer betalt
-      ...invoices.filter(i => i.status === 'paid').map(i => ({ date: i.created_at, label: `Faktura betalt — ${(i.amount || 0).toLocaleString('nb-NO')} kr`, gradient: 'from-emerald-500 to-cyan-500' })),
+  const recentActivity = useMemo((): ActivityEvent[] => {
+    if (isAdmin || isOwner) {
+      // Plattformomfattende visning for admin/owner
+      const events: ActivityEvent[] = [
+        ...adminQuotes.map(q => ({
+          date: q.created_at,
+          label: 'Forespørsel sendt',
+          gradient: 'from-amber-500 to-orange-500',
+          id: q.id,
+          entityType: 'quote' as const,
+          entity: q,
+          customerName: q.type === 'business' ? (q.company_name ?? q.name) : q.name,
+        })),
+        ...adminJobs.filter(j => j.started_at).map(j => ({
+          date: j.started_at!,
+          label: 'Jobb påbegynt',
+          gradient: 'from-cyan-500 to-blue-500',
+          id: j.id,
+          entityType: 'job' as const,
+          entity: j,
+          customerName: j.quotes?.type === 'business' ? (j.quotes?.company_name ?? j.quotes?.name) : j.quotes?.name,
+        })),
+        ...adminJobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({
+          date: j.completed_date!,
+          label: 'Jobb fullført',
+          gradient: 'from-emerald-500 to-teal-500',
+          id: `${j.id}-completed`,
+          entityType: 'job' as const,
+          entity: j,
+          customerName: j.quotes?.type === 'business' ? (j.quotes?.company_name ?? j.quotes?.name) : j.quotes?.name,
+        })),
+        ...adminAgreements.map(a => ({
+          date: a.created_at,
+          label: 'Avtaleforespørsel sendt',
+          gradient: 'from-fuchsia-500 to-purple-500',
+          id: a.id,
+          entityType: 'agreement' as const,
+          entity: a,
+          customerName: a.contact_person,
+        })),
+      ];
+      return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+    }
+
+    // Vanlig bruker: egne data
+    const events: ActivityEvent[] = [
+      ...quotes.map(q => ({
+        date: q.created_at,
+        label: 'Forespørsel sendt',
+        gradient: 'from-amber-500 to-orange-500',
+        id: q.id,
+        entityType: 'quote' as const,
+        entity: q,
+      })),
+      ...jobs.filter(j => j.quotes?.created_at).map(j => ({
+        date: j.quotes.created_at!,
+        label: 'Forespørsel sendt',
+        gradient: 'from-amber-500 to-orange-500',
+        id: `${j.id}-quote`,
+        entityType: 'job' as const,
+        entity: j,
+      })),
+      ...jobs.filter(j => j.started_at).map(j => ({
+        date: j.started_at!,
+        label: 'Jobb påbegynt',
+        gradient: 'from-cyan-500 to-blue-500',
+        id: `${j.id}-started`,
+        entityType: 'job' as const,
+        entity: j,
+      })),
+      ...jobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({
+        date: j.completed_date!,
+        label: 'Jobb fullført',
+        gradient: 'from-emerald-500 to-teal-500',
+        id: `${j.id}-completed`,
+        entityType: 'job' as const,
+        entity: j,
+      })),
+      ...agreements.map(a => ({
+        date: a.created_at,
+        label: 'Avtaleforespørsel sendt',
+        gradient: 'from-fuchsia-500 to-purple-500',
+        id: a.id,
+        entityType: 'agreement' as const,
+        entity: a,
+      })),
+      ...invoices.filter(i => i.status === 'paid').map(i => ({
+        date: i.created_at,
+        label: `Faktura betalt — ${(i.amount || 0).toLocaleString('nb-NO')} kr`,
+        gradient: 'from-emerald-500 to-cyan-500',
+        id: i.id,
+        entityType: 'invoice' as const,
+        entity: i,
+      })),
     ];
     return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
-  }, [quotes, jobs, invoices, agreements]);
+  }, [quotes, jobs, invoices, agreements, adminQuotes, adminJobs, adminAgreements, isAdmin, isOwner]);
 
   if (loading || statsLoading) {
     return <div className="space-y-6">
@@ -400,20 +514,181 @@ const DashboardActivity = () => {
       {/* Siste aktivitet */}
       {!isOnlyWorker && recentActivity.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Siste aktivitet</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            Siste aktivitet{(isAdmin || isOwner) ? ' — alle kunder' : ''}
+          </p>
           <div className="flex flex-col sm:flex-row gap-2 overflow-x-auto pb-1">
-            {recentActivity.map((event, i) => (
-              <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-card border border-border/50 shrink-0">
+            {recentActivity.map((event) => (
+              <button
+                key={event.id}
+                onClick={() => setSelectedEvent(event)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-card border border-border/50 shrink-0 cursor-pointer hover:border-primary/40 hover:bg-card/80 transition-colors text-left"
+              >
                 <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${event.gradient} shrink-0`} />
-                <span className="text-sm text-foreground/80 whitespace-nowrap">{event.label}</span>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                <div className="flex flex-col">
+                  <span className="text-sm text-foreground/80 whitespace-nowrap">{event.label}</span>
+                  {event.customerName && (
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">{event.customerName}</span>
+                  )}
+                </div>
+                <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
                   {new Date(event.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
       )}
+
+      {/* Detaljdialog for aktivitetshendelse */}
+      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+        <DialogContent className="sm:max-w-md">
+          {selectedEvent && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <div className={`w-3 h-3 rounded-full bg-gradient-to-br ${selectedEvent.gradient} shrink-0`} />
+                  <DialogTitle>{selectedEvent.label}</DialogTitle>
+                </div>
+                <p className="text-xs text-muted-foreground pt-1">
+                  {format(new Date(selectedEvent.date), 'd. MMMM yyyy', { locale: nb })}
+                </p>
+              </DialogHeader>
+
+              <div className="space-y-3 pt-1">
+                {selectedEvent.entityType === 'quote' && (() => {
+                  const q = selectedEvent.entity as Quote;
+                  return (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm font-medium">{q.type === 'business' ? (q.company_name ?? q.name) : q.name}</span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Beskrivelse</p>
+                        <p className="text-sm">{q.description}</p>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Status</span>
+                        <Badge className={quoteStatusColors[q.status] ?? 'bg-muted'}>
+                          {quoteStatusLabels[q.status] ?? q.status}
+                        </Badge>
+                      </div>
+                      {q.address && (
+                        <div className="flex items-start gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                          <span className="text-sm">{q.address}</span>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+
+                {selectedEvent.entityType === 'job' && (() => {
+                  const j = selectedEvent.entity as Job;
+                  return (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm font-medium">
+                          {j.quotes?.type === 'business' ? (j.quotes?.company_name ?? j.quotes?.name) : j.quotes?.name}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Beskrivelse</p>
+                        <p className="text-sm">{j.quotes?.description}</p>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        {j.started_at && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <span className="text-xs text-muted-foreground">Påbegynt:</span>
+                            <span className="text-sm">{format(new Date(j.started_at), 'd. MMM yyyy', { locale: nb })}</span>
+                          </div>
+                        )}
+                        {j.completed_date && (
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-emerald-500 shrink-0" />
+                            <span className="text-xs text-muted-foreground">Fullført:</span>
+                            <span className="text-sm">{format(new Date(j.completed_date), 'd. MMM yyyy', { locale: nb })}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Status</span>
+                        <Badge className={j.status === 'completed' ? 'bg-green-500' : 'bg-blue-500'}>
+                          {j.status === 'completed' ? 'Fullført' : 'Pågår'}
+                        </Badge>
+                      </div>
+                    </>
+                  );
+                })()}
+
+                {selectedEvent.entityType === 'agreement' && (() => {
+                  const a = selectedEvent.entity as ServiceAgreement;
+                  return (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm font-medium">{a.contact_person}</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                        <span className="text-sm">{a.address}</span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">Tjenester</p>
+                        <div className="flex flex-wrap gap-1">
+                          {a.services.map((s: string) => (
+                            <Badge key={s} variant="secondary" className="text-xs">
+                              {serviceLabels[s] ?? s}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Frekvens</span>
+                        <span className="text-sm">{frequencyLabels[a.frequency] ?? a.frequency}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Status</span>
+                        <Badge className={agreementStatusColors[a.status] ?? 'bg-muted'}>
+                          {agreementStatusLabels[a.status] ?? a.status}
+                        </Badge>
+                      </div>
+                    </>
+                  );
+                })()}
+
+                {selectedEvent.entityType === 'invoice' && (() => {
+                  const i = selectedEvent.entity as Invoice;
+                  return (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Fakturanummer</span>
+                        <span className="text-sm font-medium">{i.invoice_number}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Beløp</span>
+                        <span className="text-sm font-bold text-emerald-600">
+                          {new Intl.NumberFormat('nb-NO', { style: 'currency', currency: 'NOK' }).format(i.amount)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">Forfallsdato</span>
+                        <span className="text-sm">{format(new Date(i.due_date), 'd. MMM yyyy', { locale: nb })}</span>
+                      </div>
+                      <Badge className="bg-green-500 w-fit flex items-center gap-1">
+                        <CheckCircle className="h-3 w-3" /> Betalt
+                      </Badge>
+                    </>
+                  );
+                })()}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Stats — arbeider-spesifikke */}
       {isOnlyWorker && (
