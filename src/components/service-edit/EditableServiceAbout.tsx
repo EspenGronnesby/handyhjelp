@@ -102,20 +102,20 @@ export const EditableServiceAbout = ({
           title="Om tjenesten"
         />
 
+        <div className="space-y-4 text-sm md:text-base text-muted-foreground max-w-3xl">
+          <p>{displayData.paragraph1}</p>
+          <p>{displayData.paragraph2}</p>
+          <p>{displayData.paragraph3}</p>
+        </div>
+
         {displayData.callout && (
-          <blockquote className="flex gap-3 items-start mb-6 pl-4 border-l-4 border-primary/40 bg-gradient-to-r from-primary/8 to-transparent rounded-r-lg py-4 pr-5">
+          <blockquote className="flex gap-3 items-start mt-6 pl-4 border-l-4 border-primary/40 bg-gradient-to-r from-primary/8 to-transparent rounded-r-lg py-4 pr-5">
             <Quote className="w-5 h-5 text-primary/50 shrink-0 mt-0.5" />
             <p className="text-base md:text-lg text-foreground/80 italic leading-relaxed">
               {displayData.callout}
             </p>
           </blockquote>
         )}
-
-        <div className="space-y-4 text-sm md:text-base text-muted-foreground max-w-3xl">
-          <p>{displayData.paragraph1}</p>
-          <p>{displayData.paragraph2}</p>
-          <p>{displayData.paragraph3}</p>
-        </div>
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
