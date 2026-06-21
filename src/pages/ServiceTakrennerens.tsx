@@ -26,11 +26,11 @@ const ServiceTakrennerens = () => {
       <BreadcrumbNavigation />
 
       {/* Hero */}
-      <div
-        className={`relative h-[280px] md:h-[500px] bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
-        style={{ backgroundImage: `url(${heroImage})` }}
-      >
-        <div className="absolute inset-0 bg-black/60"></div>
+      <div className={`relative h-[280px] md:h-[500px] overflow-hidden transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}>
+        <div className="absolute inset-0 bg-cover bg-center scale-110" style={{ backgroundImage: `url(${heroImage})`, filter: 'blur(18px) brightness(0.25)' }} />
+        <div className="absolute inset-0 bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url(${heroImage})` }} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+        <div className="absolute inset-3 md:inset-4 border border-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] rounded-sm pointer-events-none z-20" />
         <HeroImageEditor page="services-takrennerens" currentImageUrl={heroImage} onImageUpdate={refetch} />
 
         <div className="relative z-10">
