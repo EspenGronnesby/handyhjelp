@@ -26,15 +26,11 @@ const ServiceVaktmester = () => {
       <BreadcrumbNavigation />
 
       {/* Hero — bilde + tittel */}
-      <div className={`relative h-[280px] md:h-[500px] overflow-hidden transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}>
-        {/* Lag 1: uskarp mørk bakgrunn */}
-        <div className="absolute inset-0 bg-cover bg-center scale-110" style={{ backgroundImage: `url(${heroImage})`, filter: 'blur(18px) brightness(0.25)' }} />
-        {/* Lag 2: hele bildet synlig */}
-        <div className="absolute inset-0 bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url(${heroImage})` }} />
-        {/* Lag 3: gradient for lesbar tekst */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
-        {/* Lag 4: glass-ramme */}
-        <div className="absolute inset-3 md:inset-4 border border-white/20 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)] rounded-sm pointer-events-none z-20" />
+      <div
+        className={`relative h-[280px] md:h-[500px] bg-cover bg-center bg-no-repeat overflow-hidden transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
+        style={{ backgroundImage: `url(${heroImage})`, boxShadow: 'inset 0 0 70px 30px rgba(0,0,0,0.8)' }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <HeroImageEditor page="services-vaktmester" currentImageUrl={heroImage} onImageUpdate={refetch} />
         <div className="relative z-10">
           <EditableServiceHero
