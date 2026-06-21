@@ -191,6 +191,31 @@ Use the format above. Keep it short and concrete.
 
 ---
 
+### Hero-bilder: format og visning i panoramisk container
+**Date:** 2026-06-21
+**Category:** React
+**Affected files:** src/pages/Service*.tsx, src/assets/hero-*.png
+
+**Problem:**
+Hero-seksjonen er bred og lav (1280×500, 2.56:1 ratio). Bilder i 4:3-format (1448×1086) ga sterk zoom med `bg-cover` — kun 52% av bildhøyden var synlig. Flere løsninger ble forsøkt og forkastet:
+- `bg-contain` → tomme svarte kanter på sidene (ser rart ut)
+- Center-crop til 1280×500 → viste nøyaktig samme del som `bg-cover` (ingen forbedring)
+- Blur-padding (uskarp bakgrunn på sidene) → brukeren likte det ikke visuelt
+
+**Solution:**
+To ting fikset det:
+1. **Riktig bildeformat**: Generer/bruk bilder i **16:9-format** (f.eks. 1672×941). Da er bildets ratio mye nærmere containerens ratio, og `bg-cover` zoomer mye mindre.
+2. **Vignett-effekt**: Legg til `boxShadow: 'inset 0 0 80px 35px rgba(0,0,0,0.85)'` direkte på hero-div-en for en mørk innramming langs kantene. Ser profesjonelt ut og skjuler at bildet er zoomed.
+3. **Bildeposisjon per bilde**: Noen bilder har det viktigste innholdet øverst (f.eks. hode + bakgrunn). Bruk `backgroundPosition: 'center 20%'` istedenfor `bg-center` for å justere.
+
+**Prevention:**
+- Alltid bruk **16:9 (eller bredere)** hero-bilder til panoramiske hero-seksjoner
+- Når du genererer bilder i ChatGPT: be spesifikt om `16:9 aspect ratio` eller `wide landscape format`
+- Kombiner `bg-cover` + inset `box-shadow` vignett istedenfor å prøve å vise hele bildet via `bg-contain`
+- Sjekk alltid bakgrunnsposisjon per bilde — `bg-center` er ikke alltid riktig
+
+---
+
 ### Flex-element uten min-w-0 gjør hele siden for bred
 **Date:** 2026-06-20
 **Category:** React
