@@ -89,8 +89,8 @@ const ServiceVaktmester = () => {
         <div className="container mx-auto px-4 max-w-4xl">
           <EditableServiceTarget
             section="service-vaktmester"
-            defaultTarget="Borettslag, sameier, næringseiendom"
-            defaultDescription="Våre vaktmestertjenester er spesielt tilpasset for større eiendommer med behov for jevnlig tilsyn og vedlikehold. Vi jobber tett med styrer, eiendomsforvaltere og ansvarlige for å sikre best mulig eiendomspleie."
+            defaultTarget="Borettslag, sameier, næringseiendom, arrangører"
+            defaultDescription="Vi avlaster deg før store anledninger — enten det er 17. mai, sommerfest, generalforsamling eller andre arrangementer der det skal se pent ut. Vi tar oss av uteområder, fellesarealer og inngangspartier slik at du kan fokusere på det som skjer. Perfekt for borettslag og sameier som vil gjøre et godt inntrykk på beboere og gjester."
           />
         </div>
       </section>
