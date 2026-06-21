@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditButton } from '@/components/ui/EditButton';
 import { SectionHeading } from '@/components/ui/SectionHeading';
-import { BookOpen, Quote } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { useFadeInUp } from '@/hooks/useScrollAnimation';
 
 interface EditableServiceAboutProps {
@@ -18,7 +18,6 @@ interface EditableServiceAboutProps {
   defaultParagraph1: string;
   defaultParagraph2: string;
   defaultParagraph3: string;
-  defaultCallout?: string;
 }
 
 export const EditableServiceAbout = ({
@@ -26,7 +25,6 @@ export const EditableServiceAbout = ({
   defaultParagraph1,
   defaultParagraph2,
   defaultParagraph3,
-  defaultCallout,
 }: EditableServiceAboutProps) => {
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,13 +34,11 @@ export const EditableServiceAbout = ({
   const { content: p1 } = useEditableContent(section, 'paragraph_1');
   const { content: p2 } = useEditableContent(section, 'paragraph_2');
   const { content: p3 } = useEditableContent(section, 'paragraph_3');
-  const { content: callout } = useEditableContent(section, 'callout');
 
   const displayData = {
     paragraph1: p1 || defaultParagraph1,
     paragraph2: p2 || defaultParagraph2,
     paragraph3: p3 || defaultParagraph3,
-    callout: callout || defaultCallout || '',
   };
 
   const [formData, setFormData] = useState(displayData);
@@ -57,7 +53,6 @@ export const EditableServiceAbout = ({
         { content_key: 'paragraph_1', content_value: formData.paragraph1 },
         { content_key: 'paragraph_2', content_value: formData.paragraph2 },
         { content_key: 'paragraph_3', content_value: formData.paragraph3 },
-        { content_key: 'callout', content_value: formData.callout },
       ];
 
       for (const update of updates) {
@@ -107,15 +102,6 @@ export const EditableServiceAbout = ({
           <p>{displayData.paragraph2}</p>
           <p>{displayData.paragraph3}</p>
         </div>
-
-        {displayData.callout && (
-          <blockquote className="flex gap-3 items-start mt-6 pl-4 border-l-4 border-primary/40 bg-gradient-to-r from-primary/8 to-transparent rounded-r-lg py-4 pr-5">
-            <Quote className="w-5 h-5 text-primary/50 shrink-0 mt-0.5" />
-            <p className="text-base md:text-lg text-foreground/80 italic leading-relaxed">
-              {displayData.callout}
-            </p>
-          </blockquote>
-        )}
       </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -125,19 +111,6 @@ export const EditableServiceAbout = ({
           </DialogHeader>
 
           <div className="space-y-4">
-            <div>
-              <Label>Fremhevet sitat / callout</Label>
-              <Textarea
-                value={formData.callout}
-                onChange={(e) => setFormData({ ...formData, callout: e.target.value })}
-                rows={2}
-                maxLength={200}
-                placeholder="Kort, sterk setning som fremheves visuelt (valgfri)"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                {formData.callout.length}/200 tegn
-              </p>
-            </div>
             <div>
               <Label>Avsnitt 1</Label>
               <Textarea
