@@ -33,6 +33,7 @@ interface Quote {
   description: string;
   status: string;
   created_at: string;
+  updated_at: string;
   address?: string;
   company_name?: string;
 }
@@ -64,6 +65,8 @@ interface ServiceAgreement {
   status: string;
   created_at: string;
   contact_person: string;
+  offer_sent_at?: string;
+  contract_signed_at?: string;
 }
 interface Invoice {
   id: string;
@@ -163,6 +166,7 @@ const DashboardActivity = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const [completedJobsPage, setCompletedJobsPage] = useState(1);
   const [selectedEvent, setSelectedEvent] = useState<ActivityEvent | null>(null);
+  const [showAllActivity, setShowAllActivity] = useState(false);
   const [adminQuotes, setAdminQuotes] = useState<Quote[]>([]);
   const [adminJobs, setAdminJobs] = useState<Job[]>([]);
   const [adminAgreements, setAdminAgreements] = useState<ServiceAgreement[]>([]);
@@ -395,7 +399,7 @@ const DashboardActivity = () => {
 
   const isOnlyWorker = isWorker && !isAdmin && !isOwner;
 
-  const recentActivity = useMemo((): ActivityEvent[] => {
+  const allActivityEvents = useMemo((): ActivityEvent[] => {
     if (isAdmin || isOwner) {
       // Plattformomfattende visning for admin/owner
       const events: ActivityEvent[] = [
@@ -436,27 +440,67 @@ const DashboardActivity = () => {
           customerName: a.contact_person,
         })),
       ];
-      return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+      return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     }
 
     // Vanlig bruker: egne data
-    const events: ActivityEvent[] = [
-      ...quotes.map(q => ({
+    const quoteStatusEvents: ActivityEvent[] = quotes.flatMap(q => {
+      const base: ActivityEvent = {
         date: q.created_at,
         label: 'Forespørsel sendt',
         gradient: 'from-amber-500 to-orange-500',
         id: q.id,
-        entityType: 'quote' as const,
+        entityType: 'quote',
         entity: q,
-      })),
-      ...jobs.filter(j => j.quotes?.created_at).map(j => ({
-        date: j.quotes.created_at!,
-        label: 'Forespørsel sendt',
-        gradient: 'from-amber-500 to-orange-500',
-        id: `${j.id}-quote`,
-        entityType: 'job' as const,
-        entity: j,
-      })),
+      };
+      if (q.status === 'pending') return [base];
+      // For quotes med progresjon: vis opprettelse + statusendring
+      const statusEvent: ActivityEvent = {
+        date: q.updated_at,
+        label: q.status === 'under_review' ? 'Forespørsel under vurdering'
+             : q.status === 'quoted' ? 'Tilbud mottatt'
+             : q.status === 'accepted' ? 'Tilbud akseptert'
+             : 'Forespørsel oppdatert',
+        gradient: q.status === 'quoted' || q.status === 'accepted'
+          ? 'from-purple-500 to-violet-500'
+          : 'from-amber-500 to-orange-500',
+        id: `${q.id}-status`,
+        entityType: 'quote',
+        entity: q,
+      };
+      return [base, statusEvent];
+    });
+
+    const agreementMilestones: ActivityEvent[] = agreements.flatMap(a => {
+      const milestones: ActivityEvent[] = [{
+        date: a.created_at,
+        label: 'Avtaleforespørsel sendt',
+        gradient: 'from-fuchsia-500 to-purple-500',
+        id: a.id,
+        entityType: 'agreement',
+        entity: a,
+      }];
+      if (a.offer_sent_at) milestones.push({
+        date: a.offer_sent_at,
+        label: 'Tilbud sendt på avtale',
+        gradient: 'from-purple-500 to-violet-500',
+        id: `${a.id}-offer`,
+        entityType: 'agreement',
+        entity: a,
+      });
+      if (a.contract_signed_at) milestones.push({
+        date: a.contract_signed_at,
+        label: 'Avtale signert!',
+        gradient: 'from-emerald-500 to-teal-500',
+        id: `${a.id}-signed`,
+        entityType: 'agreement',
+        entity: a,
+      });
+      return milestones;
+    });
+
+    const events: ActivityEvent[] = [
+      ...quoteStatusEvents,
       ...jobs.filter(j => j.started_at).map(j => ({
         date: j.started_at!,
         label: 'Jobb påbegynt',
@@ -473,14 +517,7 @@ const DashboardActivity = () => {
         entityType: 'job' as const,
         entity: j,
       })),
-      ...agreements.map(a => ({
-        date: a.created_at,
-        label: 'Avtaleforespørsel sendt',
-        gradient: 'from-fuchsia-500 to-purple-500',
-        id: a.id,
-        entityType: 'agreement' as const,
-        entity: a,
-      })),
+      ...agreementMilestones,
       ...invoices.filter(i => i.status === 'paid').map(i => ({
         date: i.created_at,
         label: `Faktura betalt — ${(i.amount || 0).toLocaleString('nb-NO')} kr`,
@@ -490,8 +527,10 @@ const DashboardActivity = () => {
         entity: i,
       })),
     ];
-    return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+    return events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [quotes, jobs, invoices, agreements, adminQuotes, adminJobs, adminAgreements, isAdmin, isOwner]);
+
+  const recentActivity = allActivityEvents.slice(0, showAllActivity ? 10 : 5);
 
   if (loading || statsLoading) {
     return <div className="space-y-6">
@@ -512,31 +551,51 @@ const DashboardActivity = () => {
       </div>
 
       {/* Siste aktivitet */}
-      {!isOnlyWorker && recentActivity.length > 0 && (
+      {!isOnlyWorker && (
         <div className="space-y-2">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
             Siste aktivitet{(isAdmin || isOwner) ? ' — alle kunder' : ''}
           </p>
-          <div className="flex flex-col sm:flex-row gap-2 overflow-x-auto pb-1">
-            {recentActivity.map((event) => (
-              <button
-                key={event.id}
-                onClick={() => setSelectedEvent(event)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-card border border-border/50 shrink-0 cursor-pointer hover:border-primary/40 hover:bg-card/80 transition-colors text-left"
-              >
-                <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${event.gradient} shrink-0`} />
-                <div className="flex flex-col">
-                  <span className="text-sm text-foreground/80 whitespace-nowrap">{event.label}</span>
-                  {event.customerName && (
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">{event.customerName}</span>
-                  )}
-                </div>
-                <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
-                  {new Date(event.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
-                </span>
-              </button>
-            ))}
-          </div>
+          {recentActivity.length === 0 ? (
+            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border/50 text-sm text-muted-foreground">
+              <div className="w-2 h-2 rounded-full bg-muted-foreground/30 shrink-0" />
+              <span>Ingen aktivitet ennå —</span>
+              <Link to="/tilbud" className="text-primary hover:underline">
+                send din første forespørsel
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-col sm:flex-row gap-2 overflow-x-auto pb-1">
+                {recentActivity.map((event) => (
+                  <button
+                    key={event.id}
+                    onClick={() => setSelectedEvent(event)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-card border border-border/50 shrink-0 cursor-pointer hover:border-primary/40 hover:bg-card/80 transition-colors text-left"
+                  >
+                    <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${event.gradient} shrink-0`} />
+                    <div className="flex flex-col">
+                      <span className="text-sm text-foreground/80 whitespace-nowrap">{event.label}</span>
+                      {event.customerName && (
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">{event.customerName}</span>
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap ml-1">
+                      {new Date(event.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {allActivityEvents.length > 5 && (
+                <button
+                  onClick={() => setShowAllActivity(v => !v)}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showAllActivity ? 'Vis færre' : `Vis mer (${allActivityEvents.length - 5} til)`}
+                </button>
+              )}
+            </>
+          )}
         </div>
       )}
 
