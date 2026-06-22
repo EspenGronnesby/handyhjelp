@@ -41,7 +41,19 @@ interface ActionLink {
 interface IconConfig {
   icon: React.ReactNode;
   gradient: string;
+  border: string;
+  bg: string;
 }
+
+const ICON_STYLES = {
+  oppdrag:   { gradient: GRADIENTS.oppdrag,   border: 'border-l-blue-500',    bg: 'bg-blue-500/5'    },
+  okonomi:   { gradient: GRADIENTS.okonomi,   border: 'border-l-emerald-500', bg: 'bg-emerald-500/5' },
+  innhold:   { gradient: GRADIENTS.innhold,   border: 'border-l-fuchsia-500', bg: 'bg-fuchsia-500/5' },
+  mail:      { gradient: GRADIENTS.mail,      border: 'border-l-orange-500',  bg: 'bg-orange-500/5'  },
+  brukere:   { gradient: GRADIENTS.brukere,   border: 'border-l-rose-500',    bg: 'bg-rose-500/5'    },
+  redigering:{ gradient: GRADIENTS.redigering,border: 'border-l-amber-500',   bg: 'bg-amber-500/5'   },
+  logg:      { gradient: GRADIENTS.logg,      border: 'border-l-slate-500',   bg: 'bg-slate-500/5'   },
+};
 
 const getIconConfig = (notification: Notification): IconConfig => {
   const actionType = notification.metadata?.action_type as string | undefined;
@@ -56,41 +68,40 @@ const getIconConfig = (notification: Notification): IconConfig => {
     case 'job_started':
     case 'job_completed':
     case 'job_deleted':
-      return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.oppdrag };
+      return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.oppdrag };
 
     case 'invoice_request':
-      return { icon: <CreditCard className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.okonomi };
+      return { icon: <CreditCard className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.okonomi };
 
     case 'blog_submitted':
     case 'content_submission':
     case 'content_approved':
     case 'content_rejected':
     case 'review_submitted':
-      return { icon: <FileText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.innhold };
+      return { icon: <FileText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.innhold };
 
     case 'role_assigned':
     case 'role_removed':
     case 'customer_created':
-      return { icon: <Users className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.brukere };
+      return { icon: <Users className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.brukere };
 
     default:
-      // Fallback basert på notification.type for eldre notifikasjoner uten metadata
       switch (notification.type) {
         case 'job_update':
-          return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.oppdrag };
+          return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.oppdrag };
         case 'invoice_request':
-          return { icon: <CreditCard className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.okonomi };
+          return { icon: <CreditCard className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.okonomi };
         case 'content_submission':
         case 'content_approved':
         case 'content_rejected':
         case 'review_request':
-          return { icon: <FileText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.innhold };
+          return { icon: <FileText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.innhold };
         case 'loyalty':
-          return { icon: <Star className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.redigering };
+          return { icon: <Star className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.redigering };
         case 'activity_update':
-          return { icon: <ScrollText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.logg };
+          return { icon: <ScrollText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.logg };
         default:
-          return { icon: <Bell className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.logg };
+          return { icon: <Bell className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.logg };
       }
   }
 };
@@ -274,7 +285,7 @@ const DashboardNotifications = () => {
       ) : (
         <div className="space-y-3">
           {notifications.map((notification) => {
-            const { icon, gradient } = getIconConfig(notification);
+            const { icon, gradient, border, bg } = getIconConfig(notification);
             const actionLink = getActionLink(notification);
             return (
               <div
@@ -282,7 +293,7 @@ const DashboardNotifications = () => {
                 onClick={() => !notification.read && markAsRead(notification.id)}
                 className={`card-professional p-4 flex items-start gap-4 transition-all duration-200 ${
                   !notification.read
-                    ? 'border-l-4 border-l-primary bg-primary/5 cursor-pointer active:bg-primary/10'
+                    ? `border-l-4 ${border} ${bg} cursor-pointer`
                     : ''
                 }`}
               >
