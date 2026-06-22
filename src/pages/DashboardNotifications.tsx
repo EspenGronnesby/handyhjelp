@@ -1,15 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Loader2, Bell, CheckCircle, AlertCircle, Info,
-  FileText, Briefcase, Star, CreditCard, Receipt,
-  Activity, XCircle, Users, Mail, ArrowRight,
+  Loader2, Bell, FileText, Briefcase, Star,
+  CreditCard, Users, Mail, ArrowRight, ScrollText,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
+
+// Eksakte gradienter fra AdminDashboard (CATEGORY_GRADIENTS)
+const GRADIENTS = {
+  oppdrag:  'from-cyan-500 via-blue-500 to-indigo-600',
+  okonomi:  'from-emerald-500 via-teal-500 to-cyan-600',
+  innhold:  'from-fuchsia-500 via-purple-500 to-indigo-600',
+  mail:     'from-amber-500 via-orange-500 to-rose-600',
+  brukere:  'from-rose-500 via-pink-500 to-fuchsia-600',
+  redigering:'from-yellow-500 via-amber-500 to-orange-600',
+  logg:     'from-slate-500 via-gray-500 to-zinc-600',
+};
 
 interface Notification {
   id: string;
@@ -26,6 +37,63 @@ interface ActionLink {
   icon: React.ReactNode;
   url: string;
 }
+
+interface IconConfig {
+  icon: React.ReactNode;
+  gradient: string;
+}
+
+const getIconConfig = (notification: Notification): IconConfig => {
+  const actionType = notification.metadata?.action_type as string | undefined;
+
+  switch (actionType) {
+    case 'quote_submitted':
+    case 'agreement_submitted':
+    case 'agreement_approved':
+    case 'agreement_rejected':
+    case 'agreement_updated':
+    case 'job_created':
+    case 'job_started':
+    case 'job_completed':
+    case 'job_deleted':
+      return { icon: <Briefcase className="h-5 w-5 text-white" />, gradient: GRADIENTS.oppdrag };
+
+    case 'invoice_request':
+      return { icon: <CreditCard className="h-5 w-5 text-white" />, gradient: GRADIENTS.okonomi };
+
+    case 'blog_submitted':
+    case 'content_submission':
+    case 'content_approved':
+    case 'content_rejected':
+    case 'review_submitted':
+      return { icon: <FileText className="h-5 w-5 text-white" />, gradient: GRADIENTS.innhold };
+
+    case 'role_assigned':
+    case 'role_removed':
+    case 'customer_created':
+      return { icon: <Users className="h-5 w-5 text-white" />, gradient: GRADIENTS.brukere };
+
+    default:
+      // Fallback basert på notification.type for eldre notifikasjoner uten metadata
+      switch (notification.type) {
+        case 'job_update':
+          return { icon: <Briefcase className="h-5 w-5 text-white" />, gradient: GRADIENTS.oppdrag };
+        case 'invoice_request':
+          return { icon: <CreditCard className="h-5 w-5 text-white" />, gradient: GRADIENTS.okonomi };
+        case 'content_submission':
+        case 'content_approved':
+        case 'content_rejected':
+        case 'review_request':
+          return { icon: <FileText className="h-5 w-5 text-white" />, gradient: GRADIENTS.innhold };
+        case 'loyalty':
+          return { icon: <Star className="h-5 w-5 text-white" />, gradient: GRADIENTS.redigering };
+        case 'activity_update':
+          return { icon: <ScrollText className="h-5 w-5 text-white" />, gradient: GRADIENTS.logg };
+        default:
+          return { icon: <Bell className="h-5 w-5 text-white" />, gradient: GRADIENTS.logg };
+      }
+  }
+};
 
 const getActionLink = (notification: Notification): ActionLink | null => {
   const meta = notification.metadata ?? {};
@@ -53,7 +121,7 @@ const getActionLink = (notification: Notification): ActionLink | null => {
     case 'review_submitted':
       return {
         label: 'Se anmeldelse',
-        icon: <Star className="h-3.5 w-3.5" />,
+        icon: <FileText className="h-3.5 w-3.5" />,
         url: `/dashboard/admin?category=innhold&tab=reviews${meta.review_id ? `&highlight=${meta.review_id}` : ''}`,
       };
     case 'content_approved':
@@ -93,99 +161,20 @@ const getActionLink = (notification: Notification): ActionLink | null => {
         url: `/dashboard/admin?category=brukere&tab=kunder`,
       };
     default:
-      // Fallback based on notification type for older notifications without metadata
       if (notification.type === 'invoice_request') {
-        return {
-          label: 'Se faktura',
-          icon: <CreditCard className="h-3.5 w-3.5" />,
-          url: `/dashboard/admin?category=okonomi&tab=invoices`,
-        };
+        return { label: 'Se faktura', icon: <CreditCard className="h-3.5 w-3.5" />, url: `/dashboard/admin?category=okonomi&tab=invoices` };
       }
-      if (notification.type === 'content_submission' || notification.type === 'content_approved' || notification.type === 'content_rejected') {
-        return {
-          label: 'Se innhold',
-          icon: <FileText className="h-3.5 w-3.5" />,
-          url: `/dashboard/admin?category=innhold&tab=blog`,
-        };
+      if (['content_submission', 'content_approved', 'content_rejected'].includes(notification.type)) {
+        return { label: 'Se innhold', icon: <FileText className="h-3.5 w-3.5" />, url: `/dashboard/admin?category=innhold&tab=blog` };
       }
       return null;
-  }
-};
-
-const getNotificationIcon = (notification: Notification) => {
-  const actionType = notification.metadata?.action_type as string | undefined;
-
-  switch (actionType) {
-    case 'blog_submitted':
-    case 'content_submission':
-      return <FileText className="h-5 w-5 text-purple-500" />;
-    case 'content_approved':
-      return <CheckCircle className="h-5 w-5 text-green-500" />;
-    case 'content_rejected':
-      return <XCircle className="h-5 w-5 text-red-500" />;
-    case 'quote_submitted':
-    case 'job_created':
-    case 'job_started':
-    case 'job_completed':
-    case 'job_deleted':
-    case 'agreement_submitted':
-    case 'agreement_approved':
-    case 'agreement_rejected':
-    case 'agreement_updated':
-      return <Briefcase className="h-5 w-5 text-blue-500" />;
-    case 'review_submitted':
-      return <Star className="h-5 w-5 text-amber-500" />;
-    case 'invoice_request':
-      return <CreditCard className="h-5 w-5 text-amber-500" />;
-    case 'role_assigned':
-    case 'role_removed':
-    case 'customer_created':
-      return <Users className="h-5 w-5 text-indigo-500" />;
-    default:
-      // Fallback based on notification type
-      switch (notification.type) {
-        case 'content_approved': return <CheckCircle className="h-5 w-5 text-green-500" />;
-        case 'content_rejected': return <XCircle className="h-5 w-5 text-red-500" />;
-        case 'content_submission': return <FileText className="h-5 w-5 text-purple-500" />;
-        case 'job_update': return <Briefcase className="h-5 w-5 text-blue-500" />;
-        case 'invoice_request': return <CreditCard className="h-5 w-5 text-amber-500" />;
-        case 'loyalty': return <Star className="h-5 w-5 text-yellow-500" />;
-        case 'review_request': return <Star className="h-5 w-5 text-amber-500" />;
-        case 'activity_update': return <Activity className="h-5 w-5 text-primary" />;
-        default: return <Info className="h-5 w-5 text-primary" />;
-      }
-  }
-};
-
-const getIconBg = (notification: Notification) => {
-  const actionType = notification.metadata?.action_type as string | undefined;
-
-  switch (actionType) {
-    case 'blog_submitted':
-    case 'content_submission': return 'bg-purple-500/10';
-    case 'content_approved': return 'bg-green-500/10';
-    case 'content_rejected': return 'bg-red-500/10';
-    case 'quote_submitted':
-    case 'job_created':
-    case 'job_started':
-    case 'job_completed':
-    case 'job_deleted':
-    case 'agreement_submitted':
-    case 'agreement_approved':
-    case 'agreement_rejected':
-    case 'agreement_updated': return 'bg-blue-500/10';
-    case 'review_submitted': return 'bg-amber-500/10';
-    case 'invoice_request': return 'bg-amber-500/10';
-    case 'role_assigned':
-    case 'role_removed':
-    case 'customer_created': return 'bg-indigo-500/10';
-    default: return 'bg-primary/10';
   }
 };
 
 const DashboardNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     fetchNotifications();
@@ -224,27 +213,18 @@ const DashboardNotifications = () => {
   };
 
   const markAsRead = async (id: string) => {
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', id);
-
-    setNotifications(notifications.map(n =>
-      n.id === id ? { ...n, read: true } : n
-    ));
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    queryClient.invalidateQueries({ queryKey: ['navigation-badges'] });
+    await supabase.from('notifications').update({ read: true }).eq('id', id);
   };
 
   const markAllAsRead = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('user_id', user.id)
-      .eq('read', false);
-
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    queryClient.invalidateQueries({ queryKey: ['navigation-badges'] });
+    await supabase.from('notifications').update({ read: true }).eq('user_id', user.id).eq('read', false);
   };
 
   if (loading) {
@@ -265,9 +245,7 @@ const DashboardNotifications = () => {
             <Bell className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Varsler
-            </h1>
+            <h1 className="text-3xl font-bold text-foreground">Varsler</h1>
             <p className="text-sm text-muted-foreground">
               {unreadCount > 0 ? `${unreadCount} uleste varsler` : 'Ingen uleste varsler'}
             </p>
@@ -296,6 +274,7 @@ const DashboardNotifications = () => {
       ) : (
         <div className="space-y-3">
           {notifications.map((notification) => {
+            const { icon, gradient } = getIconConfig(notification);
             const actionLink = getActionLink(notification);
             return (
               <div
@@ -307,8 +286,8 @@ const DashboardNotifications = () => {
                     : ''
                 }`}
               >
-                <div className={`p-2 rounded-lg shrink-0 ${getIconBg(notification)}`}>
-                  {getNotificationIcon(notification)}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm shrink-0 ${gradient}`}>
+                  {icon}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -320,10 +299,7 @@ const DashboardNotifications = () => {
                     {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: nb })}
                   </p>
                   {actionLink && (
-                    <Link
-                      to={actionLink.url}
-                      onClick={(e) => e.stopPropagation()}
-                    >
+                    <Link to={actionLink.url} onClick={(e) => e.stopPropagation()}>
                       <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5 px-2.5">
                         {actionLink.icon}
                         {actionLink.label}
@@ -333,9 +309,7 @@ const DashboardNotifications = () => {
                   )}
                 </div>
                 {!notification.read && (
-                  <div className="shrink-0 text-xs text-muted-foreground/50 self-center">
-                    Trykk
-                  </div>
+                  <div className="shrink-0 text-xs text-muted-foreground/50 self-center">Trykk</div>
                 )}
               </div>
             );
