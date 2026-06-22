@@ -56,41 +56,41 @@ const getIconConfig = (notification: Notification): IconConfig => {
     case 'job_started':
     case 'job_completed':
     case 'job_deleted':
-      return { icon: <Briefcase className="h-5 w-5 text-white" />, gradient: GRADIENTS.oppdrag };
+      return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.oppdrag };
 
     case 'invoice_request':
-      return { icon: <CreditCard className="h-5 w-5 text-white" />, gradient: GRADIENTS.okonomi };
+      return { icon: <CreditCard className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.okonomi };
 
     case 'blog_submitted':
     case 'content_submission':
     case 'content_approved':
     case 'content_rejected':
     case 'review_submitted':
-      return { icon: <FileText className="h-5 w-5 text-white" />, gradient: GRADIENTS.innhold };
+      return { icon: <FileText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.innhold };
 
     case 'role_assigned':
     case 'role_removed':
     case 'customer_created':
-      return { icon: <Users className="h-5 w-5 text-white" />, gradient: GRADIENTS.brukere };
+      return { icon: <Users className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.brukere };
 
     default:
       // Fallback basert på notification.type for eldre notifikasjoner uten metadata
       switch (notification.type) {
         case 'job_update':
-          return { icon: <Briefcase className="h-5 w-5 text-white" />, gradient: GRADIENTS.oppdrag };
+          return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.oppdrag };
         case 'invoice_request':
-          return { icon: <CreditCard className="h-5 w-5 text-white" />, gradient: GRADIENTS.okonomi };
+          return { icon: <CreditCard className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.okonomi };
         case 'content_submission':
         case 'content_approved':
         case 'content_rejected':
         case 'review_request':
-          return { icon: <FileText className="h-5 w-5 text-white" />, gradient: GRADIENTS.innhold };
+          return { icon: <FileText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.innhold };
         case 'loyalty':
-          return { icon: <Star className="h-5 w-5 text-white" />, gradient: GRADIENTS.redigering };
+          return { icon: <Star className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.redigering };
         case 'activity_update':
-          return { icon: <ScrollText className="h-5 w-5 text-white" />, gradient: GRADIENTS.logg };
+          return { icon: <ScrollText className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.logg };
         default:
-          return { icon: <Bell className="h-5 w-5 text-white" />, gradient: GRADIENTS.logg };
+          return { icon: <Bell className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, gradient: GRADIENTS.logg };
       }
   }
 };
@@ -286,7 +286,7 @@ const DashboardNotifications = () => {
                     : ''
                 }`}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm shrink-0 ${gradient}`}>
+                <div className={`w-12 h-12 sm:w-11 sm:h-11 rounded-2xl sm:rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm shrink-0 ${gradient}`}>
                   {icon}
                 </div>
                 <div className="flex-1 min-w-0">
