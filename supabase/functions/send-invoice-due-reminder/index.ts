@@ -80,6 +80,37 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+async function isAuthorized(req: Request): Promise<boolean> {
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  const headerSecret = req.headers.get("x-cron-secret");
+  if (cronSecret && headerSecret && headerSecret === cronSecret) return true;
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return false;
+  const jwt = authHeader.replace("Bearer ", "");
+  const url = Deno.env.get("SUPABASE_URL")!;
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const authClient = createClient(url, anonKey);
+  const { data: userData, error: userErr } = await authClient.auth.getUser(jwt);
+  if (userErr || !userData?.user) return false;
+  const svc = createClient(url, serviceKey);
+  const { data: roleRows } = await svc
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userData.user.id)
+    .in("role", ["admin", "platform_owner"]);
+  return !!(roleRows && roleRows.length > 0);
+}
+
 const handler = async (req: Request): Promise<Response> => {
   const requestId = crypto.randomUUID();
   const clientIP = getClientIP(req);
@@ -89,6 +120,14 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   log.info("Request received", { requestId, clientIP });
+
+  if (!(await isAuthorized(req))) {
+    log.warn("Unauthorized", { requestId, clientIP });
+    return new Response(
+      JSON.stringify({ success: false, error: "Unauthorized", requestId }),
+      { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
 
   // Rate limiting check
   if (!checkRateLimit(clientIP)) {
@@ -207,13 +246,13 @@ const handler = async (req: Request): Promise<Response> => {
                   <h1>Vennlig påminnelse</h1>
                 </div>
                 <div class="content">
-                  <p style="font-size: 18px;">Hei <strong>${customerName}</strong>,</p>
+                  <p style="font-size: 18px;">Hei <strong>${escapeHtml(customerName)}</strong>,</p>
                   
                   <p style="font-size: 16px; line-height: 1.6;">Vi håper du har det fint! Dette er bare en vennlig påminnelse om at fakturaen din forfaller <strong>i dag</strong>.</p>
                   
                   <div class="highlight">
-                    <p style="margin: 0 0 10px 0;"><strong>Fakturanummer:</strong> ${invoice.invoice_number}</p>
-                    <p style="margin: 0;"><strong>Beløp:</strong> <span class="amount">${formattedAmount}</span></p>
+                    <p style="margin: 0 0 10px 0;"><strong>Fakturanummer:</strong> ${escapeHtml(invoice.invoice_number)}</p>
+                    <p style="margin: 0;"><strong>Beløp:</strong> <span class="amount">${escapeHtml(formattedAmount)}</span></p>
                   </div>
                   
                   <p style="font-size: 16px; line-height: 1.6;">Hvis du allerede har betalt, kan du se bort fra denne meldingen – tusen takk!</p>

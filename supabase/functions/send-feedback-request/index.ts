@@ -58,6 +58,40 @@ const corsHeaders = {
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
+function escapeHtml(str: unknown): string {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+async function isAuthorized(req: Request): Promise<boolean> {
+  // Allow scheduler with shared secret
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  const headerSecret = req.headers.get("x-cron-secret");
+  if (cronSecret && headerSecret && headerSecret === cronSecret) return true;
+
+  // Otherwise require an admin/platform_owner JWT
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return false;
+  const jwt = authHeader.replace("Bearer ", "");
+  const url = Deno.env.get("SUPABASE_URL")!;
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const authClient = createClient(url, anonKey);
+  const { data: userData, error: userErr } = await authClient.auth.getUser(jwt);
+  if (userErr || !userData?.user) return false;
+  const svc = createClient(url, serviceKey);
+  const { data: roleRows } = await svc
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userData.user.id)
+    .in("role", ["admin", "platform_owner"]);
+  return !!(roleRows && roleRows.length > 0);
+}
+
 serve(async (req) => {
   const requestId = crypto.randomUUID();
   const clientIP = getClientIP(req);
@@ -67,6 +101,15 @@ serve(async (req) => {
   }
 
   log.info('Request received', { requestId, clientIP });
+
+  if (!(await isAuthorized(req))) {
+    log.warn('Unauthorized', { requestId, clientIP });
+    return new Response(
+      JSON.stringify({ success: false, error: 'Unauthorized', requestId }),
+      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
+  }
+
 
   // Rate limiting check
   if (!checkRateLimit(clientIP)) {
@@ -189,10 +232,10 @@ serve(async (req) => {
     </div>
     
     <div class="content">
-      <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${quote.name}</strong>,</p>
+      <p style="font-size: 18px; margin-bottom: 20px;">Hei <strong>${escapeHtml(quote.name)}</strong>,</p>
       
       <p style="font-size: 16px; line-height: 1.6; color: #4a5568;">
-        For et par dager siden fullførte vi <strong>${serviceType}</strong> for deg. 
+        For et par dager siden fullførte vi <strong>${escapeHtml(serviceType)}</strong> for deg. 
         Vi håper du er fornøyd med arbeidet!
       </p>
       
