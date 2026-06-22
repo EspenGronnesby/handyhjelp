@@ -48,18 +48,23 @@ export const HeroSection = () => {
         id="hero"
         className="min-h-[75svh] md:min-h-screen relative flex items-center pt-20 md:pt-20 section-mobile overflow-hidden"
       >
-        {/* Static background image — vises umiddelbart, ingen fade. */}
+        {/* LCP-element: ekte <img> med fetchpriority="high" gir raskere LCP enn CSS background-image */}
+        <img
+          src={heroImage}
+          alt=""
+          aria-hidden="true"
+          width={1920}
+          height={1080}
+          decoding="async"
+          // @ts-expect-error fetchpriority er gyldig HTML-attributt, ennå ikke i React-typene
+          fetchpriority="high"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: 'center 30%' }}
+        />
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundPosition: 'center 30%'
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75" style={{
-            opacity
-          }}></div>
-        </div>
+          className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75"
+          style={{ opacity }}
+        />
 
 
         {isAdmin && (
@@ -114,7 +119,7 @@ export const HeroSection = () => {
 
               {/* 24/7 Contact */}
               <div className="backdrop-blur-md rounded-xl p-4 md:p-6 inline-block bg-white/10 border border-white/30 shadow-lg hover:bg-white/20 hover:border-white/50 hover:backdrop-blur-xl hover:shadow-[0_8px_32px_hsl(0_0%_100%/0.1),inset_0_1px_0_hsl(0_0%_100%/0.15)] transition-all duration-300 group">
-                <p className="text-white/80 dark:text-muted-foreground text-xs md:text-sm mb-1 md:mb-2">24/7 Service</p>
+                <p className="text-white/95 dark:text-muted-foreground text-xs md:text-sm mb-1 md:mb-2">24/7 Service</p>
                 <a href={phoneHref} className="text-white dark:text-foreground text-2xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 md:gap-3 transition-colors">
                   <Phone className="h-6 w-6 md:h-7 md:w-7" />
                   <span>{phone}</span>
