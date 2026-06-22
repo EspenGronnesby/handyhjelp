@@ -236,7 +236,7 @@ const DashboardNotifications = () => {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setNotifications(data);
+      setNotifications(data as unknown as Notification[]);
     }
     setLoading(false);
   };
