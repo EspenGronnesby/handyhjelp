@@ -157,6 +157,22 @@ const frequencyLabels: Record<string, string> = {
 const QUOTE_STEPS = ['pending', 'under_review', 'quoted', 'accepted', 'in_progress'];
 const AGREEMENT_STEPS = ['new', 'under_review', 'offer_sent', 'contract_signed'];
 
+const entityNavLinks: Record<string, string> = {
+  email:     '/dashboard/admin?category=mail&tab=history',
+  quote:     '/dashboard/admin?category=oppdrag&tab=single-jobs',
+  job:       '/dashboard/admin?category=oppdrag&tab=single-jobs',
+  agreement: '/dashboard/admin?category=oppdrag&tab=agreements',
+  invoice:   '/dashboard/admin?category=okonomi&tab=invoices',
+};
+
+const navButtonLabel: Record<string, string> = {
+  email:     'Se e-post i historikk',
+  quote:     'Se forespørsel i Administrasjon',
+  job:       'Se jobb i Administrasjon',
+  agreement: 'Se avtale i Administrasjon',
+  invoice:   'Se faktura i Administrasjon',
+};
+
 const StatusProgressBar = ({ status, steps }: { status: string; steps: string[] }) => {
   const activeIndex = steps.indexOf(status);
   return (
@@ -841,6 +857,20 @@ const DashboardActivity = () => {
                   );
                 })()}
               </div>
+
+              {(isAdmin || isOwner) && (
+                <div className="pt-3 border-t border-border/40">
+                  <Link
+                    to={entityNavLinks[selectedEvent.entityType]}
+                    onClick={() => setSelectedEvent(null)}
+                  >
+                    <Button variant="outline" size="sm" className="w-full gap-2">
+                      <ArrowRight className="h-4 w-4" />
+                      {navButtonLabel[selectedEvent.entityType]}
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </>
           )}
         </DialogContent>
