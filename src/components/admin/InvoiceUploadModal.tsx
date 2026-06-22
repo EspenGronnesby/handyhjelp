@@ -73,6 +73,15 @@ export const InvoiceUploadModal = ({ job, open, onOpenChange, onSuccess }: Invoi
         .update({ status: 'fulfilled' })
         .eq('job_id', job.id);
 
+      // In-app notifikasjon til kunde
+      await supabase.from('notifications').insert({
+        user_id: job.user_id,
+        type: 'invoice_sent',
+        title: 'Faktura klar',
+        message: `Faktura ${invoiceNumber} på ${parseFloat(amount).toLocaleString('nb-NO')} kr er klar. Forfallsdato: ${new Date(dueDate).toLocaleDateString('nb-NO')}.`,
+        read: false,
+      });
+
       // Send email notification to customer
       await supabase.functions.invoke('send-invoice-ready-email', {
         body: {

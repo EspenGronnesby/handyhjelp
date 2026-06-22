@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { logActivity } from '@/hooks/useActivityLog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -188,6 +189,13 @@ export const WorkerBlogForm = ({ open, onClose }: WorkerBlogFormProps) => {
         .single();
 
       if (error) throw error;
+
+      await logActivity(
+        'blog_submitted',
+        'content_management',
+        `Sendte inn blogginnlegg: "${formData.title}"`,
+        { post_id: blog.id, title: formData.title, category: formData.category }
+      );
 
       // Send notification to all admins and owners
       const { data: adminUsers } = await supabase

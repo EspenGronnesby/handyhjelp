@@ -1,24 +1,29 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export type ActionType = 
-  | 'role_assigned' 
+export type ActionType =
+  | 'role_assigned'
   | 'role_removed'
   | 'job_created'
   | 'job_started'
   | 'job_completed'
   | 'job_deleted'
   | 'quote_deleted'
+  | 'quote_submitted'
   | 'agreement_approved'
   | 'agreement_rejected'
   | 'agreement_updated'
+  | 'agreement_submitted'
   | 'content_approved'
   | 'content_rejected'
+  | 'blog_submitted'
+  | 'review_submitted'
   | 'customer_created';
 
-export type ActionCategory = 
+export type ActionCategory =
   | 'role_management'
   | 'job_management'
+  | 'quote_management'
   | 'agreement_management'
   | 'content_management'
   | 'customer_management';
@@ -55,11 +60,15 @@ export const actionTypeLabels: Record<ActionType, string> = {
   job_completed: 'Fullførte oppdrag',
   job_deleted: 'Slettet oppdrag',
   quote_deleted: 'Slettet tilbud',
+  quote_submitted: 'Ny tilbudsforespørsel',
   agreement_approved: 'Godkjente avtale',
   agreement_rejected: 'Avslått avtale',
   agreement_updated: 'Oppdaterte avtale',
+  agreement_submitted: 'Ny serviceavtaleforespørsel',
   content_approved: 'Godkjente innhold',
   content_rejected: 'Avslått innhold',
+  blog_submitted: 'Sendte inn blogginnlegg',
+  review_submitted: 'Ny anmeldelse',
   customer_created: 'Opprettet kunde',
 };
 
@@ -67,6 +76,7 @@ export const actionTypeLabels: Record<ActionType, string> = {
 export const categoryLabels: Record<ActionCategory, string> = {
   role_management: 'Rolleadministrasjon',
   job_management: 'Oppdragshåndtering',
+  quote_management: 'Tilbudsforespørsler',
   agreement_management: 'Avtalehåndtering',
   content_management: 'Innholdsgodkjenning',
   customer_management: 'Kundehåndtering',
@@ -97,11 +107,15 @@ export const actionTypeColors: Record<ActionType, string> = {
   job_completed: 'bg-green-500',
   job_deleted: 'bg-red-500',
   quote_deleted: 'bg-red-500',
+  quote_submitted: 'bg-blue-600',
   agreement_approved: 'bg-emerald-500',
   agreement_rejected: 'bg-red-500',
   agreement_updated: 'bg-blue-500',
+  agreement_submitted: 'bg-indigo-600',
   content_approved: 'bg-green-500',
   content_rejected: 'bg-orange-500',
+  blog_submitted: 'bg-purple-600',
+  review_submitted: 'bg-yellow-500',
   customer_created: 'bg-indigo-500',
 };
 
