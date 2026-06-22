@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,23 +10,33 @@ import { AlertTriangle } from 'lucide-react';
 import { FileText, Save, Loader2, Download, Send, FileCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface ServiceAgreementCardProps {
   agreement: ServiceAgreement;
+  isHighlighted?: boolean;
   onUpdateStatus: (id: string, status: string) => void;
   onSendOffer: (agreement: ServiceAgreement) => void;
   onUploadContract: (agreement: ServiceAgreement) => void;
   onReject: (agreement: ServiceAgreement) => void;
 }
 
-export const ServiceAgreementCard = ({ 
-  agreement, 
-  onUpdateStatus, 
+export const ServiceAgreementCard = ({
+  agreement,
+  isHighlighted,
+  onUpdateStatus,
   onSendOffer,
   onUploadContract,
   onReject
 }: ServiceAgreementCardProps) => {
+  const ref = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (isHighlighted && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [isHighlighted]);
   const [notes, setNotes] = useState(agreement.admin_notes || '');
   const [savingNotes, setSavingNotes] = useState(false);
   const [notesChanged, setNotesChanged] = useState(false);
@@ -117,7 +127,8 @@ export const ServiceAgreementCard = ({
   };
 
   return (
-    <Card className="interactive-card">
+    <div ref={ref}>
+    <Card className={cn('interactive-card', isHighlighted && 'ring-2 ring-primary bg-primary/5 shadow-lg shadow-primary/10')}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
@@ -336,5 +347,6 @@ export const ServiceAgreementCard = ({
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 };

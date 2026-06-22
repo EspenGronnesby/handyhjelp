@@ -80,7 +80,9 @@ const AdminDashboard = () => {
   // Read initial state from URL params
   const urlCategory = searchParams.get('category') as CategoryKey | null;
   const urlTab = searchParams.get('tab');
-  
+  const highlightId = searchParams.get('highlight') ?? undefined;
+  const urlFilter = searchParams.get('filter');
+
   const initialCategory = urlCategory && VALID_CATEGORIES.includes(urlCategory) ? urlCategory : 'oppdrag';
   const initialTab = urlTab || CATEGORY_DEFAULT_TABS[initialCategory];
   
@@ -97,7 +99,9 @@ const AdminDashboard = () => {
   const [contractAgreement, setContractAgreement] = useState<ServiceAgreement | null>(null);
   const [rejectAgreement, setRejectAgreement] = useState<ServiceAgreement | null>(null);
   const [agreementStatusFilter, setAgreementStatusFilter] = useState<AgreementStatusFilter>('new');
-  const [singleJobStatusFilter, setSingleJobStatusFilter] = useState<SingleJobStatusFilter>('pending');
+  const [singleJobStatusFilter, setSingleJobStatusFilter] = useState<SingleJobStatusFilter>(
+    (urlFilter as SingleJobStatusFilter) || 'pending'
+  );
   const [showCreateJobModal, setShowCreateJobModal] = useState(false);
   const [guestCustomer, setGuestCustomer] = useState<{ email: string; name: string } | null>(null);
 
@@ -398,6 +402,7 @@ const AdminDashboard = () => {
                   key={quote.id}
                   quote={quote}
                   actionLoading={actionLoading}
+                  isHighlighted={highlightId === quote.id}
                   onStartJob={(q) => setConfirmDialog({ open: true, type: 'start', item: q })}
                   onCompleteDirectly={(q) => setConfirmDialog({ open: true, type: 'complete_directly', item: q })}
                   onDelete={(q) => setConfirmDialog({ open: true, type: 'delete_quote', item: q })}
@@ -416,6 +421,7 @@ const AdminDashboard = () => {
                   job={job}
                   variant="active"
                   actionLoading={actionLoading}
+                  isHighlighted={highlightId === job.id}
                   onComplete={(j) => setConfirmDialog({ open: true, type: 'complete', item: j })}
                   onViewHistory={(email, name) => setGuestCustomer({ email, name })}
                 />
@@ -432,6 +438,7 @@ const AdminDashboard = () => {
                   job={job}
                   variant="completed"
                   actionLoading={actionLoading}
+                  isHighlighted={highlightId === job.id}
                   onDelete={(j) => setConfirmDialog({ open: true, type: 'delete', item: j })}
                   onAddInvoice={(j) => setInvoiceJob(j)}
                 />
@@ -593,6 +600,7 @@ const AdminDashboard = () => {
               <ServiceAgreementCard
                 key={agreement.id}
                 agreement={agreement}
+                isHighlighted={highlightId === agreement.id}
                 onUpdateStatus={handleUpdateAgreementStatus}
                 onSendOffer={(a) => setOfferAgreement(a)}
                 onUploadContract={(a) => setContractAgreement(a)}
@@ -637,7 +645,7 @@ const AdminDashboard = () => {
 
         {/* Email History Tab */}
         <TabsContent value="history" forceMount className="data-[state=inactive]:hidden">
-          <EmailHistory />
+          <EmailHistory highlightId={highlightId} />
         </TabsContent>
 
         {/* Brukere: Rollestyring — owner kan endre, admin read-only */}

@@ -157,20 +157,31 @@ const frequencyLabels: Record<string, string> = {
 const QUOTE_STEPS = ['pending', 'under_review', 'quoted', 'accepted', 'in_progress'];
 const AGREEMENT_STEPS = ['new', 'under_review', 'offer_sent', 'contract_signed'];
 
-const entityNavLinks: Record<string, string> = {
-  email:     '/dashboard/admin?category=mail&tab=history',
-  quote:     '/dashboard/admin?category=oppdrag&tab=single-jobs',
-  job:       '/dashboard/admin?category=oppdrag&tab=single-jobs',
-  agreement: '/dashboard/admin?category=oppdrag&tab=agreements',
-  invoice:   '/dashboard/admin?category=okonomi&tab=invoices',
-};
-
 const navButtonLabel: Record<string, string> = {
   email:     'Se e-post i historikk',
   quote:     'Se forespørsel i Administrasjon',
   job:       'Se jobb i Administrasjon',
   agreement: 'Se avtale i Administrasjon',
   invoice:   'Se faktura i Administrasjon',
+};
+
+const getEntityNavLink = (event: ActivityEvent): string => {
+  const id = (event.entity as { id: string }).id;
+  switch (event.entityType) {
+    case 'email':
+      return `/dashboard/admin?category=mail&tab=history&highlight=${id}`;
+    case 'quote':
+      return `/dashboard/admin?category=oppdrag&tab=single-jobs&filter=pending&highlight=${id}`;
+    case 'job': {
+      const status = (event.entity as { status: string }).status;
+      const filter = status === 'completed' ? 'completed' : 'in_progress';
+      return `/dashboard/admin?category=oppdrag&tab=single-jobs&filter=${filter}&highlight=${id}`;
+    }
+    case 'agreement':
+      return `/dashboard/admin?category=oppdrag&tab=agreements&highlight=${id}`;
+    case 'invoice':
+      return `/dashboard/admin?category=okonomi&tab=invoices&highlight=${id}`;
+  }
 };
 
 const StatusProgressBar = ({ status, steps }: { status: string; steps: string[] }) => {
@@ -861,7 +872,7 @@ const DashboardActivity = () => {
               {(isAdmin || isOwner) && (
                 <div className="pt-3 border-t border-border/40">
                   <Link
-                    to={entityNavLinks[selectedEvent.entityType]}
+                    to={getEntityNavLink(selectedEvent)}
                     onClick={() => setSelectedEvent(null)}
                   >
                     <Button variant="outline" size="sm" className="w-full gap-2">

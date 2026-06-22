@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,16 +40,30 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { useEmailLogs, EmailLog, EmailLogsFilter } from '@/hooks/useEmailLogs';
+import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
-export function EmailHistory() {
+interface EmailHistoryProps {
+  highlightId?: string;
+}
+
+export function EmailHistory({ highlightId }: EmailHistoryProps) {
   const [filter, setFilter] = useState<EmailLogsFilter>({
     recipientType: 'all',
     status: 'all',
   });
   const { logs, loading, refreshLogs } = useEmailLogs(filter);
   const [selectedLog, setSelectedLog] = useState<EmailLog | null>(null);
+  const highlightRef = useRef<HTMLTableRowElement>(null);
+
+  useEffect(() => {
+    if (!loading && highlightId && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const match = logs.find(l => l.id === highlightId);
+      if (match) setSelectedLog(match);
+    }
+  }, [loading, highlightId, logs]);
 
   const handleFilterChange = (key: keyof EmailLogsFilter, value: string) => {
     setFilter(prev => ({
@@ -158,7 +172,12 @@ export function EmailHistory() {
                 </TableHeader>
                 <TableBody>
                   {logs.map((log) => (
-                    <TableRow key={log.id} className="cursor-pointer hover:bg-muted/60" onClick={() => setSelectedLog(log)}>
+                    <TableRow
+                      key={log.id}
+                      ref={log.id === highlightId ? highlightRef : undefined}
+                      className={cn('cursor-pointer hover:bg-muted/60', log.id === highlightId && 'ring-2 ring-inset ring-primary bg-primary/5')}
+                      onClick={() => setSelectedLog(log)}
+                    >
                       <TableCell className="text-sm">
                         {format(new Date(log.sent_at), 'dd.MM.yy HH:mm', { locale: nb })}
                       </TableCell>

@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -5,19 +6,30 @@ import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { Loader2, Play, CheckCircle, Trash2, History } from 'lucide-react';
 import { Quote, STATUS_COLORS, STATUS_LABELS } from '@/types/admin';
+import { cn } from '@/lib/utils';
 
 interface QuoteCardProps {
   quote: Quote;
   actionLoading: string | null;
+  isHighlighted?: boolean;
   onStartJob: (quote: Quote) => void;
   onCompleteDirectly?: (quote: Quote) => void;
   onDelete?: (quote: Quote) => void;
   onViewHistory?: (email: string, name: string) => void;
 }
 
-export const QuoteCard = ({ quote, actionLoading, onStartJob, onCompleteDirectly, onDelete, onViewHistory }: QuoteCardProps) => {
+export const QuoteCard = ({ quote, actionLoading, isHighlighted, onStartJob, onCompleteDirectly, onDelete, onViewHistory }: QuoteCardProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isHighlighted && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [isHighlighted]);
+
   return (
-    <Card className="interactive-card">
+    <div ref={ref}>
+    <Card className={cn('interactive-card', isHighlighted && 'ring-2 ring-primary bg-primary/5 shadow-lg shadow-primary/10')}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
@@ -115,5 +127,6 @@ export const QuoteCard = ({ quote, actionLoading, onStartJob, onCompleteDirectly
         </div>
       </CardContent>
     </Card>
+    </div>
   );
 };

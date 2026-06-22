@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard, Smile, 
 import { Job, STATUS_COLORS, STATUS_LABELS, Invoice, InvoiceRequest, INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface QuickFeedback {
   id: string;
@@ -21,6 +22,7 @@ interface JobCardProps {
   job: Job;
   actionLoading: string | null;
   variant: 'active' | 'completed';
+  isHighlighted?: boolean;
   onComplete?: (job: Job) => void;
   onDelete?: (job: Job) => void;
   onAddInvoice?: (job: Job) => void;
@@ -33,11 +35,18 @@ const RATING_CONFIG = {
   sad: { icon: Frown, label: 'Misfornøyd', color: 'text-red-500', bg: 'bg-red-50' }
 };
 
-export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onAddInvoice, onViewHistory }: JobCardProps) => {
+export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete, onDelete, onAddInvoice, onViewHistory }: JobCardProps) => {
+  const ref = useRef<HTMLDivElement>(null);
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [invoiceRequest, setInvoiceRequest] = useState<InvoiceRequest | null>(null);
   const [markingPaid, setMarkingPaid] = useState(false);
   const [quickFeedback, setQuickFeedback] = useState<QuickFeedback | null>(null);
+
+  useEffect(() => {
+    if (isHighlighted && ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [isHighlighted]);
 
   useEffect(() => {
     if (variant === 'completed') {
@@ -145,7 +154,8 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
   };
 
   return (
-    <Card className={`interactive-card ${hasInvoiceRequest ? 'ring-2 ring-orange-400' : ''}`}>
+    <div ref={ref}>
+    <Card className={cn('interactive-card', hasInvoiceRequest && 'ring-2 ring-orange-400', isHighlighted && 'ring-2 ring-primary bg-primary/5 shadow-lg shadow-primary/10')}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
@@ -297,5 +307,6 @@ export const JobCard = ({ job, actionLoading, variant, onComplete, onDelete, onA
         )}
       </CardContent>
     </Card>
+    </div>
   );
 };
