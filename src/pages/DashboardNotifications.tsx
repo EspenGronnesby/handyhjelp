@@ -89,6 +89,11 @@ const getIconConfig = (notification: Notification): IconConfig => {
       switch (notification.type) {
         case 'job_update':
           return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.oppdrag };
+        case 'quote_update':
+          return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.oppdrag };
+        case 'agreement_update':
+          return { icon: <Briefcase className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.oppdrag };
+        case 'invoice_sent':
         case 'invoice_request':
           return { icon: <CreditCard className="h-6 w-6 sm:h-5 sm:w-5 text-white" />, ...ICON_STYLES.okonomi };
         case 'content_submission':
@@ -172,8 +177,21 @@ const getActionLink = (notification: Notification): ActionLink | null => {
         url: `/dashboard/admin?category=brukere&tab=kunder`,
       };
     default:
+      // Kunde-notifikasjoner (uten action_type i metadata)
       if (notification.type === 'invoice_request') {
         return { label: 'Se faktura', icon: <CreditCard className="h-3.5 w-3.5" />, url: `/dashboard/admin?category=okonomi&tab=invoices` };
+      }
+      if (notification.type === 'invoice_sent') {
+        return { label: 'Se faktura', icon: <CreditCard className="h-3.5 w-3.5" />, url: `/dashboard` };
+      }
+      if (notification.type === 'job_update') {
+        return { label: 'Se oppdrag', icon: <Briefcase className="h-3.5 w-3.5" />, url: `/dashboard` };
+      }
+      if (notification.type === 'quote_update') {
+        return { label: 'Se tilbud', icon: <Briefcase className="h-3.5 w-3.5" />, url: `/dashboard` };
+      }
+      if (notification.type === 'agreement_update') {
+        return { label: 'Se avtale', icon: <Briefcase className="h-3.5 w-3.5" />, url: `/dashboard` };
       }
       if (['content_submission', 'content_approved', 'content_rejected'].includes(notification.type)) {
         return { label: 'Se innhold', icon: <FileText className="h-3.5 w-3.5" />, url: `/dashboard/admin?category=innhold&tab=blog` };
