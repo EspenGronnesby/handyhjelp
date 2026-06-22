@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Bell, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import { Loader2, Bell, CheckCircle, AlertCircle, Info, FileText, Briefcase, Star, Receipt, Activity, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
@@ -92,18 +92,30 @@ const DashboardNotifications = () => {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'success': return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'warning': return <AlertCircle className="h-5 w-5 text-amber-500" />;
-      case 'error': return <AlertCircle className="h-5 w-5 text-red-500" />;
+      case 'content_approved': return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'content_rejected': return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'content_submission': return <FileText className="h-5 w-5 text-purple-500" />;
+      case 'job_update': return <Briefcase className="h-5 w-5 text-blue-500" />;
+      case 'quote_update': return <FileText className="h-5 w-5 text-blue-600" />;
+      case 'invoice_request': return <Receipt className="h-5 w-5 text-amber-500" />;
+      case 'loyalty': return <Star className="h-5 w-5 text-yellow-500" />;
+      case 'review_request': return <Star className="h-5 w-5 text-amber-500" />;
+      case 'activity_update': return <Activity className="h-5 w-5 text-primary" />;
       default: return <Info className="h-5 w-5 text-primary" />;
     }
   };
 
   const getIconBg = (type: string) => {
     switch (type) {
-      case 'success': return 'bg-green-500/10';
-      case 'warning': return 'bg-amber-500/10';
-      case 'error': return 'bg-red-500/10';
+      case 'content_approved': return 'bg-green-500/10';
+      case 'content_rejected': return 'bg-red-500/10';
+      case 'content_submission': return 'bg-purple-500/10';
+      case 'job_update': return 'bg-blue-500/10';
+      case 'quote_update': return 'bg-blue-600/10';
+      case 'invoice_request': return 'bg-amber-500/10';
+      case 'loyalty': return 'bg-yellow-500/10';
+      case 'review_request': return 'bg-amber-500/10';
+      case 'activity_update': return 'bg-primary/10';
       default: return 'bg-primary/10';
     }
   };

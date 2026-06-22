@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import DOMPurify from 'dompurify';
 import { useAuth } from '@/hooks/useAuth';
+import { logActivity } from '@/hooks/useActivityLog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -135,13 +136,20 @@ export const ContentApprovalQueue = () => {
     mutationFn: async (project: PendingProject) => {
       const { error } = await supabase
         .from('projects')
-        .update({ 
+        .update({
           status: 'published',
           reviewed_by: user?.id,
           reviewed_at: new Date().toISOString(),
         })
         .eq('id', project.id);
       if (error) throw error;
+
+      await logActivity(
+        'content_approved',
+        'content_management',
+        `Godkjente prosjekt: "${project.title}"`,
+        { project_id: project.id, title: project.title, submitted_by: project.submitted_by }
+      );
 
       // Send notification to worker
       if (project.submitted_by) {
@@ -168,7 +176,7 @@ export const ContentApprovalQueue = () => {
     mutationFn: async (blog: PendingBlogPost) => {
       const { error } = await supabase
         .from('blog_posts')
-        .update({ 
+        .update({
           status: 'published',
           published_at: new Date().toISOString(),
           reviewed_by: user?.id,
@@ -176,6 +184,13 @@ export const ContentApprovalQueue = () => {
         })
         .eq('id', blog.id);
       if (error) throw error;
+
+      await logActivity(
+        'content_approved',
+        'content_management',
+        `Godkjente blogginnlegg: "${blog.title}"`,
+        { blog_id: blog.id, title: blog.title, submitted_by: blog.submitted_by }
+      );
 
       // Send notification to worker
       if (blog.submitted_by) {
@@ -203,7 +218,7 @@ export const ContentApprovalQueue = () => {
       const table = type === 'project' ? 'projects' : 'blog_posts';
       const { error } = await supabase
         .from(table)
-        .update({ 
+        .update({
           status: 'rejected',
           rejection_reason: reason,
           reviewed_by: user?.id,
@@ -211,6 +226,13 @@ export const ContentApprovalQueue = () => {
         })
         .eq('id', id);
       if (error) throw error;
+
+      await logActivity(
+        'content_rejected',
+        'content_management',
+        `Avslo ${type === 'project' ? 'prosjekt' : 'blogginnlegg'}: "${title}"`,
+        { id, title, reason, type, submitted_by: submittedBy }
+      );
 
       // Send notification to worker
       if (submittedBy) {
