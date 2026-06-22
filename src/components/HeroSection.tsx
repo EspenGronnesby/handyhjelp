@@ -48,18 +48,23 @@ export const HeroSection = () => {
         id="hero"
         className="min-h-[75svh] md:min-h-screen relative flex items-center pt-20 md:pt-20 section-mobile overflow-hidden"
       >
-        {/* Static background image — vises umiddelbart, ingen fade. */}
+        {/* LCP-element: ekte <img> med fetchpriority="high" gir raskere LCP enn CSS background-image */}
+        <img
+          src={heroImage}
+          alt=""
+          aria-hidden="true"
+          width={1920}
+          height={1080}
+          decoding="async"
+          // @ts-expect-error fetchpriority er gyldig HTML-attributt, ennå ikke i React-typene
+          fetchpriority="high"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ objectPosition: 'center 30%' }}
+        />
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundPosition: 'center 30%'
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75" style={{
-            opacity
-          }}></div>
-        </div>
+          className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75"
+          style={{ opacity }}
+        />
 
 
         {isAdmin && (
