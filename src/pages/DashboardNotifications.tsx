@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Loader2, Bell, CheckCircle, AlertCircle, Info, FileText, Briefcase, Star, Receipt, Activity, XCircle } from 'lucide-react';
+import {
+  Loader2, Bell, CheckCircle, AlertCircle, Info,
+  FileText, Briefcase, Star, CreditCard, Receipt,
+  Activity, XCircle, Users, Mail, ArrowRight,
+} from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
@@ -13,7 +18,170 @@ interface Notification {
   type: string;
   read: boolean;
   created_at: string;
+  metadata?: Record<string, any>;
 }
+
+interface ActionLink {
+  label: string;
+  icon: React.ReactNode;
+  url: string;
+}
+
+const getActionLink = (notification: Notification): ActionLink | null => {
+  const meta = notification.metadata ?? {};
+  const actionType = meta.action_type as string | undefined;
+
+  switch (actionType) {
+    case 'blog_submitted':
+      return {
+        label: 'Se artikkel',
+        icon: <FileText className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=innhold&tab=blog${meta.post_id ? `&highlight=${meta.post_id}` : ''}`,
+      };
+    case 'quote_submitted':
+      return {
+        label: 'Se tilbud',
+        icon: <Briefcase className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=oppdrag${meta.quote_id ? `&highlight=${meta.quote_id}` : ''}`,
+      };
+    case 'agreement_submitted':
+      return {
+        label: 'Se avtale',
+        icon: <Briefcase className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=oppdrag&tab=agreements${meta.agreement_id ? `&highlight=${meta.agreement_id}` : ''}`,
+      };
+    case 'review_submitted':
+      return {
+        label: 'Se anmeldelse',
+        icon: <Star className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=innhold&tab=reviews${meta.review_id ? `&highlight=${meta.review_id}` : ''}`,
+      };
+    case 'content_approved':
+    case 'content_rejected':
+    case 'content_submission':
+      return {
+        label: 'Se innhold',
+        icon: <FileText className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=innhold&tab=blog`,
+      };
+    case 'job_created':
+    case 'job_started':
+    case 'job_completed':
+    case 'job_deleted':
+      return {
+        label: 'Se oppdrag',
+        icon: <Briefcase className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=oppdrag&tab=single-jobs${meta.job_id ? `&highlight=${meta.job_id}` : ''}`,
+      };
+    case 'invoice_request':
+      return {
+        label: 'Se faktura',
+        icon: <CreditCard className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=okonomi&tab=invoices`,
+      };
+    case 'role_assigned':
+    case 'role_removed':
+      return {
+        label: 'Se roller',
+        icon: <Users className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=brukere&tab=rollestyring`,
+      };
+    case 'customer_created':
+      return {
+        label: 'Se kunder',
+        icon: <Users className="h-3.5 w-3.5" />,
+        url: `/dashboard/admin?category=brukere&tab=kunder`,
+      };
+    default:
+      // Fallback based on notification type for older notifications without metadata
+      if (notification.type === 'invoice_request') {
+        return {
+          label: 'Se faktura',
+          icon: <CreditCard className="h-3.5 w-3.5" />,
+          url: `/dashboard/admin?category=okonomi&tab=invoices`,
+        };
+      }
+      if (notification.type === 'content_submission' || notification.type === 'content_approved' || notification.type === 'content_rejected') {
+        return {
+          label: 'Se innhold',
+          icon: <FileText className="h-3.5 w-3.5" />,
+          url: `/dashboard/admin?category=innhold&tab=blog`,
+        };
+      }
+      return null;
+  }
+};
+
+const getNotificationIcon = (notification: Notification) => {
+  const actionType = notification.metadata?.action_type as string | undefined;
+
+  switch (actionType) {
+    case 'blog_submitted':
+    case 'content_submission':
+      return <FileText className="h-5 w-5 text-purple-500" />;
+    case 'content_approved':
+      return <CheckCircle className="h-5 w-5 text-green-500" />;
+    case 'content_rejected':
+      return <XCircle className="h-5 w-5 text-red-500" />;
+    case 'quote_submitted':
+    case 'job_created':
+    case 'job_started':
+    case 'job_completed':
+    case 'job_deleted':
+    case 'agreement_submitted':
+    case 'agreement_approved':
+    case 'agreement_rejected':
+    case 'agreement_updated':
+      return <Briefcase className="h-5 w-5 text-blue-500" />;
+    case 'review_submitted':
+      return <Star className="h-5 w-5 text-amber-500" />;
+    case 'invoice_request':
+      return <CreditCard className="h-5 w-5 text-amber-500" />;
+    case 'role_assigned':
+    case 'role_removed':
+    case 'customer_created':
+      return <Users className="h-5 w-5 text-indigo-500" />;
+    default:
+      // Fallback based on notification type
+      switch (notification.type) {
+        case 'content_approved': return <CheckCircle className="h-5 w-5 text-green-500" />;
+        case 'content_rejected': return <XCircle className="h-5 w-5 text-red-500" />;
+        case 'content_submission': return <FileText className="h-5 w-5 text-purple-500" />;
+        case 'job_update': return <Briefcase className="h-5 w-5 text-blue-500" />;
+        case 'invoice_request': return <CreditCard className="h-5 w-5 text-amber-500" />;
+        case 'loyalty': return <Star className="h-5 w-5 text-yellow-500" />;
+        case 'review_request': return <Star className="h-5 w-5 text-amber-500" />;
+        case 'activity_update': return <Activity className="h-5 w-5 text-primary" />;
+        default: return <Info className="h-5 w-5 text-primary" />;
+      }
+  }
+};
+
+const getIconBg = (notification: Notification) => {
+  const actionType = notification.metadata?.action_type as string | undefined;
+
+  switch (actionType) {
+    case 'blog_submitted':
+    case 'content_submission': return 'bg-purple-500/10';
+    case 'content_approved': return 'bg-green-500/10';
+    case 'content_rejected': return 'bg-red-500/10';
+    case 'quote_submitted':
+    case 'job_created':
+    case 'job_started':
+    case 'job_completed':
+    case 'job_deleted':
+    case 'agreement_submitted':
+    case 'agreement_approved':
+    case 'agreement_rejected':
+    case 'agreement_updated': return 'bg-blue-500/10';
+    case 'review_submitted': return 'bg-amber-500/10';
+    case 'invoice_request': return 'bg-amber-500/10';
+    case 'role_assigned':
+    case 'role_removed':
+    case 'customer_created': return 'bg-indigo-500/10';
+    default: return 'bg-primary/10';
+  }
+};
 
 const DashboardNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -22,7 +190,6 @@ const DashboardNotifications = () => {
   useEffect(() => {
     fetchNotifications();
 
-    // Realtime subscription for new notifications
     const channel = supabase
       .channel('notifications-realtime')
       .on(
@@ -62,7 +229,7 @@ const DashboardNotifications = () => {
       .update({ read: true })
       .eq('id', id);
 
-    setNotifications(notifications.map(n => 
+    setNotifications(notifications.map(n =>
       n.id === id ? { ...n, read: true } : n
     ));
   };
@@ -89,36 +256,6 @@ const DashboardNotifications = () => {
   }
 
   const unreadCount = notifications.filter(n => !n.read).length;
-
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'content_approved': return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'content_rejected': return <XCircle className="h-5 w-5 text-red-500" />;
-      case 'content_submission': return <FileText className="h-5 w-5 text-purple-500" />;
-      case 'job_update': return <Briefcase className="h-5 w-5 text-blue-500" />;
-      case 'quote_update': return <FileText className="h-5 w-5 text-blue-600" />;
-      case 'invoice_request': return <Receipt className="h-5 w-5 text-amber-500" />;
-      case 'loyalty': return <Star className="h-5 w-5 text-yellow-500" />;
-      case 'review_request': return <Star className="h-5 w-5 text-amber-500" />;
-      case 'activity_update': return <Activity className="h-5 w-5 text-primary" />;
-      default: return <Info className="h-5 w-5 text-primary" />;
-    }
-  };
-
-  const getIconBg = (type: string) => {
-    switch (type) {
-      case 'content_approved': return 'bg-green-500/10';
-      case 'content_rejected': return 'bg-red-500/10';
-      case 'content_submission': return 'bg-purple-500/10';
-      case 'job_update': return 'bg-blue-500/10';
-      case 'quote_update': return 'bg-blue-600/10';
-      case 'invoice_request': return 'bg-amber-500/10';
-      case 'loyalty': return 'bg-yellow-500/10';
-      case 'review_request': return 'bg-amber-500/10';
-      case 'activity_update': return 'bg-primary/10';
-      default: return 'bg-primary/10';
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -158,36 +295,51 @@ const DashboardNotifications = () => {
         </div>
       ) : (
         <div className="space-y-3">
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              onClick={() => !notification.read && markAsRead(notification.id)}
-              className={`card-professional p-4 flex items-start gap-4 transition-all duration-200 ${
-                !notification.read
-                  ? 'border-l-4 border-l-primary bg-primary/5 cursor-pointer active:bg-primary/10'
-                  : ''
-              }`}
-            >
-              <div className={`p-2 rounded-lg shrink-0 ${getIconBg(notification.type)}`}>
-                {getNotificationIcon(notification.type)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                  <p className="font-semibold text-sm">{notification.title}</p>
-                  {!notification.read && <Badge variant="default" className="text-xs">Ny</Badge>}
+          {notifications.map((notification) => {
+            const actionLink = getActionLink(notification);
+            return (
+              <div
+                key={notification.id}
+                onClick={() => !notification.read && markAsRead(notification.id)}
+                className={`card-professional p-4 flex items-start gap-4 transition-all duration-200 ${
+                  !notification.read
+                    ? 'border-l-4 border-l-primary bg-primary/5 cursor-pointer active:bg-primary/10'
+                    : ''
+                }`}
+              >
+                <div className={`p-2 rounded-lg shrink-0 ${getIconBg(notification)}`}>
+                  {getNotificationIcon(notification)}
                 </div>
-                <p className="text-sm text-muted-foreground mb-1">{notification.message}</p>
-                <p className="text-xs text-muted-foreground/70">
-                  {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: nb })}
-                </p>
-              </div>
-              {!notification.read && (
-                <div className="shrink-0 text-xs text-muted-foreground/50 self-center">
-                  Trykk
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                    <p className="font-semibold text-sm">{notification.title}</p>
+                    {!notification.read && <Badge variant="default" className="text-xs">Ny</Badge>}
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-1">{notification.message}</p>
+                  <p className="text-xs text-muted-foreground/70 mb-2">
+                    {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: nb })}
+                  </p>
+                  {actionLink && (
+                    <Link
+                      to={actionLink.url}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Button size="sm" variant="outline" className="h-7 text-xs gap-1.5 px-2.5">
+                        {actionLink.icon}
+                        {actionLink.label}
+                        <ArrowRight className="h-3 w-3" />
+                      </Button>
+                    </Link>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+                {!notification.read && (
+                  <div className="shrink-0 text-xs text-muted-foreground/50 self-center">
+                    Trykk
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
