@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Users, AlertTriangle, ArrowRight, Star } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -190,6 +190,7 @@ const DashboardActivity = () => {
   const [adminQuotes, setAdminQuotes] = useState<Quote[]>([]);
   const [adminJobs, setAdminJobs] = useState<Job[]>([]);
   const [adminAgreements, setAdminAgreements] = useState<ServiceAgreement[]>([]);
+  const [adminOverviewStats, setAdminOverviewStats] = useState({ totalCustomers: 0, totalCompleted: 0 });
   const { isWorker, isAdmin, isOwner } = useRole();
   const { badges } = useNavigationBadges();
   const fetchData = useCallback(async () => {
@@ -262,6 +263,15 @@ const DashboardActivity = () => {
       if (adminJRes.data) setAdminJobs(adminJRes.data);
       if (adminARes.data) setAdminAgreements(adminARes.data as ServiceAgreement[]);
       if (adminEmailRes.data) setAdminEmailLogs(adminEmailRes.data as EmailLogEntry[]);
+
+      const [customersRes, completedRes] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact', head: true }),
+        supabase.from('jobs').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
+      ]);
+      setAdminOverviewStats({
+        totalCustomers: customersRes.count ?? 0,
+        totalCompleted: completedRes.count ?? 0,
+      });
     }
 
     setLoading(false);
@@ -598,7 +608,11 @@ const DashboardActivity = () => {
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-1">Oversikt</h1>
         <p className="text-muted-foreground">
-          {isOnlyWorker ? 'Dine innleveringer og status' : 'Hold oversikt over dine tilbud og jobber'}
+          {isOnlyWorker
+            ? 'Dine innleveringer og status'
+            : (isAdmin || isOwner)
+            ? 'Plattformstatus og nøkkeltall'
+            : 'Hold oversikt over dine tilbud og jobber'}
         </p>
       </div>
 
@@ -868,8 +882,122 @@ const DashboardActivity = () => {
         </div>
       )}
 
+      {/* Stats — admin/owner business dashboard */}
+      {(isAdmin || isOwner) && (
+        <div className="space-y-4">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+            <Link to="/dashboard/admin">
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 text-white">
+                <div className="flex items-start justify-between mb-3">
+                  <p className="text-sm font-medium text-white/80">Totale kunder</p>
+                  <Users className="h-8 w-8 text-white/30" strokeWidth={1.5} />
+                </div>
+                <div className="text-3xl font-bold">{adminOverviewStats.totalCustomers}</div>
+                <p className="text-xs mt-1 text-white/60">registrerte kunder</p>
+              </div>
+            </Link>
+            <Link to="/dashboard/admin">
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white">
+                <div className="flex items-start justify-between mb-3">
+                  <p className="text-sm font-medium text-white/80">Åpne forespørsler</p>
+                  <FileText className="h-8 w-8 text-white/30" strokeWidth={1.5} />
+                </div>
+                <div className="text-3xl font-bold">{badges.adminDetails.pendingQuotes}</div>
+                <p className="text-xs mt-1 text-white/60">venter på svar</p>
+              </div>
+            </Link>
+            <Link to="/dashboard/admin">
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white">
+                <div className="flex items-start justify-between mb-3">
+                  <p className="text-sm font-medium text-white/80">Aktive jobber</p>
+                  <Briefcase className="h-8 w-8 text-white/30" strokeWidth={1.5} />
+                </div>
+                <div className="text-3xl font-bold">{badges.adminDetails.activeJobs}</div>
+                <p className="text-xs mt-1 text-white/60">pågår akkurat nå</p>
+              </div>
+            </Link>
+            <Link to="/dashboard/admin">
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white">
+                <div className="flex items-start justify-between mb-3">
+                  <p className="text-sm font-medium text-white/80">Fullførte jobber</p>
+                  <CheckCircle className="h-8 w-8 text-white/30" strokeWidth={1.5} />
+                </div>
+                <div className="text-3xl font-bold">{adminOverviewStats.totalCompleted}</div>
+                <p className="text-xs mt-1 text-white/60">ferdigstilte oppdrag</p>
+              </div>
+            </Link>
+          </div>
+
+          {/* Trenger oppmerksomhet */}
+          {(badges.adminDetails.pendingQuotes > 0 ||
+            (badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs) > 0 ||
+            badges.adminDetails.newAgreements > 0 ||
+            badges.adminDetails.pendingReviews > 0) && (
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                Trenger oppmerksomhet
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                {badges.adminDetails.pendingQuotes > 0 && (
+                  <Link to="/dashboard/admin">
+                    <div className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-amber-300/60 transition-colors cursor-pointer group">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="text-sm text-foreground/80 flex-1">
+                        {badges.adminDetails.pendingQuotes} forespørsel{badges.adminDetails.pendingQuotes !== 1 ? 'er' : ''} venter
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+                    </div>
+                  </Link>
+                )}
+                {(badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs) > 0 && (
+                  <Link to="/dashboard/admin">
+                    <div className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-fuchsia-300/60 transition-colors cursor-pointer group">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-fuchsia-500 to-purple-500 flex items-center justify-center shrink-0">
+                        <ClipboardList className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="text-sm text-foreground/80 flex-1">
+                        {badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs} innlevering{(badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs) !== 1 ? 'er' : ''} til godkjenning
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+                    </div>
+                  </Link>
+                )}
+                {badges.adminDetails.newAgreements > 0 && (
+                  <Link to="/dashboard/admin">
+                    <div className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-cyan-300/60 transition-colors cursor-pointer group">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shrink-0">
+                        <CalendarCheck className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="text-sm text-foreground/80 flex-1">
+                        {badges.adminDetails.newAgreements} ny{badges.adminDetails.newAgreements !== 1 ? 'e' : ''} avtaleforespørsel{badges.adminDetails.newAgreements !== 1 ? 'er' : ''}
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+                    </div>
+                  </Link>
+                )}
+                {badges.adminDetails.pendingReviews > 0 && (
+                  <Link to="/dashboard/admin">
+                    <div className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-rose-300/60 transition-colors cursor-pointer group">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shrink-0">
+                        <Star className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="text-sm text-foreground/80 flex-1">
+                        {badges.adminDetails.pendingReviews} anmeldelse{badges.adminDetails.pendingReviews !== 1 ? 'r' : ''} til moderering
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors" />
+                    </div>
+                  </Link>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Stats — kunde-spesifikke */}
-      {!isOnlyWorker && (
+      {!isOnlyWorker && !isAdmin && !isOwner && (
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Mine oppdrag — kompakt samle-kort */}
           <div className="bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white card-hover-lift p-6 rounded-xl flex flex-col justify-between min-h-[140px]">
@@ -909,8 +1037,8 @@ const DashboardActivity = () => {
         </div>
       )}
 
-      {/* Kom i gang — vises bare når brukeren ikke har noen data ennå */}
-      {isEmpty && !isOnlyWorker && (
+      {/* Kom i gang — vises bare når vanlig bruker ikke har noen data ennå */}
+      {isEmpty && !isOnlyWorker && !isAdmin && !isOwner && (
         <div className="card-professional p-6">
           <h2 className="text-base font-semibold mb-1">Kom i gang</h2>
           <p className="text-sm text-muted-foreground mb-4">Her er noen ting du kan gjøre</p>
@@ -929,8 +1057,8 @@ const DashboardActivity = () => {
         </div>
       )}
 
-      {/* Mine forespørsler */}
-      {!isEmpty && <>
+      {/* Mine forespørsler — kun for vanlige brukere */}
+      {!isEmpty && !isAdmin && !isOwner && <>
           <div>
             <h2 className="text-xl font-semibold mb-4">Mine Jobber</h2>
           </div>
