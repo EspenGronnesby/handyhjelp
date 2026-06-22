@@ -191,6 +191,58 @@ Use the format above. Keep it short and concrete.
 
 ---
 
+### SECURITY DEFINER-funksjoner mangler SET search_path
+**Date:** 2026-06-22
+**Category:** Supabase
+**Affected files:** supabase/migrations/ (alle funksjoner vi lager med SECURITY DEFINER)
+
+**Problem:**
+Supabase sin sikkerhetsrådgiver flagget alle 5 funksjonene vi laget for notifikasjonssystemet (`log_new_quote`, `log_new_agreement`, `log_new_review`, `notify_owners_on_activity`, `notify_admins_on_activity`) fordi de manglet `SET search_path = public`. Uten dette kan en angriper manipulere hvilke tabeller en SECURITY DEFINER-funksjon treffer via "search_path hijacking". Lovable oppdaget og fikset dette.
+
+**Solution:**
+```sql
+ALTER FUNCTION public.funksjonsnavn() SET search_path = public;
+```
+Eller legg det direkte i funksjonsdefinisjonen:
+```sql
+CREATE OR REPLACE FUNCTION public.funksjonsnavn()
+RETURNS TRIGGER AS $$
+...
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+```
+
+**Prevention:**
+- Alltid legg til `SET search_path = public` på ALLE nye SECURITY DEFINER-funksjoner
+- Skriv det som en del av funksjonssignaturen, ikke som et ettertrinn
+- Supabase sin sikkerhetsrådgiver (Database → Advisors) fanger dette opp — sjekk den etter større migrasjoner
+
+---
+
+### RLS mangler på realtime.messages
+**Date:** 2026-06-22
+**Category:** Supabase
+**Affected files:** supabase/migrations/
+
+**Problem:**
+Supabase sin sikkerhetsrådgiver flagget at `realtime.messages`-tabellen manglet Row Level Security. Uten RLS kan autentiserte brukere potensielt lese og skrive meldinger de ikke skal ha tilgang til. Lovable fikset dette.
+
+**Solution:**
+```sql
+ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated users can receive realtime messages"
+ON realtime.messages FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "Authenticated users can send realtime messages"
+ON realtime.messages FOR INSERT TO authenticated WITH CHECK (true);
+```
+
+**Prevention:**
+- Når du aktiverer Supabase Realtime, husk å også aktivere RLS på `realtime.messages`
+- Sjekk Supabase → Database → Advisors etter du har satt opp Realtime-kanaler
+
+---
+
 ### Hero-bilder: format og visning i panoramisk container
 **Date:** 2026-06-21
 **Category:** React
