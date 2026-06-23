@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useRole } from '@/hooks/useRole';
 import { useNavigationBadges } from '@/hooks/useNavigationBadges';
+import { AdminStatDetailModal, type StatCardType } from '@/components/admin/AdminStatDetailModal';
 import {
   Pagination,
   PaginationContent,
@@ -218,6 +219,7 @@ const DashboardActivity = () => {
   const [adminJobs, setAdminJobs] = useState<Job[]>([]);
   const [adminAgreements, setAdminAgreements] = useState<ServiceAgreement[]>([]);
   const [adminOverviewStats, setAdminOverviewStats] = useState({ totalCustomers: 0, totalCompleted: 0 });
+  const [selectedCard, setSelectedCard] = useState<StatCardType | null>(null);
   const { isWorker, isAdmin, isOwner } = useRole();
   const { badges } = useNavigationBadges();
   const fetchData = useCallback(async () => {
@@ -291,10 +293,15 @@ const DashboardActivity = () => {
       if (adminARes.data) setAdminAgreements(adminARes.data as ServiceAgreement[]);
       if (adminEmailRes.data) setAdminEmailLogs(adminEmailRes.data as EmailLogEntry[]);
 
-      const [customersRes, completedRes] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
+      const [nonCustomerRoles, completedRes] = await Promise.all([
+        supabase.from('user_roles').select('user_id').in('role', ['admin', 'platform_owner', 'worker', 'moderator']),
         supabase.from('jobs').select('id', { count: 'exact', head: true }).eq('status', 'completed'),
       ]);
+      const excludeIds = (nonCustomerRoles.data ?? []).map(r => r.user_id);
+      const customersRes = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .not('id', 'in', excludeIds.length > 0 ? `(${excludeIds.join(',')})` : '(00000000-0000-0000-0000-000000000000)');
       setAdminOverviewStats({
         totalCustomers: customersRes.count ?? 0,
         totalCompleted: completedRes.count ?? 0,
@@ -927,8 +934,8 @@ const DashboardActivity = () => {
       {(isAdmin || isOwner) && (
         <div className="space-y-4">
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-            <Link to="/dashboard/admin">
-              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 text-white">
+            <button onClick={() => setSelectedCard('customers')} disabled={adminOverviewStats.totalCustomers === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 text-white cursor-pointer">
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Totale kunder</p>
                   <Users className="h-8 w-8 text-white/30" strokeWidth={1.5} />
@@ -936,9 +943,15 @@ const DashboardActivity = () => {
                 <div className="text-3xl font-bold">{adminOverviewStats.totalCustomers}</div>
                 <p className="text-xs mt-1 text-white/60">registrerte kunder</p>
               </div>
-            </Link>
-            <Link to="/dashboard/admin">
-              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white">
+            </button>
+            <button onClick={() => setSelectedCard('quotes')} disabled={badges.adminDetails.pendingQuotes === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white cursor-pointer relative">
+                {badges.adminDetails.pendingQuotes > 0 && (
+                  <span className="absolute top-3 right-3 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF0000] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-[#FF0000]" />
+                  </span>
+                )}
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Åpne forespørsler</p>
                   <FileText className="h-8 w-8 text-white/30" strokeWidth={1.5} />
@@ -946,9 +959,15 @@ const DashboardActivity = () => {
                 <div className="text-3xl font-bold">{badges.adminDetails.pendingQuotes}</div>
                 <p className="text-xs mt-1 text-white/60">venter på svar</p>
               </div>
-            </Link>
-            <Link to="/dashboard/admin">
-              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white">
+            </button>
+            <button onClick={() => setSelectedCard('activeJobs')} disabled={badges.adminDetails.activeJobs === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white cursor-pointer relative">
+                {badges.adminDetails.activeJobs > 0 && (
+                  <span className="absolute top-3 right-3 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-400" />
+                  </span>
+                )}
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Aktive jobber</p>
                   <Briefcase className="h-8 w-8 text-white/30" strokeWidth={1.5} />
@@ -956,9 +975,9 @@ const DashboardActivity = () => {
                 <div className="text-3xl font-bold">{badges.adminDetails.activeJobs}</div>
                 <p className="text-xs mt-1 text-white/60">pågår akkurat nå</p>
               </div>
-            </Link>
-            <Link to="/dashboard/admin">
-              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white">
+            </button>
+            <button onClick={() => setSelectedCard('completedJobs')} disabled={adminOverviewStats.totalCompleted === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white cursor-pointer">
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Fullførte jobber</p>
                   <CheckCircle className="h-8 w-8 text-white/30" strokeWidth={1.5} />
@@ -966,7 +985,7 @@ const DashboardActivity = () => {
                 <div className="text-3xl font-bold">{adminOverviewStats.totalCompleted}</div>
                 <p className="text-xs mt-1 text-white/60">ferdigstilte oppdrag</p>
               </div>
-            </Link>
+            </button>
           </div>
 
           {/* Trenger oppmerksomhet */}
@@ -1383,6 +1402,12 @@ const DashboardActivity = () => {
         </TabsContent>
       </Tabs>
         </>}
+
+      <AdminStatDetailModal
+        type={selectedCard}
+        isOpen={selectedCard !== null}
+        onClose={() => setSelectedCard(null)}
+      />
     </div>;
 };
 export default DashboardActivity;
