@@ -258,7 +258,7 @@ const DashboardNotifications = () => {
   };
 
   if (loading) {
-    return <NotificationListSkeleton count={5} />;
+    return <NotificationListSkeleton />;
   }
 
   const unreadCount = notifications.filter(n => !n.read).length;
