@@ -34,8 +34,22 @@
     
     <!-- Favicon and Touch Icons -->
     <link rel="icon" type="image/png" href="/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png">
-    <link rel="apple-touch-icon" href="/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png">
+    <link rel="apple-touch-icon" href="/icons/app-icon-512.png">
     <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#0a1628">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Handy">
+
+    <!-- Initial app loader styles (inline so they paint immediately) -->
+    <style>
+      #app-loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;background:#0a1628;color:#e2e8f0;font-family:Inter,system-ui,sans-serif;transition:opacity .35s ease}
+      #app-loader.is-hidden{opacity:0;pointer-events:none}
+      #app-loader img{width:104px;height:104px;border-radius:22px;box-shadow:0 12px 40px rgba(0,212,212,.18)}
+      #app-loader .ldr-spin{width:34px;height:34px;border-radius:50%;border:2.5px solid rgba(0,212,212,.2);border-top-color:#00d4d4;animation:ldr-spin .8s linear infinite}
+      #app-loader .ldr-text{font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8}
+      @keyframes ldr-spin{to{transform:rotate(360deg)}}
+    </style>
     
     <!-- Structured Data for Local Business -->
     <script type="application/ld+json">
@@ -67,6 +81,11 @@
   </head>
 
   <body>
+    <div id="app-loader" aria-hidden="true">
+      <img src="/icons/app-icon-512.png" alt="" width="104" height="104">
+      <div class="ldr-spin"></div>
+      <div class="ldr-text">Laster…</div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

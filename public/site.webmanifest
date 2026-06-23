@@ -1,18 +1,30 @@
 {
   "name": "HandyHjelp",
-  "short_name": "HandyHjelp",
+  "short_name": "Handy",
   "description": "Profesjonell vaktmester, tømrer og blikkenslagertjenester i Kristiansand.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0ea5e9",
-  "theme_color": "#0ea5e9",
+  "background_color": "#0a1628",
+  "theme_color": "#0a1628",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/lovable-uploads/1269f51d-725a-4c46-a6aa-cad9053d1c73.png",
-      "sizes": "any",
+      "src": "/icons/app-icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/app-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "categories": ["business", "productivity"],
