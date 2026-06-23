@@ -13,6 +13,7 @@ import { TrustStripe } from "@/components/TrustStripe";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { ServiceIcon, ServiceBadge, getCategoryLabel } from "@/lib/serviceIcons";
+import { ProjectGridSkeleton } from "@/components/ui/skeleton-loaders";
 
 interface Project {
   id: string;
@@ -162,10 +163,7 @@ const Projects = () => {
 
           {/* Loading State */}
           {isLoading ? (
-            <div className="text-center py-16">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="text-muted-foreground mt-4">Laster prosjekter...</p>
-            </div>
+            <ProjectGridSkeleton count={6} />
           ) : (
             <>
               {/* Projects Grid */}

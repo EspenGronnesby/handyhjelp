@@ -5,7 +5,8 @@ import { useRole } from '@/hooks/useRole';
 import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import { useNotificationSound } from '@/hooks/useNotificationSound';
 import { Button } from '@/components/ui/button';
-import { Loader2, Briefcase, Shield, Upload, Bell, User } from 'lucide-react';
+import { Briefcase, Shield, Upload, Bell, User } from 'lucide-react';
+import { DashboardShellSkeleton } from '@/components/ui/skeleton-loaders';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { CustomerTypeModal } from '@/components/CustomerTypeModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,11 +46,7 @@ const Dashboard = () => {
   }, [user]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <DashboardShellSkeleton />;
   }
 
   if (!user) {

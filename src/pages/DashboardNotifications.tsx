@@ -5,9 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Loader2, Bell, FileText, Briefcase, Star,
+  Bell, FileText, Briefcase, Star,
   CreditCard, Users, Mail, ArrowRight, ScrollText,
 } from 'lucide-react';
+import { NotificationListSkeleton } from '@/components/ui/skeleton-loaders';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
@@ -257,11 +258,7 @@ const DashboardNotifications = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <NotificationListSkeleton count={5} />;
   }
 
   const unreadCount = notifications.filter(n => !n.read).length;
