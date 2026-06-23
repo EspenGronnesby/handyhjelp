@@ -59,24 +59,28 @@ const config = {
     icon: Users,
     title: 'Totale kunder',
     subtitle: 'Alle registrerte kunder',
+    adminLink: '/dashboard/admin?category=brukere&tab=kunder',
   },
   quotes: {
     gradient: 'from-amber-500 via-orange-500 to-rose-600',
     icon: FileText,
     title: 'Åpne forespørsler',
     subtitle: 'Venter på svar',
+    adminLink: '/dashboard/admin?category=oppdrag&tab=quotes',
   },
   activeJobs: {
     gradient: 'from-cyan-500 via-blue-600 to-indigo-700',
     icon: Briefcase,
     title: 'Aktive jobber',
     subtitle: 'Pågår akkurat nå',
+    adminLink: '/dashboard/admin?category=oppdrag&tab=single-jobs',
   },
   completedJobs: {
     gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
     icon: CheckCircle,
     title: 'Fullførte jobber',
     subtitle: 'Ferdigstilte oppdrag',
+    adminLink: '/dashboard/admin?category=oppdrag&tab=single-jobs&filter=completed',
   },
 };
 
@@ -233,9 +237,9 @@ export function AdminStatDetailModal({ type, isOpen, onClose }: AdminStatDetailM
                           <p className="text-sm font-semibold text-white truncate">{c.full_name ?? 'Ukjent'}</p>
                           <p className="text-xs text-white/60 truncate">{c.email}</p>
                           {c.phone && (
-                            <p className="text-xs text-white/50 flex items-center gap-1 mt-0.5">
-                              <Phone className="h-3 w-3" />{c.phone}
-                            </p>
+                            <a href={`tel:${c.phone}`} className="flex items-center gap-1 text-xs text-white/50 hover:text-white mt-0.5 transition-colors w-fit">
+                              <Phone className="h-3 w-3" />{formatPhone(c.phone)}
+                            </a>
                           )}
                         </div>
                         <div className="text-right shrink-0">
@@ -275,9 +279,9 @@ export function AdminStatDetailModal({ type, isOpen, onClose }: AdminStatDetailM
                         <p className="text-xs text-white/70 line-clamp-2 mb-2">{q.description}</p>
                         <div className="flex items-center justify-between">
                           {q.phone ? (
-                            <span className="flex items-center gap-1 text-xs text-white/60">
-                              <Phone className="h-3 w-3" />{q.phone}
-                            </span>
+                            <a href={`tel:${q.phone}`} className="flex items-center gap-1 text-xs text-white/60 hover:text-white transition-colors">
+                              <Phone className="h-3 w-3" />{formatPhone(q.phone)}
+                            </a>
                           ) : <span />}
                           <div className="flex items-center gap-1">
                             <Clock className="h-3 w-3 text-[#FF0000]" />
@@ -313,9 +317,9 @@ export function AdminStatDetailModal({ type, isOpen, onClose }: AdminStatDetailM
                         <p className="text-xs text-white/70 line-clamp-2 mb-2">{j.quotes?.description}</p>
                         <div className="flex items-center justify-between text-white/50">
                           {j.quotes?.phone ? (
-                            <span className="flex items-center gap-1 text-xs">
-                              <Phone className="h-3 w-3" />{j.quotes.phone}
-                            </span>
+                            <a href={`tel:${j.quotes.phone}`} className="flex items-center gap-1 text-xs text-white/50 hover:text-white transition-colors">
+                              <Phone className="h-3 w-3" />{formatPhone(j.quotes.phone)}
+                            </a>
                           ) : <span />}
                           <div className="flex items-center gap-3">
                             {j.started_at && (
@@ -363,9 +367,16 @@ export function AdminStatDetailModal({ type, isOpen, onClose }: AdminStatDetailM
                                 : format(new Date(j.created_at), 'd. MMM yyyy', { locale: nb })}
                             </p>
                             {badge ? (
-                              <span className={`inline-flex text-xs px-2 py-0.5 rounded-full border ${badge.className}`}>
-                                {badge.label}
-                              </span>
+                              <>
+                                <span className={`inline-flex text-xs px-2 py-0.5 rounded-full border ${badge.className}`}>
+                                  {badge.label}
+                                </span>
+                                {invoice?.amount != null && (
+                                  <p className="text-xs text-white/50">
+                                    kr {invoice.amount.toLocaleString('nb-NO')}
+                                  </p>
+                                )}
+                              </>
                             ) : (
                               <span className="inline-flex text-xs px-2 py-0.5 rounded-full border border-white/20 text-white/40">
                                 Ingen faktura
@@ -381,7 +392,7 @@ export function AdminStatDetailModal({ type, isOpen, onClose }: AdminStatDetailM
 
               {/* Se i Admin-knapp */}
               {!loading && !error && itemCount > 0 && (
-                <Link to="/dashboard/admin" onClick={onClose}>
+                <Link to={cfg.adminLink} onClick={onClose}>
                   <button className="w-full mt-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-sm font-medium transition-colors flex items-center justify-center gap-2">
                     Se alle i Admin <ArrowRight className="h-4 w-4" />
                   </button>
@@ -393,6 +404,13 @@ export function AdminStatDetailModal({ type, isOpen, onClose }: AdminStatDetailM
       </DialogContent>
     </Dialog>
   );
+}
+
+function formatPhone(phone: string | null): string | null {
+  if (!phone) return null;
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length === 8) return `${digits.slice(0, 3)} ${digits.slice(3, 5)} ${digits.slice(5)}`;
+  return phone;
 }
 
 function formatWaitTime(createdAt: string): string {
