@@ -12,6 +12,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Helmet } from "react-helmet";
 import { SEO_CONFIG, getCanonicalUrl, getOgImageUrl } from "@/config/seo";
 import { ServiceBadge } from "@/lib/serviceIcons";
+import { ProjectDetailSkeleton } from "@/components/ui/skeleton-loaders";
 
 interface Project {
   id: string;
@@ -67,10 +68,7 @@ const ProjectDetail = () => {
         <BreadcrumbNavigation />
         <main className="pt-32 pb-16">
           <div className="container mx-auto px-4">
-            <div className="text-center py-16">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="text-muted-foreground mt-4">Laster prosjekt...</p>
-            </div>
+            <ProjectDetailSkeleton />
           </div>
         </main>
         <Footer />
