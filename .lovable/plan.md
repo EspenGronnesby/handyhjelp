@@ -1,52 +1,45 @@
-## Mål
+# Fiks PWA-utseende og loading-skjerm
 
-Fikse de to gjenværende tekniske SEO-funnene som faktisk kan rettes i koden:
+## Problemer i skjermbildene
 
-1. **Ytelse (LCP — hero-bilde lastes for sent)**
-2. **Tilgjengelighet (lav tekstkontrast)**
-
-De to mid-funnene i listen er allerede håndtert eller krever deg:
-- *Sitemap*: allerede markert som fikset (private ruter er korrekt utelatt og blokkert i `robots.txt`).
-- *Google Search Console*: krever at **du** logger inn med Google — kan ikke fikses i kode. Jeg kan trigge tilkoblingsdialogen som et separat steg når du sier ifra.
-
----
-
-## Hva som er galt
-
-### 1. Hero-bildet (LCP)
-
-`index.html` preloader hero-bildet fra `/src/assets/hero-building-maintenance-*.webp`. Den stien fungerer kun i dev — i produksjon hasher Vite filnavnene til `/assets/hero-building-maintenance-[hash].webp`, så preloadene **404-er på live-siden**. Bildet lastes derfor sent via CSS `background-image`, og Lighthouse måler dårlig LCP.
-
-### 2. Lav kontrast
-
-Glassmorf-boksen i hero bruker `text-white/80` for "24/7 Service"-etiketten på en delvis transparent bakgrunn. På lyse partier av hero-bildet faller kontrasten under 4.5:1.
-
----
+1. **Hjemskjerm-ikon** ("HandyH..."): logoen vises i en liten hvit sirkel med altfor mye luft, og navnet kuttes av — fordi `site.webmanifest` har én icon-entry markert `"purpose": "any maskable"`. Android bruker da samme bilde til både ikon og maskable, og maskable krever ~20% safe zone som logoen ikke har.
+2. **Splash/loading-skjerm**: Android genererer splash automatisk fra `background_color` (lys cyan `#0ea5e9`) + ikonet. Resultatet er en grell blå flate med et hardt sort logo i midten. Det matcher ikke merkevaren (mørk navy/marine).
+3. **Ingen in-app loading-skjerm** mens React/Vite-bundlen laster — brukeren ser blank skjerm før hero rendres.
 
 ## Endringer
 
-### `index.html`
-- Fjern de tre `<link rel="preload" ...>`-linjene som peker på `/src/assets/...` (de virker bare i dev og 404-er i prod).
+### 1. Nye PWA-ikoner (genereres med imagegen, lagres i `public/icons/`)
+- `app-icon-512.png` — full logo sentrert på mørk navy bakgrunn (`#0a1628`), brukes til `purpose: "any"`.
+- `app-icon-maskable-512.png` — samme logo skalert til ~60% med riktig safe zone på navy bakgrunn, brukes til `purpose: "maskable"`.
+- `app-icon-192.png` — 192px versjon av samme.
 
-### `src/components/HeroSection.tsx`
-- Erstatt CSS `background-image`-divet med et faktisk `<img>`-element:
-  - `src={heroImage}` (samme hook som i dag, faller tilbake til `heroDefaultImage` importert via Vite → hashet URL i prod)
-  - `alt=""` (dekorativt, h1 forteller historien)
-  - `fetchpriority="high"`, `decoding="async"`, eksplisitt `width`/`height` for å unngå CLS
-  - `className="absolute inset-0 w-full h-full object-cover"` med `object-position: center 30%`
-- Behold gradient-overlay-divet oppå.
-- Bump `text-white/80` → `text-white/95` på "24/7 Service"-etiketten for å løfte kontrasten.
+### 2. `public/site.webmanifest`
+- `short_name`: `"HandyHjelp"` → `"Handy"` (unngår "HandyH..." trunkering).
+- `background_color` og `theme_color`: `#0ea5e9` → `#0a1628` (mørk navy, matcher merkevaren og fjerner den grelle blå splash-flaten).
+- Tre separate `icons`-entries: 192 any, 512 any, 512 maskable (med safe zone). Ingen blandet `"any maskable"`.
 
-### Etter fiks
-- Marker `lighthouse:lighthouse_performance` og `lighthouse:lighthouse_accessibility` som fikset i SEO-panelet.
-- Påminn deg om at fiksene først slår inn på live-siden **etter publisering** — Lighthouse-funn måles på publisert versjon.
+### 3. `index.html` — in-app loading screen
+Legge til en `<div id="app-loader">` rett inne i `<body>` (før `<div id="root">`) med:
+- Mørk navy bakgrunn (matcher splash → ingen "flash").
+- Sentrert logo + diskret spinner + tekst "Laster…".
+- CSS inline i `<head>` så det vises umiddelbart.
+- I `src/main.tsx`: fjerne `#app-loader` med fade-out etter at React har mountet roten.
 
----
+### 4. `<meta name="theme-color">` i `index.html`
+Oppdater eksisterende theme-color tag fra `#0ea5e9` til `#0a1628` så statuslinjen i installert app matcher.
 
-## Det jeg ikke gjør (uten din OK)
+## Filer som endres
+- `public/site.webmanifest` (oppdatert)
+- `public/icons/app-icon-192.png` (ny)
+- `public/icons/app-icon-512.png` (ny)
+- `public/icons/app-icon-maskable-512.png` (ny)
+- `index.html` (loader-markup + theme-color)
+- `src/main.tsx` (fjerne loader når app er klar)
 
-- **Semrush-forslag (borettslag-side)**: ny landingsside er en innholdsbeslutning, ikke en bug.
-- **Google Search Console-tilkobling**: krever din Google-innlogging.
-- **Større refaktor** av hero-komponenten eller bytte av bildeformat.
+## Hva som IKKE endres
+- Ingen service worker / offline-cache (du har ikke bedt om offline).
+- Hero-seksjonen og resten av siden røres ikke — kun PWA-skall og første-frame loader.
+- Logo-filen i `lovable-uploads/` beholdes uendret; nye ikoner er separate filer i `public/icons/`.
 
-Si fra om jeg også skal trigge GSC-tilkoblingen eller bygge borettslag-siden etter dette.
+## Merk
+Endringer i installert PWA vises først etter at brukeren avinstallerer og installerer på nytt (eller Android oppdaterer ikonet i bakgrunnen, kan ta tid). Splash og ikon i nettleser oppdateres ved neste lasting.
