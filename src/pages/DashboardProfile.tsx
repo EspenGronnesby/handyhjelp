@@ -32,6 +32,9 @@ const roleIcons: Record<string, LucideIcon> = {
   user: UserIcon
 };
 
+// Prioritet (høyest først) — profilen viser kun den viktigste rollen
+const ROLE_PRIORITY = ['platform_owner', 'tenant_admin', 'admin', 'moderator', 'worker', 'user'];
+
 interface Profile {
   full_name: string;
   email: string;
@@ -215,15 +218,17 @@ const DashboardProfile = () => {
                 )}
               </Badge>
             )}
-            {roles.map((role) => {
-              const Icon = roleIcons[role] || Shield;
+            {(() => {
+              if (roles.length === 0) return null;
+              const primaryRole = ROLE_PRIORITY.find((r) => roles.includes(r)) || roles[0];
+              const Icon = roleIcons[primaryRole] || Shield;
               return (
-                <Badge key={role} variant="default" className="flex items-center gap-1">
+                <Badge variant="default" className="flex items-center gap-1">
                   <Icon className="h-3 w-3" />
-                  {roleLabels[role] || role}
+                  {roleLabels[primaryRole] || primaryRole}
                 </Badge>
               );
-            })}
+            })()}
           </div>
         </div>
       </div>
