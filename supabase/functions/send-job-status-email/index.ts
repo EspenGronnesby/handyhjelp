@@ -435,15 +435,20 @@ const handler = async (req: Request): Promise<Response> => {
       status
     });
 
-    await supabase.from('email_logs').insert({
+    const { error: logError } = await supabase.from('email_logs').insert({
       recipient_email: customerEmail,
       recipient_name: customerName,
       recipient_type: 'customer',
       subject: subject,
+      content: `Jobbstatus: ${status === 'started' ? 'startet' : 'fullført'} – ${jobDescription}`,
+      sender_user_id: userData.user.id,
       status: 'sent',
       sent_at: new Date().toISOString(),
       template_name: status === 'started' ? 'job_started' : 'job_completed',
-    }).catch((logErr: Error) => log.warn("Failed to write email_log", { requestId, error: logErr.message }));
+    });
+    if (logError) {
+      log.warn("Failed to write email_log", { requestId, error: logError.message });
+    }
 
     return new Response(JSON.stringify({ 
       success: true, 
@@ -456,6 +461,27 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error) {
     log.error("Failed to send job status email", error, { requestId, customerEmail, status });
+
+    // Log the failure so it is visible in the email history (failed filter)
+    try {
+      const { error: failLogError } = await supabase.from('email_logs').insert({
+        recipient_email: customerEmail,
+        recipient_name: customerName,
+        recipient_type: 'customer',
+        subject: `Jobbstatus: ${status === 'started' ? 'startet' : 'fullført'}`,
+        content: `Jobbstatus: ${status === 'started' ? 'startet' : 'fullført'} – ${jobDescription}`,
+        sender_user_id: userData.user.id,
+        status: 'failed',
+        error_message: error instanceof Error ? error.message : 'Ukjent feil',
+        sent_at: new Date().toISOString(),
+        template_name: status === 'started' ? 'job_started' : 'job_completed',
+      });
+      if (failLogError) {
+        log.warn("Failed to write failed email_log", { requestId, error: failLogError.message });
+      }
+    } catch (logErr) {
+      log.warn("Exception while writing failed email_log", { requestId, error: logErr instanceof Error ? logErr.message : String(logErr) });
+    }
 
     // Send error notification to team
     try {

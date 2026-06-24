@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard, Smile, Meh, Frown, History } from 'lucide-react';
+import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard, Smile, Meh, Frown, History, Mail } from 'lucide-react';
 import { Job, STATUS_COLORS, STATUS_LABELS, Invoice, InvoiceRequest, INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -40,6 +40,7 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [invoiceRequest, setInvoiceRequest] = useState<InvoiceRequest | null>(null);
   const [markingPaid, setMarkingPaid] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
   const [quickFeedback, setQuickFeedback] = useState<QuickFeedback | null>(null);
 
   useEffect(() => {
@@ -114,7 +115,42 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
     }
   };
 
-  const dateLabel = variant === 'active' 
+  const handleResendEmail = async () => {
+    setResendingEmail(true);
+    try {
+      const customerName = job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name;
+      const { data, error } = await supabase.functions.invoke('send-job-status-email', {
+        body: {
+          customerName,
+          customerEmail: job.quotes.email,
+          jobDescription: job.quotes.description,
+          status: 'completed',
+          jobId: job.id,
+        },
+      });
+
+      if (error || (data && (data as { success?: boolean }).success === false)) {
+        const message = error?.message || (data as { error?: string })?.error || 'Ukjent feil';
+        throw new Error(message);
+      }
+
+      toast({
+        title: 'E-post sendt',
+        description: `Bekreftelse er sendt til ${job.quotes.email}.`,
+      });
+    } catch (error) {
+      console.error('Error resending job status email:', error);
+      toast({
+        title: 'Kunne ikke sende e-post',
+        description: error instanceof Error ? error.message : 'Ukjent feil. Prøv igjen senere.',
+        variant: 'destructive',
+      });
+    } finally {
+      setResendingEmail(false);
+    }
+  };
+
+  const dateLabel = variant === 'active'
     ? `Startet ${job.started_at && formatDistanceToNow(new Date(job.started_at), { addSuffix: true, locale: nb })}`
     : `Fullført ${job.completed_date && formatDistanceToNow(new Date(job.completed_date), { addSuffix: true, locale: nb })}`;
 
@@ -280,7 +316,7 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
         {variant === 'completed' && (
           <div className="flex flex-wrap gap-2">
             {!invoice && onAddInvoice && (
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => onAddInvoice(job)}
                 className="flex-1 sm:flex-none"
@@ -289,6 +325,18 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
                 Legg til faktura
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={handleResendEmail}
+              disabled={resendingEmail}
+              className="flex-1 sm:flex-none"
+            >
+              {resendingEmail ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sender...</>
+              ) : (
+                <><Mail className="mr-2 h-4 w-4" /> Send bekreftelse på nytt</>
+              )}
+            </Button>
             {onDelete && (
               <Button 
                 variant="destructive"
