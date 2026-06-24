@@ -39,6 +39,28 @@ export const useAdminData = (isAdmin: boolean) => {
     }
   }, [isAdmin]);
 
+  // Sends a job-status email and reports whether it actually succeeded.
+  // supabase.functions.invoke does not always throw on non-2xx, so we also
+  // inspect the returned { error } and the function's { success: false } body.
+  const sendJobStatusEmail = async (body: {
+    customerName: string | null | undefined;
+    customerEmail: string;
+    jobDescription: string;
+    status: 'started' | 'completed';
+    jobId?: string;
+  }): Promise<{ ok: boolean; error?: string }> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('send-job-status-email', { body });
+      if (error) return { ok: false, error: error.message };
+      if (data && (data as { success?: boolean }).success === false) {
+        return { ok: false, error: (data as { error?: string }).error || 'Ukjent feil' };
+      }
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err instanceof Error ? err.message : 'Ukjent feil' };
+    }
+  };
+
   const handleStartJob = async (quote: Quote) => {
     setActionLoading(quote.id);
     
@@ -146,15 +168,13 @@ export const useAdminData = (isAdmin: boolean) => {
       await fetchData();
 
       const customerName = job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name;
-      supabase.functions.invoke('send-job-status-email', {
-        body: {
-          customerName,
-          customerEmail: job.quotes.email,
-          jobDescription: job.quotes.description,
-          status: 'completed',
-          jobId: job.id,
-        },
-      }).catch(console.error);
+      const emailResult = await sendJobStatusEmail({
+        customerName,
+        customerEmail: job.quotes.email,
+        jobDescription: job.quotes.description,
+        status: 'completed',
+        jobId: job.id,
+      });
 
       // Log activity
       await logActivity(
@@ -164,10 +184,17 @@ export const useAdminData = (isAdmin: boolean) => {
         { job_id: job.id, quote_id: job.quote_id }
       );
 
-      toast({
-        title: "Suksess!",
-        description: "Jobben er fullført og kunde vil motta e-post.",
-      });
+      if (emailResult.ok) {
+        toast({
+          title: "Suksess!",
+          description: "Jobben er fullført og kunde varslet på e-post.",
+        });
+      } else {
+        toast({
+          title: "Jobben er fullført – men e-posten feilet",
+          description: "Jobben er lagret som fullført, men bekreftelses-e-posten til kunden gikk ikke ut. Bruk «Send bekreftelse på nytt» på jobbkortet.",
+        });
+      }
 
     } catch (error: any) {
       console.error('Error completing job:', error);
@@ -258,6 +285,8 @@ export const useAdminData = (isAdmin: boolean) => {
   ) => {
     setActionLoading('create-job');
     
+    let completionEmailFailed = false;
+
     try {
       // Determine initial status based on action
       let quoteStatus = 'pending';
@@ -343,15 +372,14 @@ export const useAdminData = (isAdmin: boolean) => {
         });
 
         // Send completion email via edge function
-        supabase.functions.invoke('send-job-status-email', {
-          body: {
-            customerName: profile.customer_type === 'business' ? profile.company_name : profile.full_name,
-            customerEmail: profile.email,
-            jobDescription: description,
-            status: 'completed',
-            jobId: job.id,
-          },
-        }).catch(console.error);
+        const emailResult = await sendJobStatusEmail({
+          customerName: profile.customer_type === 'business' ? profile.company_name : profile.full_name,
+          customerEmail: profile.email,
+          jobDescription: description,
+          status: 'completed',
+          jobId: job.id,
+        });
+        completionEmailFailed = !emailResult.ok;
       }
       // For action === 'register', we just create the quote without a job
 
@@ -373,7 +401,9 @@ export const useAdminData = (isAdmin: boolean) => {
       const messages = {
         register: "Oppdraget er registrert og venter på å bli startet.",
         start: "Oppdraget er opprettet og startet. Kunden har mottatt e-post.",
-        complete: "Oppdraget er opprettet og fullført. Kunden har mottatt bekreftelse på e-post.",
+        complete: completionEmailFailed
+          ? "Oppdraget er opprettet og fullført, men bekreftelses-e-posten til kunden feilet. Bruk «Send bekreftelse på nytt» på jobbkortet."
+          : "Oppdraget er opprettet og fullført. Kunden har mottatt bekreftelse på e-post.",
       };
 
       toast({
@@ -432,15 +462,13 @@ export const useAdminData = (isAdmin: boolean) => {
       }
 
       // 4. Send only completion email (not started email)
-      supabase.functions.invoke('send-job-status-email', {
-        body: {
-          customerName: quote.type === 'business' ? quote.company_name : quote.name,
-          customerEmail: quote.email,
-          jobDescription: quote.description,
-          status: 'completed',
-          jobId: job.id,
-        },
-      }).catch(console.error);
+      const emailResult = await sendJobStatusEmail({
+        customerName: quote.type === 'business' ? quote.company_name : quote.name,
+        customerEmail: quote.email,
+        jobDescription: quote.description,
+        status: 'completed',
+        jobId: job.id,
+      });
 
       await fetchData();
 
@@ -452,10 +480,17 @@ export const useAdminData = (isAdmin: boolean) => {
         { quote_id: quote.id }
       );
 
-      toast({
-        title: "Suksess!",
-        description: "Oppdraget er fullført og kunden har mottatt bekreftelse på e-post.",
-      });
+      if (emailResult.ok) {
+        toast({
+          title: "Suksess!",
+          description: "Oppdraget er fullført og kunden har mottatt bekreftelse på e-post.",
+        });
+      } else {
+        toast({
+          title: "Oppdraget er fullført – men e-posten feilet",
+          description: "Oppdraget er lagret som fullført, men bekreftelses-e-posten til kunden gikk ikke ut. Bruk «Send bekreftelse på nytt» på jobbkortet.",
+        });
+      }
 
     } catch (error: any) {
       console.error('Error completing job without start:', error);
