@@ -157,6 +157,15 @@ const handler = async (req: Request): Promise<Response> => {
     });
   }
 
+  // Resolve sender identity for the email history
+  const senderUserId = userData.user.id;
+  const { data: senderProfile } = await supabaseForRoles
+    .from("profiles")
+    .select("full_name")
+    .eq("id", senderUserId)
+    .maybeSingle();
+  const senderName = senderProfile?.full_name ?? userData.user.email ?? "System";
+
   try {
     const payload: InvoiceReadyPayload = await req.json();
     log.info("Processing payload", { requestId, invoiceNumber: payload.invoiceNumber });
@@ -194,7 +203,9 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Send email to customer
-    const emailResponse = await resend.emails.send({
+    let emailResponse;
+    try {
+      emailResponse = await resend.emails.send({
       from: "HandyHjelp <team@handyhjelp.no>",
       to: [customerEmail],
       subject: `Faktura ${invoiceNumber} er klar`,
@@ -265,7 +276,35 @@ const handler = async (req: Request): Promise<Response> => {
         </body>
         </html>
       `,
-    });
+      });
+      if (emailResponse.error) {
+        throw emailResponse.error;
+      }
+    } catch (sendError) {
+      log.error("Failed to send invoice ready email", sendError, { requestId, invoiceNumber });
+
+      // Log failed send to email history
+      const supabaseUrlFail = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKeyFail = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabaseFail = createClient(supabaseUrlFail, supabaseServiceKeyFail);
+      const { error: failLogError } = await supabaseFail.from("email_logs").insert({
+        recipient_email: customerEmail,
+        recipient_name: customerName || null,
+        recipient_type: 'customer',
+        subject: `Faktura ${invoiceNumber} er klar`,
+        content: `Faktura ${invoiceNumber} på ${formattedAmount} er klar. Forfallsdato: ${formattedDate}.`,
+        template_name: 'invoice_ready',
+        sender_user_id: senderUserId,
+        sender_name: senderName,
+        status: 'failed',
+        error_message: sendError instanceof Error ? sendError.message : 'Unknown error',
+        sent_at: new Date().toISOString(),
+      });
+      if (failLogError) {
+        log.warn("Failed to write failed email_log", { requestId, error: failLogError.message });
+      }
+      throw sendError;
+    }
 
     log.info("Email sent successfully", { requestId, messageId: emailResponse.data?.id });
 
@@ -273,6 +312,23 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Log successful send to email history
+    const { error: logError } = await supabase.from("email_logs").insert({
+      recipient_email: customerEmail,
+      recipient_name: customerName || null,
+      recipient_type: 'customer',
+      subject: `Faktura ${invoiceNumber} er klar`,
+      content: `Faktura ${invoiceNumber} på ${formattedAmount} er klar. Forfallsdato: ${formattedDate}.`,
+      template_name: 'invoice_ready',
+      sender_user_id: senderUserId,
+      sender_name: senderName,
+      status: 'sent',
+      sent_at: new Date().toISOString(),
+    });
+    if (logError) {
+      log.warn("Failed to write email_log", { requestId, error: logError.message });
+    }
 
     await supabase.from("notifications").insert({
       user_id: userId,

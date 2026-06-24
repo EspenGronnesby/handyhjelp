@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Loader2, Receipt, CreditCard, AlertTriangle, CheckCircle, Clock, Search, Filter, Download } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logActivity } from '@/hooks/useActivityLog';
 import { INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS } from '@/types/admin';
 
 interface InvoiceWithDetails {
@@ -84,9 +85,20 @@ export const InvoiceManagement = () => {
 
       if (error) throw error;
 
-      setInvoices(invoices.map(inv => 
+      setInvoices(invoices.map(inv =>
         inv.id === invoiceId ? { ...inv, status: newStatus } : inv
       ));
+
+      // Log activity when an invoice is marked as paid
+      if (newStatus === 'paid') {
+        const inv = invoices.find(i => i.id === invoiceId);
+        await logActivity(
+          'invoice_paid',
+          'invoice_management',
+          `Markerte faktura ${inv?.invoice_number || ''} som betalt${inv?.amount != null ? ` (${inv.amount.toLocaleString('nb-NO')} kr)` : ''}`,
+          { invoice_id: invoiceId, invoice_number: inv?.invoice_number, amount: inv?.amount }
+        );
+      }
 
       toast({
         title: 'Status oppdatert',

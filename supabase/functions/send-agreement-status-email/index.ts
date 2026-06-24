@@ -398,6 +398,21 @@ const handler = async (req: Request): Promise<Response> => {
 
     log.info("Agreement status email sent successfully", { requestId, messageId: data?.id, recipient: email, status });
 
+    const { error: logError } = await adminClient.from("email_logs").insert({
+      recipient_email: email,
+      recipient_name: contactPerson,
+      recipient_type: "customer",
+      subject: config.subject,
+      content: `Avtalestatus: ${status} – ${config.title}`,
+      template_name: "agreement_status",
+      sender_user_id: userData.user.id,
+      status: "sent",
+      sent_at: new Date().toISOString(),
+    });
+    if (logError) {
+      log.warn("Failed to write email_log", { requestId, error: logError.message });
+    }
+
     return new Response(JSON.stringify({ success: true, data, requestId }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -405,6 +420,22 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error) {
     log.error("Failed to send agreement status email", error, { requestId, email, status });
+
+    const { error: failLogError } = await adminClient.from("email_logs").insert({
+      recipient_email: email,
+      recipient_name: contactPerson,
+      recipient_type: "customer",
+      subject: config.subject,
+      content: `Avtalestatus: ${status} – ${config.title}`,
+      template_name: "agreement_status",
+      sender_user_id: userData.user.id,
+      status: "failed",
+      error_message: error instanceof Error ? error.message : "Ukjent feil",
+      sent_at: new Date().toISOString(),
+    });
+    if (failLogError) {
+      log.warn("Failed to write failed email_log", { requestId, error: failLogError.message });
+    }
 
     try {
       await resend.emails.send({

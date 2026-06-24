@@ -145,6 +145,8 @@ export const ActivityLogViewer = () => {
                 <SelectItem value="all">Alle kategorier</SelectItem>
                 <SelectItem value="role_management">Rolleadministrasjon</SelectItem>
                 <SelectItem value="job_management">Oppdragshåndtering</SelectItem>
+                <SelectItem value="invoice_management">Fakturahåndtering</SelectItem>
+                <SelectItem value="quote_management">Tilbudsforespørsler</SelectItem>
                 <SelectItem value="agreement_management">Avtalehåndtering</SelectItem>
                 <SelectItem value="content_management">Innholdsgodkjenning</SelectItem>
                 <SelectItem value="customer_management">Kundehåndtering</SelectItem>
