@@ -8,6 +8,7 @@ import { Loader2, CheckCircle, Trash2, Receipt, AlertCircle, CreditCard, Smile, 
 import { Job, STATUS_COLORS, STATUS_LABELS, Invoice, InvoiceRequest, INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS } from '@/types/admin';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logActivity } from '@/hooks/useActivityLog';
 import { cn } from '@/lib/utils';
 
 interface QuickFeedback {
@@ -99,6 +100,15 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
       if (error) throw error;
 
       setInvoice({ ...invoice, status: 'paid' });
+
+      // Log activity
+      await logActivity(
+        'invoice_paid',
+        'invoice_management',
+        `Markerte faktura ${invoice.invoice_number} som betalt (${invoice.amount.toLocaleString('nb-NO')} kr)`,
+        { job_id: job.id, invoice_number: invoice.invoice_number, amount: invoice.amount }
+      );
+
       toast({
         title: 'Faktura markert som betalt',
         description: `Faktura ${invoice.invoice_number} er nå registrert som betalt.`

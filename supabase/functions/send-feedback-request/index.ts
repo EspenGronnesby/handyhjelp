@@ -300,6 +300,22 @@ serve(async (req) => {
 
         log.info('Feedback email sent', { requestId, jobId: job.id, email: quote.email, messageId: emailResponse.data?.id });
 
+        const { error: logError } = await supabase.from('email_logs').insert({
+          recipient_email: quote.email,
+          recipient_name: quote.name,
+          recipient_type: 'customer',
+          subject: 'Hvordan gikk jobben? Vi setter pris på din tilbakemelding',
+          content: `Forespørsel om tilbakemelding sendt til ${quote.name} (${serviceType})`,
+          template_name: 'feedback_request',
+          sender_user_id: null,
+          sender_name: 'System',
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+        });
+        if (logError) {
+          log.warn('Failed to write email_log', { requestId, jobId: job.id, error: logError.message });
+        }
+
         // Mark job as feedback email sent
         const { error: updateError } = await supabase
           .from('jobs')
@@ -314,6 +330,23 @@ serve(async (req) => {
 
       } catch (emailError) {
         log.error('Error sending feedback email', { requestId, jobId: job.id, error: String(emailError) });
+
+        const { error: failLogError } = await supabase.from('email_logs').insert({
+          recipient_email: quote.email,
+          recipient_name: quote.name,
+          recipient_type: 'customer',
+          subject: 'Hvordan gikk jobben? Vi setter pris på din tilbakemelding',
+          content: `Forespørsel om tilbakemelding til ${quote.name} (${serviceType})`,
+          template_name: 'feedback_request',
+          sender_user_id: null,
+          sender_name: 'System',
+          status: 'failed',
+          error_message: emailError instanceof Error ? emailError.message : 'Ukjent feil',
+          sent_at: new Date().toISOString(),
+        });
+        if (failLogError) {
+          log.warn('Failed to write failed email_log', { requestId, jobId: job.id, error: failLogError.message });
+        }
       }
     }
 

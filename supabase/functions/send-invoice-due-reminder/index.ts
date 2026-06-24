@@ -284,6 +284,24 @@ const handler = async (req: Request): Promise<Response> => {
         log.info("Email sent", { requestId, invoiceNumber: invoice.invoice_number, messageId: emailResponse.data?.id });
         sentCount++;
 
+        // Log successful send to email history
+        const reminderSubject = `Vennlig påminnelse: Faktura ${invoice.invoice_number} forfaller i dag`;
+        const { error: logError } = await supabase.from('email_logs').insert({
+          recipient_email: customerEmail,
+          recipient_name: customerName || null,
+          recipient_type: 'customer',
+          subject: reminderSubject,
+          content: `Påminnelse om faktura ${invoice.invoice_number} på ${formattedAmount} som forfaller i dag.`,
+          template_name: 'invoice_due_reminder',
+          sender_user_id: null,
+          sender_name: 'System',
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+        });
+        if (logError) {
+          log.warn("Failed to write email_log", { requestId, invoiceNumber: invoice.invoice_number, error: logError.message });
+        }
+
         // Create notification for the user
         await supabase.from('notifications').insert({
           user_id: invoice.user_id,
@@ -296,6 +314,24 @@ const handler = async (req: Request): Promise<Response> => {
       } catch (emailError) {
         log.error("Error sending email", emailError, { requestId, invoiceNumber: invoice.invoice_number });
         errors.push(`${customerEmail}: ${emailError instanceof Error ? emailError.message : 'Unknown error'}`);
+
+        // Log failed send to email history
+        const { error: failLogError } = await supabase.from('email_logs').insert({
+          recipient_email: customerEmail,
+          recipient_name: customerName || null,
+          recipient_type: 'customer',
+          subject: `Vennlig påminnelse: Faktura ${invoice.invoice_number} forfaller i dag`,
+          content: `Påminnelse om faktura ${invoice.invoice_number} på ${formattedAmount} som forfaller i dag.`,
+          template_name: 'invoice_due_reminder',
+          sender_user_id: null,
+          sender_name: 'System',
+          status: 'failed',
+          error_message: emailError instanceof Error ? emailError.message : 'Unknown error',
+          sent_at: new Date().toISOString(),
+        });
+        if (failLogError) {
+          log.warn("Failed to write failed email_log", { requestId, invoiceNumber: invoice.invoice_number, error: failLogError.message });
+        }
       }
     }
 

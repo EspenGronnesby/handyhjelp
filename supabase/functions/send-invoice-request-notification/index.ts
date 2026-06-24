@@ -175,11 +175,29 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    // Service-role client (used for logging and notifications below)
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Resolve sender identity for the email history
+    const { data: senderProfile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", userId)
+      .maybeSingle();
+    const senderName = senderProfile?.full_name ?? userData.user.email ?? "System";
+
+    const notificationSubject = `Ny fakturaforespørsel fra ${customerName}`;
+    const notificationContent = `Kunde ${customerName} (${customerEmail}) har bedt om faktura for jobb ${jobId}: ${jobDescription}`;
+
     // Send email to admin
-    const emailResponse = await resend.emails.send({
+    let emailResponse;
+    try {
+      emailResponse = await resend.emails.send({
       from: "HandyHjelp System <team@handyhjelp.no>",
       to: ["team@handyhjelp.no"],
-      subject: `Ny fakturaforespørsel fra ${customerName}`,
+      subject: notificationSubject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #0891B2;">Ny fakturaforespørsel</h1>
@@ -204,14 +222,51 @@ const handler = async (req: Request): Promise<Response> => {
           </p>
         </div>
       `,
-    });
+      });
+      if (emailResponse.error) {
+        throw emailResponse.error;
+      }
+    } catch (sendError) {
+      log.error("Failed to send invoice request notification", sendError, { requestId, jobId });
+
+      // Log failed send to email history
+      const { error: failLogError } = await supabase.from("email_logs").insert({
+        recipient_email: "team@handyhjelp.no",
+        recipient_name: "HandyHjelp Team",
+        recipient_type: 'external',
+        subject: notificationSubject,
+        content: notificationContent,
+        template_name: 'invoice_request_notification',
+        sender_user_id: userId,
+        sender_name: senderName,
+        status: 'failed',
+        error_message: sendError instanceof Error ? sendError.message : 'Unknown error',
+        sent_at: new Date().toISOString(),
+      });
+      if (failLogError) {
+        log.warn("Failed to write failed email_log", { requestId, error: failLogError.message });
+      }
+      throw sendError;
+    }
 
     log.info("Email sent successfully", { requestId, messageId: emailResponse.data?.id });
 
-    // Create notification for admin
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    // Log successful send to email history
+    const { error: logError } = await supabase.from("email_logs").insert({
+      recipient_email: "team@handyhjelp.no",
+      recipient_name: "HandyHjelp Team",
+      recipient_type: 'external',
+      subject: notificationSubject,
+      content: notificationContent,
+      template_name: 'invoice_request_notification',
+      sender_user_id: userId,
+      sender_name: senderName,
+      status: 'sent',
+      sent_at: new Date().toISOString(),
+    });
+    if (logError) {
+      log.warn("Failed to write email_log", { requestId, error: logError.message });
+    }
 
     // Get admin user IDs
     const { data: adminRoles } = await supabase

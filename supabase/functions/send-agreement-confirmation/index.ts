@@ -156,6 +156,7 @@ const handler = async (req: Request): Promise<Response> => {
   if (!authHeader?.startsWith("Bearer ")) {
     return errorResponse("Unauthorized", 401, requestId);
   }
+  let senderUserId: string | null = null;
   try {
     const jwt = authHeader.replace("Bearer ", "");
     const authClient = createClient(
@@ -166,9 +167,16 @@ const handler = async (req: Request): Promise<Response> => {
     if (authErr || !userData?.user) {
       return errorResponse("Unauthorized", 401, requestId);
     }
+    senderUserId = userData.user.id;
   } catch {
     return errorResponse("Unauthorized", 401, requestId);
   }
+
+  // Service-role client for writing email_logs
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
 
   let requestData: AgreementConfirmationRequest;
 
@@ -272,13 +280,28 @@ const handler = async (req: Request): Promise<Response> => {
       throw error;
     }
 
-    log.info("Agreement confirmation email sent successfully", { 
-      requestId, 
+    log.info("Agreement confirmation email sent successfully", {
+      requestId,
       messageId: data?.id,
-      recipient: email 
+      recipient: email
     });
 
-    return new Response(JSON.stringify({ 
+    const { error: logError } = await supabase.from("email_logs").insert({
+      recipient_email: email,
+      recipient_name: contactPerson,
+      recipient_type: "customer",
+      subject: "Takk for din avtaleforespørsel – HandyHjelp",
+      content: "Avtalebekreftelse: bekreftelse på mottatt avtaleforespørsel sendt til kunde.",
+      template_name: "agreement_confirmation",
+      sender_user_id: senderUserId,
+      status: "sent",
+      sent_at: new Date().toISOString(),
+    });
+    if (logError) {
+      log.warn("Failed to write email_log", { requestId, error: logError.message });
+    }
+
+    return new Response(JSON.stringify({
       success: true, 
       data,
       requestId 
@@ -289,6 +312,22 @@ const handler = async (req: Request): Promise<Response> => {
 
   } catch (error) {
     log.error("Failed to send agreement confirmation email", error, { requestId, email });
+
+    const { error: failLogError } = await supabase.from("email_logs").insert({
+      recipient_email: email,
+      recipient_name: contactPerson,
+      recipient_type: "customer",
+      subject: "Takk for din avtaleforespørsel – HandyHjelp",
+      content: "Avtalebekreftelse: bekreftelse på mottatt avtaleforespørsel til kunde.",
+      template_name: "agreement_confirmation",
+      sender_user_id: senderUserId,
+      status: "failed",
+      error_message: error instanceof Error ? error.message : "Ukjent feil",
+      sent_at: new Date().toISOString(),
+    });
+    if (failLogError) {
+      log.warn("Failed to write failed email_log", { requestId, error: failLogError.message });
+    }
 
     // Send error notification to team
     try {

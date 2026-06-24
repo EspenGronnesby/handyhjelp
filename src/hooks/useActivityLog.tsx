@@ -8,6 +8,8 @@ export type ActionType =
   | 'job_started'
   | 'job_completed'
   | 'job_deleted'
+  | 'invoice_created'
+  | 'invoice_paid'
   | 'quote_deleted'
   | 'quote_submitted'
   | 'agreement_approved'
@@ -23,6 +25,7 @@ export type ActionType =
 export type ActionCategory =
   | 'role_management'
   | 'job_management'
+  | 'invoice_management'
   | 'quote_management'
   | 'agreement_management'
   | 'content_management'
@@ -59,6 +62,8 @@ export const actionTypeLabels: Record<ActionType, string> = {
   job_started: 'Startet oppdrag',
   job_completed: 'Fullførte oppdrag',
   job_deleted: 'Slettet oppdrag',
+  invoice_created: 'Opprettet faktura',
+  invoice_paid: 'Markerte faktura betalt',
   quote_deleted: 'Slettet tilbud',
   quote_submitted: 'Ny tilbudsforespørsel',
   agreement_approved: 'Godkjente avtale',
@@ -76,6 +81,7 @@ export const actionTypeLabels: Record<ActionType, string> = {
 export const categoryLabels: Record<ActionCategory, string> = {
   role_management: 'Rolleadministrasjon',
   job_management: 'Oppdragshåndtering',
+  invoice_management: 'Fakturahåndtering',
   quote_management: 'Tilbudsforespørsler',
   agreement_management: 'Avtalehåndtering',
   content_management: 'Innholdsgodkjenning',
@@ -106,6 +112,8 @@ export const actionTypeColors: Record<ActionType, string> = {
   job_started: 'bg-cyan-500',
   job_completed: 'bg-green-500',
   job_deleted: 'bg-red-500',
+  invoice_created: 'bg-teal-500',
+  invoice_paid: 'bg-green-600',
   quote_deleted: 'bg-red-500',
   quote_submitted: 'bg-blue-600',
   agreement_approved: 'bg-emerald-500',

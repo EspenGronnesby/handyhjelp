@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, Upload, FileText } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logActivity } from '@/hooks/useActivityLog';
 import { Job } from '@/types/admin';
 
 interface InvoiceUploadModalProps {
@@ -66,6 +67,14 @@ export const InvoiceUploadModal = ({ job, open, onOpenChange, onSuccess }: Invoi
       });
 
       if (invoiceError) throw invoiceError;
+
+      // Log activity
+      await logActivity(
+        'invoice_created',
+        'invoice_management',
+        `Opprettet faktura ${invoiceNumber} på ${parseFloat(amount).toLocaleString('nb-NO')} kr for ${job.quotes.name}`,
+        { job_id: job.id, invoice_number: invoiceNumber, amount: parseFloat(amount) }
+      );
 
       // Update invoice request if exists
       await supabase

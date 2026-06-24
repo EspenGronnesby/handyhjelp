@@ -13,7 +13,7 @@ export interface EmailLog {
   template_id: string | null;
   template_name: string | null;
   included_feedback_button: boolean;
-  sender_user_id: string;
+  sender_user_id: string | null;
   sender_name: string | null;
   sender_role: string | null;
   sent_at: string;

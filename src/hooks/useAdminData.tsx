@@ -555,6 +555,19 @@ export const useAdminData = (isAdmin: boolean) => {
         },
       }).catch(console.error);
 
+      // Log activity
+      const agreementAction = newStatus === 'contract_signed'
+        ? 'agreement_approved'
+        : newStatus === 'rejected'
+          ? 'agreement_rejected'
+          : 'agreement_updated';
+      await logActivity(
+        agreementAction,
+        'agreement_management',
+        `Endret avtalestatus til "${newStatus}" for ${agreement.contact_person} (${agreement.address})`,
+        { agreement_id: agreementId, status: newStatus }
+      );
+
       toast({
         title: "Oppdatert",
         description: "Status er oppdatert og e-post sendt til kunde.",
@@ -622,6 +635,14 @@ export const useAdminData = (isAdmin: boolean) => {
           rejectionReason: rejectionReason,
         },
       }).catch(console.error);
+
+      // Log activity
+      await logActivity(
+        'agreement_rejected',
+        'agreement_management',
+        `Avslo avtaleforespørsel for ${agreement.contact_person} (${agreement.address}): ${rejectionReason}`,
+        { agreement_id: agreementId, rejection_reason: rejectionReason }
+      );
 
       toast({
         title: "Avslått",
