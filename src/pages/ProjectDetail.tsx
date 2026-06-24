@@ -13,6 +13,7 @@ import { Helmet } from "react-helmet";
 import { SEO_CONFIG, getCanonicalUrl, getOgImageUrl } from "@/config/seo";
 import { ServiceBadge } from "@/lib/serviceIcons";
 import { ProjectDetailSkeleton } from "@/components/ui/skeleton-loaders";
+import { ProjectDetailSkeleton } from "@/components/ui/skeleton-loaders";
 
 interface Project {
   id: string;
