@@ -31,6 +31,7 @@ export interface EmailLogsFilter {
 
 export function useEmailLogs(filter?: EmailLogsFilter) {
   const [logs, setLogs] = useState<EmailLog[]>([]);
+  const [registeredEmails, setRegisteredEmails] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -61,6 +62,14 @@ export function useEmailLogs(filter?: EmailLogsFilter) {
 
       if (error) throw error;
       setLogs((data || []) as EmailLog[]);
+
+      // Fetch registered customer emails to distinguish "Kunde" (has account) from "Gjest" (no account)
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('email');
+      setRegisteredEmails(
+        new Set((profileData || []).map(p => (p.email || '').toLowerCase()).filter(Boolean))
+      );
     } catch (error) {
       console.error('Error fetching email logs:', error);
       toast({
@@ -93,6 +102,7 @@ export function useEmailLogs(filter?: EmailLogsFilter) {
   return {
     logs,
     groupedLogs,
+    registeredEmails,
     loading,
     refreshLogs: fetchLogs,
   };

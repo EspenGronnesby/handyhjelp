@@ -27,9 +27,10 @@ import {
 } from '@/components/ui/table';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  History, 
-  User, 
-  Globe, 
+  History,
+  User,
+  UserPlus,
+  Globe,
   MessageSquare, 
   Check, 
   X, 
@@ -53,9 +54,13 @@ export function EmailHistory({ highlightId }: EmailHistoryProps) {
     recipientType: 'all',
     status: 'all',
   });
-  const { logs, loading, refreshLogs } = useEmailLogs(filter);
+  const { logs, loading, refreshLogs, registeredEmails } = useEmailLogs(filter);
   const [selectedLog, setSelectedLog] = useState<EmailLog | null>(null);
   const highlightRef = useRef<HTMLTableRowElement>(null);
+
+  // A "customer" recipient with no registered profile is a guest
+  const isGuest = (log: EmailLog) =>
+    log.recipient_type === 'customer' && !registeredEmails.has((log.recipient_email || '').toLowerCase());
 
   useEffect(() => {
     if (!loading && highlightId && highlightRef.current) {
@@ -195,10 +200,17 @@ export function EmailHistory({ highlightId }: EmailHistoryProps) {
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">
                         {log.recipient_type === 'customer' ? (
-                          <Badge variant="secondary" className="text-xs gap-1">
-                            <User className="h-3 w-3" />
-                            Kunde
-                          </Badge>
+                          isGuest(log) ? (
+                            <Badge variant="outline" className="text-xs gap-1">
+                              <UserPlus className="h-3 w-3" />
+                              Gjest
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="text-xs gap-1">
+                              <User className="h-3 w-3" />
+                              Kunde
+                            </Badge>
+                          )
                         ) : (
                           <Badge variant="outline" className="text-xs gap-1">
                             <Globe className="h-3 w-3" />
@@ -301,7 +313,11 @@ export function EmailHistory({ highlightId }: EmailHistoryProps) {
                 <Label className="text-xs text-muted-foreground">Mottaker</Label>
                 <div className="flex items-center gap-2">
                   {selectedLog.recipient_type === 'customer' ? (
-                    <User className="h-4 w-4 text-primary" />
+                    isGuest(selectedLog) ? (
+                      <UserPlus className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <User className="h-4 w-4 text-primary" />
+                    )
                   ) : (
                     <Globe className="h-4 w-4 text-muted-foreground" />
                   )}
@@ -309,8 +325,8 @@ export function EmailHistory({ highlightId }: EmailHistoryProps) {
                     {selectedLog.recipient_name && `${selectedLog.recipient_name} - `}
                     {selectedLog.recipient_email}
                   </span>
-                  <Badge variant={selectedLog.recipient_type === 'customer' ? 'secondary' : 'outline'} className="text-xs">
-                    {selectedLog.recipient_type === 'customer' ? 'Kunde' : 'Ekstern'}
+                  <Badge variant={selectedLog.recipient_type === 'customer' && !isGuest(selectedLog) ? 'secondary' : 'outline'} className="text-xs">
+                    {selectedLog.recipient_type === 'customer' ? (isGuest(selectedLog) ? 'Gjest' : 'Kunde') : 'Ekstern'}
                   </Badge>
                 </div>
               </div>
