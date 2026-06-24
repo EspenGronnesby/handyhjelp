@@ -92,6 +92,7 @@ export const categoryLabels: Record<ActionCategory, string> = {
 export const roleLabels: Record<UserRole | string, string> = {
   platform_owner: 'Eier',
   admin: 'Administrator',
+  moderator: 'Moderator',
   worker: 'Medarbeider',
   user: 'Bruker',
 };
@@ -100,6 +101,7 @@ export const roleLabels: Record<UserRole | string, string> = {
 export const roleColors: Record<UserRole | string, string> = {
   platform_owner: 'bg-purple-500',
   admin: 'bg-blue-500',
+  moderator: 'bg-amber-500',
   worker: 'bg-green-500',
   user: 'bg-gray-500',
 };
@@ -144,15 +146,15 @@ export const logActivity = async (
       return;
     }
 
-    // Get user's role
+    // Get user's roles and pick the highest-priority one (not the most recently assigned)
     const { data: roleData } = await supabase
       .from('user_roles')
       .select('role')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1);
+      .eq('user_id', user.id);
 
-    const userRole = roleData?.[0]?.role || 'user';
+    const userRoles = (roleData || []).map(r => r.role);
+    const ROLE_PRIORITY = ['platform_owner', 'admin', 'moderator', 'worker', 'user'];
+    const userRole = ROLE_PRIORITY.find(r => userRoles.includes(r)) || userRoles[0] || 'user';
 
     // Get user's name from profile
     const { data: profileData } = await supabase
