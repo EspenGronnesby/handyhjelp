@@ -14,7 +14,6 @@ import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { ServiceIcon, ServiceBadge, getCategoryLabel } from "@/lib/serviceIcons";
 import { ProjectGridSkeleton } from "@/components/ui/skeleton-loaders";
-import { ProjectGridSkeleton } from "@/components/ui/skeleton-loaders";
 
 interface Project {
   id: string;
