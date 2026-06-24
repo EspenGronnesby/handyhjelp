@@ -246,10 +246,11 @@ export const ActivityLogViewer = () => {
                 <div>
                   <span className="text-muted-foreground">Bruker:</span>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge className={`${roleColors[detailsDialog.log.user_role] || 'bg-gray-500'}`}>
-                      {roleLabels[detailsDialog.log.user_role] || detailsDialog.log.user_role}
-                    </Badge>
-                    <span>{detailsDialog.log.user_name}</span>
+                    <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${roleColors[detailsDialog.log.user_role] || 'bg-gray-500'}`} />
+                    <span>
+                      <span className="font-medium">{detailsDialog.log.user_name || 'Ukjent'}</span>
+                      <span className="text-muted-foreground"> ({roleLabels[detailsDialog.log.user_role] || detailsDialog.log.user_role})</span>
+                    </span>
                   </div>
                 </div>
                 <div>
