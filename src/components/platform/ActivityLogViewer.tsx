@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, RefreshCw, Crown, Shield, Hammer, User } from 'lucide-react';
+import { Loader2, Search, RefreshCw, Crown, Shield, Hammer } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -38,14 +38,6 @@ import {
   actionTypeColors,
   ActionType,
 } from '@/hooks/useActivityLog';
-import type { LucideIcon } from 'lucide-react';
-
-const roleIcons: Record<string, LucideIcon> = {
-  platform_owner: Crown,
-  admin: Shield,
-  worker: Hammer,
-  user: User,
-};
 
 export const ActivityLogViewer = () => {
   const [filters, setFilters] = useState<ActivityLogFilters>({
@@ -197,7 +189,6 @@ export const ActivityLogViewer = () => {
                 </TableHeader>
                 <TableBody>
                   {logs.map((log) => {
-                    const Icon = roleIcons[log.user_role] || User;
                     return (
                       <TableRow key={log.id}>
                         <TableCell className="whitespace-nowrap text-sm">
@@ -205,11 +196,11 @@ export const ActivityLogViewer = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Badge className={`${roleColors[log.user_role] || 'bg-gray-500'} flex items-center gap-1`}>
-                              <Icon className="h-3 w-3" />
-                              {roleLabels[log.user_role] || log.user_role}
-                            </Badge>
-                            <span className="text-sm hidden lg:inline">{log.user_name}</span>
+                            <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${roleColors[log.user_role] || 'bg-gray-500'}`} />
+                            <span className="text-sm">
+                              <span className="font-medium">{log.user_name || 'Ukjent'}</span>
+                              <span className="text-muted-foreground"> ({roleLabels[log.user_role] || log.user_role})</span>
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>
