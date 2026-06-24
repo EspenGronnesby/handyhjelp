@@ -184,6 +184,17 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Forbidden", 403, requestId);
   }
 
+  // Resolve sender identity so the email history shows who triggered the email
+  const senderRole = roleRows.some((r) => r.role === "platform_owner")
+    ? "platform_owner"
+    : "admin";
+  const { data: senderProfile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", userData.user.id)
+    .maybeSingle();
+  const senderName = senderProfile?.full_name ?? userData.user.email ?? null;
+
   let requestData: JobStatusEmailRequest;
 
   try {
@@ -442,6 +453,8 @@ const handler = async (req: Request): Promise<Response> => {
       subject: subject,
       content: `Jobbstatus: ${status === 'started' ? 'startet' : 'fullført'} – ${jobDescription}`,
       sender_user_id: userData.user.id,
+      sender_name: senderName,
+      sender_role: senderRole,
       status: 'sent',
       sent_at: new Date().toISOString(),
       template_name: status === 'started' ? 'job_started' : 'job_completed',
@@ -471,6 +484,8 @@ const handler = async (req: Request): Promise<Response> => {
         subject: `Jobbstatus: ${status === 'started' ? 'startet' : 'fullført'}`,
         content: `Jobbstatus: ${status === 'started' ? 'startet' : 'fullført'} – ${jobDescription}`,
         sender_user_id: userData.user.id,
+        sender_name: senderName,
+        sender_role: senderRole,
         status: 'failed',
         error_message: error instanceof Error ? error.message : 'Ukjent feil',
         sent_at: new Date().toISOString(),
