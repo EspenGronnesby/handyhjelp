@@ -162,8 +162,8 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
     );
-    const { error: authErr } = await authClient.auth.getUser(jwt);
-    if (authErr && authErr.message?.toLowerCase().includes("invalid")) {
+    const { data: userData, error: authErr } = await authClient.auth.getUser(jwt);
+    if (authErr || !userData?.user) {
       return errorResponse("Unauthorized", 401, requestId);
     }
   } catch {

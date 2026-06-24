@@ -154,8 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Method not allowed", 405);
   }
 
-  // --- AuthN: require a valid Supabase-issued JWT (anon key acceptable
-  // since this is called from the public quote form via supabase-js) ---
+  // --- AuthN: require an authenticated end user (reject bare anon JWTs) ---
   const authHeader = req.headers.get("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return errorResponse("Unauthorized", 401);
@@ -166,10 +165,8 @@ const handler = async (req: Request): Promise<Response> => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
     );
-    // getUser validates the JWT signature against Supabase; anon tokens
-    // return null user without error, which we accept here.
-    const { error: authErr } = await authClient.auth.getUser(jwt);
-    if (authErr && authErr.message?.toLowerCase().includes("invalid")) {
+    const { data: userData, error: authErr } = await authClient.auth.getUser(jwt);
+    if (authErr || !userData?.user) {
       return errorResponse("Unauthorized", 401);
     }
   } catch {
