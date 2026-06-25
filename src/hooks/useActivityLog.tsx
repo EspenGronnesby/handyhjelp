@@ -153,8 +153,8 @@ export const logActivity = async (
       .eq('user_id', user.id);
 
     const userRoles = (roleData || []).map(r => r.role);
-    const ROLE_PRIORITY = ['platform_owner', 'admin', 'moderator', 'worker', 'user'];
-    const userRole = ROLE_PRIORITY.find(r => userRoles.includes(r)) || userRoles[0] || 'user';
+    const ROLE_PRIORITY = ['platform_owner', 'admin', 'moderator', 'worker', 'user'] as const;
+    const userRole = (ROLE_PRIORITY.find(r => userRoles.includes(r)) || userRoles[0] || 'user') as typeof userRoles[number];
 
     // Get user's name from profile
     const { data: profileData } = await supabase
