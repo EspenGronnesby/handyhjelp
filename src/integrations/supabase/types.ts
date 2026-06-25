@@ -305,7 +305,7 @@ export type Database = {
           recipient_user_id: string | null
           sender_name: string | null
           sender_role: string | null
-          sender_user_id: string
+          sender_user_id: string | null
           sent_at: string | null
           status: string | null
           subject: string
@@ -324,7 +324,7 @@ export type Database = {
           recipient_user_id?: string | null
           sender_name?: string | null
           sender_role?: string | null
-          sender_user_id: string
+          sender_user_id?: string | null
           sent_at?: string | null
           status?: string | null
           subject: string
@@ -343,7 +343,7 @@ export type Database = {
           recipient_user_id?: string | null
           sender_name?: string | null
           sender_role?: string | null
-          sender_user_id?: string
+          sender_user_id?: string | null
           sent_at?: string | null
           status?: string | null
           subject?: string
