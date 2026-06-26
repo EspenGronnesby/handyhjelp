@@ -21,6 +21,7 @@ import { useMultiStepForm } from "@/hooks/useMultiStepForm";
 import { useFormSubmit } from "@/hooks/useFormSubmit";
 import { useWeb3Forms } from "@/hooks/useWeb3Forms";
 import { FormProgress } from "@/components/ui/form-progress";
+import { trackConversion } from "@/hooks/useAnalytics";
 
 const serviceOptions = [
   { id: "maintenance", label: "Generelt vedlikehold og småreperasjoner" },
@@ -110,6 +111,14 @@ export const ServiceAgreementForm = () => {
       sendAgreementConfirmation({
         contactPerson: data.contactPerson,
         email: data.email,
+      });
+
+      trackConversion('agreement_submitted', {
+        metadata: {
+          customer_type: data.customerType,
+          frequency: data.frequency,
+          contract_duration: data.contractDuration,
+        },
       });
 
       navigate("/takk-avtale");
