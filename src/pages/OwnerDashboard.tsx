@@ -4,12 +4,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Loader2, Users, Palette, ScrollText, Home, Shield, UserSearch } from 'lucide-react';
+import { Loader2, Users, Palette, ScrollText, Home, Shield, UserSearch, BarChart3 } from 'lucide-react';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
 import { RoleManagement } from '@/components/platform/RoleManagement';
 import { ActivityLogViewer } from '@/components/platform/ActivityLogViewer';
 import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';
 import { AllCustomersPanel } from '@/components/admin/AllCustomersPanel';
+import { AnalyticsPanel } from '@/components/admin/analytics/AnalyticsPanel';
 
 const OwnerDashboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -57,13 +58,20 @@ const OwnerDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto gap-1 bg-muted/60 rounded-xl p-1">
+          <TabsList className="grid w-full grid-cols-5 h-auto gap-1 bg-muted/60 rounded-xl p-1">
             <TabsTrigger
               value="users"
               className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground"
             >
               <Users className="h-4 w-4" />
               <span className="hidden sm:inline">Brukere</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="analytics"
+              className="flex items-center gap-2 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-transparent data-[state=inactive]:bg-card data-[state=inactive]:border-border/50 data-[state=inactive]:text-foreground/70 data-[state=inactive]:hover:border-border data-[state=inactive]:hover:text-foreground"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span className="hidden sm:inline">Analyse</span>
             </TabsTrigger>
             <TabsTrigger
               value="editing"
@@ -90,6 +98,10 @@ const OwnerDashboard = () => {
 
           <TabsContent value="users">
             <RoleManagement />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <AnalyticsPanel />
           </TabsContent>
 
           <TabsContent value="editing">
