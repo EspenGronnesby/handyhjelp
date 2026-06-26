@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Phone, ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { trackConversion, trackCTAClick } from "@/hooks/useAnalytics";
 
 interface QuickCallbackFormProps {
   className?: string;
@@ -80,6 +81,9 @@ export const QuickCallbackForm = ({ className }: QuickCallbackFormProps) => {
         return;
       }
 
+      trackConversion('quick_callback_submitted', {
+        metadata: { service: serviceType },
+      });
       toast({
         title: "Takk! Vi ringer deg snart.",
         description: "Vi tar kontakt innen 1-3 virkedager.",
