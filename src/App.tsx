@@ -10,6 +10,8 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { EditModeProvider } from "./contexts/EditModeContext";
 import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/motion";
+import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
+import { useAnalyticsPageviews } from "@/hooks/useAnalytics";
 
 // Landing page is loaded eagerly — it's the most common entry point.
 import Index from "./pages/Index";
@@ -141,6 +143,7 @@ const AppRoutes = () => {
 // Main router that combines marketing and app routes
 const AppRouter = () => {
   const location = useLocation();
+  useAnalyticsPageviews();
 
   // Check if current path is an app route (dashboard, owner, worker)
   const isAppRoute = location.pathname.startsWith('/dashboard') ||
@@ -177,6 +180,7 @@ const App = () => (
           <EditModeProvider>
             <Toaster />
             <Sonner position="top-center" duration={2000} />
+            <GoogleAnalytics />
             <BrowserRouter>
               <ScrollToTop />
               <AppRouter />
