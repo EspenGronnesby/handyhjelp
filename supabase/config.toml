@@ -41,3 +41,9 @@ verify_jwt = false
 
 [functions.cleanup-old-agreements]
 verify_jwt = false
+
+[functions.log-event]
+verify_jwt = false
+
+[functions.analytics-summary]
+verify_jwt = true
