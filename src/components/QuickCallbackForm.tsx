@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Phone, ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { trackConversion, trackCTAClick } from "@/hooks/useAnalytics";
 
 interface QuickCallbackFormProps {
   className?: string;
@@ -80,6 +81,9 @@ export const QuickCallbackForm = ({ className }: QuickCallbackFormProps) => {
         return;
       }
 
+      trackConversion('quick_callback_submitted', {
+        metadata: { service: serviceType },
+      });
       toast({
         title: "Takk! Vi ringer deg snart.",
         description: "Vi tar kontakt innen 1-3 virkedager.",
@@ -219,12 +223,13 @@ export const QuickCallbackForm = ({ className }: QuickCallbackFormProps) => {
       <div className="mt-4 pt-4 border-t border-border/60 flex items-center justify-between gap-3 text-xs text-muted-foreground">
         <a
           href="tel:+4741250553"
+          onClick={() => trackCTAClick('phone_click', { location: 'hero_callback' })}
           className="inline-flex items-center gap-1.5 hover:text-primary transition-colors font-medium"
         >
           <Phone className="h-3.5 w-3.5" />
           Ring oss
         </a>
-        <Link to="/tilbud" className="hover:text-primary transition-colors">
+        <Link to="/tilbud" onClick={() => trackCTAClick('quote_cta', { location: 'hero_callback' })} className="hover:text-primary transition-colors">
           Detaljert tilbud →
         </Link>
       </div>

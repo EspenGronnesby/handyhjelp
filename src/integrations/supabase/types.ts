@@ -132,6 +132,66 @@ export type Database = {
           },
         ]
       }
+      analytics_events: {
+        Row: {
+          country: string | null
+          created_at: string
+          device: string | null
+          event_name: string
+          event_type: string
+          id: string
+          metadata: Json
+          occurred_at: string
+          path: string | null
+          referrer: string | null
+          related_agreement_id: string | null
+          related_quote_id: string | null
+          session_id: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          event_name: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          path?: string | null
+          referrer?: string | null
+          related_agreement_id?: string | null
+          related_quote_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          event_name?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          occurred_at?: string
+          path?: string | null
+          referrer?: string | null
+          related_agreement_id?: string | null
+          related_quote_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string

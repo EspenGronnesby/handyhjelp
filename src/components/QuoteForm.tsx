@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { trackConversion } from "@/hooks/useAnalytics";
 import { ChevronRight, Home, Building2, User, Phone, Mail, AlertCircle, Building, CheckCircle, Loader2, UserPlus } from "lucide-react";
 import { CompanySearch } from "./CompanySearch";
 import { useAuth } from "@/hooks/useAuth";
@@ -308,6 +309,12 @@ export const QuoteForm = () => {
         console.error('Failed to send confirmation email:', emailErr);
       }
       // SUCCESS!
+      trackConversion('quote_submitted', {
+        metadata: {
+          customer_type: formData.type,
+          has_account_creation: createAccount && !user,
+        },
+      });
       toast({
         title: "Tilbud sendt!",
         description: "Vi tar kontakt med deg innen 1-3 virkedager.",
