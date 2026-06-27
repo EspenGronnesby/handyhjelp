@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Users, AlertTriangle, ArrowRight, Star } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Users, AlertTriangle, ArrowRight, Star, Eye, MousePointerClick, BarChart3 } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,8 @@ import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useRole } from '@/hooks/useRole';
 import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import { AdminStatDetailModal, type StatCardType } from '@/components/admin/AdminStatDetailModal';
+import { AnalyticsStatDetailModal, type AnalyticsStatType } from '@/components/admin/AnalyticsStatDetailModal';
+import { useAnalyticsOverview } from '@/hooks/useAnalyticsOverview';
 import {
   Pagination,
   PaginationContent,
@@ -220,8 +222,10 @@ const DashboardActivity = () => {
   const [adminAgreements, setAdminAgreements] = useState<ServiceAgreement[]>([]);
   const [adminOverviewStats, setAdminOverviewStats] = useState({ totalCustomers: 0, totalCompleted: 0 });
   const [selectedCard, setSelectedCard] = useState<StatCardType | null>(null);
+  const [selectedAnalytics, setSelectedAnalytics] = useState<AnalyticsStatType>(null);
   const { isWorker, isAdmin, isOwner } = useRole();
   const { badges } = useNavigationBadges();
+  const { data: analyticsOverview } = useAnalyticsOverview(isAdmin || isOwner);
   const fetchData = useCallback(async () => {
     const {
       data: {
