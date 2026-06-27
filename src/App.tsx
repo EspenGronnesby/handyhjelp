@@ -23,6 +23,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const DashboardActivity = lazy(() => import("./pages/DashboardActivity"));
 const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
 const DashboardNotifications = lazy(() => import("./pages/DashboardNotifications"));
+const DashboardAnalytics = lazy(() => import("./pages/DashboardAnalytics"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const OwnerDashboard = lazy(() => import("./pages/OwnerDashboard"));
 const WorkerDashboard = lazy(() => import("./pages/WorkerDashboard"));
@@ -117,6 +118,11 @@ const AppRoutes = () => {
           <Route index element={<DashboardActivity />} />
           <Route path="profile" element={<DashboardProfile />} />
           <Route path="notifications" element={<DashboardNotifications />} />
+          <Route path="analytics" element={
+            <ErrorBoundary>
+              <DashboardAnalytics />
+            </ErrorBoundary>
+          } />
           <Route path="admin" element={
             <ErrorBoundary>
               <AdminDashboard />

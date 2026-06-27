@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Users, AlertTriangle, ArrowRight, Star } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Users, AlertTriangle, ArrowRight, Star, Eye, MousePointerClick, BarChart3 } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,8 @@ import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useRole } from '@/hooks/useRole';
 import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import { AdminStatDetailModal, type StatCardType } from '@/components/admin/AdminStatDetailModal';
+import { AnalyticsStatDetailModal, type AnalyticsStatType } from '@/components/admin/AnalyticsStatDetailModal';
+import { useAnalyticsOverview } from '@/hooks/useAnalyticsOverview';
 import {
   Pagination,
   PaginationContent,
@@ -220,8 +222,10 @@ const DashboardActivity = () => {
   const [adminAgreements, setAdminAgreements] = useState<ServiceAgreement[]>([]);
   const [adminOverviewStats, setAdminOverviewStats] = useState({ totalCustomers: 0, totalCompleted: 0 });
   const [selectedCard, setSelectedCard] = useState<StatCardType | null>(null);
+  const [selectedAnalytics, setSelectedAnalytics] = useState<AnalyticsStatType>(null);
   const { isWorker, isAdmin, isOwner } = useRole();
   const { badges } = useNavigationBadges();
+  const { data: analyticsOverview } = useAnalyticsOverview(isAdmin || isOwner);
   const fetchData = useCallback(async () => {
     const {
       data: {
@@ -988,6 +992,64 @@ const DashboardActivity = () => {
             </button>
           </div>
 
+          {/* Analytics KPI row */}
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+            <button
+              onClick={() => setSelectedAnalytics('visits')}
+              className="text-left w-full sm:col-span-1"
+            >
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white cursor-pointer h-full">
+                <div className="flex items-start justify-between mb-3">
+                  <p className="text-sm font-medium text-white/80">Besøk (siste 7 dager)</p>
+                  <Eye className="h-8 w-8 text-white/30" strokeWidth={1.5} />
+                </div>
+                <div className="text-3xl font-bold">
+                  {analyticsOverview ? new Intl.NumberFormat('nb-NO').format(analyticsOverview.kpi.pageviews) : '—'}
+                </div>
+                <p className="text-xs mt-1 text-white/60">
+                  {analyticsOverview
+                    ? `${new Intl.NumberFormat('nb-NO').format(analyticsOverview.kpi.visitors)} unike besøkende`
+                    : 'laster…'}
+                </p>
+              </div>
+            </button>
+            <button
+              onClick={() => setSelectedAnalytics('conversionRate')}
+              className="text-left w-full sm:col-span-1"
+            >
+              <div className="card-hover-lift p-5 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white cursor-pointer h-full">
+                <div className="flex items-start justify-between mb-3">
+                  <p className="text-sm font-medium text-white/80">Konverteringsrate</p>
+                  <MousePointerClick className="h-8 w-8 text-white/30" strokeWidth={1.5} />
+                </div>
+                <div className="text-3xl font-bold">
+                  {analyticsOverview
+                    ? new Intl.NumberFormat('nb-NO', { style: 'percent', maximumFractionDigits: 1 }).format(analyticsOverview.kpi.conversionRate)
+                    : '—'}
+                </div>
+                <p className="text-xs mt-1 text-white/60">
+                  {analyticsOverview
+                    ? `${new Intl.NumberFormat('nb-NO').format(analyticsOverview.kpi.conversions)} konverteringer`
+                    : 'laster…'}
+                </p>
+              </div>
+            </button>
+            <Link to="/dashboard/analytics" className="w-full sm:col-span-1">
+              <div className="card-hover-lift p-5 rounded-xl bg-card border border-border/60 cursor-pointer h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-3">
+                  <p className="text-sm font-medium text-muted-foreground">Full analyse</p>
+                  <BarChart3 className="h-8 w-8 text-primary/40" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <div className="text-base font-semibold text-foreground">Se mer data</div>
+                  <p className="text-xs mt-1 text-muted-foreground inline-flex items-center gap-1">
+                    Kilder, land, trakt og live feed <ArrowRight className="h-3 w-3" />
+                  </p>
+                </div>
+              </div>
+            </Link>
+          </div>
+
           {/* Trenger oppmerksomhet */}
           {(badges.adminDetails.pendingQuotes > 0 ||
             (badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs) > 0 ||
@@ -1407,6 +1469,11 @@ const DashboardActivity = () => {
         type={selectedCard}
         isOpen={selectedCard !== null}
         onClose={() => setSelectedCard(null)}
+      />
+      <AnalyticsStatDetailModal
+        type={selectedAnalytics}
+        isOpen={selectedAnalytics !== null}
+        onClose={() => setSelectedAnalytics(null)}
       />
     </div>;
 };
