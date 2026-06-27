@@ -1470,6 +1470,11 @@ const DashboardActivity = () => {
         isOpen={selectedCard !== null}
         onClose={() => setSelectedCard(null)}
       />
+      <AnalyticsStatDetailModal
+        type={selectedAnalytics}
+        isOpen={selectedAnalytics !== null}
+        onClose={() => setSelectedAnalytics(null)}
+      />
     </div>;
 };
 export default DashboardActivity;
