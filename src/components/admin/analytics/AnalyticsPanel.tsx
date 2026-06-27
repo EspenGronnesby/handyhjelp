@@ -78,6 +78,33 @@ const EVENT_LABELS: Record<string, string> = {
   quote_cta: 'Tilbud-CTA',
 };
 
+const PAGE_LABELS: Record<string, string> = {
+  '/': 'Hjemmeside',
+  '/tjenester': 'Tjenester',
+  '/kontakt': 'Kontakt oss',
+  '/om-oss': 'Om oss',
+  '/tilbud': 'Be om tilbud',
+  '/blogg': 'Blogg',
+  '/prosjekter': 'Prosjekter',
+  '/priser': 'Priser',
+  '/garantier': 'Garantier',
+  '/dashboard': 'Dashboard',
+  '/dashboard/admin': 'Admin-panel',
+  '/dashboard/worker': 'Arbeider-panel',
+  '/dashboard/owner': 'Eier-panel',
+  '/dashboard/analytics': 'Analyse',
+};
+
+function friendlyPath(p: string): string {
+  // Strip query params to get base path
+  const base = p.split('?')[0];
+  return PAGE_LABELS[base] ?? base;
+}
+
+function isInternalPath(p: string): boolean {
+  return p.includes('__lovable') || p.includes('lovable_sha') || p.includes('lovable_load');
+}
+
 function formatNumber(n: number) {
   return new Intl.NumberFormat('nb-NO').format(n);
 }
@@ -419,10 +446,12 @@ export const AnalyticsPanel = () => {
             <p className="text-sm text-muted-foreground py-8 text-center">Ingen data ennå.</p>
           ) : (
             <div className="space-y-2.5">
-              {data.topPages.map((p) => (
+              {data.topPages
+                .filter((p) => !isInternalPath(p.path))
+                .map((p) => (
                 <div key={p.path} className="grid grid-cols-[1fr_auto_auto] gap-3 items-center">
                   <div className="min-w-0">
-                    <div className="text-xs font-mono truncate">{p.path}</div>
+                    <div className="text-sm font-medium truncate">{friendlyPath(p.path)}</div>
                     <div className="mt-1">
                       <HorizontalBar value={p.visits} max={maxPage} />
                     </div>
