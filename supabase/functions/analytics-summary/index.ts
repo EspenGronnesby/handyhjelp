@@ -100,6 +100,15 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Hent user_ids for interne roller — disse filtreres bort fra analytics
+  const { data: internalUserRows } = await admin
+    .from("user_roles")
+    .select("user_id")
+    .in("role", ["admin", "platform_owner", "worker", "moderator"]);
+  const internalIds = [
+    ...new Set((internalUserRows || []).map((r: any) => r.user_id as string))
+  ];
+
   let from: string;
   let to: string;
   try {
@@ -120,23 +129,33 @@ Deno.serve(async (req) => {
   const prevFrom = new Date(fromDate.getTime() - ms).toISOString();
   const prevTo = from;
 
+  // Filtrer bort interne brukere — behold anonyme (null) og kunder (rolle 'user')
+  function applyRoleFilter(query: any): any {
+    if (internalIds.length === 0) return query;
+    return query.or(`user_id.is.null,user_id.not.in.(${internalIds.join(",")})`);
+  }
+
   // Fetch events for current and previous period
   const [{ data: curr, error: e1 }, { data: prev, error: e2 }] = await Promise.all([
-    admin
-      .from("analytics_events")
-      .select(
-        "occurred_at,event_type,event_name,path,referrer,utm_source,utm_medium,country,device,session_id,related_quote_id,related_agreement_id,metadata"
-      )
-      .gte("occurred_at", from)
-      .lte("occurred_at", to)
-      .order("occurred_at", { ascending: false })
-      .limit(50000),
-    admin
-      .from("analytics_events")
-      .select("event_type,session_id")
-      .gte("occurred_at", prevFrom)
-      .lt("occurred_at", prevTo)
-      .limit(50000),
+    applyRoleFilter(
+      admin
+        .from("analytics_events")
+        .select(
+          "occurred_at,event_type,event_name,path,referrer,utm_source,utm_medium,country,device,session_id,related_quote_id,related_agreement_id,metadata"
+        )
+        .gte("occurred_at", from)
+        .lte("occurred_at", to)
+        .order("occurred_at", { ascending: false })
+        .limit(50000)
+    ),
+    applyRoleFilter(
+      admin
+        .from("analytics_events")
+        .select("event_type,session_id")
+        .gte("occurred_at", prevFrom)
+        .lt("occurred_at", prevTo)
+        .limit(50000)
+    ),
   ]);
 
   if (e1 || e2) {

@@ -30,3 +30,7 @@ vite.config.ts.timestamp-*
 
 # Google OAuth secrets
 .google
+
+# Supabase local/temp
+supabase/.temp/
+supabase/.branches/
