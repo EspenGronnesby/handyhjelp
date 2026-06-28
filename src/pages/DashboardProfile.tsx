@@ -62,61 +62,79 @@ const DashboardProfile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const { toast } = useToast();
-  const { signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+    // Vent til auth er ferdig lastet før vi henter
+    if (authLoading) return;
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
-
-      if (!error && data) {
-        setProfile({
-          full_name: data.full_name || '',
-          email: data.email || '',
-          phone: data.phone || '',
-          address: data.address || '',
-          customer_type: data.customer_type as 'private' | 'business' | null,
-          org_number: data.org_number || '',
-          company_name: data.company_name || ''
-        });
-      }
-
-      // Fetch user roles
-      const { data: rolesData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id);
-
-      if (rolesData) {
-        setRoles(rolesData.map(r => r.role));
-      }
-
+    // Ingen innlogget bruker — Dashboard-layouten håndterer redirect.
+    if (!user) {
       setLoading(false);
+      return;
+    }
+
+    const fetchProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          toast({
+            title: 'Kunne ikke laste profilen',
+            description: 'Prøv å laste siden på nytt.',
+            variant: 'destructive'
+          });
+        }
+
+        // Forhåndsfyll e-post fra innlogget bruker, slik at skjemaet vises
+        // selv om profilraden mangler.
+        setProfile((prev) => ({
+          ...prev,
+          full_name: data?.full_name || '',
+          email: data?.email || user.email || '',
+          phone: data?.phone || '',
+          address: data?.address || '',
+          customer_type: (data?.customer_type as 'private' | 'business' | null) ?? null,
+          org_number: data?.org_number || '',
+          company_name: data?.company_name || ''
+        }));
+
+        // Hent roller
+        const { data: rolesData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        if (rolesData) {
+          setRoles(rolesData.map(r => r.role));
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchProfile();
-  }, []);
+  }, [user, authLoading, toast]);
 
   const handleSave = async () => {
-    setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+    setSaving(true);
 
+    // upsert oppretter raden hvis den mangler, ellers oppdaterer den
     const { error } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: user.id,
+        email: profile.email || user.email,
         full_name: profile.full_name,
         phone: profile.phone,
         address: profile.address
-      })
-      .eq('id', user.id);
+      });
 
     if (error) {
       toast({
