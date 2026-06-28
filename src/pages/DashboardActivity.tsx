@@ -17,6 +17,7 @@ import { useNavigationBadges } from '@/hooks/useNavigationBadges';
 import { AdminStatDetailModal, type StatCardType } from '@/components/admin/AdminStatDetailModal';
 import { AnalyticsStatDetailModal, type AnalyticsStatType } from '@/components/admin/AnalyticsStatDetailModal';
 import { useAnalyticsOverview } from '@/hooks/useAnalyticsOverview';
+import { AnimatedNumber } from '@/components/admin/analytics/AnimatedNumber';
 import {
   Pagination,
   PaginationContent,
@@ -27,6 +28,28 @@ import {
 } from '@/components/ui/pagination';
 
 const JOBS_PER_PAGE = 10;
+
+// Tall-formattering for oversikt-kort
+const nf = new Intl.NumberFormat('nb-NO');
+const fmtInt = (n: number) => nf.format(Math.round(n));
+const fmtPercent = (n: number) =>
+  new Intl.NumberFormat('nb-NO', { style: 'percent', maximumFractionDigits: 1 }).format(n);
+
+// Endringspille (↑/↓) for kort som har sammenligningstall
+const DeltaPill = ({ curr, prev }: { curr: number; prev: number }) => {
+  if (!prev && !curr) return null;
+  const change = !prev ? 1 : (curr - prev) / prev;
+  const positive = change >= 0;
+  return (
+    <span
+      className={`inline-flex items-center gap-0.5 text-[11px] font-semibold px-1.5 py-0.5 rounded-full backdrop-blur-sm ${
+        positive ? 'bg-white/20 text-white' : 'bg-black/20 text-white'
+      }`}
+    >
+      {positive ? '▲' : '▼'} {fmtPercent(Math.abs(change))}
+    </span>
+  );
+};
 interface Quote {
   id: string;
   type: string;
@@ -902,32 +925,32 @@ const DashboardActivity = () => {
       {isOnlyWorker && (
         <div className="grid gap-4 sm:grid-cols-3">
           <Link to="/dashboard/worker">
-            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 cursor-pointer bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white">
+            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white">
               <div className="flex items-start justify-between mb-3">
                 <p className="text-sm font-medium text-white/80">Venter godkjenning</p>
                 <ClipboardList className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
               </div>
-              <div className="text-3xl font-bold">{badges.workerDetails.pendingProjects + badges.workerDetails.pendingBlogs}</div>
+              <div className="text-4xl font-bold tabular-nums tracking-tight"><AnimatedNumber value={badges.workerDetails.pendingProjects + badges.workerDetails.pendingBlogs} formatter={fmtInt} /></div>
               <p className="text-xs mt-1 text-white/60">Prosjekter og innlegg til vurdering</p>
             </div>
           </Link>
           <Link to="/dashboard/worker">
-            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 cursor-pointer bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white">
+            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white">
               <div className="flex items-start justify-between mb-3">
                 <p className="text-sm font-medium text-white/80">Publiserte prosjekter</p>
                 <Camera className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
               </div>
-              <div className="text-3xl font-bold">—</div>
+              <div className="text-4xl font-bold tabular-nums tracking-tight">—</div>
               <p className="text-xs mt-1 text-white/60">Se Mine innleveringer for detaljer</p>
             </div>
           </Link>
           <Link to="/dashboard/worker">
-            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 cursor-pointer bg-gradient-to-br from-rose-500 via-pink-500 to-fuchsia-600 text-white">
+            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br from-rose-500 via-pink-500 to-fuchsia-600 text-white">
               <div className="flex items-start justify-between mb-3">
                 <p className="text-sm font-medium text-white/80">Avviste innleveringer</p>
                 <Upload className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
               </div>
-              <div className="text-3xl font-bold">{badges.workerDetails.rejectedProjects + badges.workerDetails.rejectedBlogs}</div>
+              <div className="text-4xl font-bold tabular-nums tracking-tight"><AnimatedNumber value={badges.workerDetails.rejectedProjects + badges.workerDetails.rejectedBlogs} formatter={fmtInt} /></div>
               <p className="text-xs mt-1 text-white/60">Må rettes og sendes inn på nytt</p>
             </div>
           </Link>
@@ -939,17 +962,17 @@ const DashboardActivity = () => {
         <div className="space-y-4">
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
             <button onClick={() => setSelectedCard('customers')} disabled={adminOverviewStats.totalCustomers === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 text-white cursor-pointer">
+              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 text-white cursor-pointer">
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Totale kunder</p>
                   <Users className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
                 </div>
-                <div className="text-3xl font-bold">{adminOverviewStats.totalCustomers}</div>
+                <div className="text-4xl font-bold tabular-nums tracking-tight"><AnimatedNumber value={adminOverviewStats.totalCustomers} formatter={fmtInt} /></div>
                 <p className="text-xs mt-1 text-white/60">registrerte kunder</p>
               </div>
             </button>
             <button onClick={() => setSelectedCard('quotes')} disabled={badges.adminDetails.pendingQuotes === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white cursor-pointer relative">
+              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white cursor-pointer relative">
                 {badges.adminDetails.pendingQuotes > 0 && (
                   <span className="absolute top-3 right-3 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF0000] opacity-75" />
@@ -960,12 +983,12 @@ const DashboardActivity = () => {
                   <p className="text-sm font-medium text-white/80">Åpne forespørsler</p>
                   <FileText className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
                 </div>
-                <div className="text-3xl font-bold">{badges.adminDetails.pendingQuotes}</div>
+                <div className="text-4xl font-bold tabular-nums tracking-tight"><AnimatedNumber value={badges.adminDetails.pendingQuotes} formatter={fmtInt} /></div>
                 <p className="text-xs mt-1 text-white/60">venter på svar</p>
               </div>
             </button>
             <button onClick={() => setSelectedCard('activeJobs')} disabled={badges.adminDetails.activeJobs === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white cursor-pointer relative">
+              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white cursor-pointer relative">
                 {badges.adminDetails.activeJobs > 0 && (
                   <span className="absolute top-3 right-3 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75" />
@@ -976,17 +999,17 @@ const DashboardActivity = () => {
                   <p className="text-sm font-medium text-white/80">Aktive jobber</p>
                   <Briefcase className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
                 </div>
-                <div className="text-3xl font-bold">{badges.adminDetails.activeJobs}</div>
+                <div className="text-4xl font-bold tabular-nums tracking-tight"><AnimatedNumber value={badges.adminDetails.activeJobs} formatter={fmtInt} /></div>
                 <p className="text-xs mt-1 text-white/60">pågår akkurat nå</p>
               </div>
             </button>
             <button onClick={() => setSelectedCard('completedJobs')} disabled={adminOverviewStats.totalCompleted === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white cursor-pointer">
+              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white cursor-pointer">
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Fullførte jobber</p>
                   <CheckCircle className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
                 </div>
-                <div className="text-3xl font-bold">{adminOverviewStats.totalCompleted}</div>
+                <div className="text-4xl font-bold tabular-nums tracking-tight"><AnimatedNumber value={adminOverviewStats.totalCompleted} formatter={fmtInt} /></div>
                 <p className="text-xs mt-1 text-white/60">ferdigstilte oppdrag</p>
               </div>
             </button>
@@ -998,13 +1021,16 @@ const DashboardActivity = () => {
               onClick={() => setSelectedAnalytics('visits')}
               className="text-left w-full sm:col-span-1"
             >
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white cursor-pointer h-full">
+              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white cursor-pointer h-full">
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Besøk (siste 7 dager)</p>
                   <Eye className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
                 </div>
-                <div className="text-3xl font-bold">
-                  {analyticsOverview ? new Intl.NumberFormat('nb-NO').format(analyticsOverview.kpi.pageviews) : '—'}
+                <div className="flex items-end gap-2">
+                  <div className="text-4xl font-bold tabular-nums tracking-tight">
+                    {analyticsOverview ? <AnimatedNumber value={analyticsOverview.kpi.pageviews} formatter={fmtInt} /> : '—'}
+                  </div>
+                  {analyticsOverview && <DeltaPill curr={analyticsOverview.kpi.pageviews} prev={analyticsOverview.kpi.prev.pageviews} />}
                 </div>
                 <p className="text-xs mt-1 text-white/60">
                   {analyticsOverview
@@ -1017,15 +1043,21 @@ const DashboardActivity = () => {
               onClick={() => setSelectedAnalytics('conversionRate')}
               className="text-left w-full sm:col-span-1"
             >
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white cursor-pointer h-full">
+              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white cursor-pointer h-full">
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Konverteringsrate</p>
                   <MousePointerClick className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
                 </div>
-                <div className="text-3xl font-bold">
-                  {analyticsOverview
-                    ? new Intl.NumberFormat('nb-NO', { style: 'percent', maximumFractionDigits: 1 }).format(analyticsOverview.kpi.conversionRate)
-                    : '—'}
+                <div className="flex items-end gap-2">
+                  <div className="text-4xl font-bold tabular-nums tracking-tight">
+                    {analyticsOverview ? <AnimatedNumber value={analyticsOverview.kpi.conversionRate} formatter={fmtPercent} /> : '—'}
+                  </div>
+                  {analyticsOverview && (
+                    <DeltaPill
+                      curr={analyticsOverview.kpi.conversionRate}
+                      prev={analyticsOverview.kpi.prev.visitors ? analyticsOverview.kpi.prev.conversions / analyticsOverview.kpi.prev.visitors : 0}
+                    />
+                  )}
                 </div>
                 <p className="text-xs mt-1 text-white/60">
                   {analyticsOverview
@@ -1035,7 +1067,7 @@ const DashboardActivity = () => {
               </div>
             </button>
             <Link to="/dashboard/analytics" className="w-full sm:col-span-1">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 bg-card border border-border/60 cursor-pointer h-full flex flex-col justify-between">
+              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-card border border-border/60 cursor-pointer h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-muted-foreground">Full analyse</p>
                   <BarChart3 className="h-10 w-10 p-2 rounded-xl bg-primary/10 ring-1 ring-primary/20 text-primary shadow-sm" strokeWidth={1.75} />
