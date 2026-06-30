@@ -246,6 +246,11 @@ Deno.serve(async (req) => {
   }
   const topPages = [...pageMap.entries()]
     .map(([path, v]) => ({ path, visits: v.visits, conversions: v.conversions }))
+    .filter(({ path }) =>
+      !path.includes('__lovable') &&
+      !path.includes('lovable_sha') &&
+      !path.includes('lovable_load')
+    )
     .sort((a, b) => b.visits - a.visits)
     .slice(0, 12);
 
