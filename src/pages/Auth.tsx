@@ -39,11 +39,19 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Trygg same-origin relativ path fra ?next=
+  const rawNext = searchParams.get('next');
+  const nextPath = rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : null;
+  const redirectTarget = nextPath ?? '/dashboard';
+
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
+      const redirectUri = nextPath
+        ? `${window.location.origin}/auth?next=${encodeURIComponent(nextPath)}`
+        : window.location.origin;
       const { error } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: redirectUri,
       });
       if (error) throw error;
     } catch (error: any) {
@@ -67,9 +75,9 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate(redirectTarget);
     }
-  }, [user, navigate]);
+  }, [user, navigate, redirectTarget]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +91,7 @@ const Auth = () => {
           title: 'Velkommen tilbake!',
           description: 'Du er nå logget inn.'
         });
-        navigate('/dashboard');
+        navigate(redirectTarget);
       } else {
         if (!fullName || !phone || !customerType) {
           toast({
@@ -120,7 +128,7 @@ const Auth = () => {
           title: 'Konto opprettet!',
           description: 'Du er nå logget inn og kan begynne å bruke dashboardet.'
         });
-        navigate('/dashboard');
+        navigate(redirectTarget);
       }
     } catch (error: any) {
       console.error('Authentication error:', error);

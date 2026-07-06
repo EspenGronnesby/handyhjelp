@@ -49,6 +49,7 @@ const Cookies = lazy(() => import("./pages/Cookies"));
 const Vilkaar = lazy(() => import("./pages/Vilkaar"));
 
 const Feedback = lazy(() => import("./pages/Feedback"));
+const OAuthConsent = lazy(() => import("./pages/OAuthConsent"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -99,6 +100,7 @@ const MarketingRoutes = () => {
           <Route path="/vilkaar" element={<PageTransition><Vilkaar /></PageTransition>} />
           <Route path="/tilbakemelding" element={<PageTransition><Feedback /></PageTransition>} />
           <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
+          <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
         </Routes>
       </Suspense>
     </AnimatePresence>
@@ -160,7 +162,8 @@ const AppRouter = () => {
   const isKnownRoute = [
     '/', '/tilbud', '/fast-avtale', '/takk-avtale', '/faq', '/prosjekter', '/om-oss',
     '/kontakt', '/tjenester', '/blog', '/raad', '/takk', '/personvern', '/cookies',
-    '/vilkaar', '/tilbakemelding', '/auth', '/dashboard', '/owner', '/worker'
+    '/vilkaar', '/tilbakemelding', '/auth', '/dashboard', '/owner', '/worker',
+    '/.lovable/oauth/consent'
   ].some(route => location.pathname === route || location.pathname.startsWith(route + '/'));
 
   if (!isKnownRoute) {
