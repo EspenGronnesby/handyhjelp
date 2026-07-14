@@ -12,6 +12,7 @@ import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/motion";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { useAnalyticsPageviews } from "@/hooks/useAnalytics";
+import { isKnownPath } from "@/lib/routes";
 
 // Landing page is loaded eagerly — it's the most common entry point.
 import Index from "./pages/Index";
@@ -158,13 +159,8 @@ const AppRouter = () => {
                      location.pathname === '/owner' ||
                      location.pathname === '/worker';
 
-  // Check for 404
-  const isKnownRoute = [
-    '/', '/tilbud', '/fast-avtale', '/takk-avtale', '/faq', '/prosjekter', '/om-oss',
-    '/kontakt', '/tjenester', '/blog', '/raad', '/takk', '/personvern', '/cookies',
-    '/vilkaar', '/tilbakemelding', '/anmeldelse', '/auth', '/dashboard', '/owner', '/worker',
-    '/.lovable/oauth/consent'
-  ].some(route => location.pathname === route || location.pathname.startsWith(route + '/'));
+  // Check for 404 — lista vedlikeholdes i src/lib/routes.ts (testet i routes.test.ts)
+  const isKnownRoute = isKnownPath(location.pathname);
 
   if (!isKnownRoute) {
     return (

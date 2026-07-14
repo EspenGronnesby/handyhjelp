@@ -1,0 +1,31 @@
+name: Tester
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Test, typecheck og build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # --legacy-peer-deps: lockfilen har en kjent peer-konflikt
+      # (vite 8 vs @vitejs/plugin-react-swc 3) — Lovable bygger med bun
+      - name: Installer avhengigheter
+        run: npm install --legacy-peer-deps
+
+      - name: Kjør tester
+        run: npm test
+
+      - name: TypeScript-sjekk
+        run: npx tsc --noEmit
+
+      - name: Produksjonsbygg
+        run: npm run build
