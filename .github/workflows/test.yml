@@ -2,8 +2,9 @@ name: Tester
 
 # Kort tittel per kjøring så den er lesbar på mobil:
 # PR-kjøringer viser kun «PR #28» (GitHub viser dato/klokke ved siden av).
-# Push til main viser commit-meldingen — merge-commits starter med «Merge pull request #28».
-run-name: "${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || github.event.head_commit.message }}"
+# Push til main: tom streng = GitHubs standard (første linje av commit-meldingen,
+# som for merges starter med «Merge pull request #28»).
+run-name: "${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || '' }}"
 
 on:
   push:
