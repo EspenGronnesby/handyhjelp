@@ -17,3 +17,4 @@
    innlogging (user_id = null).
 6. **Rollesjekk:** Bruk `useRole()` som eneste kilde for isAdmin/isOwner.
    Ikke lag nye frittstående rollesjekk-hooks.
+
