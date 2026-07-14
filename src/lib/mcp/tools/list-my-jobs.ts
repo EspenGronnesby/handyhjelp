@@ -24,7 +24,7 @@ export default defineTool({
     const supabase = supabaseForUser(ctx);
     const { data, error } = await supabase
       .from("jobs")
-      .select("id, title, description, status, scheduled_date, created_at")
+      .select("id, status, scheduled_date, started_at, completed_date, estimated_completion, amount, notes, quote_id, created_at")
       .eq("user_id", ctx.getUserId())
       .order("created_at", { ascending: false })
       .limit(limit ?? 20);
