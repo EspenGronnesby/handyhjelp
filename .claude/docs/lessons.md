@@ -297,3 +297,21 @@ Bruk `supabase.storage.from('invoices').download(filePath)` der `filePath = file
 
 **Prevention:**
 Aldri bruk `file_url` fra databasen direkte som href. Alltid bruk `storage.download()` + `createObjectURL`, eller generer en signed URL med `storage.createSignedUrl()`.
+
+---
+
+### Ruter og isKnownRoute-allowlist vedlikeholdes to steder
+**Date:** 2026-07-14
+**Category:** React
+**Affected files:** src/App.tsx
+
+**Problem:**
+`/anmeldelse/:jobId` (anmeldelsessiden lenket fra send-feedback-request-e-poster) ga alltid 404. Ruten var korrekt definert i `MarketingRoutes`, men `AppRouter` sjekker en separat `isKnownRoute`-allowlist FØR ruteren nås — og `/anmeldelse` manglet i listen. Hele anmeldelsesfunnelen var død uten at noe feilet synlig i kode eller build.
+
+**Solution:**
+La til `'/anmeldelse'` i `isKnownRoute`-arrayen i `src/App.tsx`.
+
+**Prevention:**
+- Når du legger til en ny route i `MarketingRoutes` eller `AppRoutes`, MÅ prefikset også legges til i `isKnownRoute`-arrayen i samme fil — to steder må alltid oppdateres sammen
+- Test alltid en ny route i nettleseren (ikke bare at builden er grønn) — 404-sjekken skjer runtime
+- Vurder på sikt å utlede allowlisten fra rutedefinisjonene så dette ikke kan divergere

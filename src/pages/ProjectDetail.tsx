@@ -194,6 +194,7 @@ const ProjectDetail = () => {
                     src={project.before_image_url}
                     alt={`${project.title} - før`}
                     className="max-w-full max-h-full object-contain object-center rounded-lg"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 </div>
                 <Badge
@@ -226,6 +227,7 @@ const ProjectDetail = () => {
                     src={project.after_image_url}
                     alt={`${project.title} - etter`}
                     className="max-w-full max-h-full object-contain object-center rounded-lg"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 </div>
                 <Badge

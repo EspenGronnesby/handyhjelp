@@ -72,7 +72,7 @@ export const InvoiceUploadModal = ({ job, open, onOpenChange, onSuccess }: Invoi
       await logActivity(
         'invoice_created',
         'invoice_management',
-        `Opprettet faktura ${invoiceNumber} på ${parseFloat(amount).toLocaleString('nb-NO')} kr for ${job.quotes.name}`,
+        `Opprettet faktura ${invoiceNumber} på ${parseFloat(amount).toLocaleString('nb-NO')} kr for ${job.quotes?.name ?? 'Ukjent kunde'}`,
         { job_id: job.id, invoice_number: invoiceNumber, amount: parseFloat(amount) }
       );
 
@@ -92,20 +92,25 @@ export const InvoiceUploadModal = ({ job, open, onOpenChange, onSuccess }: Invoi
       });
 
       // Send email notification to customer
-      await supabase.functions.invoke('send-invoice-ready-email', {
-        body: {
-          userId: job.user_id,
-          customerName: job.quotes.name,
-          customerEmail: job.quotes.email,
-          amount: parseFloat(amount),
-          dueDate: dueDate,
-          invoiceNumber: invoiceNumber,
-        },
-      });
+      const customerEmail = job.quotes?.email;
+      if (customerEmail) {
+        await supabase.functions.invoke('send-invoice-ready-email', {
+          body: {
+            userId: job.user_id,
+            customerName: job.quotes?.name,
+            customerEmail,
+            amount: parseFloat(amount),
+            dueDate: dueDate,
+            invoiceNumber: invoiceNumber,
+          },
+        });
+      }
 
       toast({
         title: 'Faktura opprettet',
-        description: `Faktura ${invoiceNumber} er sendt til ${job.quotes.email}`,
+        description: customerEmail
+          ? `Faktura ${invoiceNumber} er sendt til ${customerEmail}`
+          : `Faktura ${invoiceNumber} er opprettet, men kunden mangler e-postadresse.`,
       });
 
       onSuccess();
@@ -140,8 +145,8 @@ export const InvoiceUploadModal = ({ job, open, onOpenChange, onSuccess }: Invoi
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="bg-muted p-3 rounded-lg">
-            <p className="text-sm font-medium">{job.quotes.name}</p>
-            <p className="text-xs text-muted-foreground">{job.quotes.description}</p>
+            <p className="text-sm font-medium">{job.quotes?.name ?? 'Ukjent kunde'}</p>
+            <p className="text-xs text-muted-foreground">{job.quotes?.description ?? ''}</p>
           </div>
 
           <div className="space-y-2">

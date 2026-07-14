@@ -65,13 +65,7 @@ export const useAdminData = (isAdmin: boolean) => {
     setActionLoading(quote.id);
     
     try {
-      const { error: quoteError } = await supabase
-        .from('quotes')
-        .update({ status: 'in_progress' })
-        .eq('id', quote.id);
-
-      if (quoteError) throw quoteError;
-
+      // 1. Opprett jobben først — feiler denne, forblir quoten 'pending' og synlig i admin
       const { error: jobError } = await supabase
         .from('jobs')
         .insert({
@@ -85,6 +79,14 @@ export const useAdminData = (isAdmin: boolean) => {
         .single();
 
       if (jobError) throw jobError;
+
+      // 2. Oppdater quote-status etter at jobben er trygt opprettet
+      const { error: quoteError } = await supabase
+        .from('quotes')
+        .update({ status: 'in_progress' })
+        .eq('id', quote.id);
+
+      if (quoteError) throw quoteError;
 
       // Opprett notifikasjon for bruker
       if (quote.user_id) {
@@ -160,27 +162,33 @@ export const useAdminData = (isAdmin: boolean) => {
           user_id: job.user_id,
           type: 'job_update',
           title: 'Jobben din er fullført',
-          message: `Oppdraget "${job.quotes.description.substring(0, 100)}" er nå ferdig. Takk for at du valgte HandyHjelp!`,
+          message: `Oppdraget "${(job.quotes?.description ?? '').substring(0, 100)}" er nå ferdig. Takk for at du valgte HandyHjelp!`,
           read: false
         });
       }
 
       await fetchData();
 
-      const customerName = job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name;
-      const emailResult = await sendJobStatusEmail({
-        customerName,
-        customerEmail: job.quotes.email,
-        jobDescription: job.quotes.description,
-        status: 'completed',
-        jobId: job.id,
-      });
+      const customerName = job.quotes
+        ? (job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name)
+        : 'Ukjent kunde';
+      const customerEmail = job.quotes?.email;
+      const jobDescription = job.quotes?.description ?? '';
+      const emailResult = customerEmail
+        ? await sendJobStatusEmail({
+            customerName,
+            customerEmail,
+            jobDescription,
+            status: 'completed',
+            jobId: job.id,
+          })
+        : { ok: false, error: 'Mangler e-postadresse for kunde' };
 
       // Log activity
       await logActivity(
         'job_completed',
         'job_management',
-        `Fullførte oppdrag for ${job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name}: "${job.quotes.description.substring(0, 50)}..."`,
+        `Fullførte oppdrag for ${customerName}: "${jobDescription.substring(0, 50)}..."`,
         { job_id: job.id, quote_id: job.quote_id }
       );
 
@@ -222,7 +230,7 @@ export const useAdminData = (isAdmin: boolean) => {
       await logActivity(
         'job_deleted',
         'job_management',
-        `Slettet oppdrag: "${job.quotes.description.substring(0, 50)}..."`,
+        `Slettet oppdrag: "${(job.quotes?.description ?? '').substring(0, 50)}..."`,
         { job_id: job.id, quote_id: job.quote_id }
       );
       

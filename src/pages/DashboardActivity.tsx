@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nb } from 'date-fns/locale';
-import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Users, AlertTriangle, ArrowRight, Star, Eye, MousePointerClick, BarChart3 } from 'lucide-react';
+import { FileText, Briefcase, ClipboardList, CalendarCheck, Receipt, Download, Loader2, CheckCircle, ChevronLeft, ChevronRight, Camera, Upload, MapPin, Clock, User, Users, AlertTriangle, ArrowRight, Star, Eye, MousePointerClick, BarChart3, AlertCircle, RefreshCw } from 'lucide-react';
 import { CardGridSkeleton, PageHeaderSkeleton, StatsSkeleton } from '@/components/ui/skeleton-loaders';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
@@ -233,6 +233,7 @@ const DashboardActivity = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [invoiceRequests, setInvoiceRequests] = useState<InvoiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [requestingInvoice, setRequestingInvoice] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [completedJobsPage, setCompletedJobsPage] = useState(1);
@@ -248,8 +249,9 @@ const DashboardActivity = () => {
   const [selectedAnalytics, setSelectedAnalytics] = useState<AnalyticsStatType>(null);
   const { isWorker, isAdmin, isOwner } = useRole();
   const { badges } = useNavigationBadges();
-  const { data: analyticsOverview } = useAnalyticsOverview(isAdmin || isOwner);
+  const { data: analyticsOverview, isError: analyticsError } = useAnalyticsOverview(isAdmin || isOwner);
   const fetchData = useCallback(async () => {
+    try {
     const {
       data: {
         user
@@ -260,14 +262,14 @@ const DashboardActivity = () => {
 
     // Alle bruker-queries parallelt
     const [
-      { data: quotesData },
-      { data: jobsData },
-      { data: agreementsData },
-      { data: invoicesData },
-      { data: requestsData },
-      { data: activityLogsData },
-      { data: emailLogsData },
-      { data: rolesData },
+      { data: quotesData, error: quotesError },
+      { data: jobsData, error: jobsError },
+      { data: agreementsData, error: agreementsError },
+      { data: invoicesData, error: invoicesError },
+      { data: requestsData, error: requestsError },
+      { data: activityLogsData, error: activityLogsError },
+      { data: emailLogsData, error: emailLogsError },
+      { data: rolesData, error: rolesError },
     ] = await Promise.all([
       supabase.from('quotes').select('*')
         .or(`user_id.eq.${user.id},email.eq.${user.email}`)
@@ -302,6 +304,8 @@ const DashboardActivity = () => {
     if (activityLogsData) setJobActivityLogs(activityLogsData as ActivityLogEntry[]);
     if (emailLogsData) setEmailLogs(emailLogsData as EmailLogEntry[]);
 
+    let hasCriticalError = !!(quotesError || jobsError || agreementsError || invoicesError || requestsError || activityLogsError || emailLogsError || rolesError);
+
     const userRoles = rolesData?.map(r => r.role) ?? [];
     const hasAdminAccess = userRoles.includes('admin') || userRoles.includes('platform_owner');
 
@@ -333,9 +337,17 @@ const DashboardActivity = () => {
         totalCustomers: customersRes.count ?? 0,
         totalCompleted: completedRes.count ?? 0,
       });
+
+      hasCriticalError = hasCriticalError || !!(adminQRes.error || adminJRes.error || adminARes.error || adminEmailRes.error || nonCustomerRoles.error || completedRes.error || customersRes.error);
     }
 
+    setLoadError(hasCriticalError);
     setLoading(false);
+    } catch (err) {
+      console.error('Error fetching dashboard activity data:', err);
+      setLoadError(true);
+      setLoading(false);
+    }
   }, []);
   useEffect(() => {
     fetchData();
@@ -396,10 +408,10 @@ const DashboardActivity = () => {
         body: {
           jobId: job.id,
           userId: userId,
-          customerName: job.quotes.name,
+          customerName: job.quotes?.name ?? 'Ukjent kunde',
           customerEmail: '',
           // Will be fetched from profile
-          jobDescription: job.quotes.description
+          jobDescription: job.quotes?.description ?? ''
         }
       });
       toast({
@@ -666,6 +678,18 @@ const DashboardActivity = () => {
   const isEmpty = quotes.length === 0 && completedJobs.length === 0 && agreements.length === 0;
 
   return <div className="space-y-6">
+      {loadError && (
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-xl border border-destructive/30 bg-destructive/5">
+          <div className="flex items-center gap-2 text-sm text-destructive">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>Noe gikk galt ved lasting av data.</span>
+          </div>
+          <Button onClick={fetchData} variant="outline" size="sm" className="gap-1.5">
+            <RefreshCw className="h-3.5 w-3.5" />
+            Prøv igjen
+          </Button>
+        </div>
+      )}
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-1">Oversikt</h1>
         <p className="text-muted-foreground">
@@ -940,7 +964,7 @@ const DashboardActivity = () => {
                 <p className="text-sm font-medium text-white/80">Publiserte prosjekter</p>
                 <Camera className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
               </div>
-              <div className="text-4xl font-bold tabular-nums tracking-tight">—</div>
+              <div className="text-2xl font-bold tabular-nums tracking-tight">Se prosjekter</div>
               <p className="text-xs mt-1 text-white/60">Se Mine innleveringer for detaljer</p>
             </div>
           </Link>
@@ -1035,7 +1059,7 @@ const DashboardActivity = () => {
                 <p className="text-xs mt-1 text-white/60">
                   {analyticsOverview
                     ? `${new Intl.NumberFormat('nb-NO').format(analyticsOverview.kpi.visitors)} unike besøkende`
-                    : 'laster…'}
+                    : analyticsError ? 'Kunne ikke laste' : 'laster…'}
                 </p>
               </div>
             </button>
@@ -1062,7 +1086,7 @@ const DashboardActivity = () => {
                 <p className="text-xs mt-1 text-white/60">
                   {analyticsOverview
                     ? `${new Intl.NumberFormat('nb-NO').format(analyticsOverview.kpi.conversions)} konverteringer`
-                    : 'laster…'}
+                    : analyticsError ? 'Kunne ikke laste' : 'laster…'}
                 </p>
               </div>
             </button>
@@ -1381,7 +1405,7 @@ const DashboardActivity = () => {
                             </Badge>
                           </div>
                           <CardTitle className="text-lg mt-1">
-                            {job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name}
+                            {job.quotes ? (job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name) : 'Ukjent kunde'}
                           </CardTitle>
                           <CardDescription>
                             Fullført {job.completed_date ? formatDistanceToNow(new Date(job.completed_date), {
@@ -1402,7 +1426,7 @@ const DashboardActivity = () => {
                   <CardContent className="space-y-3">
                     <div>
                       <p className="text-sm font-medium">Beskrivelse:</p>
-                      <p className="text-sm text-muted-foreground">{job.quotes.description}</p>
+                      <p className="text-sm text-muted-foreground">{job.quotes?.description ?? ''}</p>
                     </div>
 
                     {/* Invoice section */}

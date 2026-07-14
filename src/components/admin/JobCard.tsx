@@ -126,14 +126,23 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
   };
 
   const handleResendEmail = async () => {
+    const customerEmail = job.quotes?.email;
+    if (!customerEmail) {
+      toast({
+        title: 'Kunne ikke sende e-post',
+        description: 'Mangler e-postadresse for kunden.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setResendingEmail(true);
     try {
-      const customerName = job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name;
+      const customerName = job.quotes?.type === 'business' ? job.quotes?.company_name : job.quotes?.name;
       const { data, error } = await supabase.functions.invoke('send-job-status-email', {
         body: {
           customerName,
-          customerEmail: job.quotes.email,
-          jobDescription: job.quotes.description,
+          customerEmail,
+          jobDescription: job.quotes?.description ?? '',
           status: 'completed',
           jobId: job.id,
         },
@@ -146,7 +155,7 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
 
       toast({
         title: 'E-post sendt',
-        description: `Bekreftelse er sendt til ${job.quotes.email}.`,
+        description: `Bekreftelse er sendt til ${customerEmail}.`,
       });
     } catch (error) {
       console.error('Error resending job status email:', error);
@@ -206,9 +215,9 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-lg">
-              {job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name}
+              {job.quotes ? (job.quotes.type === 'business' ? job.quotes.company_name : job.quotes.name) : 'Ukjent kunde'}
               <Badge className="ml-2" variant="outline">
-                {job.quotes.type === 'business' ? 'Bedrift' : 'Privat'}
+                {job.quotes?.type === 'business' ? 'Bedrift' : 'Privat'}
               </Badge>
             </CardTitle>
             <CardDescription>{dateLabel}</CardDescription>
@@ -231,7 +240,7 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
       <CardContent className="space-y-4">
         <div>
           <p className="text-sm font-medium">Beskrivelse:</p>
-          <p className="text-sm text-muted-foreground">{job.quotes.description}</p>
+          <p className="text-sm text-muted-foreground">{job.quotes?.description ?? ''}</p>
         </div>
         {job.notes && (
           <div>
@@ -241,14 +250,14 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
         )}
         <div className="flex gap-4 text-sm flex-wrap">
           <div>
-            <span className="font-medium">E-post:</span> {job.quotes.email}
+            <span className="font-medium">E-post:</span> {job.quotes?.email ?? ''}
           </div>
           <div>
-            <span className="font-medium">Telefon:</span> {job.quotes.phone}
+            <span className="font-medium">Telefon:</span> {job.quotes?.phone ?? ''}
           </div>
-          {job.quotes.org_number && (
+          {job.quotes?.org_number && (
             <div>
-              <span className="font-medium">Org.nr:</span> {job.quotes.org_number}
+              <span className="font-medium">Org.nr:</span> {job.quotes?.org_number}
             </div>
           )}
         </div>
@@ -315,7 +324,7 @@ export const JobCard = ({ job, actionLoading, variant, isHighlighted, onComplete
             {onViewHistory && !job.user_id && job.quotes?.email && (
               <Button
                 variant="outline"
-                onClick={() => onViewHistory(job.quotes.email, job.quotes.type === 'business' ? (job.quotes.company_name || job.quotes.name) : job.quotes.name)}
+                onClick={() => onViewHistory(job.quotes?.email ?? '', job.quotes?.type === 'business' ? (job.quotes?.company_name || job.quotes?.name || '') : (job.quotes?.name ?? ''))}
               >
                 <History className="mr-2 h-4 w-4" /> Se historikk
               </Button>

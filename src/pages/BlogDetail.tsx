@@ -147,7 +147,7 @@ const BlogDetail = () => {
       <BreadcrumbNavigation />
       
       {/* Hero Image with Overlay */}
-      <div className="relative h-[240px] md:h-[500px] bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${post.cover_image_url})`, backgroundPosition: 'center center' }}>
+      <div className="relative h-[240px] md:h-[500px] bg-cover bg-center bg-no-repeat bg-muted" style={{ backgroundImage: `url(${post.cover_image_url})`, backgroundPosition: 'center center' }}>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
         <div className="absolute inset-0 flex items-end">
           <div className="container mx-auto px-4 py-6 md:py-12">
@@ -222,10 +222,11 @@ const BlogDetail = () => {
                     <Link key={related.id} to={`/raad/${related.slug}`}>
                       <Card className="h-full overflow-hidden group cursor-pointer card-hover-lift">
                         <div className="aspect-video bg-muted relative overflow-hidden">
-                          <img 
-                            src={related.cover_image_url} 
+                          <img
+                            src={related.cover_image_url}
                             alt={related.title}
                             className="w-full h-full object-cover object-center image-hover"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                         </div>
                         <CardHeader>

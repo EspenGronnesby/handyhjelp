@@ -7,7 +7,7 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin } from "lucide-react";
+import { Calendar, MapPin, AlertCircle, RefreshCw } from "lucide-react";
 import { EditableHero } from "@/components/EditableHero";
 import { TrustStripe } from "@/components/TrustStripe";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
@@ -34,6 +34,7 @@ const Projects = () => {
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
   const [touchedProject, setTouchedProject] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -71,11 +72,13 @@ const Projects = () => {
 
     if (error) {
       console.error("Error fetching projects:", error);
+      setError(true);
     } else {
       setProjects(data || []);
       setFilteredProjects(data || []);
+      setError(false);
     }
-    
+
     setIsLoading(false);
   };
 
@@ -164,6 +167,22 @@ const Projects = () => {
           {/* Loading State */}
           {isLoading ? (
             <ProjectGridSkeleton count={6} />
+          ) : error ? (
+            <div className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-destructive/10 flex items-center justify-center">
+                  <AlertCircle className="w-10 h-10 text-destructive" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2 font-heading">Noe gikk galt</h3>
+                <p className="text-muted-foreground mb-6">
+                  Vi klarte ikke å hente prosjektene. Sjekk internettforbindelsen og prøv igjen.
+                </p>
+                <Button onClick={fetchProjects} variant="outline">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Prøv igjen
+                </Button>
+              </div>
+            </div>
           ) : (
             <>
               {/* Projects Grid */}
@@ -207,6 +226,7 @@ const Projects = () => {
                           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
                             isShowingAfter(project.id) ? "opacity-0" : "opacity-100"
                           }`}
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
                         {/* After Image */}
                         <img
@@ -216,6 +236,7 @@ const Projects = () => {
                           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
                             isShowingAfter(project.id) ? "opacity-100" : "opacity-0"
                           }`}
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         />
 
                         {/* Badges */}

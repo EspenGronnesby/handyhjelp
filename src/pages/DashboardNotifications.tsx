@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import {
   Bell, FileText, Briefcase, Star,
   CreditCard, Users, Mail, ArrowRight, ScrollText,
+  AlertCircle, RefreshCw,
 } from 'lucide-react';
 import { NotificationListSkeleton } from '@/components/ui/skeleton-loaders';
 import { formatDistanceToNow } from 'date-fns';
@@ -204,6 +205,7 @@ const getActionLink = (notification: Notification): ActionLink | null => {
 const DashboardNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -227,6 +229,7 @@ const DashboardNotifications = () => {
   }, []);
 
   const fetchNotifications = async () => {
+    setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -238,6 +241,9 @@ const DashboardNotifications = () => {
 
     if (!error && data) {
       setNotifications(data as unknown as Notification[]);
+      setError(false);
+    } else {
+      setError(true);
     }
     setLoading(false);
   };
@@ -259,6 +265,22 @@ const DashboardNotifications = () => {
 
   if (loading) {
     return <NotificationListSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="card-professional p-12 text-center">
+        <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+        </div>
+        <p className="font-semibold text-lg mb-1">Noe gikk galt</p>
+        <p className="text-sm text-muted-foreground mb-4">Kunne ikke hente varsler. Prøv igjen.</p>
+        <Button onClick={fetchNotifications} variant="outline">
+          <RefreshCw className="mr-2 h-4 w-4" />
+          Prøv igjen
+        </Button>
+      </div>
+    );
   }
 
   const unreadCount = notifications.filter(n => !n.read).length;

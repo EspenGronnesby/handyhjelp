@@ -5,7 +5,8 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, Search, Tag } from "lucide-react";
+import { Calendar, Clock, Search, Tag, AlertCircle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { Link } from "react-router-dom";
@@ -40,21 +41,26 @@ const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState("alle");
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchBlogPosts = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+
+    if (data && !error) {
+      setBlogPosts(data);
+      setError(false);
+    } else {
+      setError(true);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchBlogPosts = async () => {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('status', 'published')
-        .order('published_at', { ascending: false });
-
-      if (data && !error) {
-        setBlogPosts(data);
-      }
-      setLoading(false);
-    };
-
     fetchBlogPosts();
   }, []);
 
@@ -176,10 +182,23 @@ const Blog = () => {
                     </Card>
                   ))}
                 </div>
+              ) : error ? (
+                <Card className="p-12 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <AlertCircle className="h-8 w-8 text-destructive" />
+                    <p className="text-muted-foreground">
+                      Noe gikk galt. Kunne ikke hente artiklene.
+                    </p>
+                    <Button onClick={fetchBlogPosts} variant="outline" size="sm">
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Prøv igjen
+                    </Button>
+                  </div>
+                </Card>
               ) : filteredPosts.length === 0 ? (
                 <Card className="p-12 text-center">
                   <p className="text-muted-foreground">
-                    {blogPosts.length === 0 
+                    {blogPosts.length === 0
                       ? "Vi legger snart ut nyttige råd og artikler om eiendomsvedlikehold."
                       : "Ingen artikler funnet. Prøv et annet søk eller kategori."}
                   </p>
@@ -190,10 +209,11 @@ const Blog = () => {
                     <Link key={post.id} to={`/raad/${post.slug}`}>
                       <Card className="h-full overflow-hidden group cursor-pointer card-hover-lift">
                         <div className="aspect-video bg-muted relative overflow-hidden">
-                          <img 
-                            src={post.cover_image_url} 
+                          <img
+                            src={post.cover_image_url}
                             alt={post.title}
                             className="w-full h-full object-cover object-center image-hover"
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />
                           <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
                             {categoryLabels[post.category]}

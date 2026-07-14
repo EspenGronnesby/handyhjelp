@@ -162,7 +162,7 @@ const AppRouter = () => {
   const isKnownRoute = [
     '/', '/tilbud', '/fast-avtale', '/takk-avtale', '/faq', '/prosjekter', '/om-oss',
     '/kontakt', '/tjenester', '/blog', '/raad', '/takk', '/personvern', '/cookies',
-    '/vilkaar', '/tilbakemelding', '/auth', '/dashboard', '/owner', '/worker',
+    '/vilkaar', '/tilbakemelding', '/anmeldelse', '/auth', '/dashboard', '/owner', '/worker',
     '/.lovable/oauth/consent'
   ].some(route => location.pathname === route || location.pathname.startsWith(route + '/'));
 

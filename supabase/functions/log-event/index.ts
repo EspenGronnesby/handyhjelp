@@ -30,6 +30,68 @@ function clamp(s: unknown, max = 500): string | null {
   return v.length > max ? v.slice(0, max) : v;
 }
 
+// Vindu-basert rate limiting: maks 60 events per minutt per IP
+// (analytics er høyfrekvent, så cooldown-modellen fra submit-quick-feedback passer ikke)
+const RATE_WINDOW_MS = 60000;
+const RATE_MAX_PER_WINDOW = 60;
+const rateLimits = new Map<string, { windowStart: number; count: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+
+  if (rateLimits.size > 10000) {
+    for (const [key, value] of rateLimits.entries()) {
+      if (now - value.windowStart > RATE_WINDOW_MS) rateLimits.delete(key);
+    }
+  }
+
+  const entry = rateLimits.get(ip);
+  if (!entry || now - entry.windowStart >= RATE_WINDOW_MS) {
+    rateLimits.set(ip, { windowStart: now, count: 1 });
+    return true;
+  }
+  entry.count++;
+  return entry.count <= RATE_MAX_PER_WINDOW;
+}
+
+function getClientIP(req: Request): string {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+}
+
+// Utled user_id fra JWT i Authorization-header — klient-oppgitt user_id kan ikke stoles på.
+// supabase.functions.invoke sender automatisk brukerens token når en sesjon finnes,
+// så innloggede brukere får samme user_id som før; anonyme får null.
+async function getUserIdFromAuth(req: Request): Promise<string | null> {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return null;
+  try {
+    const client = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data, error } = await client.auth.getUser();
+    if (error) return null;
+    return data.user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+const METADATA_MAX_BYTES = 2000;
+
+function safeMetadata(metadata: unknown): Record<string, unknown> {
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return {};
+  try {
+    if (JSON.stringify(metadata).length > METADATA_MAX_BYTES) return {};
+    return metadata as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -37,6 +99,13 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (!checkRateLimit(getClientIP(req))) {
+    return new Response(JSON.stringify({ error: "Too many requests" }), {
+      status: 429,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
@@ -79,10 +148,10 @@ Deno.serve(async (req) => {
           ? body.device
           : null,
       session_id: clamp(body.session_id, 80),
-      user_id: body.user_id ?? null,
+      user_id: await getUserIdFromAuth(req),
       related_quote_id: body.related_quote_id ?? null,
       related_agreement_id: body.related_agreement_id ?? null,
-      metadata: body.metadata && typeof body.metadata === "object" ? body.metadata : {},
+      metadata: safeMetadata(body.metadata),
     };
 
     const { error } = await supabase.from("analytics_events").insert(row);

@@ -14,14 +14,14 @@ export const useAdmin = () => {
       }
 
       try {
+        // Samme semantikk som useRole: platform_owner regnes alltid som admin
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', userId)
-          .eq('role', 'admin')
-          .single();
+          .in('role', ['admin', 'platform_owner']);
 
-        if (!error && data) {
+        if (!error && data && data.length > 0) {
           setIsAdmin(true);
         } else {
           setIsAdmin(false);

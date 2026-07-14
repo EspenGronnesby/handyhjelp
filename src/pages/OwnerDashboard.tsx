@@ -89,7 +89,7 @@ const OwnerDashboard = () => {
           </TabsList>
 
           <TabsContent value="users">
-            <RoleManagement />
+            <RoleManagement canManageRoles={true} />
           </TabsContent>
 
 

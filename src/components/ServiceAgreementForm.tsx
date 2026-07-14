@@ -47,6 +47,22 @@ export const ServiceAgreementForm = () => {
       customerType: "borettslag",
       services: [],
       fixedContactPerson: false,
+      // Tom streng (ikke undefined) så zod-meldingene på norsk vises
+      // i stedet for zods engelske "Required" ved stegvalidering
+      unitsCount: "",
+      totalArea: "",
+      address: "",
+      otherServices: "",
+      frequency: "",
+      contractDuration: "",
+      customContractDuration: "",
+      currentSituation: "",
+      contactPerson: "",
+      contactRole: "",
+      customContactRole: "",
+      email: "",
+      phone: "",
+      additionalInfo: "",
     },
   });
 
@@ -123,6 +139,26 @@ export const ServiceAgreementForm = () => {
 
       navigate("/takk-avtale");
     });
+  };
+
+  // Felter som må valideres per steg før man kan gå videre ("Neste").
+  // Kun feltene som faktisk vises/er påkrevd på det aktuelle steget er med.
+  const stepFields: Record<number, (keyof ServiceAgreementFormData)[]> = {
+    1: ["customerType"],
+    2: ["address"],
+    3: ["services"],
+    4: ["frequency", "contractDuration"],
+    5: ["currentSituation"],
+    6: ["contactPerson", "contactRole", "email", "phone"],
+    7: [],
+  };
+
+  const handleNext = async () => {
+    const fields = stepFields[step] ?? [];
+    const isValid = fields.length === 0 ? true : await form.trigger(fields);
+    if (isValid) {
+      next();
+    }
   };
 
   const renderStep = () => {
@@ -622,7 +658,7 @@ export const ServiceAgreementForm = () => {
                 )}
               </Button>
             ) : (
-              <Button type="button" onClick={next}>
+              <Button type="button" onClick={handleNext}>
                 Neste
                 <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
