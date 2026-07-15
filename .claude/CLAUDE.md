@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Rule Precedence
 
-**Bruker har ALLTID høyeste prioritet.** Se `.claude/rules/precedence.md` for detaljer.
+**Bruker har ALLTID høyeste prioritet.** Se felles regel `precedence` (arves fra ~/.claude/rules/).
 
 ```
 #1 BRUKER (din eksplisitte instruks) → trumfer alt
@@ -18,30 +18,24 @@ This file provides guidance to Claude Code when working with this repository.
 
 ---
 
-## .claude/ Structure
+## Oppsett: felles + prosjektspesifikt
+
+**Generiske skills, regler og agenter arves automatisk fra `~/.claude/`**
+(kilde: `~/Vibe-kode/Projects/claude-felles/` — rediger der, aldri her):
+- Skills: scope-guard, verify, security-review, secret-guard, ui-ux-review, webapp-testing, kunnskapsbase
+- Regler: precedence, severity, kommunikasjon
+- Agenter: verifier, utforsker, lesson-skriver, security-reviewer
+
+**I dette prosjektet ligger kun det prosjektspesifikke:**
 
 ```
 .claude/
-├── CLAUDE.md                      # ← DU ER HER. Global kontekst og kart.
-│
-├── rules/                         # Harde begrensninger
-│   ├── precedence.md              # Hva vinner ved konflikt
-│   └── severity.md                # Feilhåndtering (🔴🟡🔵)
-│
-├── skills/                        # Aktive atferder (hvordan tenke)
-│   ├── scope-guard.md             # Forhindre feature creep
-│   ├── security-review.md         # Sikkerhetstenkning
-│   └── verify.md                  # Dobbeltsjekk og kvalitet
-│
-├── docs/                          # Referansemateriale (fasit/historikk)
-│   ├── security.md                # Lang sikkerhetsreferanse
-│   └── lessons.md                 # Erfaringer og løsninger
-│
-└── architectural_patterns.md      # Prosjektspesifikke kodemønstre
+├── CLAUDE.md                      # ← DU ER HER
+├── rules/supabase-patterns.md
+├── docs/  (security.md, lessons.md, backlog.md)
+├── architectural_patterns.md
+└── _arkiv/                        # Gamle dupliserte filer (nå i claude-felles)
 ```
-
-**Skills** = korte filer som sier hvordan du skal tenke.
-**Docs** = lange filer du slår opp i når du trenger detaljer.
 
 ---
 
@@ -175,59 +169,30 @@ The owner is learning. Always explain simply what's happening and why. Give a br
 ## Automatic Behaviors
 
 ### Before ANY code task
-1. **Scope guard** (`.claude/skills/scope-guard.md`):
+1. **Scope guard** (felles skill: scope-guard):
    - Kan du definere oppgaven i én setning? Hvis nei → spør bruker
    - Løs nøyaktig det som ble spurt om, ikke mer
    - Ikke legg til dependencies, refaktorer, eller endre filer uten å spørre
 
-2. **Arbeidsmodus-vurdering:**
-   Vurder oppgavens størrelse og kompleksitet, og anbefal riktig modus:
+2. **Arbeidsmodus og agent-hierarki:**
+   Hovedsesjonen planlegger og skriver kritisk kode. Rutinearbeid delegeres til billige agenter:
 
    ```
    VANLIG SESSION (standard):
-   → Oppgaven handler om én ting (fiks bug, legg til komponent, endre stil)
-   → Endringer i 1-3 filer
-   → Sekvensiell arbeid (steg A før steg B)
-   → Billigst og raskest
+   → Én ting, 1-3 filer, sekvensielt. Billigst.
 
-   SUBAGENTS:
-   → Oppgaven har 2-3 uavhengige deler som ikke påvirker hverandre
-   → Delene trenger ikke kommunisere
-   → Eksempel: "Oppdater 5 sider med ny footer" (samme jobb, mange filer)
-   → Raskere enn én og én, billigere enn team
+   DELEGER TIL AGENT (bruk aktivt, sparer credits):
+   → Lete/lese i mange filer          → utforsker (haiku)
+   → Verifisere etter kodeendringer   → verifier (haiku)
+   → Dokumentere løst problem         → lesson-skriver (haiku)
+   → Auth/RLS/Edge Functions endret   → security-reviewer (sonnet)
 
-   AGENT TEAMS:
-   → Oppgaven har flere ULIKE deler som berører ulike filer
-   → Delene må koordinere (frontend trenger å vite API-format fra backend)
-   → Eksempel: "Bygg nytt notifikasjonssystem" (UI + API + DB + tester)
-   → Kraftigst, men bruker 4-5x tokens
+   STOR OPPGAVE (planlegging + mye koding):
+   → Anbefal brukeren `/model opusplan` (sterk modell planlegger, billig koder)
+
+   AGENT TEAMS (sjelden, 4-5x tokens):
+   → Kun ved flere ULIKE deler som må koordinere. SPØR ALLTID bruker først.
    ```
-
-   **Hvis vanlig session:** Bare fortsett, ikke si noe.
-   **Hvis subagents eller team anbefales:**
-
-   ```
-   ┌─────────────────────────────────────────────────────────────────┐
-   │  🛠️ ARBEIDSMODUS                                                │
-   │                                                                 │
-   │  Denne oppgaven har [X] uavhengige deler:                       │
-   │  • [del 1]                                                      │
-   │  • [del 2]                                                      │
-   │  • [del 3]                                                      │
-   │                                                                 │
-   │  Anbefaling: [subagents/agent team]                              │
-   │  Hvorfor: [kort forklaring, f.eks. "delene berører ulike filer   │
-   │  og må koordinere API-format"]                                   │
-   │  Kostnad: ~[X]x token-bruk vs vanlig session                    │
-   │                                                                 │
-   │  Alternativ: Jeg kan også gjøre det som vanlig session,         │
-   │  men det tar lengre tid fordi [grunn].                           │
-   │                                                                 │
-   │  Hva foretrekker du?                                            │
-   └─────────────────────────────────────────────────────────────────┘
-   ```
-
-   **VENT** på brukers valg før du starter arbeidet.
 
 ### Before solving a problem
 1. Check `.claude/docs/lessons.md` for similar issues
@@ -235,17 +200,17 @@ The owner is learning. Always explain simply what's happening and why. Give a br
 3. If not found, solve and then document
 
 ### When touching auth, RLS, input, or Edge Functions
-1. Aktiver **security review** (`.claude/skills/security-review.md`)
+1. Aktiver **security review** (felles skill: security-review — eller deleger til security-reviewer-agenten)
 2. Sjekk false positive-listen i `.claude/docs/security.md` FØR du flagger
 3. Kun flagg det du kan bevise
 
 ### After changing code
-1. Run **verification** (`.claude/skills/verify.md`) unless bruker sier hopp over
+1. Run **verification** (deleger til verifier-agenten) unless bruker sier hopp over
 2. Report result using the formats in that file
 
 ### After solving a problem
 1. Ask: "Skal jeg legge dette til i docs/lessons.md?"
-2. If yes, add using the format in that file
+2. If yes: deleger til lesson-skriver-agenten (dokumenterer + synker Kunnskapsbasen)
 
 ### Before writing new hooks, forms, or components
 1. Check `.claude/architectural_patterns.md` for existing patterns
@@ -255,7 +220,7 @@ The owner is learning. Always explain simply what's happening and why. Give a br
 
 ## Severity Levels
 
-See `.claude/rules/severity.md` for full details.
+Full details: felles regel `severity` (arves fra ~/.claude/rules/).
 
 | Level | Handling |
 |-------|----------|
@@ -295,7 +260,7 @@ Status:
 
 ## Verification (Quick Reference)
 
-Full details in `.claude/skills/verify.md`.
+Full details: felles skill `verify`. Deleger helst til verifier-agenten (billig).
 
 ```
 WHEN TO VERIFY:
