@@ -21,7 +21,7 @@ This file provides guidance to Claude Code when working with this repository.
 ## Oppsett: felles + prosjektspesifikt
 
 **Generiske skills, regler og agenter arves automatisk fra `~/.claude/`**
-(kilde: `~/Vibe-kode/Projects/claude-felles/` — rediger der, aldri her):
+(kilde: `~/Vibe-kode/System/claude-felles/` — rediger der, aldri her):
 - Skills: scope-guard, verify, security-review, secret-guard, ui-ux-review, webapp-testing, kunnskapsbase
 - Regler: precedence, severity, kommunikasjon
 - Agenter: verifier, utforsker, lesson-skriver, security-reviewer

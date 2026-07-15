@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -q 'lessons\\.md' && bash '/Users/espen/Vibe-kode/Projects/Kunnskapsbase/_scripts/sync-lessons.sh' >/dev/null 2>&1; exit 0"
+            "command": "INPUT=$(cat); echo \"$INPUT\" | grep -q 'lessons\\.md' && bash '/Users/espen/Vibe-kode/System/Kunnskapsbase/_scripts/sync-lessons.sh' >/dev/null 2>&1; exit 0"
           }
         ]
       }
