@@ -208,6 +208,12 @@ The owner is learning. Always explain simply what's happening and why. Give a br
 1. Run **verification** (deleger til verifier-agenten) unless bruker sier hopp over
 2. Report result using the formats in that file
 
+### After ANY UI change
+1. Oppdater `.claude/docs/design.md` (relevant seksjon + endringsloggen med dato)
+2. Ved designtilbakemelding fra Espen («liker ikke…», «mer luft…», «alltid…»):
+   spør om preferansen også skal inn i den FELLES designprofilen
+   (`~/Vibe-kode/System/claude-felles/skills/min-designprofil/`) så alle prosjekter lærer den
+
 ### After solving a problem
 1. Ask: "Skal jeg legge dette til i docs/lessons.md?"
 2. If yes: deleger til lesson-skriver-agenten (dokumenterer + synker Kunnskapsbasen)
