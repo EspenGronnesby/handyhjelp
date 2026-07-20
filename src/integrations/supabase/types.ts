@@ -1036,6 +1036,7 @@ export type Database = {
           created_at: string
           customer_email: string | null
           customer_name: string | null
+          external_id: string | null
           feedback_type: string | null
           id: string
           is_verified_customer: boolean | null
@@ -1056,6 +1057,7 @@ export type Database = {
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
+          external_id?: string | null
           feedback_type?: string | null
           id?: string
           is_verified_customer?: boolean | null
@@ -1076,6 +1078,7 @@ export type Database = {
           created_at?: string
           customer_email?: string | null
           customer_name?: string | null
+          external_id?: string | null
           feedback_type?: string | null
           id?: string
           is_verified_customer?: boolean | null
