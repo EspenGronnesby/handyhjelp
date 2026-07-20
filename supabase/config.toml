@@ -50,3 +50,6 @@ verify_jwt = true
 
 [functions.mcp]
 verify_jwt = false
+
+[functions.sync-facebook-reviews]
+verify_jwt = false
