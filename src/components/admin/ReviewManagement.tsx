@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Star, CheckCircle, XCircle, Clock, Search, Loader2, MessageSquare, User, Briefcase, EyeOff, Trash2, Plus, Building2, BadgeCheck } from 'lucide-react';
 import CreateReviewModal from './CreateReviewModal';
+import { GoogleIcon, FacebookIcon } from '@/components/icons/brand-icons';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,6 +60,7 @@ const ReviewManagement = () => {
   const [activeTab, setActiveTab] = useState('pending');
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; reviewId: string | null }>({ open: false, reviewId: null });
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [syncingFacebook, setSyncingFacebook] = useState(false);
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -128,6 +131,41 @@ const ReviewManagement = () => {
   useEffect(() => {
     fetchReviews();
   }, []);
+
+  const handleSyncFacebook = async () => {
+    setSyncingFacebook(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-facebook-reviews');
+
+      if (error) {
+        // Hent den faktiske feilmeldingen fra funksjonens svar hvis den finnes
+        let message = error.message;
+        if (error instanceof FunctionsHttpError) {
+          const body = await error.context.json().catch(() => null);
+          if (body?.error) message = body.error;
+        }
+        throw new Error(message);
+      }
+      if (data?.error) throw new Error(data.error);
+
+      toast({
+        title: 'Facebook-synk fullført',
+        description: data?.message || `${data?.imported ?? 0} nye anmeldelser hentet`,
+      });
+      if ((data?.imported ?? 0) > 0) {
+        fetchReviews();
+      }
+    } catch (error) {
+      console.error('Error syncing Facebook reviews:', error);
+      toast({
+        title: 'Facebook-synk feilet',
+        description: error instanceof Error ? error.message : 'Ukjent feil',
+        variant: 'destructive',
+      });
+    } finally {
+      setSyncingFacebook(false);
+    }
+  };
 
   const handleUpdateStatus = async (reviewId: string, newStatus: 'approved' | 'rejected') => {
     setActionLoading(reviewId);
@@ -269,6 +307,7 @@ const ReviewManagement = () => {
   const ReviewCard = ({ review }: { review: Review }) => {
     const isGeneralFeedback = review.feedback_type === 'general' || review.feedback_type === 'manual';
     const isGoogleReview = review.source === 'google';
+    const isFacebookReview = review.source === 'facebook';
     const customerName = review.customer_name || review.profiles?.full_name || review.jobs?.quotes?.name || 'Ukjent kunde';
     const customerEmail = isGeneralFeedback ? review.customer_email : review.profiles?.email;
     const serviceType = review.jobs?.quotes?.type;
@@ -288,16 +327,13 @@ const ReviewManagement = () => {
               <div className="flex items-center gap-3">
                 <div className={cn(
                   "w-10 h-10 rounded-full flex items-center justify-center",
-                  isGoogleReview ? "bg-blue-100 dark:bg-blue-900/30" : 
+                  isGoogleReview || isFacebookReview ? "bg-blue-100 dark:bg-blue-900/30" :
                   review.company_name ? "bg-primary/10" : "bg-primary/10"
                 )}>
                   {isGoogleReview ? (
-                    <svg className="h-5 w-5" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
+                    <GoogleIcon className="h-5 w-5" />
+                  ) : isFacebookReview ? (
+                    <FacebookIcon className="h-5 w-5" />
                   ) : review.company_name ? (
                     <Building2 className="h-5 w-5 text-primary" />
                   ) : (
@@ -310,6 +346,11 @@ const ReviewManagement = () => {
                     {isGoogleReview && (
                       <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                         Google
+                      </Badge>
+                    )}
+                    {isFacebookReview && (
+                      <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        Facebook
                       </Badge>
                     )}
                     {review.is_verified_customer && (
@@ -556,10 +597,25 @@ const ReviewManagement = () => {
               className="pl-10"
             />
           </div>
-          <Button onClick={() => setCreateModalOpen(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Legg til anmeldelse
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleSyncFacebook}
+              disabled={syncingFacebook}
+              className="gap-2"
+            >
+              {syncingFacebook ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FacebookIcon className="h-4 w-4" />
+              )}
+              Synk fra Facebook
+            </Button>
+            <Button onClick={() => setCreateModalOpen(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Legg til anmeldelse
+            </Button>
+          </div>
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>

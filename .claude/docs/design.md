@@ -41,4 +41,5 @@ Gradienter (hero/kort/CTA) og 3 skyggenivåer (card → elevated → hero) gir d
 
 ## Endringslogg
 
+- 2026-07-18: Facebook som anmeldelseskilde — Facebook-logo i CreateReviewModal (kildevalg), sitat-boblen i TestimonialsSection (hvit bakgrunn, som Google) og blå «Facebook»-badge i admin-listen (ReviewManagement). Merkevare-ikoner (Google/Facebook) samlet i delt fil `src/components/icons/brand-icons.tsx` — brukes ved nye kilder senere. I tillegg: «Synk fra Facebook»-knapp (outline, med Facebook-logo) ved siden av «Legg til anmeldelse» i admin — henter anmeldelser automatisk via Edge Function `sync-facebook-reviews`.
 - 2026-07-15: Dokument opprettet (analyse av eksisterende kodebase)
