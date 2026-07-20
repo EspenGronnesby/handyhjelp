@@ -369,12 +369,10 @@ const TestimonialsSection = () => {
           </p>
         </div>
 
-        {/* Trust Badge with Google branding */}
+        {/* Trust Badge - kildenøytral, siden anmeldelser kommer fra flere plattformer */}
         <div className="mt-12 text-center">
           <div className="inline-flex items-center gap-3 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-6 py-4 rounded-full shadow-sm">
-            {/* Google logo */}
-            <GoogleIcon className="h-6 w-6" />
-            <span className="font-bold text-lg">Google</span>
+            <BadgeCheck className="h-6 w-6" />
             <span className="font-medium">
               {reviews.length}+ fornøyde kunder
             </span>
