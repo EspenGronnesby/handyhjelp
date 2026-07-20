@@ -41,5 +41,6 @@ Gradienter (hero/kort/CTA) og 3 skyggenivåer (card → elevated → hero) gir d
 
 ## Endringslogg
 
+- 2026-07-20: Trust-badge nederst i TestimonialsSection gjort kildenøytral — «Google»-logo/tekst fjernet siden anmeldelser nå kommer fra flere plattformer (var misvisende). Viser nå kun BadgeCheck-ikon + antall fornøyde kunder. Kort-boblen øverst på hvert anmeldelseskort viser fortsatt riktig plattformlogo (Google/Facebook) automatisk per anmeldelse — uendret, fungerte allerede korrekt.
 - 2026-07-18: Facebook som anmeldelseskilde — Facebook-logo i CreateReviewModal (kildevalg), sitat-boblen i TestimonialsSection (hvit bakgrunn, som Google) og blå «Facebook»-badge i admin-listen (ReviewManagement). Merkevare-ikoner (Google/Facebook) samlet i delt fil `src/components/icons/brand-icons.tsx` — brukes ved nye kilder senere. I tillegg: «Synk fra Facebook»-knapp (outline, med Facebook-logo) ved siden av «Legg til anmeldelse» i admin — henter anmeldelser automatisk via Edge Function `sync-facebook-reviews`.
 - 2026-07-15: Dokument opprettet (analyse av eksisterende kodebase)
