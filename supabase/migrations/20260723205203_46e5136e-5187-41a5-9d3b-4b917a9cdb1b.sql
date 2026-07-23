@@ -1,0 +1,1 @@
+CREATE POLICY "Support users can view their own access grants" ON public.support_access FOR SELECT TO authenticated USING (auth.uid() = support_user_id);
