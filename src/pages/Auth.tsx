@@ -136,7 +136,14 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate(redirectTarget);
+      let stored: string | null = null;
+      try { stored = sessionStorage.getItem('post_login_redirect'); } catch {}
+      if (stored && stored.startsWith('/') && !stored.startsWith('//')) {
+        try { sessionStorage.removeItem('post_login_redirect'); } catch {}
+        navigate(stored);
+      } else {
+        navigate(redirectTarget);
+      }
     }
   }, [user, navigate, redirectTarget]);
 
