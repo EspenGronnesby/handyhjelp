@@ -44,23 +44,84 @@ const Auth = () => {
   const nextPath = rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : null;
   const redirectTarget = nextPath ?? '/dashboard';
 
+  const [googleHelpVisible, setGoogleHelpVisible] = useState(false);
+
+  const detectInAppBrowser = () => {
+    const ua = navigator.userAgent || '';
+    return /(FBAN|FBAV|Instagram|Snapchat|Line|MicroMessenger|TikTok|LinkedInApp)/i.test(ua);
+  };
+
   const handleGoogleSignIn = async () => {
-    setLoading(true);
+    // Lagre intended destination — bruk enkelt redirect_uri for å unngå allow-list mismatch
+    if (nextPath) {
+      try { sessionStorage.setItem('post_login_redirect', nextPath); } catch {}
+    }
+
+    // In-app browsere (Facebook, Instagram, TikTok osv.) blokkerer nesten alltid OAuth
+    if (detectInAppBrowser()) {
+      setGoogleHelpVisible(true);
+      toast({
+        title: 'Åpne i vanlig nettleser',
+        description: 'Google-innlogging fungerer ikke i denne appen. Åpne handyhjelp.no i Safari eller Chrome, eller bruk e-post + passord.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Popup-blocker sniff — mange nettlesere blokkerer stille
+    let popupProbe: Window | null = null;
     try {
-      const redirectUri = nextPath
-        ? `${window.location.origin}/auth?next=${encodeURIComponent(nextPath)}`
-        : window.location.origin;
+      popupProbe = window.open('', '_blank', 'width=1,height=1');
+    } catch {}
+    if (!popupProbe) {
+      setGoogleHelpVisible(true);
+      toast({
+        title: 'Popup blokkert',
+        description: 'Tillat popups for handyhjelp.no i nettleseren, eller logg inn med e-post og passord under.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    popupProbe.close();
+
+    setLoading(true);
+    // Timeout-vakt: hvis brokeren henger i > 60 s, gi opp og informer brukeren
+    const timeoutId = window.setTimeout(() => {
+      setLoading(false);
+      setGoogleHelpVisible(true);
+      toast({
+        title: 'Google-innlogging tok for lang tid',
+        description: 'Popup-vinduet svarte ikke. Prøv igjen, eller bruk e-post + passord under.',
+        variant: 'destructive',
+      });
+    }, 60000);
+
+    try {
       const { error } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: redirectUri,
+        redirect_uri: window.location.origin,
       });
       if (error) throw error;
+      // Ved suksess vil auth-state-change trigge redirect via useEffect
     } catch (error: any) {
-      console.error('Google sign in error:', error);
-      toast({
-        title: 'Feil',
-        description: 'Kunne ikke logge inn med Google. Prøv igjen.',
-        variant: 'destructive'
+      window.clearTimeout(timeoutId);
+      console.error('Google sign in error:', {
+        name: error?.name,
+        message: error?.message,
+        ua: navigator.userAgent,
       });
+      const msg = String(error?.message ?? '').toLowerCase();
+      let description = 'Kunne ikke logge inn med Google. Prøv igjen, eller bruk e-post + passord.';
+      if (msg.includes('popup') && msg.includes('closed')) {
+        description = 'Popup-vinduet ble lukket før innlogging var fullført. Prøv igjen.';
+      } else if (msg.includes('popup') && msg.includes('block')) {
+        description = 'Popup ble blokkert av nettleseren. Tillat popups for handyhjelp.no og prøv igjen.';
+      } else if (msg.includes('access_denied') || msg.includes('denied')) {
+        description = 'Innlogging ble avbrutt på Google. Prøv igjen hvis dette var en feil.';
+      } else if (msg.includes('network') || msg.includes('fetch')) {
+        description = 'Nettverksfeil. Sjekk internettforbindelsen og prøv igjen.';
+      }
+      setGoogleHelpVisible(true);
+      toast({ title: 'Feil', description, variant: 'destructive' });
       setLoading(false);
     }
   };
@@ -75,7 +136,14 @@ const Auth = () => {
 
   useEffect(() => {
     if (user) {
-      navigate(redirectTarget);
+      let stored: string | null = null;
+      try { stored = sessionStorage.getItem('post_login_redirect'); } catch {}
+      if (stored && stored.startsWith('/') && !stored.startsWith('//')) {
+        try { sessionStorage.removeItem('post_login_redirect'); } catch {}
+        navigate(stored);
+      } else {
+        navigate(redirectTarget);
+      }
     }
   }, [user, navigate, redirectTarget]);
 
@@ -541,6 +609,11 @@ const Auth = () => {
               )}
               Google
             </Button>
+            {googleHelpVisible && (
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Fungerer ikke Google? Tillat popups for handyhjelp.no, eller bruk e-post + passord over. Åpner du siden fra Facebook/Instagram? Trykk «Åpne i Safari/Chrome» først.
+              </p>
+            )}
           </form>
           <div className="mt-4 text-center text-sm text-muted-foreground">
             {isLogin ? (
