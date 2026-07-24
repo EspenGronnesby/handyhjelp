@@ -609,6 +609,11 @@ const Auth = () => {
               )}
               Google
             </Button>
+            {googleHelpVisible && (
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Fungerer ikke Google? Tillat popups for handyhjelp.no, eller bruk e-post + passord over. Åpner du siden fra Facebook/Instagram? Trykk «Åpne i Safari/Chrome» først.
+              </p>
+            )}
           </form>
           <div className="mt-4 text-center text-sm text-muted-foreground">
             {isLogin ? (
