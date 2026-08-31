@@ -207,8 +207,6 @@ export const CreateJobModal = ({
                             {!profile.id && (
                               <Badge variant="outline" className="text-[10px]">Gjest</Badge>
                             )}
-                            <div className="hidden">
-                            </div>
                             <Check
                               className={cn(
                                 "h-4 w-4",
