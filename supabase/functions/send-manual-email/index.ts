@@ -100,6 +100,12 @@ interface Recipient {
   type: 'customer' | 'external';
 }
 
+interface EmailAttachment {
+  filename: string;
+  content: string; // base64 (uten data-URI-prefiks)
+  contentType?: string;
+}
+
 interface ManualEmailRequest {
   recipients: Recipient[];
   subject: string;
@@ -109,7 +115,9 @@ interface ManualEmailRequest {
   includeFeedbackButton: boolean;
   senderName: string;
   senderRole: string;
+  attachments?: EmailAttachment[];
 }
+
 
 interface SendResult {
   email: string;
