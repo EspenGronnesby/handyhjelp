@@ -38,7 +38,7 @@ export const GuestCustomerModal = ({ email, name, open, onClose }: GuestCustomer
   const handleSendEmail = () => {
     if (!email) return;
     onClose();
-    navigate(`/admin?category=mail&tab=compose&to=${encodeURIComponent(email)}&toName=${encodeURIComponent(name || '')}`);
+    navigate(`/dashboard/admin?category=mail&tab=compose&to=${encodeURIComponent(email)}&toName=${encodeURIComponent(name || '')}`);
   };
 
   useEffect(() => {
