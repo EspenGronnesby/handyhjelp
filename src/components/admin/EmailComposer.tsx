@@ -24,10 +24,12 @@ import {
   Users,
   MessageSquare,
   Loader2,
-  FileX
+  FileX,
+  Paperclip
 } from 'lucide-react';
 import { useEmailTemplates, EmailTemplate } from '@/hooks/useEmailTemplates';
-import { useSendEmail, EmailRecipient, SendEmailData } from '@/hooks/useSendEmail';
+import { useSendEmail, EmailRecipient, SendEmailData, EmailAttachment } from '@/hooks/useSendEmail';
+import { useToast } from '@/hooks/use-toast';
 import { EmailConfirmModal } from './EmailConfirmModal';
 import { EmailPreviewModal } from './EmailPreviewModal';
 import { supabase } from '@/integrations/supabase/client';
@@ -83,6 +85,8 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
   // Find current template from ID
   const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || null;
   
+  const { toast } = useToast();
+  const [attachments, setAttachments] = useState<EmailAttachment[]>([]);
   const [externalEmail, setExternalEmail] = useState('');
   const [externalName, setExternalName] = useState('');
   
@@ -187,6 +191,55 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
     setRecipients(recipients.filter(r => r.email !== email));
   };
 
+  const MAX_TOTAL_BYTES = 8 * 1024 * 1024;
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} kB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const totalAttachmentSize = attachments.reduce((sum, a) => sum + a.size, 0);
+
+  const handleFilesSelected = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const incoming = Array.from(files);
+
+    if (attachments.length + incoming.length > 5) {
+      toast({ title: 'For mange vedlegg', description: 'Maks 5 vedlegg per e-post.', variant: 'destructive' });
+      return;
+    }
+
+    let running = totalAttachmentSize;
+    const added: EmailAttachment[] = [];
+
+    for (const file of incoming) {
+      running += file.size;
+      if (running > MAX_TOTAL_BYTES) {
+        toast({ title: 'Vedlegg for store', description: 'Samlet størrelse kan ikke overstige 8 MB.', variant: 'destructive' });
+        return;
+      }
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+      });
+      added.push({
+        filename: file.name,
+        content: base64,
+        contentType: file.type || undefined,
+        size: file.size,
+      });
+    }
+
+    setAttachments(prev => [...prev, ...added]);
+  };
+
+  const removeAttachment = (filename: string) => {
+    setAttachments(prev => prev.filter(a => a.filename !== filename));
+  };
+
   // Handle send
   const handleSend = () => {
     if (recipients.length === 0 || !subject || !content) return;
@@ -201,6 +254,7 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
       templateId: selectedTemplate?.id,
       templateName: selectedTemplate?.name,
       includeFeedbackButton,
+      attachments: attachments.length > 0 ? attachments : undefined,
     };
 
     const result = await sendEmail(data);
@@ -208,6 +262,7 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
     if (result && result.summary.sent > 0) {
       // Reset form on success - clear draft
       clearDraft();
+      setAttachments([]);
       setConfirmModalOpen(false);
     }
   };
@@ -417,6 +472,54 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
             <p className="text-xs text-muted-foreground">
               Teksten formateres automatisk med HandyHjelp-branding
             </p>
+          </div>
+
+          {/* Attachments */}
+          <div className="space-y-2">
+            <Label htmlFor="email-attachments">Vedlegg (valgfritt)</Label>
+            <div className="flex items-center gap-3 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => document.getElementById('email-attachments')?.click()}
+                className="min-h-[44px]"
+              >
+                <Paperclip className="mr-2 h-4 w-4" />
+                Legg til filer
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                Maks 5 filer, 8 MB totalt {attachments.length > 0 && `· ${formatSize(totalAttachmentSize)} brukt`}
+              </span>
+            </div>
+            <input
+              id="email-attachments"
+              type="file"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                handleFilesSelected(e.target.files);
+                e.target.value = '';
+              }}
+            />
+            {attachments.length > 0 && (
+              <div className="space-y-1 rounded-md border p-2">
+                {attachments.map((att) => (
+                  <div key={att.filename} className="flex items-center gap-2 p-2 rounded-md bg-muted/50">
+                    <Paperclip className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-sm truncate flex-1">{att.filename}</span>
+                    <span className="text-xs text-muted-foreground flex-shrink-0">{formatSize(att.size)}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 flex-shrink-0"
+                      onClick={() => removeAttachment(att.filename)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Feedback button toggle */}
