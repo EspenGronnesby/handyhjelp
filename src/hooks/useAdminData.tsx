@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Quote, Job, Profile, ServiceAgreement } from '@/types/admin';
+import { Quote, Job, Profile, ServiceAgreement, JobCustomer } from '@/types/admin';
 import { logActivity } from '@/hooks/useActivityLog';
 const JOBS_PER_PAGE = 10;
 
@@ -286,7 +286,7 @@ export const useAdminData = (isAdmin: boolean) => {
 
   // New function: Create job manually for an existing customer
   const handleCreateJob = async (
-    profile: Profile,
+    profile: JobCustomer,
     description: string,
     address: string | null,
     action: 'register' | 'start' | 'complete'
@@ -301,7 +301,11 @@ export const useAdminData = (isAdmin: boolean) => {
       if (action === 'start') quoteStatus = 'in_progress';
       if (action === 'complete') quoteStatus = 'completed';
 
-      // 1. Create quote with profile data
+      // 1. Create quote with customer data (user_id kan være null for gjestekunder)
+      const displayName = profile.customer_type === 'business'
+        ? (profile.company_name || profile.full_name)
+        : profile.full_name;
+
       const quoteData = {
         user_id: profile.id,
         type: profile.customer_type || 'private',
@@ -331,25 +335,28 @@ export const useAdminData = (isAdmin: boolean) => {
           .insert({
             quote_id: quote.id,
             user_id: profile.id,
+            customer_email: profile.email,
             status: 'in_progress',
             started_at: new Date().toISOString(),
           });
 
         if (jobError) throw jobError;
 
-        // Send notification to user
-        await supabase.from('notifications').insert({
-          user_id: profile.id,
-          type: 'job_update',
-          title: 'Nytt oppdrag startet',
-          message: `Vi har startet arbeidet med: "${description.substring(0, 100)}"`,
-          read: false
-        });
+        // Send notification to user (kun registrerte brukere)
+        if (profile.id) {
+          await supabase.from('notifications').insert({
+            user_id: profile.id,
+            type: 'job_update',
+            title: 'Nytt oppdrag startet',
+            message: `Vi har startet arbeidet med: "${description.substring(0, 100)}"`,
+            read: false
+          });
+        }
 
         // Send email via edge function
         supabase.functions.invoke('send-job-status-email', {
           body: {
-            customerName: profile.customer_type === 'business' ? profile.company_name : profile.full_name,
+            customerName: displayName,
             customerEmail: profile.email,
             jobDescription: description,
             status: 'started',
@@ -362,6 +369,7 @@ export const useAdminData = (isAdmin: boolean) => {
           .insert({
             quote_id: quote.id,
             user_id: profile.id,
+            customer_email: profile.email,
             status: 'completed',
             completed_date: new Date().toISOString(),
           })
@@ -370,18 +378,20 @@ export const useAdminData = (isAdmin: boolean) => {
 
         if (jobError) throw jobError;
 
-        // Send notification to user
-        await supabase.from('notifications').insert({
-          user_id: profile.id,
-          type: 'job_update',
-          title: 'Oppdraget ditt er fullført',
-          message: `Oppdraget "${description.substring(0, 100)}" er nå ferdig. Takk for at du valgte HandyHjelp!`,
-          read: false
-        });
+        // Send notification to user (kun registrerte brukere)
+        if (profile.id) {
+          await supabase.from('notifications').insert({
+            user_id: profile.id,
+            type: 'job_update',
+            title: 'Oppdraget ditt er fullført',
+            message: `Oppdraget "${description.substring(0, 100)}" er nå ferdig. Takk for at du valgte HandyHjelp!`,
+            read: false
+          });
+        }
 
         // Send completion email via edge function
         const emailResult = await sendJobStatusEmail({
-          customerName: profile.customer_type === 'business' ? profile.company_name : profile.full_name,
+          customerName: displayName,
           customerEmail: profile.email,
           jobDescription: description,
           status: 'completed',
@@ -402,8 +412,8 @@ export const useAdminData = (isAdmin: boolean) => {
       await logActivity(
         actionLabels[action] as 'job_created' | 'job_started' | 'job_completed',
         'job_management',
-        `Opprettet oppdrag for ${profile.customer_type === 'business' ? profile.company_name : profile.full_name}: "${description.substring(0, 50)}..." (${action === 'register' ? 'registrert' : action === 'start' ? 'startet' : 'fullført'})`,
-        { profile_id: profile.id, action }
+        `Opprettet oppdrag for ${displayName}: "${description.substring(0, 50)}..." (${action === 'register' ? 'registrert' : action === 'start' ? 'startet' : 'fullført'})`,
+        { profile_id: profile.id, guest: !profile.id, email: profile.email, action }
       );
 
       const messages = {

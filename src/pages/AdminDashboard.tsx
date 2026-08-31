@@ -224,6 +224,18 @@ const AdminDashboard = () => {
     setSearchParams({ category: activeCategory, tab }, { replace: true });
   }, [activeCategory, setSearchParams]);
 
+  // Hold state i sync med URL (f.eks. når man navigerer hit fra gjestekunde-modalen)
+  useEffect(() => {
+    const cat = searchParams.get('category') as CategoryKey | null;
+    const tab = searchParams.get('tab');
+    if (cat && VALID_CATEGORIES.includes(cat) && cat !== activeCategory) {
+      setActiveCategory(cat);
+    }
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     if (!adminLoading && !isAdmin) {
       navigate('/dashboard');

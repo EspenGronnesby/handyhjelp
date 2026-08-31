@@ -3,9 +3,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Loader2, Mail, UserX, Briefcase, CheckCircle, Send, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Quote, Job, STATUS_LABELS, STATUS_COLORS } from '@/types/admin';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
@@ -31,6 +33,13 @@ export const GuestCustomerModal = ({ email, name, open, onClose }: GuestCustomer
   const [jobs, setJobs] = useState<Job[]>([]);
   const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
   const [expandedEmail, setExpandedEmail] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const handleSendEmail = () => {
+    if (!email) return;
+    onClose();
+    navigate(`/dashboard/admin?category=mail&tab=compose&to=${encodeURIComponent(email)}&toName=${encodeURIComponent(name || '')}`);
+  };
 
   useEffect(() => {
     if (email && open) {
@@ -233,6 +242,13 @@ export const GuestCustomerModal = ({ email, name, open, onClose }: GuestCustomer
             </TabsContent>
           </Tabs>
         )}
+
+        <div className="pt-4 border-t">
+          <Button className="w-full min-h-[44px]" onClick={handleSendEmail}>
+            <Mail className="h-4 w-4 mr-2" />
+            Send e-post til kunden
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
