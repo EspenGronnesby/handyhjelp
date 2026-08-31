@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, UserX, Mail, Phone, Building2 } from 'lucide-react';
+import { Loader2, Search, UserX, Mail, Phone, Building2, UserPlus } from 'lucide-react';
 import { Profile } from '@/types/admin';
 import { CustomerCard } from './CustomerCard';
 import { CustomerDetailModal } from './CustomerDetailModal';
 import { GuestCustomerModal } from './GuestCustomerModal';
+import { CreateGuestCustomerModal } from './CreateGuestCustomerModal';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 
