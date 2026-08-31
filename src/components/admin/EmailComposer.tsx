@@ -33,6 +33,7 @@ import { EmailPreviewModal } from './EmailPreviewModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useFormDraft } from '@/hooks/useFormDraft';
 import { useAuth } from '@/hooks/useAuth';
+import { useSearchParams } from 'react-router-dom';
 
 interface Profile {
   id: string;
@@ -85,6 +86,7 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
   const [externalEmail, setExternalEmail] = useState('');
   const [externalName, setExternalName] = useState('');
   
+  const [searchParams, setSearchParams] = useSearchParams();
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
@@ -108,6 +110,24 @@ export function EmailComposer({ profiles }: EmailComposerProps) {
   const setSelectedTemplateId = useCallback((templateId: string) => {
     setDraftData(prev => ({ ...prev, selectedTemplateId: templateId }));
   }, [setDraftData]);
+
+  // Forhåndsutfyll mottaker fra URL (f.eks. fra gjestekunde-modalen)
+  useEffect(() => {
+    const to = searchParams.get('to');
+    if (!to) return;
+    const toName = searchParams.get('toName') || undefined;
+
+    setDraftData(prev =>
+      prev.recipients.some(r => r.email === to)
+        ? prev
+        : { ...prev, recipients: [...prev.recipients, { email: to, name: toName || undefined, type: 'external' as const }] }
+    );
+
+    const next = new URLSearchParams(searchParams);
+    next.delete('to');
+    next.delete('toName');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setDraftData, setSearchParams]);
 
   // Handle template selection
   const handleTemplateChange = (templateId: string) => {
