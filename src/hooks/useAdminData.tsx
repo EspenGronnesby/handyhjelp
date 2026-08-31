@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Quote, Job, Profile, ServiceAgreement } from '@/types/admin';
+import { Quote, Job, Profile, ServiceAgreement, JobCustomer } from '@/types/admin';
 import { logActivity } from '@/hooks/useActivityLog';
 const JOBS_PER_PAGE = 10;
 
