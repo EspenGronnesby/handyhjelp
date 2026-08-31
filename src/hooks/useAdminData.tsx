@@ -412,8 +412,8 @@ export const useAdminData = (isAdmin: boolean) => {
       await logActivity(
         actionLabels[action] as 'job_created' | 'job_started' | 'job_completed',
         'job_management',
-        `Opprettet oppdrag for ${profile.customer_type === 'business' ? profile.company_name : profile.full_name}: "${description.substring(0, 50)}..." (${action === 'register' ? 'registrert' : action === 'start' ? 'startet' : 'fullført'})`,
-        { profile_id: profile.id, action }
+        `Opprettet oppdrag for ${displayName}: "${description.substring(0, 50)}..." (${action === 'register' ? 'registrert' : action === 'start' ? 'startet' : 'fullført'})`,
+        { profile_id: profile.id, guest: !profile.id, email: profile.email, action }
       );
 
       const messages = {
