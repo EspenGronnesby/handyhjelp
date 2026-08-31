@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Loader2, User, Building2, Mail, Phone, MapPin, Check, ChevronsUpDown } from 'lucide-react';
-import { Profile } from '@/types/admin';
+import { Profile, JobCustomer } from '@/types/admin';
+import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
 type JobAction = 'register' | 'start' | 'complete';
@@ -20,7 +21,7 @@ interface CreateJobModalProps {
   onClose: () => void;
   profiles: Profile[];
   onCreateJob: (
-    profile: Profile,
+    profile: JobCustomer,
     description: string,
     address: string | null,
     action: JobAction
@@ -33,7 +34,8 @@ export const CreateJobModal = ({
   profiles, 
   onCreateJob 
 }: CreateJobModalProps) => {
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<JobCustomer | null>(null);
+  const [guests, setGuests] = useState<JobCustomer[]>([]);
   const [description, setDescription] = useState('');
   const [address, setAddress] = useState('');
   const [action, setAction] = useState<JobAction>('register');
@@ -41,18 +43,57 @@ export const CreateJobModal = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter profiles based on search query
+  // Hent gjestekunder (henvendelser uten bruker) når modalen åpnes
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('quotes')
+        .select('name, email, company_name, org_number, phone, type, address, created_at')
+        .is('user_id', null)
+        .order('created_at', { ascending: false });
+
+      if (cancelled) return;
+      const seen = new Map<string, JobCustomer>();
+      for (const q of data || []) {
+        if (!seen.has(q.email)) {
+          seen.set(q.email, {
+            id: null,
+            full_name: q.name,
+            email: q.email,
+            phone: q.phone,
+            address: q.address,
+            customer_type: q.type,
+            company_name: q.company_name,
+            org_number: q.org_number,
+          });
+        }
+      }
+      setGuests(Array.from(seen.values()));
+    })();
+    return () => { cancelled = true; };
+  }, [open]);
+
+  const allCustomers: JobCustomer[] = useMemo(() => {
+    const registered: JobCustomer[] = profiles.map(p => ({ ...p }));
+    const registeredEmails = new Set(registered.map(p => p.email.toLowerCase()));
+    return [...registered, ...guests.filter(g => !registeredEmails.has(g.email.toLowerCase()))];
+  }, [profiles, guests]);
+
+  // Filter customers based on search query
   const filteredProfiles = useMemo(() => {
-    if (!searchQuery) return profiles;
+    const list = allCustomers;
+    if (!searchQuery) return list;
     const query = searchQuery.toLowerCase();
-    return profiles.filter(
+    return list.filter(
       p => 
         p.email.toLowerCase().includes(query) ||
         p.full_name.toLowerCase().includes(query) ||
         (p.company_name && p.company_name.toLowerCase().includes(query)) ||
         (p.phone && p.phone.includes(query))
     );
-  }, [profiles, searchQuery]);
+  }, [allCustomers, searchQuery]);
 
   const handleSubmit = async () => {
     if (!selectedProfile || !description.trim()) return;
@@ -93,7 +134,7 @@ export const CreateJobModal = ({
         <DialogHeader>
           <DialogTitle>Opprett oppdrag manuelt</DialogTitle>
           <DialogDescription>
-            Opprett et oppdrag for en eksisterende kunde basert på henvendelse via telefon eller e-post.
+            Opprett et oppdrag for en registrert kunde eller en gjestekunde, basert på henvendelse via telefon eller e-post.
           </DialogDescription>
         </DialogHeader>
 
@@ -136,8 +177,8 @@ export const CreateJobModal = ({
                     <CommandGroup>
                       {filteredProfiles.slice(0, 10).map((profile) => (
                         <CommandItem
-                          key={profile.id}
-                          value={profile.id}
+                          key={profile.email}
+                          value={`${profile.full_name} ${profile.email}`}
                           onSelect={() => {
                             setSelectedProfile(profile);
                             setSearchOpen(false);
@@ -163,10 +204,15 @@ export const CreateJobModal = ({
                                 {profile.email}
                               </div>
                             </div>
+                            {!profile.id && (
+                              <Badge variant="outline" className="text-[10px]">Gjest</Badge>
+                            )}
+                            <div className="hidden">
+                            </div>
                             <Check
                               className={cn(
                                 "h-4 w-4",
-                                selectedProfile?.id === profile.id ? "opacity-100" : "opacity-0"
+                                selectedProfile?.email === profile.email ? "opacity-100" : "opacity-0"
                               )}
                             />
                           </div>
@@ -197,6 +243,9 @@ export const CreateJobModal = ({
                   <Badge variant="outline">
                     {selectedProfile.customer_type === 'business' ? 'Bedrift' : 'Privat'}
                   </Badge>
+                  {!selectedProfile.id && (
+                    <Badge variant="secondary" className="text-xs">Gjestekunde</Badge>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Mail className="h-3.5 w-3.5" />
