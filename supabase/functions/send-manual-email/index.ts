@@ -353,7 +353,41 @@ const handler = async (req: Request): Promise<Response> => {
     return errorResponse("Invalid JSON in request body", 400);
   }
 
-  const { recipients, subject, content, templateId, templateName, includeFeedbackButton, senderName, senderRole } = requestData;
+  const { recipients, subject, content, templateId, templateName, includeFeedbackButton, senderName, senderRole, attachments } = requestData;
+
+  // Valider vedlegg
+  const MAX_ATTACHMENTS = 5;
+  const MAX_TOTAL_BYTES = 8 * 1024 * 1024; // 8 MB samlet
+  let preparedAttachments: { filename: string; content: string; content_type?: string }[] | undefined;
+
+  if (attachments && attachments.length > 0) {
+    if (attachments.length > MAX_ATTACHMENTS) {
+      return errorResponse(`Maks ${MAX_ATTACHMENTS} vedlegg per e-post`, 400);
+    }
+    let totalBytes = 0;
+    preparedAttachments = [];
+    for (const att of attachments) {
+      if (!att?.filename || typeof att.content !== "string" || !att.content) {
+        return errorResponse("Ugyldig vedlegg", 400);
+      }
+      const base64 = att.content.includes(",") && att.content.startsWith("data:")
+        ? att.content.split(",")[1]
+        : att.content;
+      if (!/^[A-Za-z0-9+/=\s]+$/.test(base64)) {
+        return errorResponse(`Ugyldig filinnhold: ${att.filename}`, 400);
+      }
+      totalBytes += Math.floor((base64.replace(/\s/g, "").length * 3) / 4);
+      if (totalBytes > MAX_TOTAL_BYTES) {
+        return errorResponse("Vedleggene er for store (maks 8 MB totalt)", 400);
+      }
+      preparedAttachments.push({
+        filename: att.filename.replace(/[\r\n"]/g, "").slice(0, 200),
+        content: base64.replace(/\s/g, ""),
+        content_type: att.contentType || undefined,
+      });
+    }
+  }
+
 
   // Validate required fields
   if (!recipients || recipients.length === 0) {
