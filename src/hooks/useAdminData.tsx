@@ -286,7 +286,7 @@ export const useAdminData = (isAdmin: boolean) => {
 
   // New function: Create job manually for an existing customer
   const handleCreateJob = async (
-    profile: Profile,
+    profile: JobCustomer,
     description: string,
     address: string | null,
     action: 'register' | 'start' | 'complete'
