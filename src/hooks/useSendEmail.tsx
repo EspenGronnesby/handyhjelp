@@ -9,6 +9,13 @@ export interface EmailRecipient {
   type: 'customer' | 'external';
 }
 
+export interface EmailAttachment {
+  filename: string;
+  content: string; // base64
+  contentType?: string;
+  size: number;
+}
+
 export interface SendEmailData {
   recipients: EmailRecipient[];
   subject: string;
@@ -16,6 +23,7 @@ export interface SendEmailData {
   templateId?: string;
   templateName?: string;
   includeFeedbackButton: boolean;
+  attachments?: EmailAttachment[];
 }
 
 interface SendResult {
@@ -93,6 +101,11 @@ export function useSendEmail() {
           templateId: data.templateId,
           templateName: data.templateName,
           includeFeedbackButton: data.includeFeedbackButton,
+          attachments: data.attachments?.map(a => ({
+            filename: a.filename,
+            content: a.content,
+            contentType: a.contentType,
+          })),
           senderName: profile?.full_name || user.email,
           senderRole: senderRole,
         },
