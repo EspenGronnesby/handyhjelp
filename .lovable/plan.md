@@ -1,41 +1,42 @@
-## Hva som sannsynligvis skjedde
+# Gjestekunder: opprett manuelt og avslutt prosjekter
 
-Google-knappen bruker `lovable.auth.signInWithOAuth("google", ...)`. Denne helperen åpner et popup-vindu mot Lovables OAuth-broker (`oauth.lovable.app`), som håndterer Google-redirecten og sender tokenene tilbake til appen via en `web_message`. "Bildet med Lovable-logoen" du så er broker-siden — den blir hengende når:
+## Bakgrunn
 
-1. **Popup blir blokkert** av nettleseren (vanligste årsaken, spesielt på mobil-Safari og strenge annonseblokkere). Broker-fanen åpner ikke, eller den åpner men parent-vinduet får aldri `web_message` fordi popup ble stengt.
-2. **Tredjepartscookies er blokkert** — brokeren klarer ikke å fullføre Google-callbacken.
-3. **`redirect_uri` ligger ikke i allow-listen.** Vi sender `${origin}/auth?next=...` når det finnes en `next`-param. Query-parametre kan noen ganger feile mot allow-list matching, avhengig av konfig.
-4. **Stale/hengt broker-sesjon** — hvis brukeren tidligere har avbrutt en OAuth-flow.
+I dag dukker en "gjestekunde" bare opp i admin hvis det finnes en forespørsel (quote) uten bruker knyttet til e-posten. Det finnes ingen måte å legge inn en kunde som aldri har bestilt via nettsiden. Derfor kan du ikke opprette jobb, fullføre den og sende sluttmail på vanlig måte for f.eks. hjordisjohansen@hotmail.com.
 
-Symptomet «kom et bilde med Lovable-logoen og jeg kom ikke videre» stemmer best med (1) eller (2): popup åpnet broker-siden, men parent fikk aldri callback → knappen står i loading-state uten feilmelding.
+Merk: Du kan allerede i dag sende en enkelt e-post til adressen via E-post → Send e-post → "Legg til ekstern mottaker". Det som mangler er selve gjestekunden og prosjektet/jobben bak den.
 
-Diagnosen er ikke 100 % bekreftet uten reproduksjon; første steg i planen er derfor å legge inn instrumentering som gir oss ekte signal neste gang.
+## Det som bygges
 
-## Endringer (kun `src/pages/Auth.tsx` og `src/integrations/lovable/index.ts` er ikke aktuelt — auto-generert)
+### 1. Ny knapp: "Ny gjestekunde"
+Plasseres i Brukere → Kunder, ved siden av søkefeltet.
 
-### 1. Robust `handleGoogleSignIn` i `src/pages/Auth.tsx`
-- **Timeout-vakt (60 s):** hvis `signInWithOAuth` verken returnerer `redirected`, feil eller setter session innen 60 s, resett `loading` og vis en forklarende feilmelding med hjelp-tekst («Popup ble blokkert? Tillat popups for handyhjelp.no, eller bruk e-post + passord under.»).
-- **Popup-blocker sniff:** før vi kaller helperen, gjør en rask `window.open('', '_blank')` og lukk den umiddelbart. Hvis returverdien er `null`, vet vi at popups er blokkert — vis melding før vi i det hele tatt starter OAuth-flowen.
-- **Feilkategorisering:** map kjente feilmeldinger (`popup_closed`, `popup_blocked`, `access_denied`, nettverk) til norsk tekst i toast-en, i stedet for generisk «Kunne ikke logge inn med Google».
-- **Logging:** `console.error` med `error.name`/`error.message` + `navigator.userAgent` så vi kan matche mot fremtidige rapporter.
+Skjema (modal):
+- Navn (påkrevd)
+- E-post (påkrevd)
+- Telefon (valgfritt)
+- Adresse (valgfritt)
+- Kundetype: privat / bedrift (+ firmanavn og org.nr ved bedrift)
+- Beskrivelse av oppdraget (påkrevd)
 
-### 2. Forenkle `redirect_uri`
-- Alltid sende `redirect_uri: window.location.origin` (fjerne `?next=` fra Google-flowen). Vi lagrer `nextPath` i `sessionStorage` før vi starter OAuth, og `useEffect` som allerede navigerer på `user` leser det og redirect'er dit. Dette eliminerer allow-list-matching som feilkilde og matcher mønsteret i Lovable-dokumentasjonen.
+Ved lagring opprettes en oppdragsforespørsel uten brukerkonto, markert som manuelt registrert. Kunden vises umiddelbart i gjestelisten og kan åpnes i gjestekunde-kortet med historikk, jobber og e-poster.
 
-### 3. Fallback-UI når Google feiler
-- Under Google-knappen: en liten, dempet hjelpetekst som først vises etter en mislykket forsøk: «Fungerer ikke Google? Bruk e-post + passord under, eller [tilbakestill passord]».
-- Behold e-post/passord som fullverdig alternativ (allerede tilfellet).
+### 2. Opprett oppdrag for gjestekunde
+"Opprett oppdrag manuelt" utvides slik at kundesøket også viser gjestekunder (ikke bare registrerte brukere). Velger du en gjest, opprettes jobben knyttet til e-postadressen i stedet for en brukerkonto. Samme valg som i dag: registrer / start / fullfør direkte.
 
-### 4. Verifiseringssteg (etter implementasjon)
-- Manuelt: test Google-innlogging fra `https://handyhjelp.no` i Chrome desktop, Safari iOS, og en profil der popups er blokkert. Bekreft at (a) suksess redirect'er til `/dashboard`, (b) blokkert popup gir tydelig feilmelding umiddelbart, (c) timeout gir feilmelding etter 60 s.
-- Sjekke browser-konsollen for de nye loggene.
+### 3. Sluttmail til gjestekunde
+Fra gjestekunde-kortet legges det til en "Send e-post"-knapp som åpner e-postkomposisjonen med adressen forhåndsutfylt som ekstern mottaker, slik at du kan bruke en mal (f.eks. "Jobben er ferdig") og sende sluttmail med informasjon.
 
-## Hva vi *ikke* endrer
+Fullføring av jobb for gjestekunde bruker eksisterende status-e-post-flyt via jobbens e-postadresse.
 
-- Ingen endringer i `src/integrations/lovable/index.ts` (auto-generert).
-- Ingen endringer i backend, RLS eller Supabase-config — dette er ren frontend-hardening av auth-flowen.
-- Ingen bytte til `supabase.auth.signInWithOAuth` direkte — Lovable Cloud krever managed helper.
+## Teknisk
 
-## Åpent spørsmål
-
-Vet du hvilken nettleser + enhet du var på da problemet skjedde (mobil Safari, Chrome desktop, in-app browser fra f.eks. Facebook/Instagram)? In-app browsere er kjent for å blokkere OAuth-popups — hvis det var der, bør vi i tillegg vise en «Åpne i Safari/Chrome»-hint. Si fra hvis du husker det, ellers bygger jeg den generelle løsningen over.
+- Ingen ny tabell. Gjestekunden lagres som rad i `quotes` med `user_id = null`; `jobs.customer_email` brukes videre som i dag.
+- Nye/endrede filer:
+  - `src/components/admin/CreateGuestCustomerModal.tsx` (ny)
+  - `src/components/admin/AllCustomersPanel.tsx` — knapp + refresh etter lagring
+  - `src/components/admin/CreateJobModal.tsx` — gjestekunder i kundesøket
+  - `src/hooks/useAdminData.tsx` — støtte for jobb uten `user_id` (setter `customer_email`)
+  - `src/components/admin/GuestCustomerModal.tsx` — "Send e-post"-knapp
+  - `src/pages/AdminDashboard.tsx` — kobling til e-postfanen med forhåndsutfylt mottaker
+- Sjekker at gjeldende tilgangsregler tillater admin å opprette forespørsel uten bruker; hvis ikke, legges en migrasjon til for det.
