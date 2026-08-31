@@ -29,6 +29,7 @@ export const AllCustomersPanel = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
   const [selectedGuest, setSelectedGuest] = useState<{ email: string; name: string } | null>(null);
+  const [createGuestOpen, setCreateGuestOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -87,14 +88,20 @@ export const AllCustomersPanel = () => {
 
   return (
     <div className="space-y-6">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          className="pl-9"
-          placeholder="Søk på navn, e-post, telefon eller firma..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            placeholder="Søk på navn, e-post, telefon eller firma..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <Button className="min-h-[44px]" onClick={() => setCreateGuestOpen(true)}>
+          <UserPlus className="h-4 w-4 mr-2" />
+          Ny gjestekunde
+        </Button>
       </div>
 
       {loading ? (
@@ -176,6 +183,15 @@ export const AllCustomersPanel = () => {
         profile={selectedProfile}
         open={!!selectedProfile}
         onClose={() => setSelectedProfile(null)}
+      />
+
+      <CreateGuestCustomerModal
+        open={createGuestOpen}
+        onClose={() => setCreateGuestOpen(false)}
+        onCreated={(guest) => {
+          fetchData();
+          setSelectedGuest(guest);
+        }}
       />
 
       <GuestCustomerModal
