@@ -434,7 +434,11 @@ const handler = async (req: Request): Promise<Response> => {
         to: [recipient.email],
         subject: subject,
         html: emailHtml,
+        ...(preparedAttachments && preparedAttachments.length > 0
+          ? { attachments: preparedAttachments }
+          : {}),
       });
+
 
       if (emailResponse.error) {
         throw emailResponse.error;
