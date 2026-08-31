@@ -61,6 +61,19 @@ export interface Profile {
   created_at: string;
 }
 
+// Kunde som kan få oppdrag: enten registrert bruker (id satt) eller gjestekunde (id = null)
+export interface JobCustomer {
+  id: string | null;
+  full_name: string;
+  email: string;
+  phone?: string | null;
+  address?: string | null;
+  customer_type?: string | null;
+  company_name?: string | null;
+  org_number?: string | null;
+}
+
+
 export interface ServiceAgreement {
   id: string;
   customer_type: string;
