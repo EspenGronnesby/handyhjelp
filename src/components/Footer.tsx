@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, Clock, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import handyhjelpLogo from '@/assets/handyhjelp-logo-new.webp';
 import handyhjelpLogoFooter from '@/assets/handyhjelp-logo-footer.webp';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
