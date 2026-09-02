@@ -103,11 +103,11 @@ const Index = () => {
 
         <GuaranteeSection />
 
-        <LazySection minHeight="700px">
+        <LazySection minHeight="700px" fallback={<SectionFallback rows={3} />}>
           <ProjectsSection />
         </LazySection>
 
-        <LazySection minHeight="500px">
+        <LazySection minHeight="500px" fallback={<SectionFallback rows={3} />}>
           <TestimonialsSection />
         </LazySection>
 
