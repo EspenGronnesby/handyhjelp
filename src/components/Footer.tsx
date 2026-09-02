@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, Clock, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import handyhjelpLogoFooter from '@/assets/handyhjelp-logo-footer.webp';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useEditableContent } from '@/hooks/useEditableContent';
@@ -24,7 +23,6 @@ const isValidSocialUrl = (url: string | undefined): boolean => {
 };
 
 export const Footer = () => {
-  const { resolvedTheme } = useTheme();
   const { editMode, isAdmin } = useEditMode();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
