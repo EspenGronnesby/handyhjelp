@@ -212,6 +212,8 @@ const Blog = () => {
                           <img
                             src={post.cover_image_url}
                             alt={post.title}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover object-center image-hover"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />

@@ -193,6 +193,7 @@ const ProjectDetail = () => {
                   <img
                     src={project.before_image_url}
                     alt={`${project.title} - før`}
+                    decoding="async"
                     className="max-w-full max-h-full object-contain object-center rounded-lg"
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
@@ -226,6 +227,8 @@ const ProjectDetail = () => {
                   <img
                     src={project.after_image_url}
                     alt={`${project.title} - etter`}
+                    loading="lazy"
+                    decoding="async"
                     className="max-w-full max-h-full object-contain object-center rounded-lg"
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
