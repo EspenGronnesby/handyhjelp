@@ -195,7 +195,7 @@ const Index = () => {
           </div>
         </section>
 
-        <LazySection minHeight="400px">
+        <LazySection minHeight="400px" fallback={<SectionFallback rows={1} />}>
           <div id="quote-standalone">
             <EditableBottomCTA />
           </div>
