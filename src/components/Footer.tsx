@@ -74,10 +74,14 @@ export const Footer = () => {
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
             {/* Kolonne 1: HandyHjelp Info */}
             <div className="col-span-2 md:col-span-1">
+              {/* Footeren har alltid mørk bakgrunn (bg-secondary) — bruk derfor
+                  alltid den lyse logoen så den er lesbar i alle temaer. */}
               <img 
                 alt="HandyHjelp - Levert med kvalitet" 
                 className="h-16 md:h-20 w-auto object-contain mb-4" 
-                src={resolvedTheme === 'blue' ? handyhjelpLogoFooter : handyhjelpLogo}
+                loading="lazy"
+                decoding="async"
+                src={handyhjelpLogoFooter}
               />
               <p className="text-sm mb-4 opacity-90">
                 {footerData.description}
