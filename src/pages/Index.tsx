@@ -30,6 +30,18 @@ const EditableBottomCTA = lazy(() => import("@/components/EditableBottomCTA").th
 const Footer = lazy(() => import("@/components/Footer").then(m => ({ default: m.Footer })));
 const StickyMobileCTA = lazy(() => import("@/components/StickyMobileCTA").then(m => ({ default: m.StickyMobileCTA })));
 
+// Lett plassholder som viser konturen av innhold mens seksjonen lastes
+const SectionFallback = ({ rows = 3 }: { rows?: number }) => (
+  <div className="container mx-auto px-4 py-16 md:py-24" aria-hidden="true">
+    <div className="mx-auto mb-10 h-7 w-56 animate-pulse rounded-md bg-muted" />
+    <div className="grid gap-4 md:grid-cols-3">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="h-48 animate-pulse rounded-xl bg-muted" />
+      ))}
+    </div>
+  </div>
+);
+
 // Component for Services Section Heading
 const ServicesHeading = () => {
   const { editMode, isAdmin } = useEditMode();
