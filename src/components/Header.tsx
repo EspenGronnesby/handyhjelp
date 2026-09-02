@@ -12,8 +12,8 @@ import { LogoSettingsModal } from "@/components/LogoSettingsModal";
 import { ContactInfoEditModal } from "@/components/ContactInfoEditModal";
 import { ThemeToggleButton } from "@/components/ThemeToggle";
 import { useHeaderVisibility } from "@/hooks/useHeaderVisibility";
-import handyhjelpLogo from '@/assets/handyhjelp-logo-new.png';
-import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
+import handyhjelpLogo from '@/assets/handyhjelp-logo-new.webp';
+import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.webp';
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

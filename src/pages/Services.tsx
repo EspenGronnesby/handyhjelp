@@ -5,7 +5,7 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { useEffect } from "react";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
-import servicesBackground from "@/assets/hero-tjenester.png";
+import servicesBackground from "@/assets/hero-tjenester.webp";
 import { EditableCTABox } from "@/components/EditableCTABox";
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 import { EditableHero } from "@/components/EditableHero";
@@ -59,9 +59,16 @@ const Services = () => {
 
       {/* Hero Section — static background (no parallax) */}
       <div className="relative min-h-[75svh] md:min-h-[600px] flex items-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${heroImage})` }}
+        <img
+          src={heroImage}
+          alt=""
+          aria-hidden="true"
+          width={1920}
+          height={1080}
+          decoding="async"
+          // @ts-expect-error fetchpriority er gyldig HTML-attributt, ennaa ikke i React-typene
+          fetchpriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
         />
 
         {/* Gradient overlay for readability */}

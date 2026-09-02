@@ -225,6 +225,8 @@ const BlogDetail = () => {
                           <img
                             src={related.cover_image_url}
                             alt={related.title}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover object-center image-hover"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           />

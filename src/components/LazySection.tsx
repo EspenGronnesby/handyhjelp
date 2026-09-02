@@ -47,7 +47,11 @@ export const LazySection = ({
   }, [shouldRender, rootMargin]);
 
   return (
-    <div ref={ref} style={!shouldRender ? { minHeight } : undefined}>
+    <div
+      ref={ref}
+      className={shouldRender ? 'lazy-section-in' : undefined}
+      style={!shouldRender ? { minHeight } : undefined}
+    >
       {shouldRender ? <Suspense fallback={fallback}>{children}</Suspense> : fallback}
     </div>
   );

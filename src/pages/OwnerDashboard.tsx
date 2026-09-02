@@ -5,7 +5,7 @@ import { useRole } from '@/hooks/useRole';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Loader2, Users, Palette, ScrollText, Home, Shield, UserSearch } from 'lucide-react';
-import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
+import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.webp';
 import { RoleManagement } from '@/components/platform/RoleManagement';
 import { ActivityLogViewer } from '@/components/platform/ActivityLogViewer';
 import { SiteEditingPanel } from '@/components/admin/SiteEditingPanel';

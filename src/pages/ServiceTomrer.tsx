@@ -5,7 +5,7 @@ import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { HeroImageEditor } from "@/components/admin/HeroImageEditor";
 import { useHeroImage } from "@/hooks/useHeroImage";
-import servicesBackground from "@/assets/hero-tomrer.png";
+import servicesBackground from "@/assets/hero-tomrer.webp";
 import { EditableServiceHero } from "@/components/service-edit/EditableServiceHero";
 import { EditableServiceAbout } from "@/components/service-edit/EditableServiceAbout";
 import { EditableServiceCallout } from "@/components/service-edit/EditableServiceCallout";
@@ -16,7 +16,7 @@ import { EditableServiceBenefits } from "@/components/service-edit/EditableServi
 import { EditableBottomCTA } from "@/components/EditableBottomCTA";
 
 const ServiceTomrer = () => {
-  const { heroImage, loading, refetch } = useHeroImage('services-tomrer', servicesBackground);
+  const { heroImage, refetch } = useHeroImage('services-tomrer', servicesBackground);
 
   return (
     <div className="min-h-screen pt-20 lg:pt-40">
@@ -27,9 +27,21 @@ const ServiceTomrer = () => {
 
       {/* Hero */}
       <div
-        className={`relative h-[280px] md:h-[500px] bg-cover bg-center bg-no-repeat overflow-hidden transition-opacity duration-500 ${loading ? 'opacity-0' : 'opacity-100'}`}
-        style={{ backgroundImage: `url(${heroImage})`, boxShadow: 'inset 0 0 80px 35px rgba(0,0,0,0.85)' }}
+        className="relative h-[280px] md:h-[500px] overflow-hidden"
+        style={{ boxShadow: 'inset 0 0 80px 35px rgba(0,0,0,0.85)' }}
       >
+        {/* LCP-element: ekte <img> med hoy prioritet gir raskere visning enn CSS-bakgrunn */}
+        <img
+          src={heroImage}
+          alt=""
+          aria-hidden="true"
+          width={1920}
+          height={1080}
+          decoding="async"
+          // @ts-expect-error fetchpriority er gyldig HTML-attributt, ennaa ikke i React-typene
+          fetchpriority="high"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <HeroImageEditor page="services-tomrer" currentImageUrl={heroImage} onImageUpdate={refetch} />
         <div className="relative z-10">
