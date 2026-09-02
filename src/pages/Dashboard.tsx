@@ -7,7 +7,7 @@ import { useNotificationSound } from '@/hooks/useNotificationSound';
 import { Button } from '@/components/ui/button';
 import { Briefcase, Shield, Upload, Bell, User } from 'lucide-react';
 import { DashboardShellSkeleton } from '@/components/ui/skeleton-loaders';
-import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
+import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.webp';
 import { CustomerTypeModal } from '@/components/CustomerTypeModal';
 import { supabase } from '@/integrations/supabase/client';
 

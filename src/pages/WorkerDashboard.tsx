@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Camera, FileText, Home, Plus, Hammer } from 'lucide-react';
-import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.png';
+import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.webp';
 import { WorkerProjectForm } from '@/components/worker/WorkerProjectForm';
 import { WorkerBlogForm } from '@/components/worker/WorkerBlogForm';
 import { WorkerProjectEditForm } from '@/components/worker/WorkerProjectEditForm';
