@@ -245,7 +245,7 @@ const ReviewSubmit = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <img 
-              src="/lovable-uploads/b938c0bf-4496-4b1f-8e38-fc4d96f22ae2.png" 
+              src="/lovable-uploads/handyhjelp-splash.webp" 
               alt="HandyHjelp" 
               className="h-12 mx-auto mb-6"
             />
