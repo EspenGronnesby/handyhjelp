@@ -189,6 +189,7 @@ const App = () => (
             <GoogleAnalytics />
             <BrowserRouter>
               <ScrollToTop />
+              <PostLoginRedirect />
               <AppRouter />
             </BrowserRouter>
           </EditModeProvider>
