@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-route
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { PostLoginRedirect } from "@/components/PostLoginRedirect";
 import { EditModeProvider } from "./contexts/EditModeContext";
 import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/motion";
