@@ -60,6 +60,21 @@ Gradienter (hero/kort/CTA) og 3 skyggenivåer (card → elevated → hero) gir d
 
 ## Endringslogg
 
+- 2026-09-09 (runde 6): **Ny tema-bryter — rund iOS-bryter.**
+  Headeren bruker nå én knapp (`role="switch"`): hvert trykk vipper til motsatt
+  modus, uansett om du treffer sola eller månen. Rund `rounded-full` som før,
+  men uten den gamle variantens tre defekter — hardkodet `amber-500`/`blue-500`,
+  en `transition-all` som overlevde oppryddingen, og en tommel i `bg-background`
+  som var praktisk talt usynlig mot `bg-muted` i blå modus.
+  Tommelen er nå `bg-primary` (teal), som har kontrast mot sporet i BEGGE modus
+  (2,93 lys med ring+skygge som avgrensning, 7,44 blå). Ikonet på tommelen er
+  `--secondary` (mørk navy), ikke `--primary-foreground` — hvitt på blå modus'
+  lyse cyan ga bare 2,21 i kontrast. Nå 3,53 lys / 8,17 blå.
+  Profilsiden beholder en segmentert variant med etiketter, siden det er en
+  innstillingsrad der eksplisitte navn er tydeligere enn en bryter.
+  Rettet samtidig teksten der, som sa «lys og mørk modus» — modusene heter lys
+  og blå. Ikoner: sol + måne (Espens valg).
+  
 - 2026-09-09 (runde 5): **Størrelses-/bildeblink ved lasting fjernet.**
   Begge hadde samme rotårsak: verdien hentes fra databasen, men siden tegner
   først med en standardverdi og retter seg når svaret kommer.

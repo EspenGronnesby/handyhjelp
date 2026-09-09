@@ -366,7 +366,7 @@ const DashboardProfile = () => {
           </div>
           <div>
             <h2 className="text-lg font-semibold">Utseende</h2>
-            <p className="text-sm text-muted-foreground">Velg mellom lys og mørk modus</p>
+            <p className="text-sm text-muted-foreground">Velg mellom lys og blå modus</p>
           </div>
         </div>
         <ThemeToggle />
