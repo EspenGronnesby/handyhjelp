@@ -10,6 +10,7 @@ import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { Helmet } from "react-helmet";
 import { useContactInfo } from "@/hooks/useContactInfo";
+import { GRADIENT } from "@/lib/gradients";
 
 const ThankYou = () => {
   const { phone: contactPhone, email: contactEmail, phoneHref, emailHref } = useContactInfo();
@@ -111,7 +112,7 @@ const ThankYou = () => {
           <Card className="glass-card p-8 mb-8">
             <SectionHeading
               icon={Clock}
-              gradient="from-cyan-500 via-blue-500 to-indigo-600"
+              gradient={GRADIENT.hav}
               title="Hva skjer nå?"
             />
             <div className="space-y-6">
@@ -169,7 +170,7 @@ const ThankYou = () => {
           <Card className="glass-card p-8 mb-8 !bg-gradient-to-br !from-muted/50 !to-muted/30">
             <SectionHeading
               icon={HelpCircle}
-              gradient="from-emerald-500 via-teal-500 to-cyan-600"
+              gradient={GRADIENT.skog}
               title="Har du spørsmål i mellomtiden?"
             />
             <div className="space-y-3">

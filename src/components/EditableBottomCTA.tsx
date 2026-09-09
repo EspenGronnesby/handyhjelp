@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { EditButton } from './ui/EditButton';
 import { ArrowRight, Phone, Star } from 'lucide-react';
 import { useFadeInUp } from '@/hooks/useScrollAnimation';
+import { GRADIENT } from "@/lib/gradients";
 
 export const EditableBottomCTA = () => {
   const { editMode, isAdmin } = useEditMode();
@@ -29,7 +30,7 @@ export const EditableBottomCTA = () => {
 
   return (
     <>
-      <section className="relative py-10 md:py-20 overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+      <section className={`relative py-10 md:py-20 overflow-hidden bg-gradient-to-br ${GRADIENT.dyp} text-white`}>
         {/* Dot-pattern overlay som matcher gradient-headere ellers på siden */}
         <div
           className="absolute inset-0 opacity-10 pointer-events-none"

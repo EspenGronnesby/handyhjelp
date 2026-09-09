@@ -6,6 +6,7 @@ import { CertificationsEditModal } from './CertificationsEditModal';
 import { Card, CardContent } from '@/components/ui/card';
 import { EditButton } from './ui/EditButton';
 import { SectionHeading } from './ui/SectionHeading';
+import { GRADIENT } from "@/lib/gradients";
 
 export const EditableCertifications = () => {
   const { editMode, isAdmin } = useEditMode();
@@ -88,7 +89,7 @@ export const EditableCertifications = () => {
         <div className="max-w-4xl mx-auto mb-10 md:mb-12">
           <SectionHeading
             icon={ShieldCheck}
-            gradient="from-emerald-500 via-teal-500 to-cyan-600"
+            gradient={GRADIENT.skog}
             title={displayHeading}
           />
         </div>

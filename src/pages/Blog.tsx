@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EditableHero } from "@/components/EditableHero";
 import { PageSEO } from "@/components/SEO/PageSEO";
 import { TrustStripe } from "@/components/TrustStripe";
+import { GRADIENT } from "@/lib/gradients";
 
 interface BlogPost {
   id: string;
@@ -116,7 +117,7 @@ const Blog = () => {
               <div className="glass-card p-4 lg:p-5">
                 <SectionHeading
                   icon={Search}
-                  gradient="from-cyan-500 via-blue-500 to-indigo-600"
+                  gradient={GRADIENT.hav}
                   title="Søk"
                   className="!mb-4"
                 />
@@ -136,7 +137,7 @@ const Blog = () => {
               <div className="glass-card p-4 lg:p-5">
                 <SectionHeading
                   icon={Tag}
-                  gradient="from-emerald-500 via-teal-500 to-cyan-600"
+                  gradient={GRADIENT.skog}
                   title="Kategorier"
                   className="!mb-4"
                 />

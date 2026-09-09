@@ -1,6 +1,4 @@
 // Motion components barrel export
-export { MotionButton } from "./MotionButton";
-export { MotionLink } from "./MotionLink";
-export { MotionCard } from "./MotionCard";
-export { ParallaxBackground } from "./ParallaxBackground";
+// MotionButton ble fjernet 2026-09-09 — <Button> har allerede trykk- og
+// hover-feedback i CSS, og wrapperen dro inn hele framer-motion.
 export { PageTransition } from "./PageTransition";

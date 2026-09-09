@@ -9,7 +9,6 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { PostLoginRedirect } from "@/components/PostLoginRedirect";
 import { EditModeProvider } from "./contexts/EditModeContext";
-import { AnimatePresence } from "framer-motion";
 import { PageTransition } from "@/components/motion";
 import { GoogleAnalytics } from "@/components/SEO/GoogleAnalytics";
 import { useAnalyticsPageviews } from "@/hooks/useAnalytics";
@@ -75,8 +74,7 @@ const MarketingRoutes = () => {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={<PageLoader />}>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Index /></PageTransition>} />
           <Route path="/tilbud" element={<PageTransition><QuotePage /></PageTransition>} />
@@ -104,8 +102,7 @@ const MarketingRoutes = () => {
           <Route path="/auth" element={<PageTransition><Auth /></PageTransition>} />
           <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
         </Routes>
-      </Suspense>
-    </AnimatePresence>
+    </Suspense>
   );
 };
 
@@ -165,13 +162,11 @@ const AppRouter = () => {
 
   if (!isKnownRoute) {
     return (
-      <AnimatePresence mode="wait">
-        <Suspense fallback={<PageLoader />}>
-          <PageTransition>
-            <NotFound />
-          </PageTransition>
-        </Suspense>
-      </AnimatePresence>
+      <Suspense fallback={<PageLoader />}>
+        <PageTransition>
+          <NotFound />
+        </PageTransition>
+      </Suspense>
     );
   }
 

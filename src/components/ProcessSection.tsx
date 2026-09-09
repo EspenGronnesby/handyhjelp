@@ -10,6 +10,7 @@ import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
 import { cn } from "@/lib/utils";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Workflow } from "lucide-react";
+import { GRADIENT } from "@/lib/gradients";
 
 // Per-step card — gradient header with large icon + step number, followed
 // by title and description. Fully static; no continuous scroll-driven motion.
@@ -115,21 +116,21 @@ export const ProcessSection = () => {
       title: step1Title || 'Ta kontakt',
       description: step1Desc || 'Ring oss eller send inn skjema — vi svarer raskt og hjelper deg med å beskrive jobben.',
       icon: Phone,
-      gradient: 'from-cyan-500 via-blue-500 to-indigo-600',
+      gradient: GRADIENT.hav,
     },
     {
       section: 'how-it-works-step-2',
       title: step2Title || 'Få tilbud',
       description: step2Desc || 'Du får et tydelig tilbud tilpasset ditt behov — ingen skjulte gebyrer eller overraskelser.',
       icon: Calculator,
-      gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
+      gradient: GRADIENT.skog,
     },
     {
       section: 'how-it-works-step-3',
       title: step3Title || 'Vi løser det',
       description: step3Desc || 'Erfarne fagfolk kommer på avtalt tid og utfører jobben profesjonelt — du slipper bekymringene.',
       icon: CheckCircle,
-      gradient: 'from-amber-500 via-orange-500 to-rose-600',
+      gradient: GRADIENT.solnedgang,
     },
   ];
 
@@ -146,7 +147,7 @@ export const ProcessSection = () => {
 
           <SectionHeading
             icon={Workflow}
-            gradient="from-emerald-500 via-teal-500 to-cyan-600"
+            gradient={GRADIENT.skog}
             title={displayHeading}
             subtitle="Enkelt, trygt og forutsigbart"
             align="center"

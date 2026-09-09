@@ -7,6 +7,7 @@ import { useEditableContent } from '@/hooks/useEditableContent';
 import { useContactInfo } from '@/hooks/useContactInfo';
 import { FooterEditModal } from './FooterEditModal';
 import { EditButton } from './ui/EditButton';
+import { GRADIENT } from "@/lib/gradients";
 
 // TikTok icon component (not available in lucide-react)
 const TikTok = ({ className }: { className?: string }) => (
@@ -58,7 +59,7 @@ export const Footer = () => {
       <footer className="bg-secondary text-secondary-foreground relative">
         {/* Tynn gradient-stripe på toppen — visuell signatur */}
         <div
-          className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 pointer-events-none"
+          className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${GRADIENT.hav} pointer-events-none`}
           aria-hidden="true"
         />
 
@@ -89,7 +90,7 @@ export const Footer = () => {
                     href={footerData.facebookUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-all active:scale-95" 
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-[background-image,background-color,color] duration-fast ease-enter active:scale-[0.97]" 
                     aria-label="Facebook"
                   >
                     <Facebook className="h-5 w-5" />
@@ -100,7 +101,7 @@ export const Footer = () => {
                     href={footerData.instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-all active:scale-95" 
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-[background-image,background-color,color] duration-fast ease-enter active:scale-[0.97]" 
                     aria-label="Instagram"
                   >
                     <Instagram className="h-5 w-5" />
@@ -111,7 +112,7 @@ export const Footer = () => {
                     href={footerData.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-all active:scale-95" 
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-[background-image,background-color,color] duration-fast ease-enter active:scale-[0.97]" 
                     aria-label="LinkedIn"
                   >
                     <Linkedin className="h-5 w-5" />
@@ -122,7 +123,7 @@ export const Footer = () => {
                     href={footerData.tiktokUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-all active:scale-95" 
+                    className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg bg-secondary-foreground/10 hover:bg-gradient-to-br hover:from-cyan-500 hover:via-blue-500 hover:to-indigo-600 hover:text-white transition-[background-image,background-color,color] duration-fast ease-enter active:scale-[0.97]" 
                     aria-label="TikTok"
                   >
                     <TikTok className="h-5 w-5" />

@@ -8,6 +8,7 @@ import { useStaggeredGridReveal } from '@/hooks/useScrollAnimation';
 import { EditButton } from './ui/EditButton';
 import { SectionHeading } from './ui/SectionHeading';
 import { cn } from '@/lib/utils';
+import { GRADIENT } from "@/lib/gradients";
 
 const iconMap: Record<string, LucideIcon> = {
   Clock, Shield, Award, Users, CheckCircle2, Star
@@ -16,12 +17,12 @@ const iconMap: Record<string, LucideIcon> = {
 // Distinct gradient per slot so the 6 cards each have their own visual ID
 // without depending on what icon-name the admin picked.
 const slotGradients = [
-  "from-cyan-500 via-blue-500 to-indigo-600",
-  "from-emerald-500 via-teal-500 to-cyan-600",
-  "from-amber-500 via-orange-500 to-rose-600",
-  "from-fuchsia-500 via-purple-500 to-indigo-600",
-  "from-rose-500 via-pink-500 to-fuchsia-600",
-  "from-yellow-500 via-amber-500 to-orange-600",
+  GRADIENT.hav,
+  GRADIENT.skog,
+  GRADIENT.solnedgang,
+  GRADIENT.natt,
+  GRADIENT.rose,
+  GRADIENT.sol,
 ];
 
 export const EditableWhyUs = () => {
@@ -83,7 +84,7 @@ export const EditableWhyUs = () => {
         <div className="max-w-4xl mx-auto mb-10 md:mb-12">
           <SectionHeading
             icon={Award}
-            gradient="from-cyan-500 via-blue-500 to-indigo-600"
+            gradient={GRADIENT.hav}
             title={getDisplayValue(heading, headingEdited, 'Hvorfor velge oss?')}
           />
         </div>

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Users, FileText, Briefcase, CheckCircle, Loader2, Calendar, Clock, Building2, User, Phone, ArrowRight } from 'lucide-react';
 import { format, formatDistanceToNow, differenceInHours, differenceInMinutes, differenceInDays } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { GRADIENT } from "@/lib/gradients";
 
 export type StatCardType = 'customers' | 'quotes' | 'activeJobs' | 'completedJobs';
 
@@ -55,28 +56,28 @@ interface CompletedJobRow {
 
 const config = {
   customers: {
-    gradient: 'from-fuchsia-600 via-purple-600 to-indigo-700',
+    gradient: GRADIENT.nattDyp,
     icon: Users,
     title: 'Totale kunder',
     subtitle: 'Alle registrerte kunder',
     adminLink: '/dashboard/admin?category=brukere&tab=kunder',
   },
   quotes: {
-    gradient: 'from-amber-500 via-orange-500 to-rose-600',
+    gradient: GRADIENT.solnedgang,
     icon: FileText,
     title: 'Åpne forespørsler',
     subtitle: 'Venter på svar',
     adminLink: '/dashboard/admin?category=oppdrag&tab=quotes',
   },
   activeJobs: {
-    gradient: 'from-cyan-500 via-blue-600 to-indigo-700',
+    gradient: GRADIENT.havDyp2,
     icon: Briefcase,
     title: 'Aktive jobber',
     subtitle: 'Pågår akkurat nå',
     adminLink: '/dashboard/admin?category=oppdrag&tab=single-jobs',
   },
   completedJobs: {
-    gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
+    gradient: GRADIENT.skog,
     icon: CheckCircle,
     title: 'Fullførte jobber',
     subtitle: 'Ferdigstilte oppdrag',

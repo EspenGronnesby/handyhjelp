@@ -7,7 +7,7 @@ export const SEO_CONFIG = {
   siteName: 'HandyHjelp',
   locale: 'nb_NO',
   twitterCard: 'summary_large_image' as const,
-  defaultImage: '/og-image.png',
+  defaultImage: '/og-image.jpg',
   defaultRobots: 'index, follow',
 };
 

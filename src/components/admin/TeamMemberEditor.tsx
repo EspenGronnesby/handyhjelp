@@ -266,7 +266,7 @@ export const TeamMemberEditor = ({ member, onUpdate, isNewMember = false }: Team
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="absolute top-2 right-2 z-10 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-all opacity-0 group-hover:opacity-100"
+        className="absolute top-2 right-2 z-10 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background transition-[opacity,background-color,transform] duration-fast ease-enter opacity-0 group-hover:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100 active:scale-95"
         title="Rediger teammedlem"
       >
         <Edit2 className="w-4 h-4 text-primary" />

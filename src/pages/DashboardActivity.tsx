@@ -18,6 +18,7 @@ import { AdminStatDetailModal, type StatCardType } from '@/components/admin/Admi
 import { AnalyticsStatDetailModal, type AnalyticsStatType } from '@/components/admin/AnalyticsStatDetailModal';
 import { useAnalyticsOverview } from '@/hooks/useAnalyticsOverview';
 import { AnimatedNumber } from '@/components/admin/analytics/AnimatedNumber';
+import { GRADIENT } from "@/lib/gradients";
 import {
   Pagination,
   PaginationContent,
@@ -518,7 +519,7 @@ const DashboardActivity = () => {
         ...adminQuotes.map(q => ({
           date: q.created_at,
           label: 'Forespørsel sendt',
-          gradient: 'from-amber-500 to-orange-500',
+          gradient: GRADIENT.solnedgangKort,
           id: q.id,
           entityType: 'quote' as const,
           entity: q,
@@ -527,7 +528,7 @@ const DashboardActivity = () => {
         ...adminJobs.filter(j => j.started_at).map(j => ({
           date: j.started_at!,
           label: 'Jobb påbegynt',
-          gradient: 'from-cyan-500 to-blue-500',
+          gradient: GRADIENT.havKort,
           id: j.id,
           entityType: 'job' as const,
           entity: j,
@@ -537,7 +538,7 @@ const DashboardActivity = () => {
         ...adminJobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({
           date: j.completed_date!,
           label: 'Jobb fullført',
-          gradient: 'from-emerald-500 to-teal-500',
+          gradient: GRADIENT.skogKort,
           id: `${j.id}-completed`,
           entityType: 'job' as const,
           entity: j,
@@ -547,7 +548,7 @@ const DashboardActivity = () => {
         ...adminAgreements.map(a => ({
           date: a.created_at,
           label: 'Avtaleforespørsel sendt',
-          gradient: 'from-fuchsia-500 to-purple-500',
+          gradient: GRADIENT.nattKort,
           id: a.id,
           entityType: 'agreement' as const,
           entity: a,
@@ -556,7 +557,7 @@ const DashboardActivity = () => {
         ...adminEmailLogs.filter(e => e.sent_at).map(e => ({
           date: e.sent_at!,
           label: 'E-post sendt',
-          gradient: 'from-sky-500 to-blue-500',
+          gradient: GRADIENT.himmelKort,
           id: e.id,
           entityType: 'email' as const,
           entity: e,
@@ -572,7 +573,7 @@ const DashboardActivity = () => {
       const base: ActivityEvent = {
         date: q.created_at,
         label: 'Forespørsel sendt',
-        gradient: 'from-amber-500 to-orange-500',
+        gradient: GRADIENT.solnedgangKort,
         id: q.id,
         entityType: 'quote',
         entity: q,
@@ -585,8 +586,8 @@ const DashboardActivity = () => {
              : q.status === 'accepted' ? 'Tilbud akseptert'
              : 'Forespørsel oppdatert',
         gradient: q.status === 'quoted' || q.status === 'accepted'
-          ? 'from-purple-500 to-violet-500'
-          : 'from-amber-500 to-orange-500',
+          ? GRADIENT.lillaKort
+          : GRADIENT.solnedgangKort,
         id: `${q.id}-status`,
         entityType: 'quote',
         entity: q,
@@ -598,7 +599,7 @@ const DashboardActivity = () => {
       const milestones: ActivityEvent[] = [{
         date: a.created_at,
         label: 'Avtaleforespørsel sendt',
-        gradient: 'from-fuchsia-500 to-purple-500',
+        gradient: GRADIENT.nattKort,
         id: a.id,
         entityType: 'agreement',
         entity: a,
@@ -606,7 +607,7 @@ const DashboardActivity = () => {
       if (a.offer_sent_at) milestones.push({
         date: a.offer_sent_at,
         label: 'Tilbud sendt på avtale',
-        gradient: 'from-purple-500 to-violet-500',
+        gradient: GRADIENT.lillaKort,
         id: `${a.id}-offer`,
         entityType: 'agreement',
         entity: a,
@@ -614,7 +615,7 @@ const DashboardActivity = () => {
       if (a.contract_signed_at) milestones.push({
         date: a.contract_signed_at,
         label: 'Avtale signert!',
-        gradient: 'from-emerald-500 to-teal-500',
+        gradient: GRADIENT.skogKort,
         id: `${a.id}-signed`,
         entityType: 'agreement',
         entity: a,
@@ -627,7 +628,7 @@ const DashboardActivity = () => {
       ...jobs.filter(j => j.started_at).map(j => ({
         date: j.started_at!,
         label: 'Jobb påbegynt',
-        gradient: 'from-cyan-500 to-blue-500',
+        gradient: GRADIENT.havKort,
         id: `${j.id}-started`,
         entityType: 'job' as const,
         entity: j,
@@ -636,7 +637,7 @@ const DashboardActivity = () => {
       ...jobs.filter(j => j.status === 'completed' && j.completed_date).map(j => ({
         date: j.completed_date!,
         label: 'Jobb fullført',
-        gradient: 'from-emerald-500 to-teal-500',
+        gradient: GRADIENT.skogKort,
         id: `${j.id}-completed`,
         entityType: 'job' as const,
         entity: j,
@@ -646,7 +647,7 @@ const DashboardActivity = () => {
       ...invoices.filter(i => i.status === 'paid').map(i => ({
         date: i.created_at,
         label: `Faktura betalt — ${(i.amount || 0).toLocaleString('nb-NO')} kr`,
-        gradient: 'from-emerald-500 to-cyan-500',
+        gradient: GRADIENT.skogKort3,
         id: i.id,
         entityType: 'invoice' as const,
         entity: i,
@@ -654,7 +655,7 @@ const DashboardActivity = () => {
       ...emailLogs.filter(e => e.sent_at).map(e => ({
         date: e.sent_at!,
         label: 'E-post sendt',
-        gradient: 'from-sky-500 to-blue-500',
+        gradient: GRADIENT.himmelKort,
         id: e.id,
         entityType: 'email' as const,
         entity: e,
@@ -949,7 +950,7 @@ const DashboardActivity = () => {
       {isOnlyWorker && (
         <div className="grid gap-4 sm:grid-cols-3">
           <Link to="/dashboard/worker">
-            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white">
+            <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br ${GRADIENT.solnedgang} text-white`}>
               <div className="flex items-start justify-between mb-3">
                 <p className="text-sm font-medium text-white/80">Venter godkjenning</p>
                 <ClipboardList className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
@@ -959,7 +960,7 @@ const DashboardActivity = () => {
             </div>
           </Link>
           <Link to="/dashboard/worker">
-            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white">
+            <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br ${GRADIENT.hav} text-white`}>
               <div className="flex items-start justify-between mb-3">
                 <p className="text-sm font-medium text-white/80">Publiserte prosjekter</p>
                 <Camera className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
@@ -969,7 +970,7 @@ const DashboardActivity = () => {
             </div>
           </Link>
           <Link to="/dashboard/worker">
-            <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br from-rose-500 via-pink-500 to-fuchsia-600 text-white">
+            <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] cursor-pointer bg-gradient-to-br ${GRADIENT.rose} text-white`}>
               <div className="flex items-start justify-between mb-3">
                 <p className="text-sm font-medium text-white/80">Avviste innleveringer</p>
                 <Upload className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
@@ -986,7 +987,7 @@ const DashboardActivity = () => {
         <div className="space-y-4">
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
             <button onClick={() => setSelectedCard('customers')} disabled={adminOverviewStats.totalCustomers === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 text-white cursor-pointer">
+              <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br ${GRADIENT.natt} text-white cursor-pointer`}>
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Totale kunder</p>
                   <Users className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
@@ -996,7 +997,7 @@ const DashboardActivity = () => {
               </div>
             </button>
             <button onClick={() => setSelectedCard('quotes')} disabled={badges.adminDetails.pendingQuotes === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white cursor-pointer relative">
+              <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br ${GRADIENT.solnedgang} text-white cursor-pointer relative`}>
                 {badges.adminDetails.pendingQuotes > 0 && (
                   <span className="absolute top-3 right-3 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF0000] opacity-75" />
@@ -1012,7 +1013,7 @@ const DashboardActivity = () => {
               </div>
             </button>
             <button onClick={() => setSelectedCard('activeJobs')} disabled={badges.adminDetails.activeJobs === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white cursor-pointer relative">
+              <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br ${GRADIENT.hav} text-white cursor-pointer relative`}>
                 {badges.adminDetails.activeJobs > 0 && (
                   <span className="absolute top-3 right-3 flex h-3 w-3">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-300 opacity-75" />
@@ -1028,7 +1029,7 @@ const DashboardActivity = () => {
               </div>
             </button>
             <button onClick={() => setSelectedCard('completedJobs')} disabled={adminOverviewStats.totalCompleted === 0} className="text-left w-full disabled:opacity-60 disabled:cursor-default">
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white cursor-pointer">
+              <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br ${GRADIENT.skog} text-white cursor-pointer`}>
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Fullførte jobber</p>
                   <CheckCircle className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
@@ -1045,7 +1046,7 @@ const DashboardActivity = () => {
               onClick={() => setSelectedAnalytics('visits')}
               className="text-left w-full sm:col-span-1"
             >
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white cursor-pointer h-full">
+              <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br ${GRADIENT.hav} text-white cursor-pointer h-full`}>
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Besøk (siste 7 dager)</p>
                   <Eye className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
@@ -1067,7 +1068,7 @@ const DashboardActivity = () => {
               onClick={() => setSelectedAnalytics('conversionRate')}
               className="text-left w-full sm:col-span-1"
             >
-              <div className="card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white cursor-pointer h-full">
+              <div className={`card-hover-lift p-5 rounded-2xl ring-1 ring-white/15 shadow-xl shadow-black/10 relative overflow-hidden before:pointer-events-none before:absolute before:-top-12 before:-right-10 before:h-36 before:w-36 before:rounded-full before:bg-white/25 before:blur-2xl before:content-[''] bg-gradient-to-br ${GRADIENT.skog} text-white cursor-pointer h-full`}>
                 <div className="flex items-start justify-between mb-3">
                   <p className="text-sm font-medium text-white/80">Konverteringsrate</p>
                   <MousePointerClick className="h-10 w-10 p-2 rounded-xl bg-white/15 ring-1 ring-white/20 text-white shadow-sm" strokeWidth={1.75} />
@@ -1119,7 +1120,7 @@ const DashboardActivity = () => {
                 {badges.adminDetails.pendingQuotes > 0 && (
                   <Link to="/dashboard/admin">
                     <div className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-amber-300/60 transition-colors cursor-pointer group">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shrink-0">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${GRADIENT.solnedgangKort} flex items-center justify-center shrink-0`}>
                         <AlertTriangle className="h-4 w-4 text-white" />
                       </div>
                       <span className="text-sm text-foreground/80 flex-1">
@@ -1132,7 +1133,7 @@ const DashboardActivity = () => {
                 {(badges.adminDetails.pendingProjects + badges.adminDetails.pendingBlogs) > 0 && (
                   <Link to="/dashboard/admin">
                     <div className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-fuchsia-300/60 transition-colors cursor-pointer group">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-fuchsia-500 to-purple-500 flex items-center justify-center shrink-0">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${GRADIENT.nattKort} flex items-center justify-center shrink-0`}>
                         <ClipboardList className="h-4 w-4 text-white" />
                       </div>
                       <span className="text-sm text-foreground/80 flex-1">
@@ -1145,7 +1146,7 @@ const DashboardActivity = () => {
                 {badges.adminDetails.newAgreements > 0 && (
                   <Link to="/dashboard/admin">
                     <div className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-cyan-300/60 transition-colors cursor-pointer group">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center shrink-0">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${GRADIENT.havKort} flex items-center justify-center shrink-0`}>
                         <CalendarCheck className="h-4 w-4 text-white" />
                       </div>
                       <span className="text-sm text-foreground/80 flex-1">
@@ -1158,7 +1159,7 @@ const DashboardActivity = () => {
                 {badges.adminDetails.pendingReviews > 0 && (
                   <Link to="/dashboard/admin">
                     <div className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-card hover:border-rose-300/60 transition-colors cursor-pointer group">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center shrink-0">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${GRADIENT.roseKort} flex items-center justify-center shrink-0`}>
                         <Star className="h-4 w-4 text-white" />
                       </div>
                       <span className="text-sm text-foreground/80 flex-1">
@@ -1178,7 +1179,7 @@ const DashboardActivity = () => {
       {!isOnlyWorker && !isAdmin && !isOwner && (
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Mine oppdrag — kompakt samle-kort */}
-          <div className="bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 text-white card-hover-lift p-6 rounded-xl flex flex-col justify-between min-h-[140px]">
+          <div className={`bg-gradient-to-br ${GRADIENT.hav} text-white card-hover-lift p-6 rounded-xl flex flex-col justify-between min-h-[140px]`}>
             <div className="flex items-start justify-between">
               <p className="text-sm font-medium text-white/80">Mine oppdrag</p>
               <Briefcase className="h-8 w-8 text-white/25" strokeWidth={1.5} />
@@ -1202,7 +1203,7 @@ const DashboardActivity = () => {
           </div>
 
           {/* Fullførte jobber */}
-          <div className="card-hover-lift p-6 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white flex flex-col justify-between min-h-[140px]">
+          <div className={`card-hover-lift p-6 rounded-xl bg-gradient-to-br ${GRADIENT.skog} text-white flex flex-col justify-between min-h-[140px]`}>
             <div className="flex items-start justify-between">
               <p className="text-sm font-medium text-white/80">Fullførte jobber</p>
               <CheckCircle className="h-8 w-8 text-white/25" strokeWidth={1.5} />
@@ -1259,7 +1260,7 @@ const DashboardActivity = () => {
 
         <TabsContent value="quotes" className="space-y-4">
           {quotes.length === 0 ? <div className="card-professional p-10 text-center">
-              <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 shadow-md">
+              <div className={`mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br ${GRADIENT.solnedgang} shadow-md`}>
                 <FileText className="h-7 w-7 text-white drop-shadow" />
               </div>
               <p className="font-semibold mb-1">Ingen forespørsler ennå</p>
@@ -1268,7 +1269,7 @@ const DashboardActivity = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 shadow-sm shrink-0">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br ${GRADIENT.solnedgang} shadow-sm shrink-0`}>
                         <FileText className="h-4 w-4 text-white drop-shadow" />
                       </div>
                       <div>
@@ -1317,7 +1318,7 @@ const DashboardActivity = () => {
 
         <TabsContent value="agreements" className="space-y-4">
           {activeAgreements.length === 0 ? <div className="card-professional p-10 text-center">
-              <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 shadow-md">
+              <div className={`mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br ${GRADIENT.hav} shadow-md`}>
                 <CalendarCheck className="h-7 w-7 text-white drop-shadow" />
               </div>
               <p className="font-semibold mb-1">Ingen aktive avtaler ennå</p>
@@ -1328,7 +1329,7 @@ const DashboardActivity = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 shadow-sm shrink-0">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br ${GRADIENT.hav} shadow-sm shrink-0`}>
                         <CalendarCheck className="h-4 w-4 text-white drop-shadow" />
                       </div>
                       <div>
@@ -1381,7 +1382,7 @@ const DashboardActivity = () => {
 
         <TabsContent value="jobs" className="space-y-4">
           {completedJobs.length === 0 ? <div className="card-professional p-10 text-center">
-              <div className="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-md">
+              <div className={`mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-4 bg-gradient-to-br ${GRADIENT.skog} shadow-md`}>
                 <Briefcase className="h-7 w-7 text-white drop-shadow" />
               </div>
               <p className="font-semibold mb-1">Ingen fullførte oppdrag ennå</p>
@@ -1395,7 +1396,7 @@ const DashboardActivity = () => {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-sm shrink-0">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br ${GRADIENT.skog} shadow-sm shrink-0`}>
                           <Briefcase className="h-4 w-4 text-white drop-shadow" />
                         </div>
                         <div>

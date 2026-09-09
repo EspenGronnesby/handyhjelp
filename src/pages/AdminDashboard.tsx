@@ -45,6 +45,7 @@ import { EmailTemplateManager } from '@/components/admin/EmailTemplateManager';
 import { EmailComposer } from '@/components/admin/EmailComposer';
 import { EmailHistory } from '@/components/admin/EmailHistory';
 import { AllCustomersPanel } from '@/components/admin/AllCustomersPanel';
+import { GRADIENT } from "@/lib/gradients";
 
 type CategoryKey = 'oppdrag' | 'okonomi' | 'innhold' | 'mail' | 'brukere' | 'redigering' | 'logg';
 
@@ -61,13 +62,13 @@ const CATEGORY_DEFAULT_TABS: Record<CategoryKey, string> = {
 };
 
 const CATEGORY_GRADIENTS: Partial<Record<CategoryKey, string>> = {
-  oppdrag:  'from-cyan-500 via-blue-500 to-indigo-600',
-  okonomi:  'from-emerald-500 via-teal-500 to-cyan-600',
-  innhold:  'from-fuchsia-500 via-purple-500 to-indigo-600',
-  mail:     'from-amber-500 via-orange-500 to-rose-600',
-  brukere:  'from-rose-500 via-pink-500 to-fuchsia-600',
-  redigering:'from-yellow-500 via-amber-500 to-orange-600',
-  logg:     'from-slate-500 via-gray-500 to-zinc-600',
+  oppdrag:  GRADIENT.hav,
+  okonomi:  GRADIENT.skog,
+  innhold:  GRADIENT.natt,
+  mail:     GRADIENT.solnedgang,
+  brukere:  GRADIENT.rose,
+  redigering:GRADIENT.sol,
+  logg:     GRADIENT.steinLys,
 };
 
 const AdminDashboard = () => {
@@ -309,7 +310,7 @@ const AdminDashboard = () => {
     <div className="container mx-auto py-8 px-4 pb-24 md:pb-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 shadow-sm">
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br ${GRADIENT.hav} shadow-sm`}>
             <Shield className="h-5 w-5 text-white drop-shadow" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">
@@ -340,7 +341,7 @@ const AdminDashboard = () => {
               <div className={cn(
                 "w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br shadow-sm transition-transform duration-200",
                 isActive ? "scale-110" : "",
-                CATEGORY_GRADIENTS[key] || 'from-cyan-500 via-blue-500 to-indigo-600'
+                CATEGORY_GRADIENTS[key] || GRADIENT.hav
               )}>
                 <Icon className="h-7 w-7 text-white drop-shadow" />
               </div>

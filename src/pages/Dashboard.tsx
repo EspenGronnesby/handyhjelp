@@ -10,6 +10,7 @@ import { DashboardShellSkeleton } from '@/components/ui/skeleton-loaders';
 import handyhjelpLogoWhite from '@/assets/handyhjelp-logo-footer.webp';
 import { CustomerTypeModal } from '@/components/CustomerTypeModal';
 import { supabase } from '@/integrations/supabase/client';
+import { GRADIENT } from "@/lib/gradients";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -80,7 +81,7 @@ const Dashboard = () => {
           <Icon className="h-4 w-4 shrink-0" />
           {item.label}
           {item.badge > 0 && (
-            <span className={`ml-auto text-xs font-semibold rounded-full px-2 py-0.5 min-w-[20px] text-center animate-subtle-pulse ${
+            <span className={`ml-auto text-xs font-semibold rounded-full px-2 py-0.5 min-w-[20px] text-center ${
               isActive ? 'bg-white/20 text-white' : 'bg-destructive text-destructive-foreground'
             }`}>
               {item.badge > 99 ? '99+' : item.badge}
@@ -103,7 +104,7 @@ const Dashboard = () => {
 
       {/* Top Navigation */}
       <header className="bg-card border-b border-border/60 sticky top-0 z-40">
-        <div className="h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600" />
+        <div className={`h-0.5 bg-gradient-to-r ${GRADIENT.hav}`} />
         <div className="container mx-auto px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
@@ -119,7 +120,7 @@ const Dashboard = () => {
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell className="h-5 w-5" />
                   {badges.notifications > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-semibold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 animate-subtle-pulse">
+                    <span className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-semibold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
                       {badges.notifications > 9 ? '9+' : badges.notifications}
                     </span>
                   )}
@@ -182,7 +183,7 @@ const Dashboard = () => {
 
       {/* Mobil bunnnavigasjon */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border/60 md:hidden z-50">
-        <div className="h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600" />
+        <div className={`h-0.5 bg-gradient-to-r ${GRADIENT.hav}`} />
         <div className="flex justify-around items-center py-2 px-2 safe-area-inset-bottom">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -200,7 +201,7 @@ const Dashboard = () => {
                 <div className="relative">
                   <Icon className="h-5 w-5 mb-1" />
                   {item.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2.5 bg-destructive text-destructive-foreground text-[10px] font-medium rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 animate-subtle-pulse">
+                    <span className="absolute -top-1.5 -right-2.5 bg-destructive text-destructive-foreground text-[10px] font-medium rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
                       {item.badge > 9 ? '9+' : item.badge}
                     </span>
                   )}

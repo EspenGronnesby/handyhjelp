@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { GradientHeaderCard } from "@/components/ui/GradientHeaderCard";
 import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
+import { GRADIENT } from "@/lib/gradients";
 
 interface PricingData {
   heading: string;
@@ -74,7 +75,7 @@ const EditablePricingDetails = () => {
           <div className="max-w-5xl mx-auto">
             <SectionHeading
               icon={Receipt}
-              gradient="from-emerald-500 via-teal-500 to-cyan-600"
+              gradient={GRADIENT.skog}
               title={data.heading}
               align="center"
               className="mb-10 md:mb-14"
@@ -84,7 +85,7 @@ const EditablePricingDetails = () => {
               <div style={getItemStyle(0)}>
                 <GradientHeaderCard
                   icon={CheckCircle2}
-                  gradient="from-emerald-500 via-teal-500 to-cyan-600"
+                  gradient={GRADIENT.skog}
                   title={data.includedTitle}
                 >
                   <ul className="space-y-3 mt-1">
@@ -103,7 +104,7 @@ const EditablePricingDetails = () => {
               <div style={getItemStyle(1)}>
                 <GradientHeaderCard
                   icon={Receipt}
-                  gradient="from-amber-500 via-orange-500 to-rose-600"
+                  gradient={GRADIENT.solnedgang}
                   title={data.separateTitle}
                 >
                   <ul className="space-y-3 mt-1">

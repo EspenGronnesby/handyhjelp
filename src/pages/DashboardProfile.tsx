@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import type { LucideIcon } from 'lucide-react';
+import { GRADIENT } from "@/lib/gradients";
 
 // Norske rolle-etiketter
 const roleLabels: Record<string, string> = {
@@ -322,7 +323,7 @@ const DashboardProfile = () => {
 
       <div className="card-professional p-6 space-y-4">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 shadow-sm">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br ${GRADIENT.hav} shadow-sm`}>
             <Lock className="h-4 w-4 text-white drop-shadow" />
           </div>
           <div>
@@ -360,7 +361,7 @@ const DashboardProfile = () => {
 
       <div className="card-professional p-6">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 shadow-sm">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br ${GRADIENT.natt} shadow-sm`}>
             <UserIcon className="h-4 w-4 text-white drop-shadow" />
           </div>
           <div>

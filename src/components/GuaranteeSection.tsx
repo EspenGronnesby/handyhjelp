@@ -6,6 +6,7 @@ import { EditButton } from "@/components/ui/EditButton";
 import { SectionEditModal } from "@/components/SectionEditModal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useFadeInUp } from "@/hooks/useScrollAnimation";
+import { GRADIENT } from "@/lib/gradients";
 
 // Mr. Handyman-inspirert "Vår garanti"-seksjon. Etablerer tillit gjennom en
 // klart formulert promise + tre konkrete punkter.
@@ -46,13 +47,13 @@ export const GuaranteeSection = () => {
 
           <SectionHeading
             icon={Award}
-            gradient="from-emerald-500 via-teal-500 to-cyan-600"
+            gradient={GRADIENT.skog}
             title={displayHeading}
           />
 
           <div className="glass-card p-6 md:p-8">
             <div className="relative pl-5 md:pl-6 mb-6">
-              <div className="absolute left-0 top-0 bottom-0 w-1 rounded-full bg-gradient-to-b from-emerald-400 to-teal-500" />
+              <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-full bg-gradient-to-b ${GRADIENT.skogLys}`} />
               <p className="text-lg md:text-xl text-foreground leading-relaxed font-medium italic">
                 "{displayPromise}"
               </p>
@@ -65,7 +66,7 @@ export const GuaranteeSection = () => {
                 { icon: Sparkles, text: displayPoint3 },
               ].map(({ icon: Icon, text }, idx) => (
                 <div key={idx} className="flex items-center gap-3 pt-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-900/30">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${GRADIENT.skogKort2} flex items-center justify-center shrink-0 shadow-lg shadow-emerald-900/30`}>
                     <Icon
                       className="h-5 w-5 text-white"
                       strokeWidth={2}

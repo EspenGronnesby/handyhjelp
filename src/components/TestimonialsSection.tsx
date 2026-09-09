@@ -10,6 +10,7 @@ import { useEditableContent } from '@/hooks/useEditableContent';
 import { EditButton } from '@/components/ui/EditButton';
 import { SectionEditModal } from '@/components/SectionEditModal';
 import { SectionHeading } from '@/components/ui/SectionHeading';
+import { GRADIENT } from "@/lib/gradients";
 
 interface Review {
   id: string;
@@ -214,7 +215,7 @@ const TestimonialsSection = () => {
           </div>
           <SectionHeading
             icon={MessageCircle}
-            gradient="from-fuchsia-500 via-purple-500 to-indigo-600"
+            gradient={GRADIENT.natt}
             title={heading}
             subtitle={subheading}
             align="center"
@@ -291,7 +292,7 @@ const TestimonialsSection = () => {
                           <Star
                             key={star}
                             className={cn(
-                              "h-5 w-5 transition-all duration-300",
+                              "h-5 w-5 transition-[color,fill] duration-fast ease-enter",
                               star <= review.rating
                                 ? "text-yellow-400 fill-yellow-400"
                                 : "text-muted-foreground/30"
@@ -353,7 +354,7 @@ const TestimonialsSection = () => {
                 key={index}
                 onClick={() => scrollToIndex(index)}
                 className={cn(
-                  "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                  "w-2.5 h-2.5 rounded-full transition-[background-color,width,opacity] duration-fast ease-enter",
                   index === currentIndex
                     ? "bg-primary w-8"
                     : "bg-muted-foreground/30 hover:bg-muted-foreground/50"

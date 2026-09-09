@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -15,17 +16,52 @@ export interface LogoSettings {
   desktopMarginLeft: number;
 }
 
+/**
+ * Brukes ved aller første besøk, før databasen har svart og før localStorage
+ * har noe bufret. Verdiene er et øyeblikksbilde av det som faktisk lå i
+ * `site_content` 2026-09-09, slik at første maling treffer riktig i praksis
+ * og logoen ikke hopper i størrelse.
+ *
+ * Endrer du logostørrelsen i admin, vil førstegangsbesøkende se én liten
+ * justering til de nye verdiene er bufret. Oppdater gjerne tallene her da.
+ */
 const defaultSettings: LogoSettings = {
-  mobileHeight: 40,
-  tabletHeight: 48,
-  desktopHeight: 64,
-  mobilePadding: 12,
+  mobileHeight: 72,
+  tabletHeight: 100,
+  desktopHeight: 80,
+  mobilePadding: 6,
   tabletPadding: 16,
-  desktopPadding: 16,
-  mobileHorizontalPadding: 0,
-  tabletHorizontalPadding: 0,
+  desktopPadding: 0,
+  mobileHorizontalPadding: 6,
+  tabletHorizontalPadding: 16,
   desktopHorizontalPadding: 0,
-  desktopMarginLeft: 0,
+  desktopMarginLeft: 32,
+};
+
+const LAGRINGSNOKKEL = 'hh-logo-settings';
+
+/**
+ * Logostørrelsen kommer fra databasen. Uten buffer tegnes logoen først med
+ * standardverdiene (64px desktop) og hopper så til DB-verdien (80px) når
+ * spørringen lander — et synlig blink ved hver lasting.
+ *
+ * Vi husker siste kjente verdi lokalt og bruker den som initialData, slik at
+ * første maling blir riktig. `initialDataUpdatedAt: 0` gjør at React Query
+ * likevel henter friske verdier i bakgrunnen med én gang.
+ */
+const lesBufret = (): LogoSettings | undefined => {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    const raa = window.localStorage.getItem(LAGRINGSNOKKEL);
+    if (!raa) return undefined;
+    const p = JSON.parse(raa);
+    // Grov validering — en ødelagt verdi skal ikke velte headeren.
+    return typeof p?.desktopHeight === 'number' && typeof p?.mobileHeight === 'number'
+      ? (p as LogoSettings)
+      : undefined;
+  } catch {
+    return undefined;
+  }
 };
 
 export const useLogoSettings = () => {
@@ -57,7 +93,19 @@ export const useLogoSettings = () => {
       return defaultSettings;
     },
     staleTime: 1000 * 60 * 5,
+    // Male riktig med én gang, men fortsatt hente ferske verdier i bakgrunnen.
+    initialData: lesBufret,
+    initialDataUpdatedAt: 0,
   });
+
+  // Husk til neste lasting.
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(LAGRINGSNOKKEL, JSON.stringify(settings));
+    } catch {
+      /* private vinduer o.l. — buffer er en bonus, ikke et krav */
+    }
+  }, [settings]);
 
   const updateSettings = async (newSettings: LogoSettings) => {
     queryClient.setQueryData(

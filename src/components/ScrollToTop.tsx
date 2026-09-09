@@ -71,7 +71,7 @@ export const ScrollToTop = () => {
       variant="outline"
       size="icon"
       className={cn(
-        "fixed bottom-6 right-6 z-50 rounded-full shadow-lg transition-all duration-300 min-h-[48px] min-w-[48px] touch-manipulation",
+        "fixed bottom-6 right-6 z-50 rounded-full shadow-lg transition-[opacity,transform,background-color] duration-normal ease-enter min-h-[48px] min-w-[48px] touch-manipulation",
         "bg-background/80 backdrop-blur-sm hover:bg-background",
         showButton 
           ? "opacity-100 translate-y-0" 

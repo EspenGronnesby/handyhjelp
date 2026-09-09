@@ -13,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { EditButton } from '@/components/ui/EditButton';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useFadeInUp } from '@/hooks/useScrollAnimation';
+import { GRADIENT } from "@/lib/gradients";
 
 interface EditableServiceTargetProps {
   section: string;
@@ -94,7 +95,7 @@ export const EditableServiceTarget = ({
 
         <SectionHeading
           icon={Users}
-          gradient="from-cyan-500 via-blue-500 to-indigo-600"
+          gradient={GRADIENT.hav}
           title="Hvem er dette for?"
         />
 

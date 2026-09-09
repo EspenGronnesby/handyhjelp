@@ -106,7 +106,7 @@ export const Header = () => {
               <img 
                 src={resolvedTheme === 'blue' ? handyhjelpLogoWhite : handyhjelpLogo}
                 alt="HandyHjelp - Levert med kvalitet" 
-                className="w-auto object-contain transition-all duration-200"
+                className="w-auto object-contain"
                 id="header-logo"
               />
               <style>{`

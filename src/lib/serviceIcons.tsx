@@ -1,5 +1,6 @@
 import { Wrench, Hammer, Droplets, CloudRain, LucideIcon } from 'lucide-react';
 import { cn } from './utils';
+import { GRADIENT } from "@/lib/gradients";
 
 // Service icon and color mapping for consistent styling across the app
 export interface ServiceConfig {
@@ -64,10 +65,10 @@ export const getServiceColors = (serviceId: string): ServiceColors => {
 // across the site (Index, /tjenester, future service detail pages). Keeps
 // every card visually distinct without needing external image assets.
 export const serviceGradients: Record<string, string> = {
-  vaktmester: 'from-cyan-500 via-blue-500 to-indigo-600',
-  takrennerens: 'from-emerald-500 via-teal-500 to-cyan-600',
-  tomrer: 'from-amber-500 via-orange-500 to-rose-600',
-  blikk: 'from-slate-500 via-zinc-600 to-gray-700',
+  vaktmester: GRADIENT.hav,
+  takrennerens: GRADIENT.skog,
+  tomrer: GRADIENT.solnedgang,
+  blikk: GRADIENT.stein,
 };
 
 export const getServiceGradient = (serviceId: string): string => {

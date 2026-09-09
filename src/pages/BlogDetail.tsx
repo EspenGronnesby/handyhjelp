@@ -14,6 +14,7 @@ import { Helmet } from 'react-helmet';
 import { SEO_CONFIG, getCanonicalUrl } from '@/config/seo';
 import { Skeleton } from '@/components/ui/skeleton';
 import DOMPurify from 'dompurify';
+import { GRADIENT } from "@/lib/gradients";
 
 interface BlogPost {
   id: string;
@@ -214,7 +215,7 @@ const BlogDetail = () => {
               <div>
                 <SectionHeading
                   icon={Newspaper}
-                  gradient="from-amber-500 via-orange-500 to-rose-600"
+                  gradient={GRADIENT.solnedgang}
                   title="Lignende artikler"
                 />
                 <div className="grid md:grid-cols-3 gap-6">

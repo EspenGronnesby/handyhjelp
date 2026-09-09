@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { EditButton } from './ui/EditButton';
 import { ArrowRight, Phone } from 'lucide-react';
+import { GRADIENT } from "@/lib/gradients";
 
 // Kompakt CTA-boks plassert i Services-hero. Beholder visuell signatur fra
 // EditableBottomCTA (mørk gradient + gradient-stripe på topp) men er strippet
@@ -32,10 +33,10 @@ export const EditableCTABox = () => {
 
   return (
     <>
-      <div className="relative max-w-2xl mx-auto overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white shadow-lg">
+      <div className={`relative max-w-2xl mx-auto overflow-hidden rounded-2xl bg-gradient-to-br ${GRADIENT.dyp} text-white shadow-lg`}>
         {/* Tynn gradient-stripe på toppen — visuell signatur som matcher BottomCTA */}
         <div
-          className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 pointer-events-none"
+          className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${GRADIENT.hav} pointer-events-none`}
           aria-hidden="true"
         />
 

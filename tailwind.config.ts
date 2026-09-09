@@ -1,7 +1,13 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
 
 export default {
   darkMode: ["selector", ".blue"],
+  // Pakker alle hover:-utilities i @media (hover: hover). Uten dette henger
+  // hover-tilstanden igjen etter et trykk på touch — knappen blir stående
+  // forstørret. Se forbudslisten i .claude/rules/bevegelse.md.
+  future: { hoverOnlyWhenSupported: true },
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
@@ -51,11 +57,6 @@ export default {
           foreground: "hsl(var(--destructive-foreground))",
         },
         
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
-        
         muted: {
           DEFAULT: "hsl(var(--muted))",
           hover: "hsl(var(--muted-hover))",
@@ -93,6 +94,24 @@ export default {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         heading: ['Roboto Slab', 'serif'],
       },
+      // Bevegelse — peker på CSS-variablene i src/index.css (:root).
+      // Nye navn med vilje: de innebygde ease-out/duration-300 er urørt, så
+      // ingen eksisterende klasse endrer oppførsel. Se .claude/rules/bevegelse.md
+      transitionTimingFunction: {
+        enter: "var(--ease-out)",
+        move: "var(--ease-in-out)",
+        press: "var(--ease-press)",
+      },
+      transitionDuration: {
+        micro: "var(--duration-micro)",
+        fast: "var(--duration-fast)",
+        normal: "var(--duration-normal)",
+        slow: "var(--duration-slow)",
+        reveal: "var(--duration-reveal)",
+      },
+      letterSpacing: {
+        display: "-0.02em",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
@@ -127,5 +146,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate, typography],
 } satisfies Config;

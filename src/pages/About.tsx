@@ -25,6 +25,7 @@ import { EditButton } from "@/components/ui/EditButton";
 import { SectionEditModal } from "@/components/SectionEditModal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Users } from "lucide-react";
+import { GRADIENT } from "@/lib/gradients";
 
 const About = () => {
   const { heroImage, opacity, refetch: refetchHero } = useHeroImage('about', heroAboutImg);
@@ -116,7 +117,7 @@ const About = () => {
             <div className={`max-w-4xl mx-auto mb-10 md:mb-12 transition-all duration-700 ${teamVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               <SectionHeading
                 icon={Users}
-                gradient="from-amber-500 via-orange-500 to-rose-600"
+                gradient={GRADIENT.solnedgang}
                 title={displayTeamHeading}
                 subtitle={displayTeamSubtext}
               />

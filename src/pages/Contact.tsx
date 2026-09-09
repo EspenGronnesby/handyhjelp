@@ -25,6 +25,7 @@ import { EditButton } from "@/components/ui/EditButton";
 import { SectionEditModal } from "@/components/SectionEditModal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TrustStripe } from "@/components/TrustStripe";
+import { GRADIENT } from "@/lib/gradients";
 const Contact = () => {
   const { phone: contactPhone } = useContactInfo();
   const { editMode, isAdmin } = useEditMode();
@@ -125,7 +126,7 @@ const Contact = () => {
                 <div>
                   <SectionHeading
                     icon={MessageSquare}
-                    gradient="from-cyan-500 via-blue-500 to-indigo-600"
+                    gradient={GRADIENT.hav}
                     title={formHeading}
                   />
                   <form onSubmit={handleSubmit} className="space-y-4">
@@ -185,7 +186,7 @@ const Contact = () => {
               <div className="glass-card p-6">
                 <SectionHeading
                   icon={Info}
-                  gradient="from-emerald-500 via-teal-500 to-cyan-600"
+                  gradient={GRADIENT.skog}
                   title={infoHeading}
                 />
                 <EditableContactInfo />
@@ -209,7 +210,7 @@ const Contact = () => {
           <section className="max-w-3xl mx-auto mt-8">
             <SectionHeading
               icon={HelpCircle}
-              gradient="from-fuchsia-500 via-purple-500 to-indigo-600"
+              gradient={GRADIENT.natt}
               title="Ofte stilte spørsmål"
               subtitle="før du kontakter oss"
             />

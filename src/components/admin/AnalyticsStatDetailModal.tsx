@@ -4,6 +4,7 @@ import { Eye, MousePointerClick, ArrowRight, Loader2, Users, TrendingUp } from '
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { useAnalyticsOverview } from '@/hooks/useAnalyticsOverview';
+import { GRADIENT } from "@/lib/gradients";
 
 export type AnalyticsStatType = 'visits' | 'conversionRate' | null;
 
@@ -11,13 +12,13 @@ const config = {
   visits: {
     title: 'Besøk siste 7 dager',
     icon: Eye,
-    gradient: 'from-cyan-600 via-blue-600 to-indigo-700',
+    gradient: GRADIENT.havDyp,
     chartColor: '#6366f1',
   },
   conversionRate: {
     title: 'Konverteringsrate siste 7 dager',
     icon: MousePointerClick,
-    gradient: 'from-emerald-600 via-teal-600 to-cyan-700',
+    gradient: GRADIENT.skogDyp,
     chartColor: '#10b981',
   },
 } as const;

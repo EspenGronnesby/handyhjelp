@@ -13,6 +13,7 @@ import { Helmet } from "react-helmet";
 import { SEO_CONFIG, getCanonicalUrl, getOgImageUrl } from "@/config/seo";
 import { ServiceBadge } from "@/lib/serviceIcons";
 import { ProjectDetailSkeleton } from "@/components/ui/skeleton-loaders";
+import { GRADIENT } from "@/lib/gradients";
 
 interface Project {
   id: string;
@@ -176,7 +177,7 @@ const ProjectDetail = () => {
               <div className="relative rounded-2xl p-3 md:p-8 h-[320px] md:h-[600px] w-full overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent backdrop-blur-2xl backdrop-saturate-150 border border-white/25 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)]">
                 {/* Top gradient-stripe — visuell signatur */}
                 <div
-                  className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 pointer-events-none"
+                  className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${GRADIENT.hav} pointer-events-none`}
                   aria-hidden="true"
                 />
                 {/* Dot-pattern overlay */}
@@ -211,7 +212,7 @@ const ProjectDetail = () => {
             <div className="relative">
               <div className="relative rounded-2xl p-3 md:p-8 h-[320px] md:h-[600px] w-full overflow-hidden bg-gradient-to-br from-white/10 via-white/5 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent backdrop-blur-2xl backdrop-saturate-150 border border-white/25 shadow-[0_8px_32px_0_rgba(0,0,0,0.2),inset_0_1px_0_0_rgba(255,255,255,0.25)]">
                 <div
-                  className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 pointer-events-none"
+                  className={`absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r ${GRADIENT.skog} pointer-events-none`}
                   aria-hidden="true"
                 />
                 <div
@@ -247,7 +248,7 @@ const ProjectDetail = () => {
           <div className="max-w-3xl mb-12">
             <SectionHeading
               icon={BookOpen}
-              gradient="from-slate-500 via-zinc-600 to-gray-700"
+              gradient={GRADIENT.stein}
               title="Om prosjektet"
             />
             <p className="text-lg leading-relaxed text-foreground/90">
