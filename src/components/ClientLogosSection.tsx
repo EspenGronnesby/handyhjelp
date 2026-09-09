@@ -19,7 +19,7 @@ interface ClientLogo {
 const LogoItem = ({ logo }: { logo: ClientLogo }) => {
   const inner = (
     <div
-      className="group flex items-center justify-center px-6 py-3 rounded-xl transition-all duration-500 grayscale hover:grayscale-0 opacity-50 hover:opacity-100 hover:scale-105 cursor-pointer"
+      className="group flex items-center justify-center px-6 py-3 rounded-xl transition-[filter,opacity,transform] duration-fast ease-enter grayscale hover:grayscale-0 opacity-50 hover:opacity-100 hover:scale-105 cursor-pointer"
       title={logo.name}
     >
       {/* Fixed container: 140×56px — fits square, round, wide/text logos */}

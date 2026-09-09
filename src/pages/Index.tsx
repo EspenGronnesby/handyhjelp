@@ -1,4 +1,4 @@
-import { lazy, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Header } from "@/components/Header";
 import { HeroSection } from "@/components/HeroSection";
 import { BreadcrumbNavigation } from "@/components/SEO/BreadcrumbNavigation";
@@ -22,6 +22,7 @@ import { LazySection } from "@/components/LazySection";
 import ClientLogosSection from "@/components/ClientLogosSection";
 import { ProcessSection } from "@/components/ProcessSection";
 import { GuaranteeSection } from "@/components/GuaranteeSection";
+import { GRADIENT } from "@/lib/gradients";
 
 // Sections far below the fold — split off the initial bundle.
 const ProjectsSection = lazy(() => import("@/components/ProjectsSection").then(m => ({ default: m.ProjectsSection })));
@@ -65,7 +66,7 @@ const ServicesHeading = () => {
 
         <SectionHeading
           icon={Wrench}
-          gradient="from-cyan-500 via-blue-500 to-indigo-600"
+          gradient={GRADIENT.hav}
           title={displayHeading}
           subtitle={displaySubheading}
           align="center"
@@ -126,7 +127,7 @@ const Index = () => {
         {/* Services overview — kept inline (light JSX) but reveal-animated */}
         <section className="py-10 md:py-24 bg-background" id="services" ref={servicesRef}>
           <div className="container mx-auto px-4">
-            <div className={`transition-all duration-700 ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className={`transition-[opacity,transform] duration-reveal ease-enter ${servicesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <ServicesHeading />
 
               <div className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 max-w-5xl mx-auto mb-8 md:mb-12">
@@ -220,9 +221,13 @@ const Index = () => {
         <Footer />
       </LazySection>
 
-      <LazySection minHeight="0px">
+      {/* IKKE i LazySection: den monterer først når sin egen 0px-høye div
+          nederst på siden treffes, og da rekker aldri scroll-lytteren i
+          StickyMobileCTA (scrollY > 400) å bli aktiv. lazy() beholdes, så
+          JS-en er fortsatt kodesplittet. */}
+      <Suspense fallback={null}>
         <StickyMobileCTA />
-      </LazySection>
+      </Suspense>
     </div>
   );
 };

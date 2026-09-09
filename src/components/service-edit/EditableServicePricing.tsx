@@ -14,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { EditButton } from '@/components/ui/EditButton';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useFadeInUp } from '@/hooks/useScrollAnimation';
+import { GRADIENT } from "@/lib/gradients";
 
 interface EditableServicePricingProps {
   section: string;
@@ -111,8 +112,8 @@ export const EditableServicePricing = ({
           icon={Tag}
           gradient={
             isFixedPrice
-              ? "from-amber-500 via-orange-500 to-rose-600"
-              : "from-cyan-500 via-blue-500 to-indigo-600"
+              ? GRADIENT.solnedgang
+              : GRADIENT.hav
           }
           title="Priser"
         />

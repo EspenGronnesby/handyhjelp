@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { EditButton } from '@/components/ui/EditButton';
+import { GRADIENT } from "@/lib/gradients";
 
 interface HowWeWorkStep {
   title: string;
@@ -127,7 +128,7 @@ export const EditableHowWeWork = () => {
 
         <SectionHeading
           icon={Workflow}
-          gradient="from-amber-500 via-orange-500 to-rose-600"
+          gradient={GRADIENT.solnedgang}
           title={defaultData.heading}
         />
         <div className="space-y-4">

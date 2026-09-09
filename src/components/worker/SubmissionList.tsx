@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2, Camera, FileText, Clock, CheckCircle, XCircle, FileEdit, Edit, Trash2 } from 'lucide-react';
+import { GRADIENT } from "@/lib/gradients";
 
 interface SubmissionListProps {
   type: 'projects' | 'blog';
@@ -89,14 +90,14 @@ export const SubmissionList = ({ type, userId, onEditProject, onEditBlog, onDele
         <CardContent className="py-12 text-center text-muted-foreground">
           {type === 'projects' ? (
             <>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-md">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br ${GRADIENT.skog} shadow-md`}>
                 <Camera className="h-7 w-7 text-white drop-shadow" />
               </div>
               <p>Du har ikke sendt inn noen prosjekter ennå</p>
             </>
           ) : (
             <>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-fuchsia-500 via-purple-500 to-indigo-600 shadow-md">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br ${GRADIENT.natt} shadow-md`}>
                 <FileText className="h-7 w-7 text-white drop-shadow" />
               </div>
               <p>Du har ikke sendt inn noen blogginnlegg ennå</p>

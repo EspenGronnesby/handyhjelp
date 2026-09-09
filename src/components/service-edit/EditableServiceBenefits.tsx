@@ -14,6 +14,7 @@ import { EditButton } from '@/components/ui/EditButton';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useStaggeredGridReveal } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
+import { GRADIENT } from "@/lib/gradients";
 
 interface EditableServiceBenefitsProps {
   section: string;
@@ -22,10 +23,10 @@ interface EditableServiceBenefitsProps {
 
 // Stable per-slot visual identity for the four benefit tiles.
 const slotVisuals: { icon: LucideIcon; gradient: string }[] = [
-  { icon: ShieldCheck, gradient: "from-cyan-500 via-blue-500 to-indigo-600" },
-  { icon: Zap, gradient: "from-amber-500 via-orange-500 to-rose-600" },
-  { icon: Heart, gradient: "from-emerald-500 via-teal-500 to-cyan-600" },
-  { icon: Sparkles, gradient: "from-fuchsia-500 via-purple-500 to-indigo-600" },
+  { icon: ShieldCheck, gradient: GRADIENT.hav },
+  { icon: Zap, gradient: GRADIENT.solnedgang },
+  { icon: Heart, gradient: GRADIENT.skog },
+  { icon: Sparkles, gradient: GRADIENT.natt },
 ];
 
 export const EditableServiceBenefits = ({
@@ -111,7 +112,7 @@ export const EditableServiceBenefits = ({
 
         <SectionHeading
           icon={Star}
-          gradient="from-amber-500 via-orange-500 to-rose-600"
+          gradient={GRADIENT.solnedgang}
           title="Hvorfor velge oss?"
         />
 

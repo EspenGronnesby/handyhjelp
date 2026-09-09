@@ -8,6 +8,7 @@ import {
 } from "framer-motion";
 import { Milestone } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { GRADIENT } from "@/lib/gradients";
 
 export type RoadmapMilestone = {
   year: string;
@@ -107,7 +108,7 @@ export function RoadmapTimeline({ heading, milestones }: RoadmapTimelineProps) {
       <div className="mx-auto max-w-6xl px-4">
         <SectionHeading
           icon={Milestone}
-          gradient="from-fuchsia-500 via-purple-500 to-indigo-600"
+          gradient={GRADIENT.natt}
           title={heading}
           subtitle="En kort oversikt over viktige milepæler – og hvor vi er på vei."
           align="center"

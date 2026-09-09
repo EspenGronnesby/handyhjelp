@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { isItemEmpty } from "@/lib/gridUtils";
 import { GradientHeaderCard } from "@/components/ui/GradientHeaderCard";
 import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
+import { GRADIENT } from "@/lib/gradients";
 
 interface WhyChooseItem {
   title: string;
@@ -21,9 +22,9 @@ interface WhyChooseItem {
 // Visual identity per slot — kept stable across renders so each card has the
 // same look every time the user visits. Title/description are still editable.
 const slotVisuals: { icon: LucideIcon; gradient: string }[] = [
-  { icon: Award, gradient: "from-cyan-500 via-blue-500 to-indigo-600" },
-  { icon: MapPin, gradient: "from-emerald-500 via-teal-500 to-cyan-600" },
-  { icon: Shield, gradient: "from-amber-500 via-orange-500 to-rose-600" },
+  { icon: Award, gradient: GRADIENT.hav },
+  { icon: MapPin, gradient: GRADIENT.skog },
+  { icon: Shield, gradient: GRADIENT.solnedgang },
 ];
 
 const EditableWhyChooseSection = () => {
@@ -86,7 +87,7 @@ const EditableWhyChooseSection = () => {
 
           <SectionHeading
             icon={Award}
-            gradient="from-cyan-500 via-blue-500 to-indigo-600"
+            gradient={GRADIENT.hav}
             title={heading}
             align="center"
             className="mb-10 md:mb-14"

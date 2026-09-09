@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GradientHeaderCard } from "@/components/ui/GradientHeaderCard";
 import { useStaggeredGridReveal } from "@/hooks/useScrollAnimation";
+import { GRADIENT } from "@/lib/gradients";
 
 interface ComparisonData {
   mainHeading: string;
@@ -77,7 +78,7 @@ const EditableComparisonSection = () => {
 
           <SectionHeading
             icon={Sparkles}
-            gradient="from-amber-500 via-orange-500 to-rose-600"
+            gradient={GRADIENT.solnedgang}
             title={data.mainHeading}
             subtitle={data.subheading}
             align="center"
@@ -88,7 +89,7 @@ const EditableComparisonSection = () => {
             <Link to="/tilbud" style={getItemStyle(0)} className="block group/link">
               <GradientHeaderCard
                 icon={Calendar}
-                gradient="from-slate-500 via-zinc-600 to-gray-700"
+                gradient={GRADIENT.stein}
                 title={data.oneTimeTitle}
               >
                 <ul className="space-y-3 mt-1 flex-1">
@@ -111,7 +112,7 @@ const EditableComparisonSection = () => {
             <Link to="/fast-avtale" style={getItemStyle(1)} className="block group/link">
               <GradientHeaderCard
                 icon={Sparkles}
-                gradient="from-emerald-500 via-teal-500 to-cyan-600"
+                gradient={GRADIENT.skog}
                 title={data.fixedTitle}
                 badge="Anbefalt"
                 highlight

@@ -9,7 +9,7 @@ import { useContactInfo } from "@/hooks/useContactInfo";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { EditButton } from "@/components/ui/EditButton";
 import heroDefaultImage from "@/assets/hero-building-maintenance.webp";
-import { MotionButton } from "@/components/motion";
+import { Button } from "@/components/ui/button";
 
 
 // Admin-only chunks — never shipped to anonymous visitors
@@ -60,6 +60,12 @@ export const HeroSection = () => {
           fetchpriority="high"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ objectPosition: 'center 30%' }}
+          onError={(e) => {
+            // Sikkerhetsnett: en bufret URL kan ha blitt ugyldig. Fall tilbake
+            // til det innebygde bildet i stedet for å vise en tom hero.
+            const el = e.currentTarget;
+            if (el.src !== heroDefaultImage) el.src = heroDefaultImage;
+          }}
         />
         <div
           className="absolute inset-0 bg-gradient-to-br from-secondary/90 to-secondary/85 dark:from-secondary/80 dark:to-secondary/75"
@@ -87,7 +93,7 @@ export const HeroSection = () => {
             {/* Left Content - Mobile optimized */}
             <div className="text-left flex flex-col justify-center">
               {/* Main Heading - plain white text */}
-              <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-8 font-heading text-white leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-4 md:mb-8 font-heading text-white leading-[1.1] tracking-display">
                 {displayTitle}
               </h1>
 
@@ -99,26 +105,26 @@ export const HeroSection = () => {
               {/* CTA Buttons - With motion */}
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mb-8 md:mb-12">
                 <QuickCallbackDialog>
-                  <MotionButton
+                  <Button
                     size="lg"
                     variant="cta"
                     className="text-lg md:text-lg px-8 md:px-8 py-5 md:py-6 font-semibold"
                   >
                     {displayCtaText}
-                  </MotionButton>
+                  </Button>
                 </QuickCallbackDialog>
-                <MotionButton
+                <Button
                   variant="cta-outline"
                   size="lg"
                   className="text-base md:text-lg px-6 md:px-6 py-4 md:py-6 bg-white/10 text-white border-white/30 hover:bg-white/20"
                   onClick={() => navigate('/tjenester')}
                 >
                   {displayServicesButtonText}
-                </MotionButton>
+                </Button>
               </div>
 
               {/* 24/7 Contact */}
-              <div className="backdrop-blur-md rounded-xl p-4 md:p-6 inline-block bg-white/10 border border-white/30 shadow-lg hover:bg-white/20 hover:border-white/50 hover:backdrop-blur-xl hover:shadow-[0_8px_32px_hsl(0_0%_100%/0.1),inset_0_1px_0_hsl(0_0%_100%/0.15)] transition-all duration-300 group">
+              <div className="backdrop-blur-md rounded-xl p-4 md:p-6 inline-block bg-white/10 border border-white/30 shadow-lg hover:bg-white/20 hover:border-white/50 hover:backdrop-blur-xl hover:shadow-[0_8px_32px_hsl(0_0%_100%/0.1),inset_0_1px_0_hsl(0_0%_100%/0.15)] transition-[background-color,border-color,box-shadow] duration-fast ease-enter group">
                 <p className="text-white/95 dark:text-muted-foreground text-xs md:text-sm mb-1 md:mb-2">24/7 Service</p>
                 <a href={phoneHref} className="text-white dark:text-foreground text-2xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 md:gap-3 transition-colors">
                   <Phone className="h-6 w-6 md:h-7 md:w-7" />

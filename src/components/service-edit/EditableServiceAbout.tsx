@@ -12,6 +12,7 @@ import { EditButton } from '@/components/ui/EditButton';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { BookOpen } from 'lucide-react';
 import { useFadeInUp } from '@/hooks/useScrollAnimation';
+import { GRADIENT } from "@/lib/gradients";
 
 interface EditableServiceAboutProps {
   section: string;
@@ -93,7 +94,7 @@ export const EditableServiceAbout = ({
 
         <SectionHeading
           icon={BookOpen}
-          gradient="from-slate-500 via-zinc-600 to-gray-700"
+          gradient={GRADIENT.stein}
           title="Om tjenesten"
         />
 

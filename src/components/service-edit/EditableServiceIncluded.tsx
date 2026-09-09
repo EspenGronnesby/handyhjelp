@@ -14,6 +14,7 @@ import { EditButton } from '@/components/ui/EditButton';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { useFadeInUp } from '@/hooks/useScrollAnimation';
 import { cn } from '@/lib/utils';
+import { GRADIENT } from "@/lib/gradients";
 
 interface EditableServiceIncludedProps {
   section: string;
@@ -119,7 +120,7 @@ export const EditableServiceIncluded = ({
 
         <SectionHeading
           icon={ClipboardCheck}
-          gradient="from-emerald-500 via-teal-500 to-cyan-600"
+          gradient={GRADIENT.skog}
           title="Hva er inkludert?"
         />
 

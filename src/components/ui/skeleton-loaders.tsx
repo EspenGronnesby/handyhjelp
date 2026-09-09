@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { GRADIENT } from "@/lib/gradients";
 
 // Generic card skeleton for quotes, jobs, projects etc.
 export const CardSkeleton = () => (
@@ -199,7 +200,7 @@ export const NotificationListSkeleton = ({ count = 5 }: { count?: number }) => (
 export const DashboardShellSkeleton = () => (
   <div className="min-h-screen bg-background">
     <div className="border-b border-border/60 bg-card">
-      <div className="h-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600" />
+      <div className={`h-0.5 bg-gradient-to-r ${GRADIENT.hav}`} />
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Skeleton className="h-9 w-32" />
         <div className="flex items-center gap-2">

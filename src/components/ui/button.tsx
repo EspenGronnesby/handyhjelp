@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-95",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-[color,background-color,border-color,box-shadow,transform,opacity] duration-fast ease-enter focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-[0.97] active:duration-micro active:ease-press",
   {
     variants: {
       variant: {
@@ -15,8 +15,8 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        cta: "bg-success text-success-foreground hover:bg-success-hover hover:shadow-lg hover:scale-105 font-semibold",
-        "cta-outline": "border-2 border-primary bg-card text-primary hover:bg-primary hover:text-primary-foreground font-semibold hover:shadow-md",
+        cta: "bg-success text-success-foreground hover:bg-success-hover hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5 font-semibold",
+        "cta-outline": "border-2 border-primary bg-card text-primary hover:bg-primary hover:text-primary-foreground font-semibold hover:shadow-md hover:-translate-y-0.5",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -16,6 +16,7 @@ import { WorkerBlogForm } from '@/components/worker/WorkerBlogForm';
 import { WorkerProjectEditForm } from '@/components/worker/WorkerProjectEditForm';
 import { WorkerBlogEditForm } from '@/components/worker/WorkerBlogEditForm';
 import { SubmissionList, type Project, type BlogPost } from '@/components/worker/SubmissionList';
+import { GRADIENT } from "@/lib/gradients";
 
 const WorkerDashboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -98,7 +99,7 @@ const WorkerDashboard = () => {
     <div>
       <div>
         <div className="mb-6 flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 shadow-sm">
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-to-br ${GRADIENT.skog} shadow-sm`}>
             <Hammer className="h-5 w-5 text-white drop-shadow" />
           </div>
           <div>

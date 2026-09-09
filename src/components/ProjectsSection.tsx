@@ -12,6 +12,7 @@ import { ServiceBadge } from "@/lib/serviceIcons";
 import { useScrollGridReveal } from "@/hooks/useScrollAnimation";
 import { EditButton } from './ui/EditButton';
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { GRADIENT } from "@/lib/gradients";
 
 interface Project {
   id: string;
@@ -25,6 +26,11 @@ interface Project {
   category: string;
 }
 
+/** Maks antall prosjektkort. Brukes BÅDE til utvalget og til
+ *  scroll-avsløringen — endres den ett sted, må begge følge med,
+ *  ellers blir siste kort hengende under full opasitet. */
+const MAKS_KORT = 4;
+
 export const ProjectsSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [hoveredProject, setHoveredProject] = useState<string | null>(null);
@@ -37,7 +43,10 @@ export const ProjectsSection = () => {
   
   const displayHeading = heading || 'Våre prosjekter';
   const displaySubheading = subheading || 'Se resultatet av vårt arbeid';
-  const { ref, isInView: isVisible, getItemStyle } = useScrollGridReveal(3, 3);
+  // itemCount MÅ matche MAKS_KORT. Med 3 (mens fire kort ble rendret) fikk
+  // fjerde kort terskel 3/4, og (1 − 0,75) × 4 × 0,8 = 0,8 — matematisk umulig
+  // å bli helt synlig. Derfor er tallet nå én delt konstant.
+  const { ref, isInView: isVisible, getItemStyle } = useScrollGridReveal(MAKS_KORT, 3);
 
   useEffect(() => {
     fetchProjects();
@@ -88,11 +97,11 @@ export const ProjectsSection = () => {
       // If we have less than 4 projects, fill with remaining projects
       if (selectedProjects.length < 4 && data) {
         const remaining = data.filter(p => !selectedProjects.includes(p));
-        selectedProjects.push(...remaining.slice(0, 4 - selectedProjects.length));
+        selectedProjects.push(...remaining.slice(0, MAKS_KORT - selectedProjects.length));
       }
 
       // Show up to 4 projects
-      setProjects(selectedProjects.slice(0, 4));
+      setProjects(selectedProjects.slice(0, MAKS_KORT));
     }
   };
 
@@ -107,7 +116,7 @@ export const ProjectsSection = () => {
   return (
     <section id="projects" className="py-12 md:py-16 bg-muted/30 section-mobile" ref={ref}>
       <div className="container mx-auto px-4">
-        <div className={`transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className={`transition-[opacity,transform] duration-reveal ease-enter ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="relative mb-8 md:mb-12">
           {isAdmin && editMode && (
             <EditButton onClick={() => setIsModalOpen(true)} ariaLabel="Rediger Våre prosjekter overskrift" />
@@ -115,7 +124,7 @@ export const ProjectsSection = () => {
 
           <SectionHeading
             icon={Briefcase}
-            gradient="from-amber-500 via-orange-500 to-rose-600"
+            gradient={GRADIENT.solnedgang}
             title={displayHeading}
             subtitle={displaySubheading}
             align="center"
@@ -132,7 +141,7 @@ export const ProjectsSection = () => {
           <>
             {/* Mobile: horizontal swim lane (App Store-stil). Desktop: 3-kol grid. */}
             <div className="swim-lane mb-6 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible md:mx-0 md:px-0 md:pb-0 md:mb-12 md:[&>*]:w-auto">
-              {projects.slice(0, 4).map((project, index) => (
+              {projects.slice(0, MAKS_KORT).map((project, index) => (
               <Link
                 key={project.id}
                 to={`/prosjekter/${project.id}`}

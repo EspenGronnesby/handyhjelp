@@ -55,8 +55,6 @@ html, body {
     /* Status Colors */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 11%;
 
     /* Form Elements */
     --border: 210 20% 88%;
@@ -66,18 +64,27 @@ html, body {
     --ring: 188 94% 37%;
 
     /* Gradients for Hero & Special Sections */
-    --gradient-hero: linear-gradient(135deg, hsl(213 51% 24%), hsl(210 29% 20%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 98%));
-    --gradient-cta: linear-gradient(135deg, hsl(188 94% 37%), hsl(188 94% 32%));
 
     /* Shadows & Effects */
     --shadow-card: 0 4px 6px -1px hsl(222 47% 11% / 0.1), 0 2px 4px -1px hsl(222 47% 11% / 0.06);
     --shadow-elevated: 0 10px 15px -3px hsl(222 47% 11% / 0.1), 0 4px 6px -2px hsl(222 47% 11% / 0.05);
-    --shadow-hero: 0 25px 50px -12px hsl(222 47% 11% / 0.25);
 
     /* Popover (same as card in light mode) */
     --popover: 0 0% 100%;
     --popover-foreground: 217 19% 27%;
+
+    /* Bevegelse — SAMME verdier som tailwind.config.ts (ease-enter/move/press,
+       duration-micro…reveal). Endrer du én, endre begge.
+       Se .claude/rules/bevegelse.md */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);      /* inn/ut */
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);  /* bevegelse på skjermen */
+    --ease-press: cubic-bezier(0.4, 0, 0.2, 1);      /* trykk */
+
+    --duration-micro: 120ms;   /* trykk-feedback */
+    --duration-fast: 180ms;    /* hover */
+    --duration-normal: 250ms;  /* dropdowns, UI */
+    --duration-slow: 350ms;    /* sideoverganger */
+    --duration-reveal: 500ms;  /* scroll-reveal (markedsføring) */
 
     --radius: 0.75rem;
 
@@ -175,38 +182,23 @@ html, body {
 
 @layer components {
   /* Hero Section Styles */
-  .hero-gradient {
-    background: var(--gradient-hero);
-  }
+  
 
-  .card-gradient {
-    background: var(--gradient-card);
-  }
+  
 
-  .cta-gradient {
-    background: var(--gradient-cta);
-  }
+  
 
   /* Professional Button Styles */
-  .btn-hero {
-    @apply bg-primary hover:bg-primary-hover text-primary-foreground;
-    @apply px-8 py-4 rounded-lg font-semibold text-lg;
-    @apply shadow-lg hover:shadow-xl transform hover:scale-105;
-    @apply transition-all duration-300 ease-out;
-  }
+  
 
-  .btn-outline-hero {
-    @apply border-2 border-foreground text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary;
-    @apply px-6 py-3 rounded-lg font-medium;
-    @apply transition-all duration-300 ease-out;
-  }
+  
 
   /* Professional Card Styles - Enhanced for dark mode visibility */
   .card-professional {
     @apply bg-card border border-border rounded-xl;
     @apply dark:ring-1 dark:ring-white/10;
     box-shadow: var(--shadow-card);
-    transition: box-shadow 0.5s ease-out, transform 0.5s ease-out, filter 0.5s ease-out;
+    transition: box-shadow var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out), filter var(--duration-fast) var(--ease-out);
     filter: brightness(1);
   }
 
@@ -219,36 +211,12 @@ html, body {
     filter: brightness(1.08);
   }
 
-  .card-elevated {
-    @apply bg-card-elevated border border-border rounded-xl;
-    @apply dark:ring-1 dark:ring-white/10;
-    box-shadow: var(--shadow-elevated);
-  }
+  
 
-  /* Enhanced card styling for better dark mode visibility */
-  .card-enhanced {
-    @apply bg-card border border-border rounded-xl;
-    @apply shadow-md dark:shadow-lg;
-    @apply dark:ring-1 dark:ring-white/10;
-    transition: all 0.5s ease-out;
-    filter: brightness(1);
-  }
-
-  .card-enhanced:hover {
-    @apply shadow-xl dark:shadow-2xl;
-    @apply -translate-y-1;
-    filter: brightness(1.03);
-  }
-
-  :is(.dark, .blue) .card-enhanced:hover {
-    filter: brightness(1.08);
-  }
-
-  /* Image frame for better visibility */
-  .image-frame {
-    @apply rounded-lg overflow-hidden;
-    @apply ring-1 ring-border/50 dark:ring-white/15;
-    @apply shadow-md dark:shadow-xl;
+  /* Sideovergang — erstatter framer-motion sin PageTransition.
+     Spilles på nytt ved hver navigasjon (Routes har key=pathname). */
+  .page-enter {
+    animation: page-enter var(--duration-slow) var(--ease-out) both;
   }
 
   /* Form Styles */
@@ -257,41 +225,30 @@ html, body {
   }
 
   /* Typography Enhancements */
-  .heading-hero {
-    @apply text-4xl md:text-5xl lg:text-6xl font-bold text-foreground;
-    @apply leading-tight tracking-tight;
-  }
+  
 
   .heading-section {
     @apply text-2xl md:text-3xl lg:text-4xl font-bold text-foreground;
     @apply leading-tight mb-6;
   }
 
-  .text-hero-muted {
-    @apply text-hero-text-muted text-lg md:text-xl leading-relaxed;
-  }
+  
 
   /* Animations */
   .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out forwards;
+    animation: fadeInUp var(--duration-reveal) var(--ease-out) forwards;
   }
 
-  .animate-fade-in-left {
-    animation: fadeInLeft 0.6s ease-out forwards;
-  }
+  
 
-  .animate-fade-in-right {
-    animation: fadeInRight 0.6s ease-out forwards;
-  }
+  
 
-  .animate-scale-in {
-    animation: scaleIn 0.4s ease-out forwards;
-  }
+  
 
   /* Card hover lift effect - Stable pseudo-element overlay */
   .card-hover-lift {
     position: relative;
-    transition: transform 0.5s ease-out, box-shadow 0.5s ease-out;
+    transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   }
   
   .card-hover-lift::before {
@@ -300,14 +257,13 @@ html, body {
     inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
     opacity: 0;
-    transition: opacity 0.5s ease-out;
+    transition: opacity var(--duration-fast) var(--ease-out);
     pointer-events: none;
     border-radius: inherit;
     z-index: 1;
   }
   
   .card-hover-lift:hover {
-    transform: translateY(-4px);
     box-shadow: 0 12px 24px -8px rgba(0,0,0,0.12);
   }
   
@@ -327,38 +283,19 @@ html, body {
     opacity: 1;
   }
 
-  /* Subtle pulse animation for badges */
-  .animate-subtle-pulse {
-    animation: subtlePulse 2s ease-in-out infinite;
-  }
-
   /* Scroll down indicator bounce */
-  .animate-bounce-down {
-    animation: bounceDown 2s ease-in-out infinite;
-  }
+  
 
   /* Staggered animation delays */
-  .animate-stagger-1 { animation-delay: 0ms; }
-  .animate-stagger-2 { animation-delay: 100ms; }
-  .animate-stagger-3 { animation-delay: 200ms; }
-  .animate-stagger-4 { animation-delay: 300ms; }
-  .animate-stagger-5 { animation-delay: 400ms; }
-  .animate-stagger-6 { animation-delay: 500ms; }
+  
 
   /* Fade in with stagger support */
-  .animate-fade-in-stagger {
-    opacity: 0;
-    animation: fadeInUp 0.6s ease-out forwards;
-  }
+  
 
   /* Icon lift on hover - Smooth and persistent */
-  .icon-hover-bounce svg {
-    transition: transform 0.5s ease-out;
-  }
+  
 
-  .icon-hover-bounce:hover svg {
-    transform: translateY(-4px);
-  }
+
 
   /* ==============================
    * STANDARDIZED HOVER CLASSES
@@ -368,7 +305,7 @@ html, body {
   /* Standard interactive card - stable pseudo-element overlay for admin/lists */
   .interactive-card {
     position: relative;
-    transition: transform 0.5s ease-out, box-shadow 0.5s ease-out;
+    transition: transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
     overflow: hidden;
   }
 
@@ -378,14 +315,13 @@ html, body {
     inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
     opacity: 0;
-    transition: opacity 0.5s ease-out;
+    transition: opacity var(--duration-fast) var(--ease-out);
     pointer-events: none;
     border-radius: inherit;
     z-index: 1;
   }
 
   .interactive-card:hover {
-    transform: translateY(-4px);
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
   }
 
@@ -408,7 +344,7 @@ html, body {
   /* Subtle hover - stable pseudo-element overlay for smaller elements */
   .subtle-hover {
     position: relative;
-    transition: box-shadow 0.5s ease-out;
+    transition: box-shadow var(--duration-fast) var(--ease-out);
     overflow: hidden;
   }
 
@@ -418,7 +354,7 @@ html, body {
     inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
     opacity: 0;
-    transition: opacity 0.5s ease-out;
+    transition: opacity var(--duration-fast) var(--ease-out);
     pointer-events: none;
     border-radius: inherit;
     z-index: 1;
@@ -438,68 +374,28 @@ html, body {
 
   /* Image hover - for images with scale effect */
   .image-hover {
-    transition: transform 0.5s ease-out;
+    transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .image-hover:hover {
-    transform: scale(1.05);
-  }
+
 
   /* Text glow on hover */
-  .link-glow {
-    transition: text-shadow 0.3s ease;
-  }
-  .link-glow:hover {
-    text-shadow: 0 0 12px hsl(var(--primary) / 0.4);
-  }
+  
 
   /* Shimmer effect for skeleton loading */
-  .skeleton-shimmer {
-    background: linear-gradient(
-      90deg,
-      hsl(var(--muted)) 25%,
-      hsl(var(--muted-foreground) / 0.1) 50%,
-      hsl(var(--muted)) 75%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-  }
+  
 
   /* Gradient orb for decorative backgrounds */
-  .gradient-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.3;
-    pointer-events: none;
-  }
+  
 
   /* Dots pattern background */
-  .bg-dots-pattern {
-    background-image: radial-gradient(
-      circle,
-      hsl(var(--primary) / 0.08) 1px,
-      transparent 1px
-    );
-    background-size: 24px 24px;
-  }
+  
 
   /* Focus ring animation for inputs */
-  .input-focus-ring:focus {
-    animation: focusRing 0.2s ease-out forwards;
-  }
+  
 
   /* Scroll reveal animation */
-  .scroll-reveal {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  }
   
-  .scroll-reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
 
   /* Carousel fade edges */
   .carousel-fade-edges {
@@ -520,9 +416,7 @@ html, body {
   }
 
   /* Progress bar animation */
-  .progress-fill {
-    animation: progressFill 5s linear;
-  }
+  
 
   /* ===== Apple-Style Mobile Scroll Sections ===== */
   
@@ -535,21 +429,17 @@ html, body {
   .reveal-up {
     opacity: 0;
     transform: translateY(40px);
-    animation: revealUp 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation: revealUp var(--duration-reveal) var(--ease-out) forwards;
   }
 
   .reveal-scale {
     opacity: 0;
     transform: scale(0.96);
-    animation: revealScale 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation: revealScale var(--duration-reveal) var(--ease-out) forwards;
   }
 
   /* Staggered reveal delays */
-  .reveal-stagger-1 { animation-delay: 0ms; }
-  .reveal-stagger-2 { animation-delay: 150ms; }
-  .reveal-stagger-3 { animation-delay: 300ms; }
-  .reveal-stagger-4 { animation-delay: 450ms; }
-  .reveal-stagger-5 { animation-delay: 600ms; }
+  
 
   /* Mobile-optimized card grid */
   @media (max-width: 768px) {
@@ -567,14 +457,13 @@ html, body {
   }
 
   /* Mobile section transition */
-  .mobile-section-fade {
-    @apply transition-opacity duration-700 ease-out;
-  }
+  
 
   /* Optimized performance containment */
+  /* will-change fjernet med vilje: permanent will-change reserverer GPU-minne
+     også nar ingenting animeres. Se .claude/rules/bevegelse.md */
   .perf-contain {
     contain: layout style;
-    will-change: opacity, transform;
   }
 
   /* Hide scrollbar but keep scroll functionality (used by swim lanes) */
@@ -635,6 +524,31 @@ html, body {
     right: 0;
     background: linear-gradient(to left, hsl(var(--card)) 0%, transparent 100%);
   }
+
+  /* BUG: .animate-fade-in ble brukt 4 steder (Header-mobilmenyen, Projects,
+     ReviewSubmit, Feedback) uten å være definert noe sted. Header setter til og
+     med animationDuration inline, så intensjonen var utvetydig. */
+  .animate-fade-in {
+    animation: fadeIn var(--duration-normal) var(--ease-out) forwards;
+  }
+
+  /* BUG: .hover-scale ble brukt i ProjectsSection uten å være definert.
+     Selve skaleringen ligger i hover-blokken under. */
+  .hover-scale {
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  /* ── Hover-bevegelse ──────────────────────────────────────────────
+     Kun for ekte pekerenheter. På touch "henger" hover-tilstanden igjen
+     etter et trykk, så løfteffekter blir sittende fast. Skygge- og
+     opacity-hover står igjen i grunnreglene og gjelder overalt.
+     Se .claude/rules/bevegelse.md */
+  @media (hover: hover) and (pointer: fine) {
+    .card-hover-lift:hover        { transform: translateY(-4px); }
+    .interactive-card:hover       { transform: translateY(-4px); }
+    .image-hover:hover            { transform: scale(1.05); }
+    .hover-scale:hover            { transform: scale(1.02); }
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -655,78 +569,21 @@ html, body {
   }
 }
 
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+
+
+
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
 }
 
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 
-@keyframes subtlePulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 hsla(var(--success), 0.4);
-  }
-  50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 4px hsla(var(--success), 0);
-  }
-}
-
-@keyframes bounceDown {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(8px);
-  }
-}
-
-@keyframes iconBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@keyframes focusRing {
-  0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
-  100% { box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15); }
-}
-
-@keyframes progressFill {
-  0% { width: 0%; }
-  100% { width: 100%; }
-}
 
 /* Apple-style reveal animations */
 @keyframes revealUp {
@@ -751,16 +608,7 @@ html, body {
   }
 }
 
-@keyframes scrollPulse {
-  0%, 100% {
-    opacity: 0.6;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(8px);
-  }
-}
+
 
 /* Blog Content Styling - Theme-aware */
 .blog-content {
@@ -835,7 +683,7 @@ html, body {
 .blog-content a {
   color: hsl(var(--primary));
   text-decoration: underline;
-  transition: opacity 0.2s;
+  transition: opacity var(--duration-fast) var(--ease-out);
 }
 
 .blog-content a:hover {
@@ -876,18 +724,27 @@ html, body {
   }
 }
 
-/* Mobile optimization - Reduced motion for accessibility */
+/* Redusert bevegelse.
+   Regelen er "mildere", ikke "null": overganger på opacity og farge forklarer
+   fortsatt hva som skjer, de flytter bare ikke på noe. Den gamle varianten satte
+   transition-duration og animation-duration til 0.01ms på ALT — som også frøs
+   alle lastespinnere, og de er statusindikatorer brukeren trenger.
+   Se .claude/rules/bevegelse.md */
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-in-up,
-  .animate-fade-in-left,
-  .animate-fade-in-right,
-  .animate-scale-in {
-    animation: none !important;
-  }
-  
-  * {
-    transition-duration: 0.01ms !important;
+  *, *::before, *::after {
+    transition-property: opacity, background-color, border-color, color, fill, stroke !important;
+    transition-duration: var(--duration-fast) !important;
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Spinnere må fortsatt gå rundt. Vi gjenoppretter kun varighet og repetisjon
+     på den eksisterende regelen, så vi slipper å stole på at Tailwind har sendt
+     ut @keyframes spin i utilities-laget. */
+  .animate-spin {
+    animation-duration: 1s !important;
+    animation-iteration-count: infinite !important;
   }
 }
 
@@ -949,7 +806,7 @@ html, body {
     0 0 1px hsl(var(--foreground) / 0.05),
     inset 0 0.5px 0 hsl(var(--foreground) / 0.04);
   border-radius: 1.25rem;
-  transition: box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: box-shadow var(--duration-normal) var(--ease-out);
 }
 
 .glass-surface:hover {
@@ -960,48 +817,11 @@ html, body {
 }
 
 /* Elevated variant — hero phone bar, featured cards */
-.glass-surface-elevated {
-  background: linear-gradient(
-    135deg,
-    hsl(var(--primary) / 0.06) 0%,
-    hsl(var(--card) / 0.85) 40%,
-    hsl(var(--card) / 0.7) 100%
-  );
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border: 0.5px solid hsl(var(--foreground) / 0.08);
-  box-shadow:
-    0 8px 32px hsl(0 0% 0% / 0.12),
-    0 0 1px hsl(var(--foreground) / 0.08),
-    inset 0 1px 0 hsl(var(--foreground) / 0.06);
-  border-radius: 1.25rem;
-  position: relative;
-  overflow: hidden;
-  transition: box-shadow 0.25s cubic-bezier(0.25, 0.1, 0.25, 1),
-              transform 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
 
-.glass-surface-elevated::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 15%;
-  right: 15%;
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent,
-    hsl(var(--primary) / 0.2),
-    transparent);
-  z-index: 1;
-}
 
-.glass-surface-elevated:hover {
-  box-shadow:
-    0 12px 40px hsl(0 0% 0% / 0.16),
-    0 0 1px hsl(var(--foreground) / 0.1),
-    inset 0 1px 0 hsl(var(--foreground) / 0.08);
-  transform: translateY(-2px);
-}
+
+
+
 
 /* Service card glass — subtle primary tint */
 .glass-card {
@@ -1018,7 +838,7 @@ html, body {
   box-shadow:
     0 0 20px hsl(var(--primary) / 0.05),
     inset 0 1px 0 hsl(var(--primary) / 0.1);
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
   position: relative;
   overflow: hidden;
 }
@@ -1038,7 +858,6 @@ html, body {
 }
 
 .glass-card:hover {
-  transform: translateY(-2px);
   border-color: hsl(var(--primary) / 0.25);
   box-shadow:
     0 4px 30px hsl(var(--primary) / 0.1),
@@ -1055,16 +874,6 @@ html, body {
     135deg,
     hsl(var(--card) / 0.95) 0%,
     hsl(var(--card) / 0.85) 100%
-  );
-  border-color: hsl(var(--foreground) / 0.06);
-}
-
-:root:not(.dark):not(.blue) .glass-surface-elevated {
-  background: linear-gradient(
-    135deg,
-    hsl(var(--primary) / 0.04) 0%,
-    hsl(var(--card) / 0.92) 40%,
-    hsl(var(--card) / 0.82) 100%
   );
   border-color: hsl(var(--foreground) / 0.06);
 }
@@ -1089,10 +898,6 @@ html, body {
   border-color: hsl(var(--foreground) / 0.1);
 }
 
-.blue .glass-surface-elevated {
-  border-color: hsl(var(--foreground) / 0.12);
-}
-
 .blue .glass-card {
   border-color: hsl(var(--primary) / 0.2);
 }
@@ -1104,7 +909,7 @@ html, body {
 
 /* Rolig innfading når lazy-lastede seksjoner monteres */
 .lazy-section-in {
-  animation: lazy-section-fade 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: lazy-section-fade var(--duration-normal) var(--ease-out) both;
 }
 
 @keyframes lazy-section-fade {
@@ -1121,5 +926,13 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
   .lazy-section-in {
     animation: none;
+  }
+}
+
+/* Hover-bevegelse for glass-flatene — samme begrunnelse som blokken i
+   @layer components: løfteffekt kun på ekte pekerenheter. */
+@media (hover: hover) and (pointer: fine) {
+  .glass-card:hover {
+    transform: translateY(-2px);
   }
 }

@@ -12,16 +12,17 @@ import {
 import { NotificationListSkeleton } from '@/components/ui/skeleton-loaders';
 import { formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
+import { GRADIENT } from "@/lib/gradients";
 
 // Eksakte gradienter fra AdminDashboard (CATEGORY_GRADIENTS)
 const GRADIENTS = {
-  oppdrag:  'from-cyan-500 via-blue-500 to-indigo-600',
-  okonomi:  'from-emerald-500 via-teal-500 to-cyan-600',
-  innhold:  'from-fuchsia-500 via-purple-500 to-indigo-600',
-  mail:     'from-amber-500 via-orange-500 to-rose-600',
-  brukere:  'from-rose-500 via-pink-500 to-fuchsia-600',
-  redigering:'from-yellow-500 via-amber-500 to-orange-600',
-  logg:     'from-slate-500 via-gray-500 to-zinc-600',
+  oppdrag:  GRADIENT.hav,
+  okonomi:  GRADIENT.skog,
+  innhold:  GRADIENT.natt,
+  mail:     GRADIENT.solnedgang,
+  brukere:  GRADIENT.rose,
+  redigering:GRADIENT.sol,
+  logg:     GRADIENT.steinLys,
 };
 
 interface Notification {
